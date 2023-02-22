@@ -254,7 +254,7 @@ func TestTraceCall(t *testing.T) {
 			},
 			config:    nil,
 			expectErr: fmt.Errorf("block #%d not found", genBlocks+1),
-			//expect:    nil,
+			// expect:    nil,
 		},
 		// Standard JSON trace upon the latest block
 		{
@@ -564,7 +564,7 @@ func TestTracingWithOverrides(t *testing.T) {
 				From: &accounts[0].addr,
 				// BLOCKNUMBER PUSH1 MSTORE
 				Input: newRPCBytes(common.Hex2Bytes("4360005260206000f3")),
-				//&hexutil.Bytes{0x43}, // blocknumber
+				// &hexutil.Bytes{0x43}, // blocknumber
 			},
 			config: &TraceCallConfig{
 				BlockOverrides: &ethapi.BlockOverrides{Number: (*hexutil.Big)(big.NewInt(0x1337))},
@@ -640,7 +640,7 @@ func TestTracingWithOverrides(t *testing.T) {
 					},
 				},
 			},
-			//want: `{"gas":46900,"failed":false,"returnValue":"0000000000000000000000000000000000000000000000000000000000000539"}`,
+			// want: `{"gas":46900,"failed":false,"returnValue":"0000000000000000000000000000000000000000000000000000000000000539"}`,
 			want: `{"gas":44100,"failed":false,"returnValue":"0000000000000000000000000000000000000000000000000000000000000001"}`,
 		},
 		{ // No state override
@@ -847,7 +847,7 @@ func TestTraceChain(t *testing.T) {
 		//    value: 1000 wei
 		//    fee:   0 wei
 		for j := 0; j < i+1; j++ {
-			tx, _ := types.SignTx(types.NewTransaction(nonce, accounts[1].addr, big.NewInt(1000), params.TxGas, b.BaseFee(), nil), signer, accounts[0].key)
+			tx, _ := types.SignTx(types.NewTransaction(nonce, accounts[1].addr, big.NewInt(1000), vars.TxGas, b.BaseFee(), nil), signer, accounts[0].key)
 			b.AddTx(tx)
 			nonce += 1
 		}

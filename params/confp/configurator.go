@@ -520,7 +520,7 @@ func TimeForks(conf ctypes.ChainConfigurator) []uint64 {
 }
 
 func isBlockForkIncompatible(a, b, head *big.Int) bool {
-	return (isBlockForked(a, head) || isBlockForked(b, head)) && a.Cmp(b) != 0
+	return isBlockForked(a, head) != isBlockForked(b, head)
 }
 
 func isBlockForked(x, head *big.Int) bool {

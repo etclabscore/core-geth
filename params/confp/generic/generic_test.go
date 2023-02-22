@@ -289,7 +289,7 @@ func TestUnmarshalChainConfigurator2(t *testing.T) {
 				t.Fatal("wrong type", i, j)
 			}
 
-			compatErr := confp.Compatible(&head, gotOldConf, gotNewConf)
+			compatErr := confp.Compatible(new(big.Int).SetUint64(head), nil, gotOldConf, gotNewConf)
 			if compatErr != nil {
 				t.Error(compatErr, i, j)
 			}

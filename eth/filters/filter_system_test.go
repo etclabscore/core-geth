@@ -799,9 +799,9 @@ func TestLightFilterLogs(t *testing.T) {
 
 		key, _  = crypto.GenerateKey()
 		addr    = crypto.PubkeyToAddress(key.PublicKey)
-		genesis = &core.Genesis{Config: params.TestChainConfig,
-			Alloc: core.GenesisAlloc{
-				addr: {Balance: big.NewInt(params.Ether)},
+		genesis = &genesisT.Genesis{Config: params.TestChainConfig,
+			Alloc: genesisT.GenesisAlloc{
+				addr: {Balance: big.NewInt(vars.Ether)},
 			},
 		}
 		receipts = []*types.Receipt{{
@@ -819,7 +819,7 @@ func TestLightFilterLogs(t *testing.T) {
 		}
 		receipts[i-1].Bloom = types.CreateBloom(types.Receipts{receipts[i-1]})
 		b.AddUncheckedReceipt(receipts[i-1])
-		tx, _ := types.SignTx(types.NewTx(&types.LegacyTx{Nonce: uint64(i - 1), To: &common.Address{}, Value: big.NewInt(1000), Gas: params.TxGas, GasPrice: b.BaseFee(), Data: nil}), signer, key)
+		tx, _ := types.SignTx(types.NewTx(&types.LegacyTx{Nonce: uint64(i - 1), To: &common.Address{}, Value: big.NewInt(1000), Gas: vars.TxGas, GasPrice: b.BaseFee(), Data: nil}), signer, key)
 		b.AddTx(tx)
 	})
 	for i, block := range blocks {

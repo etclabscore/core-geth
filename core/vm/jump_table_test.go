@@ -17,18 +17,21 @@
 package vm
 
 import (
+	"math/big"
 	"testing"
 
+	"github.com/ethereum/go-ethereum/params"
 	"github.com/stretchr/testify/require"
 )
 
 // TestJumpTableCopy tests that deep copy is necessery to prevent modify shared jump table
 func TestJumpTableCopy(t *testing.T) {
-	tbl := newMergeInstructionSet()
+	zero := uint64(0)
+	tbl := instructionSetForConfig(params.TestChainConfig, true, big.NewInt(0), &zero)
 	require.Equal(t, uint64(0), tbl[SLOAD].constantGas)
 
 	// a deep copy won't modify the shared jump table
-	deepCopy := copyJumpTable(&tbl)
+	deepCopy := copyJumpTable(tbl)
 	deepCopy[SLOAD].constantGas = 100
 	require.Equal(t, uint64(100), deepCopy[SLOAD].constantGas)
 	require.Equal(t, uint64(0), tbl[SLOAD].constantGas)

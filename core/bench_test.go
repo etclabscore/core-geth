@@ -189,7 +189,7 @@ func benchInsertChain(b *testing.B, disk bool, gen func(int, *BlockGen)) {
 
 	// Generate a chain of b.N blocks using the supplied block
 	// generator function.
-	gspec := genesisT.Genesis{
+	gspec := &genesisT.Genesis{
 		Config: params.TestChainConfig,
 		Alloc:  genesisT.GenesisAlloc{benchRootAddr: {Balance: benchRootFunds}},
 	}

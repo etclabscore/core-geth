@@ -39,6 +39,7 @@ import (
 	"github.com/ethereum/go-ethereum/eth/tracers/logger"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
@@ -1465,7 +1466,7 @@ func TestEIP155Transition(t *testing.T) {
 				return types.SignTx(types.NewTransaction(block.TxNonce(address), common.Address{}, new(big.Int), 21000, new(big.Int), nil), signer, key)
 			}
 		)
-		switch blockIndex {
+		switch i {
 		case 0:
 			tx, err = basicTx(types.HomesteadSigner{})
 			if err != nil {
@@ -1635,7 +1636,7 @@ func TestBlockchainHeaderchainReorgConsistency(t *testing.T) {
 	// Generate a bunch of fork blocks, each side forking from the canonical chain
 	forks := make([]*types.Block, len(blocks))
 	for i := 0; i < len(forks); i++ {
-		parent := genesis.ToBlock()
+		parent := MustCommitGenesis(rawdb.NewMemoryDatabase(), genesis)
 		if i > 0 {
 			parent = blocks[i-1]
 		}
@@ -1680,7 +1681,7 @@ func TestTrieForkGC(t *testing.T) {
 	// Generate a bunch of fork blocks, each side forking from the canonical chain
 	forks := make([]*types.Block, len(blocks))
 	for i := 0; i < len(forks); i++ {
-		parent := genesis.ToBlock()
+		parent := MustCommitGenesis(rawdb.NewMemoryDatabase(), genesis)
 		if i > 0 {
 			parent = blocks[i-1]
 		}
@@ -2018,7 +2019,7 @@ func testSideImport(t *testing.T, numCanonBlocksInSidechain, blocksBetweenCommon
 		merger.FinalizePoS()
 		// Set the terminal total difficulty in the config
 		ttd := big.NewInt(int64(len(blocks)))
-		ttd.Mul(ttd, params.GenesisDifficulty)
+		ttd.Mul(ttd, vars.GenesisDifficulty)
 		gspec.Config.SetEthashTerminalTotalDifficulty(ttd)
 		mergeBlock = len(blocks)
 	}
@@ -2059,7 +2060,7 @@ func TestForkChoice_CommonAncestor(t *testing.T) {
 	genesis := params.DefaultMessNetGenesisBlock()
 	genesisB := MustCommitGenesis(db, genesis)
 
-	chain, err := NewBlockChain(db, nil, genesis.Config, engine, vm.Config{}, nil, nil)
+	chain, err := NewBlockChain(db, nil, genesis, nil, engine, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -2310,8 +2311,8 @@ func testInsertKnownChainDataWithMerging(t *testing.T, typ string, mergeHeight i
 	if mergeHeight == 1 {
 		// TTD is genesis diff + blocks
 		ttd := big.NewInt(1 + int64(len(blocks)))
-		ttd.Mul(ttd, params.GenesisDifficulty)
-		genesis.Config.TerminalTotalDifficulty = ttd
+		ttd.Mul(ttd, vars.GenesisDifficulty)
+		genesis.Config.SetEthashTerminalTotalDifficulty(ttd)
 		mergeBlock = uint64(len(blocks))
 	}
 	// Longer chain and shorter chain
@@ -2437,7 +2438,7 @@ func testInsertKnownChainDataWithMerging(t *testing.T, typ string, mergeHeight i
 }
 
 // getLongAndShortChains returns two chains: A is longer, B is heavier.
-func getLongAndShortChains() (*BlockChain, []*types.Block, []*types.Block, *Genesis, error) {
+func getLongAndShortChains() (*BlockChain, []*types.Block, []*types.Block, *genesisT.Genesis, error) {
 	// Generate a canonical chain to act as the main dataset
 	engine := ethash.NewFaker()
 	genesis := &genesisT.Genesis{
@@ -2634,7 +2635,8 @@ func TestTransactionIndices(t *testing.T) {
 	for _, l := range limit {
 		frdir := t.TempDir()
 		ancientDb, _ := rawdb.NewDatabaseWithFreezer(rawdb.NewMemoryDatabase(), frdir, "", false)
-		rawdb.WriteAncientBlocks(ancientDb, append([]*types.Block{gspec.ToBlock()}, blocks...), append([]types.Receipts{{}}, receipts...), big.NewInt(0))
+		genesisBlock := MustCommitGenesis(rawdb.NewMemoryDatabase(), gspec)
+		rawdb.WriteAncientBlocks(ancientDb, append([]*types.Block{genesisBlock}, blocks...), append([]types.Receipts{{}}, receipts...), big.NewInt(0))
 
 		l := l
 		chain, err := NewBlockChain(ancientDb, nil, gspec, nil, ethash.NewFaker(), vm.Config{}, nil, &l)
@@ -2657,7 +2659,8 @@ func TestTransactionIndices(t *testing.T) {
 	ancientDb, _ := rawdb.NewDatabaseWithFreezer(rawdb.NewMemoryDatabase(), t.TempDir(), "", false)
 	defer ancientDb.Close()
 
-	rawdb.WriteAncientBlocks(ancientDb, append([]*types.Block{gspec.ToBlock()}, blocks...), append([]types.Receipts{{}}, receipts...), big.NewInt(0))
+	genesisBlock := MustCommitGenesis(rawdb.NewMemoryDatabase(), gspec)
+	rawdb.WriteAncientBlocks(ancientDb, append([]*types.Block{genesisBlock}, blocks...), append([]types.Receipts{{}}, receipts...), big.NewInt(0))
 	limit = []uint64{0, 64 /* drop stale */, 32 /* shorten history */, 64 /* extend history */, 0 /* restore all */}
 	for _, l := range limit {
 		l := l
@@ -2685,7 +2688,7 @@ func TestSkipStaleTxIndicesInSnapSync(t *testing.T) {
 		signer  = types.LatestSigner(gspec.Config)
 	)
 	_, blocks, receipts := GenerateChainWithGenesis(gspec, ethash.NewFaker(), 128, func(i int, block *BlockGen) {
-		tx, err := types.SignTx(types.NewTransaction(block.TxNonce(address), common.Address{0x00}, big.NewInt(1000), params.TxGas, block.header.BaseFee, nil), signer, key)
+		tx, err := types.SignTx(types.NewTransaction(block.TxNonce(address), common.Address{0x00}, big.NewInt(1000), vars.TxGas, block.header.BaseFee, nil), signer, key)
 		if err != nil {
 			panic(err)
 		}
@@ -3736,7 +3739,7 @@ func TestSetCanonical(t *testing.T) {
 	)
 	// Generate and import the canonical chain
 	_, canon, _ := GenerateChainWithGenesis(gspec, engine, 2*TriesInMemory, func(i int, gen *BlockGen) {
-		tx, err := types.SignTx(types.NewTransaction(gen.TxNonce(address), common.Address{0x00}, big.NewInt(1000), params.TxGas, gen.header.BaseFee, nil), signer, key)
+		tx, err := types.SignTx(types.NewTransaction(gen.TxNonce(address), common.Address{0x00}, big.NewInt(1000), vars.TxGas, gen.header.BaseFee, nil), signer, key)
 		if err != nil {
 			panic(err)
 		}
@@ -3754,7 +3757,7 @@ func TestSetCanonical(t *testing.T) {
 
 	// Generate the side chain and import them
 	_, side, _ := GenerateChainWithGenesis(gspec, engine, 2*TriesInMemory, func(i int, gen *BlockGen) {
-		tx, err := types.SignTx(types.NewTransaction(gen.TxNonce(address), common.Address{0x00}, big.NewInt(1), params.TxGas, gen.header.BaseFee, nil), signer, key)
+		tx, err := types.SignTx(types.NewTransaction(gen.TxNonce(address), common.Address{0x00}, big.NewInt(1), vars.TxGas, gen.header.BaseFee, nil), signer, key)
 		if err != nil {
 			panic(err)
 		}
@@ -3909,16 +3912,16 @@ func TestTxIndexer(t *testing.T) {
 		testBankAddress = crypto.PubkeyToAddress(testBankKey.PublicKey)
 		testBankFunds   = big.NewInt(1000000000000000000)
 
-		gspec = &Genesis{
+		gspec = &genesisT.Genesis{
 			Config:  params.TestChainConfig,
-			Alloc:   GenesisAlloc{testBankAddress: {Balance: testBankFunds}},
-			BaseFee: big.NewInt(params.InitialBaseFee),
+			Alloc:   genesisT.GenesisAlloc{testBankAddress: {Balance: testBankFunds}},
+			BaseFee: big.NewInt(vars.InitialBaseFee),
 		}
 		engine = ethash.NewFaker()
 		nonce  = uint64(0)
 	)
 	_, blocks, receipts := GenerateChainWithGenesis(gspec, engine, 128, func(i int, gen *BlockGen) {
-		tx, _ := types.SignTx(types.NewTransaction(nonce, common.HexToAddress("0xdeadbeef"), big.NewInt(1000), params.TxGas, big.NewInt(10*params.InitialBaseFee), nil), types.HomesteadSigner{}, testBankKey)
+		tx, _ := types.SignTx(types.NewTransaction(nonce, common.HexToAddress("0xdeadbeef"), big.NewInt(1000), vars.TxGas, big.NewInt(10*vars.InitialBaseFee), nil), types.HomesteadSigner{}, testBankKey)
 		gen.AddTx(tx)
 		nonce += 1
 	})
@@ -4082,7 +4085,8 @@ func TestTxIndexer(t *testing.T) {
 	for _, c := range cases {
 		frdir := t.TempDir()
 		db, _ := rawdb.NewDatabaseWithFreezer(rawdb.NewMemoryDatabase(), frdir, "", false)
-		rawdb.WriteAncientBlocks(db, append([]*types.Block{gspec.ToBlock()}, blocks...), append([]types.Receipts{{}}, receipts...), big.NewInt(0))
+		genesisBlock := MustCommitGenesis(rawdb.NewMemoryDatabase(), gspec)
+		rawdb.WriteAncientBlocks(db, append([]*types.Block{genesisBlock}, blocks...), append([]types.Receipts{{}}, receipts...), big.NewInt(0))
 
 		// Index the initial blocks from ancient store
 		chain, _ := NewBlockChain(db, nil, gspec, nil, engine, vm.Config{}, nil, &c.limitA)
@@ -4112,7 +4116,7 @@ func TestCreateThenDeletePreByzantium(t *testing.T) {
 	// We use Ropsten chain config instead of Testchain config, this is
 	// deliberate: we want to use pre-byz rules where we have intermediate state roots
 	// between transactions.
-	testCreateThenDelete(t, &params.ChainConfig{
+	testCreateThenDelete(t, &goethereum.ChainConfig{
 		ChainID:        big.NewInt(3),
 		HomesteadBlock: big.NewInt(0),
 		EIP150Block:    big.NewInt(0),
@@ -4127,7 +4131,7 @@ func TestCreateThenDeletePostByzantium(t *testing.T) {
 
 // testCreateThenDelete tests a creation and subsequent deletion of a contract, happening
 // within the same block.
-func testCreateThenDelete(t *testing.T, config *params.ChainConfig) {
+func testCreateThenDelete(t *testing.T, config ctypes.ChainConfigurator) {
 	var (
 		engine = ethash.NewFaker()
 		// A sender who makes transactions, has some funds
@@ -4154,9 +4158,9 @@ func testCreateThenDelete(t *testing.T, config *params.ChainConfig) {
 		byte(vm.PUSH1), 0x0, // offset
 		byte(vm.RETURN), // return 3 bytes of zero-code
 	}...)
-	gspec := &Genesis{
+	gspec := &genesisT.Genesis{
 		Config: config,
-		Alloc: GenesisAlloc{
+		Alloc: genesisT.GenesisAlloc{
 			address: {Balance: funds},
 		},
 	}
@@ -4241,9 +4245,9 @@ func TestTransientStorageReset(t *testing.T) {
 		byte(vm.PUSH1), 0x0, // offset
 		byte(vm.RETURN), // return 6 bytes of zero-code
 	}...)
-	gspec := &Genesis{
+	gspec := &genesisT.Genesis{
 		Config: params.TestChainConfig,
-		Alloc: GenesisAlloc{
+		Alloc: genesisT.GenesisAlloc{
 			address: {Balance: funds},
 		},
 	}
@@ -4306,11 +4310,11 @@ func TestEIP3651(t *testing.T) {
 		key2, _ = crypto.HexToECDSA("8a1f9a8f95be41cd7ccb6168179afb4504aefe388d1e14474d32c45c72ce7b7a")
 		addr1   = crypto.PubkeyToAddress(key1.PublicKey)
 		addr2   = crypto.PubkeyToAddress(key2.PublicKey)
-		funds   = new(big.Int).Mul(common.Big1, big.NewInt(params.Ether))
+		funds   = new(big.Int).Mul(common.Big1, big.NewInt(vars.Ether))
 		config  = *params.AllEthashProtocolChanges
-		gspec   = &Genesis{
+		gspec   = &genesisT.Genesis{
 			Config: &config,
-			Alloc: GenesisAlloc{
+			Alloc: genesisT.GenesisAlloc{
 				addr1: {Balance: funds},
 				addr2: {Balance: funds},
 				// The address 0xAAAA sloads 0x00 and 0x01
@@ -4344,18 +4348,18 @@ func TestEIP3651(t *testing.T) {
 		}
 	)
 
-	gspec.Config.BerlinBlock = common.Big0
-	gspec.Config.LondonBlock = common.Big0
-	gspec.Config.TerminalTotalDifficulty = common.Big0
-	gspec.Config.TerminalTotalDifficultyPassed = true
-	gspec.Config.ShanghaiTime = u64(0)
+	gspec.Config.(*goethereum.ChainConfig).BerlinBlock = common.Big0
+	gspec.Config.(*goethereum.ChainConfig).LondonBlock = common.Big0
+	gspec.Config.(*goethereum.ChainConfig).TerminalTotalDifficulty = common.Big0
+	gspec.Config.(*goethereum.ChainConfig).TerminalTotalDifficultyPassed = true
+	gspec.Config.(*goethereum.ChainConfig).ShanghaiTime = u64(0)
 	signer := types.LatestSigner(gspec.Config)
 
 	_, blocks, _ := GenerateChainWithGenesis(gspec, engine, 1, func(i int, b *BlockGen) {
 		b.SetCoinbase(aa)
 		// One transaction to Coinbase
 		txdata := &types.DynamicFeeTx{
-			ChainID:    gspec.Config.ChainID,
+			ChainID:    gspec.Config.GetChainID(),
 			Nonce:      0,
 			To:         &bb,
 			Gas:        500000,
@@ -4380,8 +4384,8 @@ func TestEIP3651(t *testing.T) {
 	block := chain.GetBlockByNumber(1)
 
 	// 1+2: Ensure EIP-1559 access lists are accounted for via gas usage.
-	innerGas := vm.GasQuickStep*2 + params.ColdSloadCostEIP2929*2
-	expectedGas := params.TxGas + 5*vm.GasFastestStep + vm.GasQuickStep + 100 + innerGas // 100 because 0xaaaa is in access list
+	innerGas := vm.GasQuickStep*2 + vars.ColdSloadCostEIP2929*2
+	expectedGas := vars.TxGas + 5*vm.GasFastestStep + vm.GasQuickStep + 100 + innerGas // 100 because 0xaaaa is in access list
 	if block.GasUsed() != expectedGas {
 		t.Fatalf("incorrect amount of gas spent: expected %d, got %d", expectedGas, block.GasUsed())
 	}

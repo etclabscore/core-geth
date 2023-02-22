@@ -60,8 +60,8 @@ func TestDAOForkRangeExtradata(t *testing.T) {
 	conConf.HomesteadBlock = big.NewInt(0)
 	conConf.DAOForkBlock = forkBlock
 	conConf.DAOForkSupport = false
-	congspec := &Genesis{
-		BaseFee: big.NewInt(params.InitialBaseFee),
+	congspec := &genesisT.Genesis{
+		BaseFee: big.NewInt(vars.InitialBaseFee),
 		Config:  &conConf,
 	}
 	conBc, _ := NewBlockChain(conDb, nil, congspec, nil, ethash.NewFaker(), vm.Config{}, nil, nil)

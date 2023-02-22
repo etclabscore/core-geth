@@ -1116,7 +1116,7 @@ func TestWithdrawals(t *testing.T) {
 	}
 	for i, w := range blockParams.Withdrawals {
 		// w.Amount is in gwei, balance in wei
-		if db.GetBalance(w.Address).Uint64() != w.Amount*params.GWei {
+		if db.GetBalance(w.Address).Uint64() != w.Amount*vars.GWei {
 			t.Fatalf("failed to process withdrawal %d", i)
 		}
 	}

@@ -22,6 +22,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/vm"
+	"github.com/ethereum/go-ethereum/tests"
 	big2 "github.com/holiman/big"
 )
 
@@ -40,7 +41,7 @@ func Fuzz(input []byte) int {
 		return -1
 	}
 	// Abort on too expensive inputs
-	precomp := vm.PrecompiledContractsBerlin[common.BytesToAddress([]byte{5})]
+	precomp := vm.PrecompiledContractsForConfig(tests.Forks["Byzantium"], common.Big0)[common.BytesToAddress([]byte{5})]
 	if gas := precomp.RequiredGas(input); gas > 40_000_000 {
 		return 0
 	}

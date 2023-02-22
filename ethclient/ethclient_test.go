@@ -999,11 +999,6 @@ waiting:
 			t.Errorf("hash: want: %s, got: %s", b.Hash().Hex()[:8], got[i].Hash().Hex()[:8])
 		}
 	}
-
-	if t.Failed() {
-		unAuthed, authed := backend.GetAPIs()
-		t.Logf("backend APIS: unAuthed=%v authed=%v", unAuthed, authed)
-	}
 }
 
 // mustNewTestBackend is the same logic as newTestBackend(t *testing.T) but without the testing.T argument.

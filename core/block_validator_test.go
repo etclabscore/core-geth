@@ -88,7 +88,7 @@ func TestHeaderVerificationForMergingEthash(t *testing.T) { testHeaderVerificati
 // Tests the verification for eth1/2 merging, including pre-merge and post-merge
 func testHeaderVerificationForMerging(t *testing.T, isClique bool) {
 	var (
-		gspec      *Genesis
+		gspec      *genesisT.Genesis
 		preBlocks  []*types.Block
 		postBlocks []*types.Block
 		engine     consensus.Engine
@@ -130,21 +130,21 @@ func testHeaderVerificationForMerging(t *testing.T, isClique bool) {
 			td += int(block.Difficulty().Uint64())
 		}
 		preBlocks = blocks
-		gspec.Config.SetTerminalTotalDifficulty(big.NewInt(int64(td))) // PTAL-meowsbits Use setter instead of var assign.
+		gspec.Config.SetEthashTerminalTotalDifficulty(big.NewInt(int64(td))) // PTAL-meowsbits Use setter instead of var assign.
 		postBlocks, _ = GenerateChain(gspec.Config, preBlocks[len(preBlocks)-1], engine, genDb, 8, nil)
 	} else {
 		config := *params.TestChainConfig
 		gspec = &genesisT.Genesis{Config: &config}
 		engine = beacon.New(ethash.NewFaker())
-		td := int(params.GenesisDifficulty.Uint64()) // FIXME?-meowsbits vars.MinimumDifficulty?
+		td := int(vars.GenesisDifficulty.Uint64()) // FIXME?-meowsbits vars.MinimumDifficulty?
 		genDb, blocks, _ := GenerateChainWithGenesis(gspec, engine, 8, nil)
 		for _, block := range blocks {
 			// calculate td
 			td += int(block.Difficulty().Uint64())
 		}
 		preBlocks = blocks
-		gspec.Config.SetTerminalTotalDifficulty(big.NewInt(int64(td)))
-		t.Logf("Set ttd to %v\n", gspec.Config.TerminalTotalDifficulty)
+		gspec.Config.SetEthashTerminalTotalDifficulty(big.NewInt(int64(td)))
+		t.Logf("Set ttd to %v\n", gspec.Config.GetEthashTerminalTotalDifficulty())
 		postBlocks, _ = GenerateChain(gspec.Config, preBlocks[len(preBlocks)-1], engine, genDb, 8, func(i int, gen *BlockGen) {
 			gen.SetPoS()
 		})

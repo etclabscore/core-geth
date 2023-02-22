@@ -30,7 +30,7 @@ func runMESSTest2(t *testing.T, enableMess bool, easyL, hardL, caN int, easyT, h
 	genesis := params.DefaultMessNetGenesisBlock()
 	genesisB := MustCommitGenesis(db, genesis)
 
-	chain, err := NewBlockChain(db, nil, genesis.Config, engine, vm.Config{}, nil, nil)
+	chain, err := NewBlockChain(db, nil, genesis, nil, engine, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -211,7 +211,7 @@ func TestAFKnownBlock(t *testing.T) {
 	// genesis.Timestamp = 1
 	genesisB := MustCommitGenesis(db, genesis)
 
-	chain, err := NewBlockChain(db, nil, genesis.Config, engine, vm.Config{}, nil, nil)
+	chain, err := NewBlockChain(db, nil, genesis, nil, engine, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -364,7 +364,7 @@ func TestGenerateChainTargetingHashrate(t *testing.T) {
 	// genesis.Timestamp = 1
 	genesisB := MustCommitGenesis(db, genesis)
 
-	chain, err := NewBlockChain(db, nil, genesis.Config, engine, vm.Config{}, nil, nil)
+	chain, err := NewBlockChain(db, nil, genesis, nil, engine, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -433,7 +433,7 @@ func runMESSTest(t *testing.T, easyL, hardL, caN int, easyT, hardT int64) (hardH
 	genesis := params.DefaultMessNetGenesisBlock()
 	genesisB := MustCommitGenesis(db, genesis)
 
-	chain, err := NewBlockChain(db, nil, genesis.Config, engine, vm.Config{}, nil, nil)
+	chain, err := NewBlockChain(db, nil, genesis, nil, engine, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -735,7 +735,7 @@ func TestBlockChain_AF_Difficulty_Develop(t *testing.T) {
 	// genesis.Timestamp = 1
 	genesisB := MustCommitGenesis(db, genesis)
 
-	chain, err := NewBlockChain(db, nil, genesis.Config, engine, vm.Config{}, nil, nil)
+	chain, err := NewBlockChain(db, nil, genesis, nil, engine, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

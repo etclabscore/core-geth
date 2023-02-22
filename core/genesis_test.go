@@ -45,7 +45,7 @@ func TestSetupGenesisBlock(t *testing.T) {
 
 	defaultGenesisBlock := params.DefaultGenesisBlock()
 
-	config, hash, err := SetupGenesisBlock(db, defaultGenesisBlock)
+	config, hash, err := SetupGenesisBlock(db, trie.NewDatabase(db), defaultGenesisBlock)
 	if err != nil {
 		t.Errorf("err: %v", err)
 	}
@@ -60,7 +60,7 @@ func TestSetupGenesisBlock(t *testing.T) {
 
 	classicGenesisBlock := params.DefaultClassicGenesisBlock()
 
-	clConfig, clHash, clErr := SetupGenesisBlock(db, classicGenesisBlock)
+	clConfig, clHash, clErr := SetupGenesisBlock(db, trie.NewDatabase(db), classicGenesisBlock)
 	if clErr != nil {
 		t.Errorf("err: %v", clErr)
 	}
@@ -141,7 +141,7 @@ func TestSetupGenesis(t *testing.T) {
 			name: "custom block in DB, genesis == goerli",
 			fn: func(db ethdb.Database) (ctypes.ChainConfigurator, common.Hash, error) {
 				MustCommitGenesis(db, &customg)
-				return SetupGenesisBlock(db, trie.NewDatabase(db), DefaultGoerliGenesisBlock())
+				return SetupGenesisBlock(db, trie.NewDatabase(db), params.DefaultGoerliGenesisBlock())
 			},
 			wantErr:    &genesisT.GenesisMismatchError{Stored: customghash, New: params.GoerliGenesisHash},
 			wantHash:   params.GoerliGenesisHash,
@@ -150,7 +150,7 @@ func TestSetupGenesis(t *testing.T) {
 		{
 			name: "compatible config in DB",
 			fn: func(db ethdb.Database) (ctypes.ChainConfigurator, common.Hash, error) {
-				MustCommitGenesis(db, oldcustomg)
+				MustCommitGenesis(db, &oldcustomg)
 				return SetupGenesisBlock(db, trie.NewDatabase(db), &customg)
 			},
 			wantHash:   customghash,
@@ -174,7 +174,7 @@ func TestSetupGenesis(t *testing.T) {
 			},
 			wantHash:   customghash,
 			wantConfig: customg.Config,
-			wantErr: &params.ConfigCompatError{
+			wantErr: &confp.ConfigCompatError{
 				What:          "Homestead fork block",
 				StoredBlock:   big.NewInt(2),
 				NewBlock:      big.NewInt(3),
@@ -235,7 +235,7 @@ func TestSetupGenesisBlockOldVsNewMultigeth(t *testing.T) {
 	}
 
 	// Set it up.
-	config, hash, err := SetupGenesisBlock(db, genA)
+	config, hash, err := SetupGenesisBlock(db, trie.NewDatabase(db), genA)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -256,14 +256,14 @@ func TestSetupGenesisBlockOldVsNewMultigeth(t *testing.T) {
 	}
 
 	headHeight := big.NewInt(9700559)
-	headTime := 9700559
+	headTime := uint64(9700559)
 	headHash := common.HexToHash("0xe618c1b2d738dfa09052e199e5870274f09eb83c684a8a2c194b82dedc00a977")
 	rawdb.WriteHeadHeaderHash(db, headHash)
 	rawdb.WriteHeaderNumber(db, headHash, headHeight.Uint64())
 
 	genB := params.DefaultClassicGenesisBlock()
 
-	newConfig, newHash, err := SetupGenesisBlock(db, genB)
+	newConfig, newHash, err := SetupGenesisBlock(db, trie.NewDatabase(db), genB)
 	if err != nil {
 		t.Fatal("incompat conf", err)
 	}
@@ -277,10 +277,10 @@ func TestSetupGenesisBlockOldVsNewMultigeth(t *testing.T) {
 
 	// These should be redundant to the SetupGenesisBlock method, but this is
 	// for double double double extra sureness.
-	if compatErr := confp.Compatible(headHeight, headTime, genA, genB); compatErr != nil {
+	if compatErr := confp.Compatible(headHeight, &headTime, genA, genB); compatErr != nil {
 		t.Fatal(err)
 	}
-	if compatErr := confp.Compatible(headHeight, headTime, config, newConfig); compatErr != nil {
+	if compatErr := confp.Compatible(headHeight, &headTime, config, newConfig); compatErr != nil {
 		t.Fatal(err)
 	}
 }
@@ -374,7 +374,7 @@ func TestSetupGenesisBlock2(t *testing.T) {
 	genHash := common.HexToHash("0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3")
 	headHash := common.HexToHash("0xe618c1b2d738dfa09052e199e5870274f09eb83c684a8a2c194b82dedc00a977")
 
-	_, hash, err := SetupGenesisBlock(db, params.DefaultClassicGenesisBlock())
+	_, hash, err := SetupGenesisBlock(db, trie.NewDatabase(db), params.DefaultClassicGenesisBlock())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -405,7 +405,7 @@ func TestSetupGenesisBlock2(t *testing.T) {
 	rawdb.WriteHeaderNumber(db, headHash, headHeight)
 
 	// Setup genesis again, but now with contemporary chain config, ie v1.9.7+
-	conf2, hash2, err := SetupGenesisBlock(db, params.DefaultClassicGenesisBlock())
+	conf2, hash2, err := SetupGenesisBlock(db, trie.NewDatabase(db), params.DefaultClassicGenesisBlock())
 	if err != nil {
 		t.Fatal(err)
 	}

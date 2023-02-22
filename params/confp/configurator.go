@@ -23,7 +23,6 @@ import (
 	"reflect"
 	"regexp"
 	"sort"
-	"strings"
 
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
@@ -46,8 +45,17 @@ func nameSignalsCompatibility(name string) bool {
 	return false
 }
 
+var (
+	blockTransitionNamePattern = regexp.MustCompile(`(?m)^Get.+Transition$`)
+	timeTransitionNamePattern  = regexp.MustCompile(`(?m)^Get.+TransitionTime$`)
+)
+
+func nameSignalsBlockBasedFork(name string) bool {
+	return blockTransitionNamePattern.MatchString(name)
+}
+
 func nameSignalsTimeBasedFork(name string) bool {
-	return regexp.MustCompile("Time").MatchString(name)
+	return timeTransitionNamePattern.MatchString(name)
 }
 
 // ConfigCompatError is raised if the locally-stored blockchain is initialised with a
@@ -217,7 +225,7 @@ func compatible(headBlock *big.Int, headTime *uint64, a, b ctypes.ChainConfigura
 				continue
 			}
 			// Skip time-based forks. These are checked separately.
-			if nameSignalsTimeBasedFork(aNames[i]) {
+			if !nameSignalsBlockBasedFork(aNames[i]) {
 				continue
 			}
 
@@ -433,7 +441,7 @@ func Transitions(conf ctypes.ChainConfigurator) (fns []func() *uint64, names []s
 	k := reflect.TypeOf(conf)
 	for i := 0; i < k.NumMethod(); i++ {
 		method := k.Method(i)
-		if !strings.HasPrefix(method.Name, "Get") || !strings.HasSuffix(method.Name, "Transition") {
+		if !nameSignalsBlockBasedFork(method.Name) && !nameSignalsTimeBasedFork(method.Name) {
 			continue
 		}
 		m := reflect.ValueOf(conf).MethodByName(method.Name).Interface()

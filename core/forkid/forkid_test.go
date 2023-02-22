@@ -183,45 +183,45 @@ func TestCreation(t *testing.T) {
 			params.ClassicChainConfig,
 			params.MainnetGenesisHash,
 			[]testcase{
-				{0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
-				{1, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
-				{2, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
-				{3, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
-				{9, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
-				{10, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
-				{1149999, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
-				{1150000, ID{Hash: checksumToBytes(0x97c2c34c), Next: 2500000}},
-				{1150001, ID{Hash: checksumToBytes(0x97c2c34c), Next: 2500000}},
-				{2499999, ID{Hash: checksumToBytes(0x97c2c34c), Next: 2500000}},
-				{2500000, ID{Hash: checksumToBytes(0xdb06803f), Next: 3000000}},
-				{2500001, ID{Hash: checksumToBytes(0xdb06803f), Next: 3000000}},
-				{2999999, ID{Hash: checksumToBytes(0xdb06803f), Next: 3000000}},
-				{3000000, ID{Hash: checksumToBytes(0xaff4bed4), Next: 5000000}},
-				{3000001, ID{Hash: checksumToBytes(0xaff4bed4), Next: 5000000}},
-				{4999999, ID{Hash: checksumToBytes(0xaff4bed4), Next: 5000000}},
-				{5000000, ID{Hash: checksumToBytes(0xf79a63c0), Next: 5900000}},
-				{5000001, ID{Hash: checksumToBytes(0xf79a63c0), Next: 5900000}},
-				{5899999, ID{Hash: checksumToBytes(0xf79a63c0), Next: 5900000}},
-				{5900000, ID{Hash: checksumToBytes(0x744899d6), Next: 8772000}},
-				{5900001, ID{Hash: checksumToBytes(0x744899d6), Next: 8772000}},
-				{8771999, ID{Hash: checksumToBytes(0x744899d6), Next: 8772000}},
-				{8772000, ID{Hash: checksumToBytes(0x518b59c6), Next: 9573000}},
-				{8772001, ID{Hash: checksumToBytes(0x518b59c6), Next: 9573000}},
-				{9572999, ID{Hash: checksumToBytes(0x518b59c6), Next: 9573000}},
-				{9573000, ID{Hash: checksumToBytes(0x7ba22882), Next: 10500839}},
-				{9573001, ID{Hash: checksumToBytes(0x7ba22882), Next: 10500839}},
-				{10500838, ID{Hash: checksumToBytes(0x7ba22882), Next: 10500839}},
-				{10500839, ID{Hash: checksumToBytes(0x9007bfcc), Next: 11_700_000}},
-				{10500840, ID{Hash: checksumToBytes(0x9007bfcc), Next: 11_700_000}},
-				{11_699_999, ID{Hash: checksumToBytes(0x9007bfcc), Next: 11_700_000}},
-				{11_700_000, ID{Hash: checksumToBytes(0xdb63a1ca), Next: 13_189_133}},
-				{11_700_001, ID{Hash: checksumToBytes(0xdb63a1ca), Next: 13_189_133}},
-				{13_189_132, ID{Hash: checksumToBytes(0xdb63a1ca), Next: 13_189_133}},
-				{13_189_133, ID{Hash: checksumToBytes(0x0f6bf187), Next: 14_525_000}},
-				{13_189_134, ID{Hash: checksumToBytes(0x0f6bf187), Next: 14_525_000}},
-				{14_524_999, ID{Hash: checksumToBytes(0x0f6bf187), Next: 14_525_000}},
-				{14_525_000, ID{Hash: checksumToBytes(0x7fd1bb25), Next: 0}},
-				{14_525_001, ID{Hash: checksumToBytes(0x7fd1bb25), Next: 0}},
+				{0, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
+				{1, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
+				{2, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
+				{3, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
+				{9, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
+				{10, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
+				{1149999, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
+				{1150000, 0, ID{Hash: checksumToBytes(0x97c2c34c), Next: 2500000}},
+				{1150001, 0, ID{Hash: checksumToBytes(0x97c2c34c), Next: 2500000}},
+				{2499999, 0, ID{Hash: checksumToBytes(0x97c2c34c), Next: 2500000}},
+				{2500000, 0, ID{Hash: checksumToBytes(0xdb06803f), Next: 3000000}},
+				{2500001, 0, ID{Hash: checksumToBytes(0xdb06803f), Next: 3000000}},
+				{2999999, 0, ID{Hash: checksumToBytes(0xdb06803f), Next: 3000000}},
+				{3000000, 0, ID{Hash: checksumToBytes(0xaff4bed4), Next: 5000000}},
+				{3000001, 0, ID{Hash: checksumToBytes(0xaff4bed4), Next: 5000000}},
+				{4999999, 0, ID{Hash: checksumToBytes(0xaff4bed4), Next: 5000000}},
+				{5000000, 0, ID{Hash: checksumToBytes(0xf79a63c0), Next: 5900000}},
+				{5000001, 0, ID{Hash: checksumToBytes(0xf79a63c0), Next: 5900000}},
+				{5899999, 0, ID{Hash: checksumToBytes(0xf79a63c0), Next: 5900000}},
+				{5900000, 0, ID{Hash: checksumToBytes(0x744899d6), Next: 8772000}},
+				{5900001, 0, ID{Hash: checksumToBytes(0x744899d6), Next: 8772000}},
+				{8771999, 0, ID{Hash: checksumToBytes(0x744899d6), Next: 8772000}},
+				{8772000, 0, ID{Hash: checksumToBytes(0x518b59c6), Next: 9573000}},
+				{8772001, 0, ID{Hash: checksumToBytes(0x518b59c6), Next: 9573000}},
+				{9572999, 0, ID{Hash: checksumToBytes(0x518b59c6), Next: 9573000}},
+				{9573000, 0, ID{Hash: checksumToBytes(0x7ba22882), Next: 10500839}},
+				{9573001, 0, ID{Hash: checksumToBytes(0x7ba22882), Next: 10500839}},
+				{10500838, 0, ID{Hash: checksumToBytes(0x7ba22882), Next: 10500839}},
+				{10500839, 0, ID{Hash: checksumToBytes(0x9007bfcc), Next: 11_700_000}},
+				{10500840, 0, ID{Hash: checksumToBytes(0x9007bfcc), Next: 11_700_000}},
+				{11_699_999, 0, ID{Hash: checksumToBytes(0x9007bfcc), Next: 11_700_000}},
+				{11_700_000, 0, ID{Hash: checksumToBytes(0xdb63a1ca), Next: 13_189_133}},
+				{11_700_001, 0, ID{Hash: checksumToBytes(0xdb63a1ca), Next: 13_189_133}},
+				{13_189_132, 0, ID{Hash: checksumToBytes(0xdb63a1ca), Next: 13_189_133}},
+				{13_189_133, 0, ID{Hash: checksumToBytes(0x0f6bf187), Next: 14_525_000}},
+				{13_189_134, 0, ID{Hash: checksumToBytes(0x0f6bf187), Next: 14_525_000}},
+				{14_524_999, 0, ID{Hash: checksumToBytes(0x0f6bf187), Next: 14_525_000}},
+				{14_525_000, 0, ID{Hash: checksumToBytes(0x7fd1bb25), Next: 0}},
+				{14_525_001, 0, ID{Hash: checksumToBytes(0x7fd1bb25), Next: 0}},
 			},
 		},
 		{
@@ -229,22 +229,22 @@ func TestCreation(t *testing.T) {
 			params.KottiChainConfig,
 			params.KottiGenesisHash,
 			[]testcase{
-				{0, ID{Hash: checksumToBytes(0x0550152e), Next: 716617}},
-				{716616, ID{Hash: checksumToBytes(0x0550152e), Next: 716617}},
-				{716617, ID{Hash: checksumToBytes(0xa3270822), Next: 1705549}},
-				{716618, ID{Hash: checksumToBytes(0xa3270822), Next: 1705549}},
-				{1705548, ID{Hash: checksumToBytes(0xa3270822), Next: 1705549}},
-				{1705549, ID{Hash: checksumToBytes(0x8f3698e0), Next: 2200013}},
-				{1705550, ID{Hash: checksumToBytes(0x8f3698e0), Next: 2200013}},
-				{2200012, ID{Hash: checksumToBytes(0x8f3698e0), Next: 2200013}},
-				{2200013, ID{Hash: checksumToBytes(0x6f402821), Next: 4_368_634}},
-				{2200014, ID{Hash: checksumToBytes(0x6f402821), Next: 4_368_634}},
-				{4_368_633, ID{Hash: checksumToBytes(0x6f402821), Next: 4_368_634}},
-				{4_368_634, ID{Hash: checksumToBytes(0xf03e54e7), Next: 5_578_000}},
-				{4_368_635, ID{Hash: checksumToBytes(0xf03e54e7), Next: 5_578_000}},
-				{5_577_999, ID{Hash: checksumToBytes(0xf03e54e7), Next: 5_578_000}},
-				{5_578_000, ID{Hash: checksumToBytes(0xc5459816), Next: 0}},
-				{5_578_001, ID{Hash: checksumToBytes(0xc5459816), Next: 0}},
+				{0, 0, ID{Hash: checksumToBytes(0x0550152e), Next: 716617}},
+				{716616, 0, ID{Hash: checksumToBytes(0x0550152e), Next: 716617}},
+				{716617, 0, ID{Hash: checksumToBytes(0xa3270822), Next: 1705549}},
+				{716618, 0, ID{Hash: checksumToBytes(0xa3270822), Next: 1705549}},
+				{1705548, 0, ID{Hash: checksumToBytes(0xa3270822), Next: 1705549}},
+				{1705549, 0, ID{Hash: checksumToBytes(0x8f3698e0), Next: 2200013}},
+				{1705550, 0, ID{Hash: checksumToBytes(0x8f3698e0), Next: 2200013}},
+				{2200012, 0, ID{Hash: checksumToBytes(0x8f3698e0), Next: 2200013}},
+				{2200013, 0, ID{Hash: checksumToBytes(0x6f402821), Next: 4_368_634}},
+				{2200014, 0, ID{Hash: checksumToBytes(0x6f402821), Next: 4_368_634}},
+				{4_368_633, 0, ID{Hash: checksumToBytes(0x6f402821), Next: 4_368_634}},
+				{4_368_634, 0, ID{Hash: checksumToBytes(0xf03e54e7), Next: 5_578_000}},
+				{4_368_635, 0, ID{Hash: checksumToBytes(0xf03e54e7), Next: 5_578_000}},
+				{5_577_999, 0, ID{Hash: checksumToBytes(0xf03e54e7), Next: 5_578_000}},
+				{5_578_000, 0, ID{Hash: checksumToBytes(0xc5459816), Next: 0}},
+				{5_578_001, 0, ID{Hash: checksumToBytes(0xc5459816), Next: 0}},
 			},
 		},
 		{
@@ -252,26 +252,26 @@ func TestCreation(t *testing.T) {
 			params.MordorChainConfig,
 			params.MordorGenesisHash,
 			[]testcase{
-				{0, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
-				{1, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
-				{2, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
-				{3, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
-				{9, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
-				{10, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
-				{301242, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
-				{301243, ID{Hash: checksumToBytes(0x604f6ee1), Next: 999983}},
-				{301244, ID{Hash: checksumToBytes(0x604f6ee1), Next: 999983}},
-				{999982, ID{Hash: checksumToBytes(0x604f6ee1), Next: 999983}},
-				{999983, ID{Hash: checksumToBytes(0xf42f5539), Next: 2_520_000}},
-				{999984, ID{Hash: checksumToBytes(0xf42f5539), Next: 2_520_000}},
-				{2_519_999, ID{Hash: checksumToBytes(0xf42f5539), Next: 2_520_000}},
-				{2_520_000, ID{Hash: checksumToBytes(0x66b5c286), Next: 3_985_893}},
-				{3_985_892, ID{Hash: checksumToBytes(0x66b5c286), Next: 3_985_893}},
-				{3_985_893, ID{Hash: checksumToBytes(0x92b323e0), Next: 5_520_000}},
-				{3_985_894, ID{Hash: checksumToBytes(0x92b323e0), Next: 5_520_000}},
-				{5_519_999, ID{Hash: checksumToBytes(0x92b323e0), Next: 5_520_000}},
-				{5_520_000, ID{Hash: checksumToBytes(0x8c9b1797), Next: 0}},
-				{5_520_001, ID{Hash: checksumToBytes(0x8c9b1797), Next: 0}},
+				{0, 0, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
+				{1, 0, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
+				{2, 0, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
+				{3, 0, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
+				{9, 0, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
+				{10, 0, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
+				{301242, 0, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
+				{301243, 0, ID{Hash: checksumToBytes(0x604f6ee1), Next: 999983}},
+				{301244, 0, ID{Hash: checksumToBytes(0x604f6ee1), Next: 999983}},
+				{999982, 0, ID{Hash: checksumToBytes(0x604f6ee1), Next: 999983}},
+				{999983, 0, ID{Hash: checksumToBytes(0xf42f5539), Next: 2_520_000}},
+				{999984, 0, ID{Hash: checksumToBytes(0xf42f5539), Next: 2_520_000}},
+				{2_519_999, 0, ID{Hash: checksumToBytes(0xf42f5539), Next: 2_520_000}},
+				{2_520_000, 0, ID{Hash: checksumToBytes(0x66b5c286), Next: 3_985_893}},
+				{3_985_892, 0, ID{Hash: checksumToBytes(0x66b5c286), Next: 3_985_893}},
+				{3_985_893, 0, ID{Hash: checksumToBytes(0x92b323e0), Next: 5_520_000}},
+				{3_985_894, 0, ID{Hash: checksumToBytes(0x92b323e0), Next: 5_520_000}},
+				{5_519_999, 0, ID{Hash: checksumToBytes(0x92b323e0), Next: 5_520_000}},
+				{5_520_000, 0, ID{Hash: checksumToBytes(0x8c9b1797), Next: 0}},
+				{5_520_001, 0, ID{Hash: checksumToBytes(0x8c9b1797), Next: 0}},
 			},
 		},
 		// MintMe test cases
@@ -280,8 +280,8 @@ func TestCreation(t *testing.T) {
 			params.MintMeChainConfig,
 			params.MintMeGenesisHash,
 			[]testcase{
-				{0, ID{Hash: checksumToBytes(0x02bf4180), Next: 252500}},
-				{252500, ID{Hash: checksumToBytes(0x50aed09f), Next: 0}},
+				{0, 0, ID{Hash: checksumToBytes(0x02bf4180), Next: 252500}},
+				{252500, 0, ID{Hash: checksumToBytes(0x50aed09f), Next: 0}},
 			},
 		},
 	}
@@ -302,7 +302,7 @@ func TestValidation(t *testing.T) {
 	timestampedConfig.ShanghaiTime = u64(1668000000)
 
 	tests := []struct {
-		config *params.ChainConfig
+		config ctypes.ChainConfigurator
 		head   uint64
 		time   uint64
 		id     ID
@@ -536,7 +536,7 @@ func TestValidation(t *testing.T) {
 	for i, tt := range tests {
 		filter := newFilter(tt.config, params.MainnetGenesisHash, func() (uint64, uint64) { return tt.head, tt.time })
 		if err := filter(tt.id); err != tt.err {
-			t.Errorf("test %d, head: %d: validation error mismatch: have %v, want %v", i, tt.head, err, tt.err)
+			t.Errorf("test %d, head: %d: validation error mismatch: have %v, want %v\nConfig=%s", i, tt.head, err, tt.err, tt.config)
 		}
 	}
 }
@@ -605,14 +605,14 @@ func TestGatherForks(t *testing.T) {
 		return false
 	}
 	for _, c := range cases {
-		gotForkNs := gatherForks(c.config)
-		if len(gotForkNs) != len(c.wantNs) {
+		blockForks, _ := gatherForks(c.config)
+		if len(blockForks) != len(c.wantNs) {
 			for _, n := range c.wantNs {
-				if !sliceContains(gotForkNs, n) {
+				if !sliceContains(blockForks, n) {
 					t.Errorf("config=%s missing wanted fork at block number: %d", c.name, n)
 				}
 			}
-			for _, n := range gotForkNs {
+			for _, n := range blockForks {
 				if !sliceContains(c.wantNs, n) {
 					t.Errorf("config=%s gathered unwanted fork at block number: %d", c.name, n)
 				}
@@ -680,13 +680,14 @@ func TestGenerateSpecificationCases(t *testing.T) {
 	}
 	for _, tt := range tests {
 		cs := []uint64{0}
-		for _, f := range gatherForks(tt.config) {
+		blockForks, _ := gatherForks(tt.config)
+		for _, f := range blockForks {
 			cs = append(cs, f-1, f, f+1)
 		}
 		fmt.Printf("##### %s\n", tt.name)
 		fmt.Println()
 		fmt.Printf("- Genesis Hash: `0x%x`\n", tt.genesisHash)
-		forks := gatherForks(tt.config)
+		forks, _ := gatherForks(tt.config)
 		forksS := []string{}
 		for _, fi := range forks {
 			forksS = append(forksS, strconv.Itoa(int(fi)))
@@ -696,7 +697,7 @@ func TestGenerateSpecificationCases(t *testing.T) {
 		fmt.Println("| Head Block Number | `FORK_HASH` | `FORK_NEXT` | RLP Encoded (Hex) |")
 		fmt.Println("| --- | --- | --- | --- |")
 		for _, c := range cs {
-			id := NewID(tt.config, tt.genesisHash, c)
+			id := NewID(tt.config, tt.genesisHash, c, 0)
 			isCanonical := false
 			for _, fi := range forks {
 				if c == fi {

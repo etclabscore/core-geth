@@ -533,7 +533,7 @@ func assertEqual(orig *Transaction, cpy *Transaction) error {
 }
 
 func TestTransactionSizes(t *testing.T) {
-	signer := NewLondonSigner(big.NewInt(123))
+	signer := NewEIP1559Signer(big.NewInt(123))
 	key, _ := crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 	to := common.HexToAddress("0x01")
 	for i, txdata := range []TxData{

@@ -210,7 +210,7 @@ func compatible(headBlock *big.Int, headTime *uint64, a, b ctypes.ChainConfigura
 	bFns, _ := Transitions(b)
 	// Handle forks by block.
 	if headBlock != nil {
-		for i, afn := range aFns {
+		for i := range aFns {
 			// Skip cross-compatible namespaced transition names, assuming
 			// these will not be enforced as hardforks.
 			if nameSignalsCompatibility(aNames[i]) {
@@ -232,7 +232,7 @@ func compatible(headBlock *big.Int, headTime *uint64, a, b ctypes.ChainConfigura
 			// Call the respective functions; these return pointers.
 			// We need to dereference them to get the actual values for the comparison
 			// before converting to big.Int pointers for the actual check.
-			av := afn()
+			av := aFns[i]()
 			bv := bFns[i]()
 			var aBig, bBig *big.Int
 			if av != nil {
@@ -520,7 +520,21 @@ func TimeForks(conf ctypes.ChainConfigurator) []uint64 {
 }
 
 func isBlockForkIncompatible(a, b, head *big.Int) bool {
-	return isBlockForked(a, head) != isBlockForked(b, head)
+	// If the head is nil, then either fork config is ok. Return incompatible = false.
+	if head == nil {
+		return false
+	}
+	// If one config is forked and the other not, return incompatible = true.
+	if isBlockForked(a, head) != isBlockForked(b, head) {
+		return true
+	}
+	// If they are both forked, then we need to check if they are/were forked at the same block.
+	// Note that we could technically only check one (since we know they are both forked or both not forked),
+	// but checking them both because it is more explicit.
+	if isBlockForked(a, head) && isBlockForked(b, head) {
+		return a.Cmp(b) != 0
+	}
+	return false
 }
 
 func isBlockForked(x, head *big.Int) bool {

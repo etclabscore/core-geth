@@ -57,6 +57,7 @@ func TestCheckCompatible(t *testing.T) {
 			headBlock: 9,
 			wantErr:   nil,
 		},
+		// case index 4
 		{
 			stored:    AllEthashProtocolChanges,
 			new:       &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), HomesteadBlock: nil},
@@ -68,7 +69,7 @@ func TestCheckCompatible(t *testing.T) {
 				RewindToBlock: 0,
 			},
 		},
-		// 4
+		// 5
 		{
 			stored:    AllEthashProtocolChanges,
 			new:       &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), HomesteadBlock: big.NewInt(1)},
@@ -80,7 +81,9 @@ func TestCheckCompatible(t *testing.T) {
 				RewindToBlock: 0,
 			},
 		},
-		// 5
+		// 6
+		// Want the EIP150 block error because it is below the head block AND below the Homestead blocks.
+		// The compat error should always be the earliest fork block incompatibility.
 		{
 			stored:    &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), HomesteadBlock: big.NewInt(30), EIP150Block: big.NewInt(10)},
 			new:       &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), HomesteadBlock: big.NewInt(25), EIP150Block: big.NewInt(20)},
@@ -92,7 +95,7 @@ func TestCheckCompatible(t *testing.T) {
 				RewindToBlock: 9,
 			},
 		},
-		// 6
+		// 7
 		{
 			stored:    &coregeth.CoreGethChainConfig{Ethash: new(ctypes.EthashConfig), EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(30)},
 			new:       &coregeth.CoreGethChainConfig{Ethash: new(ctypes.EthashConfig), EIP100FBlock: big.NewInt(24), EIP649FBlock: big.NewInt(24)},
@@ -104,21 +107,21 @@ func TestCheckCompatible(t *testing.T) {
 				RewindToBlock: 23,
 			},
 		},
-		// 7
+		// 8
 		{
 			stored:    &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), ByzantiumBlock: big.NewInt(30)},
 			new:       &coregeth.CoreGethChainConfig{Ethash: new(ctypes.EthashConfig), EIP211FBlock: big.NewInt(26)},
 			headBlock: 25,
 			wantErr:   nil,
 		},
-		// 8
+		// 9
 		{
 			stored:    &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), ByzantiumBlock: big.NewInt(30)},
 			new:       &coregeth.CoreGethChainConfig{Ethash: new(ctypes.EthashConfig), EIP100FBlock: big.NewInt(26), EIP649FBlock: big.NewInt(26)},
 			headBlock: 25,
 			wantErr:   nil,
 		},
-		// 9
+		// 10
 		{
 			stored: MainnetChainConfig,
 			new: func() ctypes.ChainConfigurator {

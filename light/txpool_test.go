@@ -53,20 +53,20 @@ func (r *testTxRelay) Discard(hashes []common.Hash) {
 	r.discard <- len(hashes)
 }
 
-const poolTestTxsN = 1000
-const poolTestBlocksN = 100
+const poolTestTxs = 1000
+const poolTestBlocks = 100
 
 // test tx 0..n-1
-var testTxSet [poolTestTxsN]*types.Transaction
+var testTxSet [poolTestTxs]*types.Transaction
 
 // txs sent before block i
 func sentTx(i int) int {
-	return int(math.Pow(float64(i)/float64(poolTestBlocksN), 0.9) * poolTestTxsN)
+	return int(math.Pow(float64(i)/float64(poolTestBlocks), 0.9) * poolTestTxs)
 }
 
 // txs included in block i or before that (minedTx(i) <= sentTx(i))
 func minedTx(i int) int {
-	return int(math.Pow(float64(i)/float64(poolTestBlocksN), 1.1) * poolTestTxsN)
+	return int(math.Pow(float64(i)/float64(poolTestBlocks), 1.1) * poolTestTxs)
 }
 
 func txPoolTestChainGen(i int, block *core.BlockGen) {

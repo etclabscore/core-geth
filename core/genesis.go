@@ -434,7 +434,7 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 	}
 	var withdrawals []*types.Withdrawal
 	if g.Config != nil && g.Config.IsEnabledByTime(g.Config.GetEIP4895TransitionTime, &g.Timestamp) {
-		head.WithdrawalsHash = &types.EmptyRootHash
+		head.WithdrawalsHash = &types.EmptyWithdrawalsHash
 		withdrawals = make([]*types.Withdrawal, 0)
 	}
 	return types.NewBlock(head, nil, nil, nil, trie.NewStackTrie(nil)).WithWithdrawals(withdrawals)

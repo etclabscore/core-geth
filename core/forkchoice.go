@@ -134,16 +134,19 @@ func (f *ForkChoice) ReorgNeeded(current *types.Header, extern *types.Header) (b
 	// Local and external difficulty is identical.
 	// Second clause in the if statement reduces the vulnerability to selfish mining.
 	// Please refer to http://www.cs.cornell.edu/~ie53/publications/btcProcFC.pdf
-	reorg := false
-	externNum, localNum := extern.Number.Uint64(), current.Number.Uint64()
-	if externNum < localNum {
-		reorg = true
-	} else if externNum == localNum {
-		var currentPreserve, externPreserve bool
-		if f.preserve != nil {
-			currentPreserve, externPreserve = f.preserve(current), f.preserve(extern)
+	reorg := externTd.Cmp(localTD) > 0
+	tie := externTd.Cmp(localTD) == 0
+	if tie {
+		externNum, localNum := extern.Number.Uint64(), current.Number.Uint64()
+		if externNum < localNum {
+			reorg = true
+		} else if externNum == localNum {
+			var currentPreserve, externPreserve bool
+			if f.preserve != nil {
+				currentPreserve, externPreserve = f.preserve(current), f.preserve(extern)
+			}
+			reorg = !currentPreserve && (externPreserve || f.rand.Float64() < 0.5)
 		}
-		reorg = !currentPreserve && (externPreserve || f.rand.Float64() < 0.5)
 	}
 
 	// If reorg is not needed (false), then we can just return.

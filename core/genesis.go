@@ -117,7 +117,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, gen
 			return genesis.Config, common.Hash{}, err
 		}
 		applyOverrides(genesis.Config)
-		log.Info("Wrote custom genesis block OK", "config", genesis.Config)
+		log.Info("Wrote genesis block OK", "config", genesis.Config)
 		return genesis.Config, block.Hash(), nil
 	}
 	// We have the genesis block in database(perhaps in ancient database)

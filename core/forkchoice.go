@@ -115,12 +115,22 @@ func (f *ForkChoice) ReorgNeeded(current *types.Header, extern *types.Header) (b
 		return true, nil
 	}
 
-	// If the total difficulty is higher than our known, add it to the canonical chain
-	if diff := externTd.Cmp(localTD); diff > 0 {
-		return true, nil
-	} else if diff < 0 {
-		return false, nil
-	}
+	// // If the total difficulty is higher than our known, add it to the canonical chain
+	// if diff := externTd.Cmp(localTD); diff > 0 {
+	// 	return true, nil
+	// } else if diff < 0 {
+	// 	return false, nil
+	// }
+	/*
+		This is chunk was added with the following commit, citing it to be logically inoperative.
+		etclabscore/core-geth omits it because of subsequent Artifical Finality checks on the reorg var.
+
+			core: clarify code in forkchoice (#26257)
+
+			refactoring without logic change
+			0dc9b01c github.com/setunapo 20221128
+	*/
+
 	// Local and external difficulty is identical.
 	// Second clause in the if statement reduces the vulnerability to selfish mining.
 	// Please refer to http://www.cs.cornell.edu/~ie53/publications/btcProcFC.pdf

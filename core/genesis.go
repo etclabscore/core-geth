@@ -220,10 +220,12 @@ func LoadCliqueConfig(db ethdb.Database, genesis *genesisT.Genesis) (*ctypes.Cli
 	if stored != (common.Hash{}) {
 		storedcfg := rawdb.ReadChainConfig(db, stored)
 		if storedcfg != nil {
-			return &ctypes.CliqueConfig{
-				Period: storedcfg.GetCliquePeriod(),
-				Epoch:  storedcfg.GetCliqueEpoch(),
-			}, nil
+			if storedcfg.GetConsensusEngineType() == ctypes.ConsensusEngineT_Clique {
+				return &ctypes.CliqueConfig{
+					Period: storedcfg.GetCliquePeriod(),
+					Epoch:  storedcfg.GetCliqueEpoch(),
+				}, nil
+			}
 		}
 	}
 	// Load the clique config from the provided genesis specification.
@@ -240,10 +242,12 @@ func LoadCliqueConfig(db ethdb.Database, genesis *genesisT.Genesis) (*ctypes.Cli
 		if stored != (common.Hash{}) && genesisBlock.Hash() != stored {
 			return nil, &genesisT.GenesisMismatchError{stored, genesisBlock.Hash()}
 		}
-		return &ctypes.CliqueConfig{
-			Period: genesis.Config.GetCliquePeriod(),
-			Epoch:  genesis.Config.GetCliqueEpoch(),
-		}, nil
+		if genesis.Config.GetConsensusEngineType() == ctypes.ConsensusEngineT_Clique {
+			return &ctypes.CliqueConfig{
+				Period: genesis.Config.GetCliquePeriod(),
+				Epoch:  genesis.Config.GetCliqueEpoch(),
+			}, nil
+		}
 	}
 	// There is no stored chain config and no new config provided,
 	// In this case the default chain config(mainnet) will be used,

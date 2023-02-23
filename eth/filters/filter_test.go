@@ -82,7 +82,7 @@ func BenchmarkFilters(b *testing.B) {
 	// The test txs are not properly signed, can't simply create a chain
 	// and then import blocks. TODO(rjl493456442) try to get rid of the
 	// manual database writes.
-	gspec.MustCommit(db)
+	core.MustCommitGenesis(db, gspec)
 
 	for i, block := range chain {
 		rawdb.WriteBlock(db, block)
@@ -170,7 +170,7 @@ func TestFilters(t *testing.T) {
 	// The test txs are not properly signed, can't simply create a chain
 	// and then import blocks. TODO(rjl493456442) try to get rid of the
 	// manual database writes.
-	gspec.MustCommit(db)
+	core.MustCommitGenesis(db, gspec)
 	for i, block := range chain {
 		rawdb.WriteBlock(db, block)
 		rawdb.WriteCanonicalHash(db, block.Hash(), block.NumberU64())

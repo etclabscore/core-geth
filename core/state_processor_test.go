@@ -213,7 +213,8 @@ func TestStateProcessorErrors(t *testing.T) {
 				want: "could not apply tx 0 [0xd82a0c2519acfeac9a948258c47e784acd20651d9d80f9a1c67b4137651c3a24]: insufficient funds for gas * price + value: address 0x71562b71999873DB5b286dF957af199Ec94617F7 have 1000000000000000000 want 2431633873983640103894990685182446064918669677978451844828609264166175722438635000",
 			},
 		} {
-			block := GenerateBadBlock(gspec.ToBlock(), ethash.NewFaker(), tt.txs, gspec.Config)
+			genesisBlock := MustCommitGenesis(rawdb.NewMemoryDatabase(), gspec)
+			block := GenerateBadBlock(genesisBlock, ethash.NewFaker(), tt.txs, gspec.Config)
 			_, err := blockchain.InsertChain(types.Blocks{block})
 			if err == nil {
 				t.Fatal("block imported without errors")
@@ -339,16 +340,16 @@ func TestStateProcessorErrors(t *testing.T) {
 					TerminalTotalDifficultyPassed: true,
 					ShanghaiTime:                  u64(0),
 				},
-				Alloc: GenesisAlloc{
-					common.HexToAddress("0x71562b71999873DB5b286dF957af199Ec94617F7"): GenesisAccount{
+				Alloc: genesisT.GenesisAlloc{
+					common.HexToAddress("0x71562b71999873DB5b286dF957af199Ec94617F7"): genesisT.GenesisAccount{
 						Balance: big.NewInt(1000000000000000000), // 1 ether
 						Nonce:   0,
 					},
 				},
 			}
-			genesis        = gspec.MustCommit(db)
+			genesis        = MustCommitGenesis(db, gspec)
 			blockchain, _  = NewBlockChain(db, nil, gspec, nil, beacon.New(ethash.NewFaker()), vm.Config{}, nil, nil)
-			tooBigInitCode = [params.MaxInitCodeSize + 1]byte{}
+			tooBigInitCode = make([]byte, vars.MaxInitCodeSize+1)
 			smallInitCode  = [320]byte{}
 		)
 		defer blockchain.Stop()
@@ -408,7 +409,7 @@ func GenerateBadBlock(parent *types.Block, engine consensus.Engine, txs types.Tr
 	if config.IsEnabled(config.GetEIP1559Transition, header.Number) {
 		header.BaseFee = misc.CalcBaseFee(config, parent.Header())
 	}
-	if config.IsShanghai(header.Time) { // FIXME-meowsbits re: withdrawals eip
+	if config.IsEnabledByTime(config.GetEIP4895TransitionTime, &header.Time) {
 		header.WithdrawalsHash = &types.EmptyRootHash
 	}
 	var receipts []*types.Receipt
@@ -428,7 +429,7 @@ func GenerateBadBlock(parent *types.Block, engine consensus.Engine, txs types.Tr
 	}
 	header.Root = common.BytesToHash(hasher.Sum(nil))
 	// Assemble and return the final block for sealing
-	if config.IsShanghai(header.Time) {
+	if config.IsEnabledByTime(config.GetEIP4895TransitionTime, &header.Time) {
 		return types.NewBlockWithWithdrawals(header, txs, nil, receipts, []*types.Withdrawal{}, trie.NewStackTrie(nil))
 	}
 	return types.NewBlock(header, txs, nil, receipts, trie.NewStackTrie(nil))

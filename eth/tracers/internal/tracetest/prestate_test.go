@@ -30,6 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/eth/tracers"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/tests"
 )
 
@@ -45,11 +46,11 @@ type account struct {
 
 // testcase defines a single test to check the stateDiff tracer against.
 type testcase struct {
-	Genesis      *core.Genesis   `json:"genesis"`
-	Context      *callContext    `json:"context"`
-	Input        string          `json:"input"`
-	TracerConfig json.RawMessage `json:"tracerConfig"`
-	Result       interface{}     `json:"result"`
+	Genesis      *genesisT.Genesis `json:"genesis"`
+	Context      *callContext      `json:"context"`
+	Input        string            `json:"input"`
+	TracerConfig json.RawMessage   `json:"tracerConfig"`
+	Result       interface{}       `json:"result"`
 }
 
 func TestPrestateTracerLegacy(t *testing.T) {

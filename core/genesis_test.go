@@ -175,7 +175,7 @@ func TestSetupGenesis(t *testing.T) {
 			wantHash:   customghash,
 			wantConfig: customg.Config,
 			wantErr: &confp.ConfigCompatError{
-				What:          "Homestead fork block",
+				What:          "incompatible fork value: GetEIP2Transition",
 				StoredBlock:   big.NewInt(2),
 				NewBlock:      big.NewInt(3),
 				RewindToBlock: 1,

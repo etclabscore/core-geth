@@ -2521,15 +2521,22 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readonly bool) (*core.BlockCh
 		Fatalf("%v", err)
 	}
 	ethashConfig := ethconfig.Defaults.Ethash
+
+	// ETC-specific configuration: ECIP1099 modifies the original Ethash algo, doubling the epoch size.
+	ethashConfig.ECIP1099Block = gspec.GetEthashECIP1099Transition()
+
+	var lyra2Config *lyra2.Config
+	if ctx.Bool(MintMeFlag.Name) {
+		lyra2Config = &lyra2.Config{}
+	}
+
+	// Toggle PoW modes at user request.
 	if ctx.Bool(FakePoWFlag.Name) {
 		ethashConfig.PowMode = ethash.ModeFake
 	} else if ctx.Bool(FakePoWPoissonFlag.Name) {
 		ethashConfig.PowMode = ethash.ModePoissonFake
 	}
-	var lyra2Config *lyra2.Config
-	if ctx.Bool(MintMeFlag.Name) {
-		lyra2Config = &lyra2.Config{}
-	}
+
 	engine := ethconfig.CreateConsensusEngine(stack, &ethashConfig, cliqueConfig, lyra2Config, nil, false, chainDb)
 	if gcmode := ctx.String(GCModeFlag.Name); gcmode != "full" && gcmode != "archive" {
 		Fatalf("--%s must be either 'full' or 'archive'", GCModeFlag.Name)

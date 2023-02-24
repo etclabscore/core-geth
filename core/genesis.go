@@ -240,7 +240,7 @@ func LoadCliqueConfig(db ethdb.Database, genesis *genesisT.Genesis) (*ctypes.Cli
 		// is matched.
 		genesisBlock := MustCommitGenesis(rawdb.NewMemoryDatabase(), genesis)
 		if stored != (common.Hash{}) && genesisBlock.Hash() != stored {
-			return nil, &genesisT.GenesisMismatchError{stored, genesisBlock.Hash()}
+			return nil, &genesisT.GenesisMismatchError{Stored: stored, New: genesisBlock.Hash()}
 		}
 		if genesis.Config.GetConsensusEngineType() == ctypes.ConsensusEngineT_Clique {
 			return &ctypes.CliqueConfig{

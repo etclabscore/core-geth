@@ -77,6 +77,7 @@ func isLittleEndian() bool {
 }
 
 // uint32Array2ByteArray returns the bytes represented by uint32 array c
+// nolint:unused
 func uint32Array2ByteArray(c []uint32) []byte {
 	buf := make([]byte, len(c)*4)
 	if isLittleEndian() {
@@ -93,6 +94,7 @@ func uint32Array2ByteArray(c []uint32) []byte {
 
 // bytes2Keccak256 returns the keccak256 hash as a hex string (0x prefixed)
 // for a given uint32 array (cache/dataset)
+// nolint:unused
 func uint32Array2Keccak256(data []uint32) string {
 	// convert to bytes
 	bytes := uint32Array2ByteArray(data)

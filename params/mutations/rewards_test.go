@@ -307,13 +307,16 @@ func (c *expectedRewardCase) String() string {
 //
 // An example of output:
 // ----
+//
 //	{
 //		// mainnet
 //		{
 //			block:   big.NewInt(2),
 //			rewards: calculateExpectedEraRewards(era1, 1),
 //		},
+//
 // ...
+//
 //		{
 //			block:   big.NewInt(20000000),
 //			rewards: calculateExpectedEraRewards(era4, 1),

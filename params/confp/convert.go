@@ -28,12 +28,10 @@ import (
 func CloneChainConfigurator(from ctypes.ChainConfigurator) (ctypes.ChainConfigurator, error) {
 	// Use a hardcoded switch on known types implementing the ChainConfigurator interface.
 	// Reflection would be more elegant, but it's not worth the conceptual overhead.
-	var to ctypes.ChainConfigurator
-
 	// Note that reflect.New will create a new value which is initialized to its zero value
 	// (so it will not be a copy of the original).
 	// https://stackoverflow.com/a/37851764
-	to = reflect.New(reflect.ValueOf(from).Elem().Type()).Interface().(ctypes.ChainConfigurator)
+	to := reflect.New(reflect.ValueOf(from).Elem().Type()).Interface().(ctypes.ChainConfigurator)
 
 	// To complete the clone, we crush the original into the zero-value copy.
 	if err := Crush(to, from, true); err != nil {
@@ -144,7 +142,6 @@ func Crush(dest, source interface{}, crushZeroValues bool) error {
 		default:
 			return ctypes.UnsupportedConfigError(ctypes.ErrUnsupportedConfigFatal, "consensus engine", ctypes.ConsensusEngineT_Unknown)
 		}
-
 	}
 next:
 	return nil

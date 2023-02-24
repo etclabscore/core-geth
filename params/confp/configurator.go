@@ -562,13 +562,3 @@ func isTimeForked(x, head *uint64) bool {
 	}
 	return *x <= *head
 }
-
-func u2Equal(x, y *big.Int) bool {
-	if x == nil {
-		return y == nil
-	}
-	if y == nil {
-		return x == nil
-	}
-	return x.Cmp(y) == 0
-}

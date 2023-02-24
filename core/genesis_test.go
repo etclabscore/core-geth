@@ -181,7 +181,6 @@ func TestSetupGenesis(t *testing.T) {
 	}
 
 	for _, test := range tests {
-
 		db := rawdb.NewMemoryDatabase()
 		config, hash, err := test.fn(db)
 		// Check the return values.

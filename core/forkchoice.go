@@ -123,7 +123,7 @@ func (f *ForkChoice) ReorgNeeded(current *types.Header, extern *types.Header) (b
 	// }
 	/*
 		This is chunk was added with the following commit, citing it to be logically inoperative.
-		etclabscore/core-geth omits it because of subsequent Artifical Finality checks on the reorg var.
+		etclabscore/core-geth omits it because of subsequent Artificial Finality checks on the reorg var.
 
 			core: clarify code in forkchoice (#26257)
 

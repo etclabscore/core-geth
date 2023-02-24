@@ -143,14 +143,23 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 	// Transfer mining-related config to the ethash config.
 	ethashConfig := config.Ethash
 	ethashConfig.NotifyFull = config.Miner.NotifyFull
+
+	if config.Genesis != nil && config.Genesis.Config != nil {
+		ethashConfig.ECIP1099Block = config.Genesis.GetEthashECIP1099Transition()
+	}
+
 	cliqueConfig, err := core.LoadCliqueConfig(chainDb, config.Genesis)
 	if err != nil {
 		return nil, err
 	}
+
 	var lyra2Config *lyra2.Config
-	if config.Genesis != nil && config.Genesis.Config != nil && config.Genesis.Config.GetConsensusEngineType() == ctypes.ConsensusEngineT_Lyra2 {
-		lyra2Config = &lyra2.Config{}
+	if config.Genesis != nil && config.Genesis.Config != nil {
+		if config.Genesis.Config.GetConsensusEngineType() == ctypes.ConsensusEngineT_Lyra2 {
+			lyra2Config = &lyra2.Config{}
+		}
 	}
+
 	engine := ethconfig.CreateConsensusEngine(stack, &ethashConfig, cliqueConfig, lyra2Config, config.Miner.Notify, config.Miner.Noverify, chainDb)
 
 	eth := &Ethereum{

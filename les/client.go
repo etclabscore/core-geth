@@ -123,6 +123,8 @@ func New(stack *node.Node, config *ethconfig.Config) (*LightEthereum, error) {
 		}
 	} else if chainConfig.GetConsensusEngineType() == ctypes.ConsensusEngineT_Lyra2 {
 		lyra2Config = &lyra2.Config{}
+	} else if chainConfig.GetConsensusEngineType() == ctypes.ConsensusEngineT_Ethash {
+		config.Ethash.ECIP1099Block = chainConfig.GetEthashECIP1099Transition()
 	}
 
 	peers := newServerPeerSet()

@@ -49,7 +49,7 @@ var parityErrorMappingStartingWith = map[string]string{
 
 func init() {
 	// type ctorFn = func(*tracers.Context, json.RawMessage) (tracers.Tracer, error)
-	register("callTracerParity", NewCallParityTracer)
+	tracers.DefaultDirectory.Register("callTracerParity", NewCallParityTracer, false)
 }
 
 // callParityFrame is the result of a callParityTracerParity run.

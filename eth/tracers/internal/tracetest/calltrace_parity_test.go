@@ -43,10 +43,11 @@ type callTraceParity struct {
 
 // callTracerParityTest defines a single test to check the call tracer against.
 type callTracerParityTest struct {
-	Genesis *genesisT.Genesis  `json:"genesis"`
-	Context *callContext       `json:"context"`
-	Input   string             `json:"input"`
-	Result  *[]callTraceParity `json:"result"`
+	Genesis      *genesisT.Genesis  `json:"genesis"`
+	Context      *callContext       `json:"context"`
+	Input        string             `json:"input"`
+	TracerConfig json.RawMessage    `json:"tracerConfig"`
+	Result       *[]callTraceParity `json:"result"`
 }
 
 func callTracerParityTestRunner(tracerName string, filename string, dirPath string, t testing.TB) error {
@@ -82,7 +83,7 @@ func callTracerParityTestRunner(tracerName string, filename string, dirPath stri
 	_, statedb := tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false)
 
 	// Create the tracer, the EVM environment and run it
-	tracer, err := tracers.New(tracerName, new(tracers.Context), nil)
+	tracer, err := tracers.DefaultDirectory.New(tracerName, new(tracers.Context), test.TracerConfig)
 	if err != nil {
 		return fmt.Errorf("failed to create call tracer: %v", err)
 	}
@@ -203,6 +204,7 @@ type stateDiffTest struct {
 	Context        *callContext            `json:"context"`
 	Input          *ethapi.TransactionArgs `json:"input"`
 	StateOverrides *ethapi.StateOverride
+	TracerConfig   json.RawMessage                       `json:"tracerConfig"`
 	Result         *map[common.Address]*stateDiffAccount `json:"result"`
 }
 
@@ -247,7 +249,7 @@ func stateDiffTracerTestRunner(tracerName string, filename string, dirPath strin
 	}
 
 	// Create the tracer, the EVM environment and run it
-	tracer, err := tracers.New(tracerName, new(tracers.Context), nil)
+	tracer, err := tracers.DefaultDirectory.New(tracerName, new(tracers.Context), test.TracerConfig)
 	if err != nil {
 		return fmt.Errorf("failed to create state diff tracer: %v", err)
 	}

@@ -2523,7 +2523,7 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readonly bool) (*core.BlockCh
 	ethashConfig := ethconfig.Defaults.Ethash
 
 	// ETC-specific configuration: ECIP1099 modifies the original Ethash algo, doubling the epoch size.
-	if gspec.Config != nil {
+	if gspec != nil && gspec.Config != nil {
 		ethashConfig.ECIP1099Block = gspec.GetEthashECIP1099Transition() // This will panic if the genesis config field is not nil.
 	}
 

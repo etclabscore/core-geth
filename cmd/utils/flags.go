@@ -2523,7 +2523,9 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readonly bool) (*core.BlockCh
 	ethashConfig := ethconfig.Defaults.Ethash
 
 	// ETC-specific configuration: ECIP1099 modifies the original Ethash algo, doubling the epoch size.
-	ethashConfig.ECIP1099Block = gspec.GetEthashECIP1099Transition()
+	if gspec.Config != nil {
+		ethashConfig.ECIP1099Block = gspec.GetEthashECIP1099Transition() // This will panic if the genesis config field is not nil.
+	}
 
 	var lyra2Config *lyra2.Config
 	if ctx.Bool(MintMeFlag.Name) {

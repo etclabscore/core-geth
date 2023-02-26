@@ -201,7 +201,6 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, isPostMerge bool, 
 			maxStack:    maxStack(0, 1),
 		}
 	}
-	// TODO-meowsbits Implement me.
 	if config.IsEnabledByTime(config.GetEIP3855TransitionTime, bt) {
 		enable3855(instructionSet) // PUSH0 instruction
 	}

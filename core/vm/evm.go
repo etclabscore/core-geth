@@ -43,9 +43,7 @@ type (
 	GetHashFunc func(uint64) common.Hash
 )
 
-// ActivePrecompiles returns the addresses of the precompiles enabled with the current
-// configuration
-// FIXME-meowsbits This need block.time reference.
+// ActivePrecompiles returns the addresses of the precompiles enabled with the current configuration.
 func (evm *EVM) ActivePrecompiles() []common.Address {
 	p := PrecompiledContractsForConfig(evm.chainConfig, evm.Context.BlockNumber)
 	addresses := []common.Address{}

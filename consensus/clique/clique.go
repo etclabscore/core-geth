@@ -399,7 +399,6 @@ func (c *Clique) snapshot(chain consensus.ChainHeaderReader, number uint64, hash
 			if checkpoint != nil {
 				hash := checkpoint.Hash()
 
-				// FIXME meowsbits panic: runtime error: makeslice: len out of range
 				signers := make([]common.Address, (len(checkpoint.Extra)-extraVanity-extraSeal)/common.AddressLength) // = (#extra - 32 - 65 ) / 20
 				for i := 0; i < len(signers); i++ {
 					copy(signers[i][:], checkpoint.Extra[extraVanity+i*common.AddressLength:])

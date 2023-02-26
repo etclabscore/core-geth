@@ -95,8 +95,6 @@ func (t *table) ReadAncients(fn func(reader ethdb.AncientReaderOp) error) (err e
 	return t.db.ReadAncients(fn)
 }
 
-// TODO/meowsbits/20220405: TruncateAncients became TruncateHead+TruncateTail.
-
 // TruncateHead is a noop passthrough that just forwards the request to the underlying
 // database.
 func (t *table) TruncateHead(items uint64) error {

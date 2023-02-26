@@ -376,7 +376,6 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	// Execute the preparatory steps for state transition which includes:
 	// - prepare accessList(post-berlin)
 	// - reset transient storage(eip 1153)
-	// FIXME-meowsbits Rules. Its not a thing in core-geth.
 	st.state.Prepare(eip2930f, eip3651f, msg.From(), st.evm.Context.Coinbase, msg.To(), st.evm.ActivePrecompiles(), msg.AccessList())
 
 	var (

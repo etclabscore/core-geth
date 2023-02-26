@@ -364,7 +364,6 @@ func CommitGenesisState(db ethdb.Database, hash common.Hash) error {
 		switch hash {
 		case params.MainnetGenesisHash:
 			genesis = params.DefaultGenesisBlock()
-			// TODO/meowsbits/20220405: make sure we don't need Classic in here
 		case params.RinkebyGenesisHash:
 			genesis = params.DefaultRinkebyGenesisBlock()
 		case params.GoerliGenesisHash:

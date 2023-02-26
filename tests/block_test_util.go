@@ -112,7 +112,7 @@ func (t *BlockTest) Run(snapshotter bool) error {
 	// import pre accounts & construct test genesis block & state root
 	db := rawdb.NewMemoryDatabase()
 	genesis := t.genesis(config)
-	gblock, err := core.CommitGenesis(genesis, db, trie.NewDatabase(db)) // FIXME-meowsbits Another arg? Trie?
+	gblock, err := core.CommitGenesis(genesis, db, trie.NewDatabase(db))
 	if err != nil {
 		return err
 	}

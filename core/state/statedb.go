@@ -1096,7 +1096,7 @@ func (s *StateDB) Commit(deleteEmptyObjects bool) (common.Hash, error) {
 // - Add coinbase to access list (EIP-3651)
 // - Reset transient storage (EIP-1153)
 func (s *StateDB) Prepare(eip2930 bool, eip3651 bool, sender, coinbase common.Address, dst *common.Address, precompiles []common.Address, list types.AccessList) {
-	if eip2930 { // TODO meowsbits Implement Rules as a generic ChainConfigurator function.
+	if eip2930 {
 		// Clear out any leftover from previous executions
 		al := newAccessList()
 		s.accessList = al

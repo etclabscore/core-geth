@@ -490,7 +490,6 @@ func (s *PersonalAccountAPI) SignTransaction(ctx context.Context, args Transacti
 	if args.Nonce == nil {
 		return nil, fmt.Errorf("nonce not specified")
 	}
-	// TODO(meowsbits): I hate this. Wrong logic. Wrong place. This is not geth's job.
 	// Before actually signing the transaction, ensure the transaction fee is reasonable.
 	tx := args.toTransaction()
 	if err := checkTxFee(tx.GasPrice(), tx.Gas(), s.b.RPCTxFeeCap()); err != nil {
@@ -2238,7 +2237,6 @@ func (s *NetAPI) Version() string {
 
 // checkTxFee is an internal function used to check whether the fee of
 // the given transaction is _reasonable_(under the cap).
-// TODO(meowsbits): rm me
 func checkTxFee(gasPrice *big.Int, gas uint64, cap float64) error {
 	// Short circuit if there is no cap for transaction fee at all.
 	if cap == 0 {

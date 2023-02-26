@@ -130,13 +130,13 @@ func testHeaderVerificationForMerging(t *testing.T, isClique bool) {
 			td += int(block.Difficulty().Uint64())
 		}
 		preBlocks = blocks
-		gspec.Config.SetEthashTerminalTotalDifficulty(big.NewInt(int64(td))) // PTAL-meowsbits Use setter instead of var assign.
+		gspec.Config.SetEthashTerminalTotalDifficulty(big.NewInt(int64(td)))
 		postBlocks, _ = GenerateChain(gspec.Config, preBlocks[len(preBlocks)-1], engine, genDb, 8, nil)
 	} else {
 		config := *params.TestChainConfig
 		gspec = &genesisT.Genesis{Config: &config}
 		engine = beacon.New(ethash.NewFaker())
-		td := int(vars.GenesisDifficulty.Uint64()) // FIXME?-meowsbits vars.MinimumDifficulty?
+		td := int(vars.GenesisDifficulty.Uint64())
 		genDb, blocks, _ := GenerateChainWithGenesis(gspec, engine, 8, nil)
 		for _, block := range blocks {
 			// calculate td

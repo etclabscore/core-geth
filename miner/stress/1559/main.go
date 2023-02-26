@@ -211,8 +211,6 @@ func makeGenesis(faucets []*ecdsa.PrivateKey) *genesisT.Genesis {
 	genesis.GasLimit = 8_000_000
 
 	genesis.SetChainID(big.NewInt(18))
-	// TODO(meowsbits): review me
-	// genesis.Config.EIP150Hash = common.Hash{}
 
 	genesis.Alloc = genesisT.GenesisAlloc{}
 	for _, faucet := range faucets {

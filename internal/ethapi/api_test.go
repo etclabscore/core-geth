@@ -25,6 +25,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
 func TestTransaction_RoundTripRpcJSON(t *testing.T) {
@@ -62,7 +63,7 @@ func TestTransaction_RoundTripRpcJSON(t *testing.T) {
 	}
 }
 
-func allTransactionTypes(addr common.Address, config *params.ChainConfig) []types.TxData {
+func allTransactionTypes(addr common.Address, config ctypes.ChainConfigurator) []types.TxData {
 	return []types.TxData{
 		&types.LegacyTx{
 			Nonce:    5,
@@ -87,7 +88,7 @@ func allTransactionTypes(addr common.Address, config *params.ChainConfig) []type
 			S:        big.NewInt(11),
 		},
 		&types.AccessListTx{
-			ChainID:  config.ChainID,
+			ChainID:  config.GetChainID(),
 			Nonce:    5,
 			GasPrice: big.NewInt(6),
 			Gas:      7,
@@ -105,7 +106,7 @@ func allTransactionTypes(addr common.Address, config *params.ChainConfig) []type
 			S: big.NewInt(11),
 		},
 		&types.AccessListTx{
-			ChainID:  config.ChainID,
+			ChainID:  config.GetChainID(),
 			Nonce:    5,
 			GasPrice: big.NewInt(6),
 			Gas:      7,
@@ -123,7 +124,7 @@ func allTransactionTypes(addr common.Address, config *params.ChainConfig) []type
 			S: big.NewInt(11),
 		},
 		&types.DynamicFeeTx{
-			ChainID:   config.ChainID,
+			ChainID:   config.GetChainID(),
 			Nonce:     5,
 			GasTipCap: big.NewInt(6),
 			GasFeeCap: big.NewInt(9),
@@ -142,7 +143,7 @@ func allTransactionTypes(addr common.Address, config *params.ChainConfig) []type
 			S: big.NewInt(11),
 		},
 		&types.DynamicFeeTx{
-			ChainID:    config.ChainID,
+			ChainID:    config.GetChainID(),
 			Nonce:      5,
 			GasTipCap:  big.NewInt(6),
 			GasFeeCap:  big.NewInt(9),

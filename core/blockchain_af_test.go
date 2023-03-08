@@ -385,7 +385,8 @@ func TestGenerateChainTargetingHashrate(t *testing.T) {
 	data := plotter.XYs{}
 
 	for chain.CurrentHeader().Difficulty.Cmp(targetDifficulty) < 0 {
-		next, _ := GenerateChain(genesis.Config, chain.CurrentBlock(), engine, db, 1, func(i int, gen *BlockGen) {
+		bl := chain.GetBlock(chain.CurrentHeader().Hash(), chain.CurrentHeader().Number.Uint64())
+		next, _ := GenerateChain(genesis.Config, bl, engine, db, 1, func(i int, gen *BlockGen) {
 			gen.OffsetTime(-9) // 8: (=10+8=18>(13+4=17).. // minimum value over stable range
 		})
 		if _, err := chain.InsertChain(next); err != nil {
@@ -407,7 +408,7 @@ func TestGenerateChainTargetingHashrate(t *testing.T) {
 
 		data = append(data, plotter.XY{X: float64(next[0].NumberU64()), Y: rat1})
 	}
-	t.Log(chain.CurrentBlock().Number())
+	t.Log(chain.CurrentBlock().Number)
 
 	p, err := plot.New()
 	if err != nil {

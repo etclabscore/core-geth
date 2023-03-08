@@ -28,6 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
@@ -40,12 +41,12 @@ func TestGenerateWithdrawalChain(t *testing.T) {
 		address = crypto.PubkeyToAddress(key.PublicKey) // 658bdf435d810c91414ec09147daa6db62406379
 		aa      = common.Address{0xaa}
 		bb      = common.Address{0xbb}
-		funds   = big.NewInt(0).Mul(big.NewInt(1337), big.NewInt(params.Ether))
+		funds   = big.NewInt(0).Mul(big.NewInt(1337), big.NewInt(vars.Ether))
 		config  = *params.AllEthashProtocolChanges
-		gspec   = &Genesis{
+		gspec   = &genesisT.Genesis{
 			Config:     &config,
-			Alloc:      GenesisAlloc{address: {Balance: funds}},
-			BaseFee:    big.NewInt(params.InitialBaseFee),
+			Alloc:      genesisT.GenesisAlloc{address: {Balance: funds}},
+			BaseFee:    big.NewInt(vars.InitialBaseFee),
 			Difficulty: common.Big1,
 			GasLimit:   5_000_000,
 		}
@@ -64,23 +65,23 @@ func TestGenerateWithdrawalChain(t *testing.T) {
 	storage[common.Hash{0x01}] = common.Hash{0x01}
 	storage[common.Hash{0x02}] = common.Hash{0x02}
 	storage[common.Hash{0x03}] = common.HexToHash("0303")
-	gspec.Alloc[aa] = GenesisAccount{
+	gspec.Alloc[aa] = genesisT.GenesisAccount{
 		Balance: common.Big1,
 		Nonce:   1,
 		Storage: storage,
 		Code:    common.Hex2Bytes("6042"),
 	}
-	gspec.Alloc[bb] = GenesisAccount{
+	gspec.Alloc[bb] = genesisT.GenesisAccount{
 		Balance: common.Big2,
 		Nonce:   1,
 		Storage: storage,
 		Code:    common.Hex2Bytes("600154600354"),
 	}
 
-	genesis := gspec.MustCommit(gendb)
+	genesis := MustCommitGenesis(gendb, gspec)
 
 	chain, _ := GenerateChain(gspec.Config, genesis, beacon.NewFaker(), gendb, 4, func(i int, gen *BlockGen) {
-		tx, _ := types.SignTx(types.NewTransaction(gen.TxNonce(address), address, big.NewInt(1000), params.TxGas, new(big.Int).Add(gen.BaseFee(), common.Big1), nil), signer, key)
+		tx, _ := types.SignTx(types.NewTransaction(gen.TxNonce(address), address, big.NewInt(1000), vars.TxGas, new(big.Int).Add(gen.BaseFee(), common.Big1), nil), signer, key)
 		gen.AddTx(tx)
 		if i == 1 {
 			gen.AddWithdrawal(&types.Withdrawal{

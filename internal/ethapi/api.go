@@ -1853,7 +1853,7 @@ func SubmitTransaction(ctx context.Context, b Backend, tx *types.Transaction) (c
 
 	if tx.To() == nil {
 		addr := crypto.CreateAddress(from, tx.Nonce())
-		if b.ChainConfig().IsEnabled(b.ChainConfig().GetLyra2NonceTransition, b.CurrentBlock().Number()) {
+		if b.ChainConfig().IsEnabled(b.ChainConfig().GetLyra2NonceTransition, b.CurrentBlock().Number) {
 			addr = crypto.CreateAddress(from, tx.Nonce()+vars.Lyra2ContractNonceOffset)
 		}
 		log.Info("Submitted contract creation", "hash", tx.Hash().Hex(), "from", from, "nonce", tx.Nonce(), "contract", addr.Hex(), "value", tx.Value())

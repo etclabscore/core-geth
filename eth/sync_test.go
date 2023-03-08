@@ -217,7 +217,7 @@ func TestArtificialFinalityFeatureEnablingDisabling(t *testing.T) {
 	if next != nil {
 		t.Fatal("non-nil next sync op")
 	}
-	if !b.chain.Config().IsEnabled(b.chain.Config().GetECBP1100Transition, b.chain.CurrentBlock().Number()) {
+	if !b.chain.Config().IsEnabled(b.chain.Config().GetECBP1100Transition, b.chain.CurrentBlock().Number) {
 		t.Error("AF feature not configured")
 	}
 	if !b.chain.IsArtificialFinalityEnabled() {
@@ -302,7 +302,7 @@ func TestArtificialFinalityFeatureEnablingDisabling_NoDisable(t *testing.T) {
 	if next != nil {
 		t.Fatal("non-nil next sync op")
 	}
-	if !b.chain.Config().IsEnabled(b.chain.Config().GetECBP1100Transition, b.chain.CurrentBlock().Number()) {
+	if !b.chain.Config().IsEnabled(b.chain.Config().GetECBP1100Transition, b.chain.CurrentBlock().Number) {
 		t.Error("AF feature not configured")
 	}
 	if !b.chain.IsArtificialFinalityEnabled() {
@@ -382,7 +382,7 @@ func TestArtificialFinalityFeatureEnablingDisabling_StaleHead(t *testing.T) {
 	if next != nil {
 		t.Fatal("non-nil next sync op")
 	}
-	if !b.chain.Config().IsEnabled(b.chain.Config().GetECBP1100Transition, b.chain.CurrentBlock().Number()) {
+	if !b.chain.Config().IsEnabled(b.chain.Config().GetECBP1100Transition, b.chain.CurrentBlock().Number) {
 		t.Error("AF feature not configured")
 	}
 	// Unit test the timestamp. We want to be sure that the blockchain's current header is actually very old

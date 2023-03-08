@@ -1558,7 +1558,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals, setHead bool)
 		stats = insertStats{
 			startTime: mclock.Now(),
 			artificialFinality: bc.IsArtificialFinalityEnabled() &&
-				bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, bc.CurrentBlock().Number()),
+				bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, bc.CurrentBlock().Number),
 		}
 		lastCanon *types.Block
 	)

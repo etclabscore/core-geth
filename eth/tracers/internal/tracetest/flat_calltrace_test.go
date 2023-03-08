@@ -16,6 +16,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/tests"
 
@@ -63,11 +64,11 @@ type flatCallTraceResult struct {
 
 // flatCallTracerTest defines a single test to check the call tracer against.
 type flatCallTracerTest struct {
-	Genesis      core.Genesis    `json:"genesis"`
-	Context      callContext     `json:"context"`
-	Input        string          `json:"input"`
-	TracerConfig json.RawMessage `json:"tracerConfig"`
-	Result       []flatCallTrace `json:"result"`
+	Genesis      genesisT.Genesis `json:"genesis"`
+	Context      callContext      `json:"context"`
+	Input        string           `json:"input"`
+	TracerConfig json.RawMessage  `json:"tracerConfig"`
+	Result       []flatCallTrace  `json:"result"`
 }
 
 func flatCallTracerTestRunner(tracerName string, filename string, dirPath string, t testing.TB) error {

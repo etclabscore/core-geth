@@ -249,7 +249,7 @@ func (api *AdminAPI) Ecbp1100(blockNr rpc.BlockNumber) (bool, error) {
 	return api.eth.blockchain.IsArtificialFinalityEnabled() &&
 		api.eth.blockchain.Config().IsEnabled(
 			api.eth.blockchain.Config().GetECBP1100Transition,
-			api.eth.blockchain.CurrentBlock().Number()), err
+			api.eth.blockchain.CurrentBlock().Number), err
 }
 
 // MaxPeers sets the maximum peer limit for the protocol manager and the p2p server.

@@ -69,8 +69,8 @@ var (
 		TerminalTotalDifficulty:       MainnetTerminalTotalDifficulty, // 58_750_000_000_000_000_000_000
 		TerminalTotalDifficultyPassed: true,
 		Ethash:                        new(ctypes.EthashConfig),
-		TrustedCheckpoint: MainnetTrustedCheckpoint,
-		TrustedCheckpointOracle: MainnetCheckpointOracle,
+		TrustedCheckpoint:             MainnetTrustedCheckpoint,
+		TrustedCheckpointOracle:       MainnetCheckpointOracle,
 	}
 
 	// MainnetTrustedCheckpoint contains the light client trusted checkpoint for the main network.
@@ -115,7 +115,7 @@ var (
 		MergeNetsplitBlock:            big.NewInt(1735371),
 		ShanghaiTime:                  newUint64(1677557088),
 		Ethash:                        new(ctypes.EthashConfig),
-		TrustedCheckpoint: SepoliaTrustedCheckpoint,
+		TrustedCheckpoint:             SepoliaTrustedCheckpoint,
 	}
 
 	// SepoliaTrustedCheckpoint contains the light client trusted checkpoint for the Sepolia test network.

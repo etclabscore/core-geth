@@ -150,7 +150,7 @@ func newTestWorkerBackend(t *testing.T, chainConfig ctypes.ChainConfigurator, en
 		if _, err := chain.InsertChain(blocks); err != nil {
 			t.Fatalf("failed to insert origin chain: %v", err)
 		}
-		parent := chain.GetBlockByHash(chain.CurrentBlock().ParentHash())
+		parent := chain.GetBlockByHash(chain.CurrentBlock().ParentHash)
 		blocks, _ = core.GenerateChain(chainConfig, parent, engine, genDb, 1, func(i int, gen *core.BlockGen) {
 			gen.SetCoinbase(testUserAddress)
 		})
@@ -179,10 +179,10 @@ func (b *testWorkerBackend) StateAtBlock(block *types.Block, reexec uint64, base
 func (b *testWorkerBackend) newRandomUncle() *types.Block {
 	var parent *types.Block
 	cur := b.chain.CurrentBlock()
-	if cur.NumberU64() == 0 {
+	if cur.Number.Uint64() == 0 {
 		parent = b.chain.Genesis()
 	} else {
-		parent = b.chain.GetBlockByHash(b.chain.CurrentBlock().ParentHash())
+		parent = b.chain.GetBlockByHash(b.chain.CurrentBlock().ParentHash)
 	}
 	blocks, _ := core.GenerateChain(b.chain.Config(), parent, b.chain.Engine(), b.db, 1, func(i int, gen *core.BlockGen) {
 		var addr = make([]byte, common.AddressLength)
@@ -625,21 +625,21 @@ func testGetSealingWork(t *testing.T, chainConfig ctypes.ChainConfigurator, engi
 			b.chain.CurrentBlock().Hash(),
 			common.HexToAddress("0xdeadbeef"),
 			common.HexToHash("0xcafebabe"),
-			b.chain.CurrentBlock().NumberU64() + 1,
+			b.chain.CurrentBlock().Number.Uint64() + 1,
 			false,
 		},
 		{
 			b.chain.CurrentBlock().Hash(),
 			common.Address{},
 			common.HexToHash("0xcafebabe"),
-			b.chain.CurrentBlock().NumberU64() + 1,
+			b.chain.CurrentBlock().Number.Uint64() + 1,
 			false,
 		},
 		{
 			b.chain.CurrentBlock().Hash(),
 			common.Address{},
 			common.Hash{},
-			b.chain.CurrentBlock().NumberU64() + 1,
+			b.chain.CurrentBlock().Number.Uint64() + 1,
 			false,
 		},
 		{

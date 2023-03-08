@@ -882,7 +882,7 @@ func TestNewPayloadOnInvalidTerminalBlock(t *testing.T) {
 	n, ethservice := startEthService(t, genesis, preMergeBlocks)
 	defer n.Close()
 
-	ethservice.BlockChain().Config().SetEthashTerminalTotalDifficulty(preMergeBlocks[0].Difficulty()) //.Sub(genesis.Config.TerminalTotalDifficulty, preMergeBlocks[len(preMergeBlocks)-1].Difficulty())
+	ethservice.BlockChain().Config().SetEthashTerminalTotalDifficulty(preMergeBlocks[0].Difficulty()) // .Sub(genesis.Config.TerminalTotalDifficulty, preMergeBlocks[len(preMergeBlocks)-1].Difficulty())
 
 	var (
 		api    = NewConsensusAPI(ethservice)
@@ -1244,7 +1244,11 @@ func setupBodies(t *testing.T) (*node.Node, *eth.Ethereum, []*types.Block) {
 	genesis, blocks := generateMergeChain(10, true)
 	n, ethservice := startEthService(t, genesis, blocks)
 	// enable shanghai on the last block
-	ethservice.BlockChain().Config().ShanghaiTime = &blocks[len(blocks)-1].Header().Time
+	ethservice.BlockChain().Config().SetEIP3651TransitionTime(&blocks[len(blocks)-1].Header().Time)
+	ethservice.BlockChain().Config().SetEIP3855TransitionTime(&blocks[len(blocks)-1].Header().Time)
+	ethservice.BlockChain().Config().SetEIP3860TransitionTime(&blocks[len(blocks)-1].Header().Time)
+	ethservice.BlockChain().Config().SetEIP4895TransitionTime(&blocks[len(blocks)-1].Header().Time)
+	ethservice.BlockChain().Config().SetEIP6049TransitionTime(&blocks[len(blocks)-1].Header().Time)
 
 	var (
 		parent = ethservice.BlockChain().CurrentBlock()

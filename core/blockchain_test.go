@@ -2074,7 +2074,7 @@ func TestForkChoice_CommonAncestor(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if chain.CurrentBlock().NumberU64() != 10 {
+	if chain.CurrentBlock().Number.Uint64() != 10 {
 		t.Fatal("insanity")
 	}
 

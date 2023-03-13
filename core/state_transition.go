@@ -365,7 +365,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	)
 
 	// Check clauses 4-5, subtract intrinsic gas if everything is correct
-	gas, err := IntrinsicGas(st.data, st.msg.AccessList(), contractCreation, eip2f, eip2028f, eip3860f)
+	gas, err := IntrinsicGas(msg.Data, msg.AccessList, contractCreation, eip2f, eip2028f, eip3860f)
 	if err != nil {
 		return nil, err
 	}
@@ -384,8 +384,8 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	// However, this was not enforced in the incumbent core-geth version. It may be a red herring.
 	//
 	// Check whether the init code size has been exceeded.
-	if eip3860f && contractCreation && uint64(len(msg.data)) > vars.MaxInitCodeSize {
-		return nil, fmt.Errorf("%w: code size %v limit %v", ErrMaxInitCodeSizeExceeded, len(msg.data), vars.MaxInitCodeSize)
+	if eip3860f && contractCreation && uint64(len(msg.Data)) > vars.MaxInitCodeSize {
+		return nil, fmt.Errorf("%w: code size %v limit %v", ErrMaxInitCodeSizeExceeded, len(msg.Data), vars.MaxInitCodeSize)
 	}
 
 	// Execute the preparatory steps for state transition which includes:

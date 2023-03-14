@@ -89,7 +89,7 @@ func callTracerParityTestRunner(tracerName string, filename string, dirPath stri
 	}
 	evm := vm.NewEVM(context, txContext, statedb, test.Genesis.Config, vm.Config{Debug: true, Tracer: tracer})
 
-	msg, err := tx.AsMessage(signer, nil)
+	msg, err := core.TransactionToMessage(tx, signer, nil)
 	if err != nil {
 		return fmt.Errorf("failed to prepare transaction for tracing: %v", err)
 	}
@@ -230,8 +230,8 @@ func stateDiffTracerTestRunner(tracerName string, filename string, dirPath strin
 	// which might lead into ErrInsufficientFundsForTransfer error
 
 	txContext := vm.TxContext{
-		Origin:   msg.From(),
-		GasPrice: msg.GasPrice(),
+		Origin:   msg.From,
+		GasPrice: msg.GasPrice,
 	}
 	context := vm.BlockContext{
 		CanTransfer: core.CanTransfer,
@@ -259,7 +259,7 @@ func stateDiffTracerTestRunner(tracerName string, filename string, dirPath strin
 		traceStateCapturer.CapturePreEVM(evm)
 	}
 
-	st := core.NewStateTransition(evm, msg, new(core.GasPool).AddGas(msg.Gas()))
+	st := core.NewStateTransition(evm, msg, new(core.GasPool).AddGas(msg.GasLimit))
 	if _, err = st.TransitionDb(); err != nil {
 		return fmt.Errorf("failed to execute transaction: %v", err)
 	}

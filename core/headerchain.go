@@ -20,9 +20,7 @@ import (
 	crand "crypto/rand"
 	"errors"
 	"fmt"
-	"math"
 	"math/big"
-	mrand "math/rand"
 	"sync/atomic"
 	"time"
 
@@ -70,18 +68,12 @@ type HeaderChain struct {
 
 	procInterrupt func() bool
 
-	rand   *mrand.Rand
 	engine consensus.Engine
 }
 
 // NewHeaderChain creates a new HeaderChain structure. ProcInterrupt points
 // to the parent's interrupt semaphore.
 func NewHeaderChain(chainDb ethdb.Database, config ctypes.ChainConfigurator, engine consensus.Engine, procInterrupt func() bool) (*HeaderChain, error) {
-	// Seed a fast but crypto originating random generator
-	seed, err := crand.Int(crand.Reader, big.NewInt(math.MaxInt64))
-	if err != nil {
-		return nil, err
-	}
 	hc := &HeaderChain{
 		config:        config,
 		chainDb:       chainDb,
@@ -89,7 +81,6 @@ func NewHeaderChain(chainDb ethdb.Database, config ctypes.ChainConfigurator, eng
 		tdCache:       lru.NewCache[common.Hash, *big.Int](tdCacheLimit),
 		numberCache:   lru.NewCache[common.Hash, uint64](numberCacheLimit),
 		procInterrupt: procInterrupt,
-		rand:          mrand.New(mrand.NewSource(seed.Int64())),
 		engine:        engine,
 	}
 	hc.genesisHeader = hc.GetHeaderByNumber(0)
@@ -338,7 +329,11 @@ func (hc *HeaderChain) ValidateHeaderChain(chain []*types.Header, checkFreq int)
 	if checkFreq != 0 {
 		// In case of checkFreq == 0 all seals are left false.
 		for i := 0; i <= len(seals)/checkFreq; i++ {
-			index := i*checkFreq + hc.rand.Intn(checkFreq)
+			randomValue, err := crand.Int(crand.Reader, big.NewInt(int64(checkFreq)))
+			if err != nil {
+				return 0, fmt.Errorf("CSPRNG is unavailable: %w", err)
+			}
+			index := i*checkFreq + int(randomValue.Uint64())
 			if index >= len(seals) {
 				index = len(seals) - 1
 			}

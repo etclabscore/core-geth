@@ -256,12 +256,12 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		IstanbulBlock:       big.NewInt(5),
 	},
 	"MuirGlacier": &goethereum.ChainConfig{
-		Ethash:              new(ctypes.EthashConfig),
 		ChainID:             big.NewInt(1),
 		HomesteadBlock:      big.NewInt(0),
 		EIP150Block:         big.NewInt(0),
 		EIP155Block:         big.NewInt(0),
 		EIP158Block:         big.NewInt(0),
+		DAOForkBlock:        big.NewInt(0),
 		ByzantiumBlock:      big.NewInt(0),
 		ConstantinopleBlock: big.NewInt(0),
 		PetersburgBlock:     big.NewInt(0),

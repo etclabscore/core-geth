@@ -250,7 +250,6 @@ func (t *jsTracer) CaptureStart(env *vm.EVM, from common.Address, to common.Addr
 	t.ctx["block"] = t.vm.ToValue(env.Context.BlockNumber.Uint64())
 	// Update list of precompiles based on current block
 	t.activePrecompiles = env.ActivePrecompiles()
-	t.ctx["intrinsicGas"] = t.vm.ToValue(t.gasLimit - gas) // PTAL-meowsbits Is this supposed to be here?
 }
 
 // CaptureState implements the Tracer interface to trace a single step of VM execution.

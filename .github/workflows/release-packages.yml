@@ -37,12 +37,12 @@ jobs:
       - name: Checkout etclabscore/core-geth
         uses: actions/checkout@v2
 
-      - name: Set up Go 1.16
+      - name: Set up Go 1.19
         if: ${{ matrix.BUILD_OS_NAME != 'arm' }}
         id: go
         uses: actions/setup-go@v2
         with:
-          go-version: ^1.16
+          go-version: ^1.19
 
       - name: Build all packages (non ARM)
         if: ${{ matrix.BUILD_OS_NAME != 'arm' }}
@@ -59,14 +59,14 @@ jobs:
 
           sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install gcc-arm-linux-gnueabi libc6-dev-armel-cross gcc-arm-linux-gnueabihf libc6-dev-armhf-cross gcc-aarch64-linux-gnu libc6-dev-arm64-cross
           sudo ln -s /usr/include/asm-generic /usr/include/asm
-          
+
           echo "arm: This archive filepath is deprecated."
           echo "     It will be removed, and will cease to be present"
           echo "     as of the etclabscore/core-geth@v1.12.7 release."
           echo "     The \*-arm5\* build should be used instead."
           GOARM=5 go run build/ci.go install -dlgo -arch arm -cc arm-linux-gnueabi-gcc
           env BUILD_OS_NAME=arm ./build/archive-signing.sh
-          
+
           GOARM=5 go run build/ci.go install -dlgo -arch arm -cc arm-linux-gnueabi-gcc
           env BUILD_OS_NAME=arm5 ./build/archive-signing.sh
           GOARM=6 go run build/ci.go install -dlgo -arch arm -cc arm-linux-gnueabi-gcc

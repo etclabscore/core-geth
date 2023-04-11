@@ -82,7 +82,7 @@ func TestState(t *testing.T) {
 		st.skipFork("Magneto")  // ETC
 		st.skipFork("London")   // ETH
 		st.skipFork("Mystique") // ETC
-		st.skipFork("Merged")   // ETH
+		st.skipFork("Merge")    // ETH
 	}
 	// The multigeth data type (like the Ethereum Foundation data type) doesn't support
 	// the ETC_Mystique fork/feature configuration, which omits EIP1559 and the associated BASEFEE

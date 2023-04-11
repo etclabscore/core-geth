@@ -27,8 +27,6 @@ var (
 		"geth": &genesisT.Genesis{
 			Config: &goethereum.ChainConfig{},
 		},
-		// TODO
-		// "aleth"
 		// "retesteth"
 	}
 )

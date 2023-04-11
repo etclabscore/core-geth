@@ -24,8 +24,6 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
-	"github.com/ethereum/go-ethereum/params/types/parity"
-	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/tidwall/gjson"
 )
 
@@ -48,13 +46,6 @@ func (c GenericCC) DAOSupport() bool {
 	}
 	if mg, ok := c.ChainConfigurator.(*coregeth.CoreGethChainConfig); ok {
 		return mg.GetEthashEIP779Transition() != nil
-	}
-	// Parity: Deprecated.
-	if pc, ok := c.ChainConfigurator.(*parity.ParityChainSpec); ok {
-		return pc.Engine.Ethash.Params.DaoHardforkTransition != nil &&
-			pc.Engine.Ethash.Params.DaoHardforkBeneficiary != nil &&
-			*pc.Engine.Ethash.Params.DaoHardforkBeneficiary == vars.DAORefundContract &&
-			len(pc.Engine.Ethash.Params.DaoHardforkAccounts) == len(vars.DAODrainList())
 	}
 	panic(fmt.Sprintf("uimplemented DAO logic, config: %v", c.ChainConfigurator))
 }

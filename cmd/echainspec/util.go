@@ -9,7 +9,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
-	"github.com/ethereum/go-ethereum/params/types/parity"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -48,8 +47,6 @@ func unmarshalChainSpec(format string, data []byte) (conf ctypes.Configurator, e
 	switch t := configurator.(type) {
 	case *genesisT.Genesis:
 		d.Config = t.Config
-	case *parity.ParityChainSpec:
-		// Don't need to do anything here; the Parity type already conforms to ChainConfigurator.
 	default:
 		return nil, fmt.Errorf("unhandled chainspec type: %v %v", format, t)
 	}

@@ -31,7 +31,6 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
-	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
 func mustReadTestdataTo(t *testing.T, fabbrev string, into interface{}) {
@@ -165,7 +164,6 @@ func TestIdentical(t *testing.T) {
 	configs := []ctypes.ChainConfigurator{
 		&coregeth.CoreGethChainConfig{},
 		&goethereum.ChainConfig{},
-		&parity.ParityChainSpec{},
 		&coregeth.CoreGethChainConfig{}, // Complete combination test set.
 	}
 	for i := range configs {
@@ -192,12 +190,6 @@ func TestIdentical(t *testing.T) {
 // to fulfil certain interfaces do fill them.
 func TestConfiguratorImplementationsSatisfied(t *testing.T) {
 	for _, ty := range []interface{}{
-		&parity.ParityChainSpec{},
-	} {
-		_ = ty.(ctypes.Configurator)
-	}
-
-	for _, ty := range []interface{}{
 		&goethereum.ChainConfig{},
 		&coregeth.CoreGethChainConfig{},
 	} {
@@ -212,7 +204,7 @@ func TestConfiguratorImplementationsSatisfied(t *testing.T) {
 }
 
 func TestCompatible(t *testing.T) {
-	spec := &parity.ParityChainSpec{}
+	spec := &goethereum.ChainConfig{}
 	fns, names := confp.Transitions(spec)
 	for i, fn := range fns {
 		t.Log(names[i], fn())

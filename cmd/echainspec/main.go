@@ -13,7 +13,6 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
-	"github.com/ethereum/go-ethereum/params/types/parity"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -28,7 +27,6 @@ var (
 		"geth": &genesisT.Genesis{
 			Config: &goethereum.ChainConfig{},
 		},
-		"parity": &parity.ParityChainSpec{},
 		// TODO
 		// "aleth"
 		// "retesteth"

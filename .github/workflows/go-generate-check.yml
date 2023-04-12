@@ -55,7 +55,7 @@ jobs:
           # Intentionally revert this commit which has a custom modification to the genesis unmarshaling,
           # with regards reading different genesis formats origniating from different clients
           # This way, this script can alert us on any code changes that have to be applied on if file gets changed.
-          git revert --no-edit 4b2cf83737ffe7c46c334a11414d151de049e0b3
+          git revert --no-edit 7dafb43840f8d229845b006ca8d5353f073e788c
 
       - name: Check for modified files
         id: git-check

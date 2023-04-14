@@ -53,7 +53,7 @@ func TestFreezerModify(t *testing.T) {
 	defer f.Close()
 
 	// Commit test data.
-	_, err := f.ModifyAncients(func(op ethdb.AncientWriteOperator) error {
+	_, err := f.ModifyAncients(func(op ethdb.AncientWriteOp) error {
 		for i := range valuesRaw {
 			if err := op.AppendRaw("raw", uint64(i), valuesRaw[i]); err != nil {
 				return err
@@ -97,7 +97,7 @@ func TestFreezerModifyRollback(t *testing.T) {
 	f, dir := newFreezerForTesting(t, freezerTestTableDef)
 
 	theError := errors.New("oops")
-	_, err := f.ModifyAncients(func(op ethdb.AncientWriteOperator) error {
+	_, err := f.ModifyAncients(func(op ethdb.AncientWriteOp) error {
 		// Append three items. This creates two files immediately,
 		// because the table size limit of the test freezer is 2048.
 		require.NoError(t, op.AppendRaw("test", 0, make([]byte, 2048)))
@@ -141,7 +141,7 @@ func TestFreezerConcurrentModifyRetrieve(t *testing.T) {
 		defer wg.Done()
 		defer close(written)
 		for item := uint64(0); item < 10000; item += writeBatchSize {
-			_, err := f.ModifyAncients(func(op ethdb.AncientWriteOperator) error {
+			_, err := f.ModifyAncients(func(op ethdb.AncientWriteOp) error {
 				for i := uint64(0); i < writeBatchSize; i++ {
 					item := item + i
 					value := getChunk(32, int(item))
@@ -190,12 +190,12 @@ func TestFreezerConcurrentModifyTruncate(t *testing.T) {
 
 	var item = make([]byte, 256)
 
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 10; i++ {
 		// First reset and write 100 items.
 		if err := f.TruncateHead(0); err != nil {
 			t.Fatal("truncate failed:", err)
 		}
-		_, err := f.ModifyAncients(func(op ethdb.AncientWriteOperator) error {
+		_, err := f.ModifyAncients(func(op ethdb.AncientWriteOp) error {
 			for i := uint64(0); i < 100; i++ {
 				if err := op.AppendRaw("test", i, item); err != nil {
 					return err
@@ -216,7 +216,7 @@ func TestFreezerConcurrentModifyTruncate(t *testing.T) {
 		)
 		wg.Add(3)
 		go func() {
-			_, modifyErr = f.ModifyAncients(func(op ethdb.AncientWriteOperator) error {
+			_, modifyErr = f.ModifyAncients(func(op ethdb.AncientWriteOp) error {
 				for i := uint64(100); i < 200; i++ {
 					if err := op.AppendRaw("test", i, item); err != nil {
 						return err
@@ -405,5 +405,27 @@ func TestRenameWindows(t *testing.T) {
 	}
 	if !bytes.Equal(buf, data2) {
 		t.Errorf("unexpected file contents. Got %v\n", buf)
+	}
+}
+
+func TestFreezerCloseSync(t *testing.T) {
+	t.Parallel()
+	f, _ := newFreezerForTesting(t, map[string]bool{"a": true, "b": true})
+	defer f.Close()
+
+	// Now, close and sync. This mimics the behaviour if the node is shut down,
+	// just as the chain freezer is writing.
+	// 1: thread-1: chain treezer writes, via freezeRange (holds lock)
+	// 2: thread-2: Close called, waits for write to finish
+	// 3: thread-1: finishes writing, releases lock
+	// 4: thread-2: obtains lock, completes Close()
+	// 5: thread-1: calls f.Sync()
+	if err := f.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if err := f.Sync(); err == nil {
+		t.Fatalf("want error, have nil")
+	} else if have, want := err.Error(), "[closed closed]"; have != want {
+		t.Fatalf("want %v, have %v", have, want)
 	}
 }

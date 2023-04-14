@@ -17,6 +17,7 @@
 package ethash
 
 import (
+	crand "crypto/rand"
 	"encoding/binary"
 	"encoding/json"
 	"math/big"
@@ -91,16 +92,15 @@ func TestCalcDifficulty(t *testing.T) {
 
 func randSlice(min, max uint32) []byte {
 	var b = make([]byte, 4)
-	rand.Read(b)
+	crand.Read(b)
 	a := binary.LittleEndian.Uint32(b)
 	size := min + a%(max-min)
 	out := make([]byte, size)
-	rand.Read(out)
+	crand.Read(out)
 	return out
 }
 
 func TestDifficultyCalculators(t *testing.T) {
-	rand.Seed(2)
 	for i := 0; i < 5000; i++ {
 		// 1 to 300 seconds diff
 		var timeDelta = uint64(1 + rand.Uint32()%3000)
@@ -108,7 +108,7 @@ func TestDifficultyCalculators(t *testing.T) {
 		if diffBig.Cmp(vars.MinimumDifficulty) < 0 {
 			diffBig.Set(vars.MinimumDifficulty)
 		}
-		//rand.Read(difficulty)
+		// rand.Read(difficulty)
 		header := &types.Header{
 			Difficulty: diffBig,
 			Number:     new(big.Int).SetUint64(rand.Uint64() % 50_000_000),
@@ -186,4 +186,56 @@ func BenchmarkDifficultyCalculator(b *testing.B) {
 			x2(1000014, h)
 		}
 	})
+}
+
+// TestEtchash_11700000 tests that Etchash can verify the block at 11700000.
+// EtcHash is a fork of Ethash developed by Ethereum Classic which doubles the epoch length,
+// approximately halving the DAG size over time.
+// Block 11_700_000 is the block at which ETC implemented this hard-fork feature.
+// This test takes a long time to run; about 2 minutes on my machine.
+// It builds a real DAG and verifies the canonical block header.
+func TestEtchash_11700000(t *testing.T) {
+	// canon11700000 is a JSONRPC response to a getBlockByNumber request for block 11700000 for the ETC chain from rivet.cloud.
+	// Unmarshal this data into a block header.
+	canon11700000 := `{"jsonrpc":"2.0","id":3019187,"result":{"difficulty":"0x317df020bde4","extraData":"0x7374726174756d2d65752d31","gasLimit":"0x7a6d21","gasUsed":"0x0","hash":"0x3cdbd6d80f7fd983ac2a6b13230f56c61dc58cef3deeaeaffda36ca5efc6cb31","logsBloom":"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","miner":"0xdf7d7e053933b5cc24372f878c90e62dadad5d42","mixHash":"0x5f688fe8043392fd60d661edd5744dcb3d557042d3e472e7a708294c34216fb8","nonce":"0x69710a743181b923","number":"0xb28720","parentHash":"0xadaa50fd7a72baa19df873163b563c7cfa5ad254ca8dcf3b019076499e219e2e","receiptsRoot":"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421","sha3Uncles":"0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347","size":"0x211","stateRoot":"0x373bd9a0991eff6c03f5ead0f25a0466a2ae10cf80cb37bd51d144f68668af29","timestamp":"0x5fc2a999","totalDifficulty":"0x388236832f6f1333ed","transactions":[],"transactionsRoot":"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421","uncles":[]}}`
+	tmpRPCRes := struct {
+		Result types.Header
+	}{}
+	if err := json.Unmarshal([]byte(canon11700000), &tmpRPCRes); err != nil {
+		t.Fatal(err)
+	}
+	canonHeader := tmpRPCRes.Result
+
+	// The block number is 11700000.
+	forkBlock := big.NewInt(11700000)
+	forkBlockU := forkBlock.Uint64()
+	if canonHeader.Number.Cmp(forkBlock) != 0 {
+		t.Fatalf("wrong block number: %v", canonHeader.Number)
+	}
+
+	// Set up the ethash config, defining
+	// the cache and DAG as namespaced directories within the os temp dir.
+	temp := filepath.Join(os.TempDir(), "/geth-test-etchash-11700000")
+	ethashConfig := Config{
+		CacheDir:         filepath.Join(temp, "etcash-cache"),
+		CachesInMem:      2,
+		CachesOnDisk:     3,
+		CachesLockMmap:   false,
+		DatasetDir:       filepath.Join(temp, "etcash-dag"),
+		DatasetsInMem:    1,
+		DatasetsOnDisk:   2,
+		DatasetsLockMmap: false,
+		ECIP1099Block:    &forkBlockU,
+	}
+	// Clean up ahead of ourselves to prevent interference.
+	os.RemoveAll(ethashConfig.CacheDir)
+	os.RemoveAll(ethashConfig.DatasetDir)
+
+	// Create a new instance of *Ethash and use it to
+	// test that verifySeal confirms this is a valid header.
+	ethash := New(ethashConfig, nil, false)
+	defer ethash.Close()
+	if err := ethash.verifySeal(nil, &canonHeader, true); err != nil {
+		t.Fatalf("verifySeal failed: %v", err)
+	}
 }

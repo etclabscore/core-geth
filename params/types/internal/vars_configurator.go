@@ -73,6 +73,24 @@ func (_ GlobalVarsConfigurator) SetMaxCodeSize(n *uint64) error {
 	return nil
 }
 
+func (_ GlobalVarsConfigurator) GetElasticityMultiplier() uint64 {
+	return vars.DefaultElasticityMultiplier
+}
+
+func (_ GlobalVarsConfigurator) SetElasticityMultiplier(n uint64) error {
+	// Noop.
+	return nil
+}
+
+func (_ GlobalVarsConfigurator) GetBaseFeeChangeDenominator() uint64 {
+	return vars.DefaultBaseFeeChangeDenominator
+}
+
+func (_ GlobalVarsConfigurator) SetBaseFeeChangeDenominator(n uint64) error {
+	// Noop.
+	return nil
+}
+
 func (_ GlobalVarsConfigurator) GetEthashMinimumDifficulty() *big.Int {
 	return vars.MinimumDifficulty
 }

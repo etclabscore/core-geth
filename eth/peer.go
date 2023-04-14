@@ -24,6 +24,17 @@ import (
 	"github.com/ethereum/go-ethereum/eth/protocols/snap"
 )
 
+/* PTAL(meowsbits)
+https://github.com/ethereum/go-ethereum/pull/26804
+Difficulty, Head, and ForkID are removed, citing (from the PR):
+
+	> Post-merge there is no more block broadcasts and announcements.
+	> As such, we cannot maintain the head infos for our peers.
+	> This PR unexposes those infos on the admin.peers API to avoid confusion thinking all our peers are unsynced.
+	> Fixes #26733
+
+*/
+
 // ethPeerInfo represents a short summary of the `eth` sub-protocol metadata known
 // about a connected peer.
 type ethPeerInfo struct {

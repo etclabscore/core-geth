@@ -43,10 +43,11 @@ type callTraceParity struct {
 
 // callTracerParityTest defines a single test to check the call tracer against.
 type callTracerParityTest struct {
-	Genesis *genesisT.Genesis  `json:"genesis"`
-	Context *callContext       `json:"context"`
-	Input   string             `json:"input"`
-	Result  *[]callTraceParity `json:"result"`
+	Genesis      *genesisT.Genesis  `json:"genesis"`
+	Context      *callContext       `json:"context"`
+	Input        string             `json:"input"`
+	TracerConfig json.RawMessage    `json:"tracerConfig"`
+	Result       *[]callTraceParity `json:"result"`
 }
 
 func callTracerParityTestRunner(tracerName string, filename string, dirPath string, t testing.TB) error {
@@ -75,20 +76,20 @@ func callTracerParityTestRunner(tracerName string, filename string, dirPath stri
 		Transfer:    core.Transfer,
 		Coinbase:    test.Context.Miner,
 		BlockNumber: new(big.Int).SetUint64(uint64(test.Context.Number)),
-		Time:        new(big.Int).SetUint64(uint64(test.Context.Time)),
+		Time:        uint64(test.Context.Time),
 		Difficulty:  (*big.Int)(test.Context.Difficulty),
 		GasLimit:    uint64(test.Context.GasLimit),
 	}
 	_, statedb := tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false)
 
 	// Create the tracer, the EVM environment and run it
-	tracer, err := tracers.New(tracerName, new(tracers.Context), nil)
+	tracer, err := tracers.DefaultDirectory.New(tracerName, new(tracers.Context), test.TracerConfig)
 	if err != nil {
 		return fmt.Errorf("failed to create call tracer: %v", err)
 	}
 	evm := vm.NewEVM(context, txContext, statedb, test.Genesis.Config, vm.Config{Debug: true, Tracer: tracer})
 
-	msg, err := tx.AsMessage(signer, nil)
+	msg, err := core.TransactionToMessage(tx, signer, nil)
 	if err != nil {
 		return fmt.Errorf("failed to prepare transaction for tracing: %v", err)
 	}
@@ -203,6 +204,7 @@ type stateDiffTest struct {
 	Context        *callContext            `json:"context"`
 	Input          *ethapi.TransactionArgs `json:"input"`
 	StateOverrides *ethapi.StateOverride
+	TracerConfig   json.RawMessage                       `json:"tracerConfig"`
 	Result         *map[common.Address]*stateDiffAccount `json:"result"`
 }
 
@@ -228,15 +230,15 @@ func stateDiffTracerTestRunner(tracerName string, filename string, dirPath strin
 	// which might lead into ErrInsufficientFundsForTransfer error
 
 	txContext := vm.TxContext{
-		Origin:   msg.From(),
-		GasPrice: msg.GasPrice(),
+		Origin:   msg.From,
+		GasPrice: msg.GasPrice,
 	}
 	context := vm.BlockContext{
 		CanTransfer: core.CanTransfer,
 		Transfer:    core.Transfer,
 		Coinbase:    test.Context.Miner,
 		BlockNumber: new(big.Int).SetUint64(uint64(test.Context.Number)),
-		Time:        new(big.Int).SetUint64(uint64(test.Context.Time)),
+		Time:        uint64(test.Context.Time),
 		Difficulty:  (*big.Int)(test.Context.Difficulty),
 		GasLimit:    uint64(test.Context.GasLimit),
 	}
@@ -247,7 +249,7 @@ func stateDiffTracerTestRunner(tracerName string, filename string, dirPath strin
 	}
 
 	// Create the tracer, the EVM environment and run it
-	tracer, err := tracers.New(tracerName, new(tracers.Context), nil)
+	tracer, err := tracers.DefaultDirectory.New(tracerName, new(tracers.Context), test.TracerConfig)
 	if err != nil {
 		return fmt.Errorf("failed to create state diff tracer: %v", err)
 	}
@@ -257,7 +259,7 @@ func stateDiffTracerTestRunner(tracerName string, filename string, dirPath strin
 		traceStateCapturer.CapturePreEVM(evm)
 	}
 
-	st := core.NewStateTransition(evm, msg, new(core.GasPool).AddGas(msg.Gas()))
+	st := core.NewStateTransition(evm, msg, new(core.GasPool).AddGas(msg.GasLimit))
 	if _, err = st.TransitionDb(); err != nil {
 		return fmt.Errorf("failed to execute transaction: %v", err)
 	}

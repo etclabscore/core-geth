@@ -16,7 +16,7 @@ jobs:
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
         with:
-          go-version: ^1.16
+          go-version: ^1.19
         id: go
 
       - name: Check out code into the Go module directory
@@ -38,7 +38,7 @@ jobs:
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 90
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 90
           g++ --version
-          gcc --version     
+          gcc --version
           strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBCXX
 
       - name: Get dependencies

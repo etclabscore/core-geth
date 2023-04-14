@@ -22,7 +22,6 @@ import (
 	"math/big"
 	"strings"
 	"sync/atomic"
-	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -50,7 +49,7 @@ var parityErrorMappingStartingWith = map[string]string{
 
 func init() {
 	// type ctorFn = func(*tracers.Context, json.RawMessage) (tracers.Tracer, error)
-	register("callTracerParity", NewCallParityTracer)
+	tracers.DefaultDirectory.Register("callTracerParity", NewCallParityTracer, false)
 }
 
 // callParityFrame is the result of a callParityTracerParity run.
@@ -165,7 +164,7 @@ func (t *callParityTracer) CaptureStart(env *vm.EVM, from common.Address, to com
 	t.fillCallFrameFromContext(&t.callstack[0])
 }
 
-func (t *callParityTracer) CaptureEnd(output []byte, gasUsed uint64, _ time.Duration, err error) {
+func (t *callParityTracer) CaptureEnd(output []byte, gasUsed uint64, err error) {
 	if err != nil {
 		t.callstack[0].Error = err.Error()
 		if err.Error() == "execution reverted" && len(output) > 0 {

@@ -109,7 +109,7 @@ type AncientWriter interface {
 	// ModifyAncients runs a write operation on the ancient store.
 	// If the function returns an error, any changes to the underlying store are reverted.
 	// The integer return value is the total size of the written data.
-	ModifyAncients(func(AncientWriteOperator) error) (int64, error)
+	ModifyAncients(func(AncientWriteOp) error) (int64, error)
 
 	// TruncateHead discards all but the first n ancient data from the ancient store.
 	// After the truncation, the latest item can be accessed it item_n-1(start from 0).
@@ -131,8 +131,8 @@ type AncientWriter interface {
 	MigrateTable(string, func([]byte) ([]byte, error)) error
 }
 
-// AncientWriteOperator is given to the function argument of ModifyAncients.
-type AncientWriteOperator interface {
+// AncientWriteOp is given to the function argument of ModifyAncients.
+type AncientWriteOp interface {
 	// Append adds an RLP-encoded item.
 	Append(kind string, number uint64, item interface{}) error
 

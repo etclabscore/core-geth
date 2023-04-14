@@ -24,7 +24,6 @@ import (
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
@@ -92,8 +91,6 @@ var (
 )
 
 var difficultyChainConfigurations = map[string]ctypes.ChainConfigurator{
-	"Ropsten":  params.RopstenChainConfig,
-	"Morden":   params.RopstenChainConfig,
 	"Frontier": &goethereum.ChainConfig{},
 	"Homestead": &goethereum.ChainConfig{
 		Ethash:         new(ctypes.EthashConfig),

@@ -17,19 +17,7 @@ geth:
 all:
 	$(GORUN) build/ci.go install
 
-android:
-	$(GORUN) build/ci.go aar --local
-	@echo "Done building."
-	@echo "Import \"$(GOBIN)/geth.aar\" to use the library."
-	@echo "Import \"$(GOBIN)/geth-sources.jar\" to add javadocs"
-	@echo "For more info see https://stackoverflow.com/questions/20994336/android-studio-how-to-attach-javadoc"
-
-ios:
-	$(GORUN) build/ci.go xcode --local
-	@echo "Done building."
-	@echo "Import \"$(GOBIN)/Geth.framework\" to use the library."
-
-test:
+test: all
 	$(GORUN) build/ci.go test -timeout 20m
 
 # DEPRECATED.
@@ -60,18 +48,13 @@ clean-evmc:
 	rm -rf ./build/_workspace/hera ./build/_workspace/evmone
 
 test-coregeth-features: \
-	test-coregeth-features-coregeth \
-	test-coregeth-features-multigethv0 ## Runs tests specific to multi-geth using Fork/Feature configs.
+	test-coregeth-features-coregeth ## Runs tests specific to multi-geth using Fork/Feature configs.
 
 test-coregeth-consensus: test-coregeth-features-clique-consensus
 
 test-coregeth-features-coregeth:
 	@echo "Testing fork/feature/datatype implementation; equivalence - COREGETH."
 	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_COREGETH=on go test -count=1 -timeout 60m ./tests
-
-test-coregeth-features-multigethv0:
-	@echo "Testing fork/feature/datatype implementation; equivalence - MULTIGETHv0."
-	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_MULTIGETHV0=on go test -count=1 -timeout 60m ./tests
 
 test-coregeth-features-clique-consensus:
 	@echo "Testing fork/feature/datatype implementation; equivalence - Clique consensus"

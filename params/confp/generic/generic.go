@@ -24,9 +24,6 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
-	"github.com/ethereum/go-ethereum/params/types/multigeth"
-	"github.com/ethereum/go-ethereum/params/types/parity"
-	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/tidwall/gjson"
 )
 
@@ -47,58 +44,36 @@ func (c GenericCC) DAOSupport() bool {
 	if gc, ok := c.ChainConfigurator.(*goethereum.ChainConfig); ok {
 		return gc.DAOForkSupport
 	}
-	if omg, ok := c.ChainConfigurator.(*multigeth.ChainConfig); ok {
-		return omg.DAOForkSupport
-	}
 	if mg, ok := c.ChainConfigurator.(*coregeth.CoreGethChainConfig); ok {
 		return mg.GetEthashEIP779Transition() != nil
-	}
-	if pc, ok := c.ChainConfigurator.(*parity.ParityChainSpec); ok {
-		return pc.Engine.Ethash.Params.DaoHardforkTransition != nil &&
-			pc.Engine.Ethash.Params.DaoHardforkBeneficiary != nil &&
-			*pc.Engine.Ethash.Params.DaoHardforkBeneficiary == vars.DAORefundContract &&
-			len(pc.Engine.Ethash.Params.DaoHardforkAccounts) == len(vars.DAODrainList())
 	}
 	panic(fmt.Sprintf("uimplemented DAO logic, config: %v", c.ChainConfigurator))
 }
 
 // Following vars define sufficient JSON schema keys for configurator type inference.
 var (
-	paritySchemaKeysSuffice = []string{
-		"engine",
-		"genesis.seal",
-	}
-	paritySchemaKeysMustNot = []string{}
-
-	// These are fields which must differentiate "new" multigeth from "old" multigeth.
-	multigethSchemaSuffice = []string{
+	// Fields known (and unique, if possible) to etclabscore/core-geth.
+	coregethSchemaSuffice = []string{
 		"networkId", "config.networkId",
 		"requireBlockHashes", "config.requireBlockHashes",
+		"eip2FBlock", "config.eip2FBlock",
+		"supportedProtocolVersions", "config.supportedProtocolVersions",
 	}
-	multigethSchemaMustNot = []string{
+	// Fields unknown for etclabscore/core-geth.
+	coregethSchemaMustNot = []string{
 		"EIP1108FBlock", "config.EIP1108FBlock",
 		"eip158Block", "config.eip158Block",
 		"daoForkSupport", "config.daoForkSupport",
 	}
 
-	// These are fields which differentiate old multigeth from goethereum config.
-	oldmultigethSchemaSuffice = []string{
-		"EIP1108FBlock", "config.EIP1108FBlock",
-		"eip7FBlock", "config.eip7FBlock",
-		"eip2FBlock", "config.eip2FBlock",
-		"ecip1010PauseBlock", "config.ecip1010PauseBlock",
-		"disposalBlock", "config.disposalBlock",
-	}
-	oldmultigethSchemaMustNot = []string{
-		"requireBlockHashes", "config.requireBlockHashes",
-	}
-
+	// Fields known to ethereum/go-ethereum.
 	goethereumSchemaSuffice = []string{
 		"difficulty",
 		"byzantiumBlock", "config.byzantiumBlock",
 		"chainId", "config.chainId",
 		"homesteadBlock", "config.homesteadBlock",
 	}
+	// Fields unknown to ethereum/go-ethereum.
 	goethereumSchemaMustNot = []string{
 		"engine",
 		"genesis.seal",
@@ -112,9 +87,7 @@ func UnmarshalChainConfigurator(input []byte) (ctypes.ChainConfigurator, error) 
 		sufficient []string
 		negates    []string
 	}{
-		{&parity.ParityChainSpec{}, paritySchemaKeysSuffice, paritySchemaKeysMustNot},
-		{&coregeth.CoreGethChainConfig{}, multigethSchemaSuffice, multigethSchemaMustNot},
-		{&multigeth.ChainConfig{}, oldmultigethSchemaSuffice, oldmultigethSchemaMustNot},
+		{&coregeth.CoreGethChainConfig{}, coregethSchemaSuffice, coregethSchemaMustNot},
 		{&goethereum.ChainConfig{}, goethereumSchemaSuffice, goethereumSchemaMustNot},
 	}
 	for _, c := range cases {
@@ -148,16 +121,3 @@ func asMapHasAnyKey(input []byte, keys []string) (bool, error) {
 	}
 	return false, nil
 }
-
-// asMapHasValueForAnyKey extends the logic from asMapHasAnyKey, but
-// requires that the fields also denote non-nil values.
-// This was one path of logic, and may be removed later if not used.
-//func asMapHasValueForAnyKey(input []byte, keys []string) (bool, error) {
-//	results := gjson.GetManyBytes(input, keys...)
-//	for _, g := range results {
-//		if g.Exists() && g.Value() != nil {
-//			return true, nil
-//		}
-//	}
-//	return false, nil
-//}

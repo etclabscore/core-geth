@@ -441,7 +441,7 @@ func TestGenStateCoreGethConfigs(t *testing.T) {
 				genesis := test.genesis(Forks[subtest.Fork])
 
 				cgConfig := &coregeth.CoreGethChainConfig{}
-				err := confp.Convert(genesis.Config, cgConfig)
+				err := confp.Crush(cgConfig, genesis.Config, true)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -516,9 +516,9 @@ func TestConvertDefaultsBounce(t *testing.T) {
 			forkConfig := Forks[forkName]
 			eip1234 := forkConfig.GetEthashEIP1234Transition()
 
-			// Convert the original config (type) into the CoreGeth chain config data type.
+			// Crush the original config (type) into the CoreGeth chain config data type.
 			coreGethConfig := &coregeth.CoreGethChainConfig{}
-			err := confp.Convert(forkConfig, coreGethConfig)
+			err := confp.Crush(coreGethConfig, forkConfig, true)
 			if err != nil {
 				t.Fatal(err)
 			}

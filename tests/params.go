@@ -24,39 +24,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp"
-	"github.com/ethereum/go-ethereum/params/confp/tconvert"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
-	"github.com/ethereum/go-ethereum/params/types/multigeth"
-	"github.com/ethereum/go-ethereum/params/types/parity"
 	"github.com/iancoleman/strcase"
 )
-
-// paritySpecsDir is where parity specs for testing are stored.
-// These are DEPRECATED.
-// Use core-geth configurations instead.
-var paritySpecsDir = filepath.Join("..", "params", "parity.json.d")
-
-// paritySpecPath is a test utility function to get the path
-// for a parity configuration file for testing.
-// DEPRECATED. Brittle. Confusing. Ugly. Sorry.
-func paritySpecPath(name string) string {
-	p := filepath.Join(paritySpecsDir, name)
-	if fi, err := os.Open(p); err == nil {
-		fi.Close()
-		return p
-	} else if os.IsNotExist(err) {
-		// This is an ugly HACK because tests function are sometimes called from
-		// other packages that are nested more deeply, eg. eth/tracers.
-		// This is a workaround for that.
-		// And it sucks.
-		p = filepath.Join("..", paritySpecsDir, name)
-	}
-	return p
-}
 
 // coregethSpecsDir is where core-geth-style configuration files for testing are stored.
 var coregethSpecsDir = filepath.Join("..", "params", "coregeth.json.d")
@@ -138,43 +111,13 @@ func readJSONFromFile(name string, value interface{}) (sha1sum []byte, err error
 	return bb[:], nil
 }
 
-// writeDifficultyConfigFileParity writes a difficulty-test configuration file in the parity format.
-// This feature is DEPRECATED.
-// Write core-geth format configuration for testing instead.
-func writeDifficultyConfigFileParity(conf ctypes.ChainConfigurator, forkName string) (string, [20]byte, error) {
-	genesis := params.DefaultRopstenGenesisBlock()
-	genesis.Config = conf
-
-	pspec, err := tconvert.NewParityChainSpec(forkName, genesis, []string{})
-	if err != nil {
-		return "", [20]byte{}, err
-	}
-	specFilepath, ok := mapForkNameChainspecFileDifficulty[forkName]
-	if !ok {
-		return "", [20]byte{}, fmt.Errorf("nonexisting chainspec JSON file path, ref/assoc config: %s", forkName)
-	}
-
-	b, err := json.MarshalIndent(pspec, "", "    ")
-	if err != nil {
-		return "", [20]byte{}, err
-	}
-
-	err = os.WriteFile(filepath.Join("..", "params", "parity.json.d", specFilepath), b, os.ModePerm)
-	if err != nil {
-		return "", [20]byte{}, err
-	}
-
-	sum := sha1.Sum(b)
-	return specFilepath, sum, nil
-}
-
 func init() {
 	if os.Getenv(CG_CHAINCONFIG_FEATURE_EQ_COREGETH_KEY) != "" {
 		log.Println("converting to CoreGeth Chain Config data type.")
 
 		for i, config := range Forks {
 			mgc := &coregeth.CoreGethChainConfig{}
-			if err := confp.Convert(config, mgc); ctypes.IsFatalUnsupportedErr(err) {
+			if err := confp.Crush(mgc, config, true); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
 			Forks[i] = mgc
@@ -182,46 +125,10 @@ func init() {
 
 		for k, v := range difficultyChainConfigurations {
 			mgc := &coregeth.CoreGethChainConfig{}
-			if err := confp.Convert(v, mgc); ctypes.IsFatalUnsupportedErr(err) {
+			if err := confp.Crush(mgc, v, true); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
 			difficultyChainConfigurations[k] = mgc
-		}
-	} else if os.Getenv(CG_CHAINCONFIG_FEATURE_EQ_MULTIGETHV0_KEY) != "" {
-		log.Println("converting to MultiGethV0 data type.")
-
-		for i, config := range Forks {
-			pspec := &multigeth.ChainConfig{}
-			if err := confp.Convert(config, pspec); ctypes.IsFatalUnsupportedErr(err) {
-				panic(err)
-			}
-			Forks[i] = pspec
-		}
-
-		for k, v := range difficultyChainConfigurations {
-			pspec := &multigeth.ChainConfig{}
-			if err := confp.Convert(v, pspec); ctypes.IsFatalUnsupportedErr(err) {
-				panic(err)
-			}
-			difficultyChainConfigurations[k] = pspec
-		}
-	} else if os.Getenv(CG_CHAINCONFIG_FEATURE_EQ_OPENETHEREUM_KEY) != "" {
-		log.Println("converting to Parity data type.")
-
-		for i, config := range Forks {
-			pspec := &parity.ParityChainSpec{}
-			if err := confp.Convert(config, pspec); ctypes.IsFatalUnsupportedErr(err) {
-				panic(err)
-			}
-			Forks[i] = pspec
-		}
-
-		for k, v := range difficultyChainConfigurations {
-			pspec := &parity.ParityChainSpec{}
-			if err := confp.Convert(v, pspec); ctypes.IsFatalUnsupportedErr(err) {
-				panic(err)
-			}
-			difficultyChainConfigurations[k] = pspec
 		}
 	} else if os.Getenv(CG_CHAINCONFIG_CHAINSPECS_COREGETH_KEY) != "" {
 		// This logic reads Forks (used by [General]StateTests) and Difficulty configurations
@@ -267,64 +174,6 @@ func init() {
 			}
 			chainspecRefsDifficulty[k] = chainspecRef{filepath.Base(v), sha1sum}
 			difficultyChainConfigurations[k] = conf
-		}
-
-		// DEPRECATED.
-		// Use CG_CHAINCONFIG_CHAINSPECS_COREGETH_KEY instead.
-	} else if os.Getenv(CG_CHAINCONFIG_CHAINSPECS_OPENETHEREUM_KEY) != "" {
-		log.Println("Setting chain configurations from Parity chainspecs")
-
-		for k, v := range MapForkNameChainspecFileState {
-			config := &parity.ParityChainSpec{}
-			sha1sum, err := readJSONFromFile(paritySpecPath(v), config)
-			if os.IsNotExist(err) {
-				wd, wde := os.Getwd()
-				if wde != nil {
-					panic(wde)
-				}
-				fconfig := Forks[k]
-				pspec := &parity.ParityChainSpec{}
-				if err := confp.Convert(fconfig, pspec); ctypes.IsFatalUnsupportedErr(err) {
-					panic(err)
-				}
-				config = pspec
-				b, _ := json.MarshalIndent(pspec, "", "    ")
-				writePath := filepath.Join(paritySpecsDir, v)
-				err := os.WriteFile(writePath, b, os.ModePerm)
-				if err != nil {
-					panic(fmt.Sprintf("failed to write chainspec; wd: %s, config: %v/file: %v", wd, k, writePath))
-				}
-				//
-				// panic(fmt.Sprintf("failed to find chainspec, wd: %s, config: %v/file: %v", wd, k, v))
-			} else if err != nil {
-				panic(err)
-			}
-			chainspecRefsState[k] = chainspecRef{filepath.Base(v), sha1sum}
-			Forks[k] = config
-		}
-
-		for k, v := range mapForkNameChainspecFileDifficulty {
-			config := &parity.ParityChainSpec{}
-			sha1sum, err := readJSONFromFile(paritySpecPath(v), config)
-			if os.IsNotExist(err) && os.Getenv(CG_GENERATE_DIFFICULTY_TESTS_KEY) != "" {
-				log.Println("Will generate chainspec file for", k, v)
-				conf := difficultyChainConfigurations[k]
-				_, sha, err := writeDifficultyConfigFileParity(conf, k)
-				if err != nil {
-					panic(fmt.Sprintf("error writing difficulty config file: %s: %s %v", k, v, err))
-				}
-				sha1sum := []byte{}
-				for _, v := range sha {
-					sha1sum = append(sha1sum, v)
-				}
-				chainspecRefsDifficulty[k] = chainspecRef{filepath.Base(v), sha1sum}
-				difficultyChainConfigurations[k] = conf
-			} else if len(sha1sum) == 0 {
-				panic("zero sum game")
-			} else {
-				chainspecRefsDifficulty[k] = chainspecRef{filepath.Base(v), sha1sum}
-				difficultyChainConfigurations[k] = config
-			}
 		}
 	} else if os.Getenv(CG_CHAINCONFIG_CONSENSUS_EQ_CLIQUE) != "" {
 		log.Println("converting Istanbul config to Clique consensus engine")

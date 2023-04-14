@@ -239,7 +239,7 @@ func (host *hostContext) GetTxContext() evmc.TxContext {
 		Origin:     evmc.Address(host.env.TxContext.Origin),
 		Coinbase:   evmc.Address(host.env.Context.Coinbase),
 		Number:     host.env.Context.BlockNumber.Int64(),
-		Timestamp:  host.env.Context.Time.Int64(),
+		Timestamp:  int64(host.env.Context.Time),
 		GasLimit:   int64(host.env.Context.GasLimit),
 		Difficulty: evmc.Hash(common.BigToHash(host.env.Context.Difficulty)),
 		ChainID:    evmc.Hash(common.BigToHash(host.env.chainConfig.GetChainID())),

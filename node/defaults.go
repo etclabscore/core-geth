@@ -60,4 +60,5 @@ var DefaultConfig = Config{
 		MaxPeers:   50,
 		NAT:        nat.Any(),
 	},
+	DBEngine: "",
 }

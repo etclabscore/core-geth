@@ -17,9 +17,7 @@
 package params
 
 import (
-	"encoding/json"
 	"math/big"
-	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -40,18 +38,6 @@ func DefaultGenesisBlock() *genesisT.Genesis {
 		GasLimit:   5000,
 		Difficulty: big.NewInt(17179869184),
 		Alloc:      genesisT.DecodePreAlloc(MainnetAllocData),
-	}
-}
-
-// DefaultRopstenGenesisBlock returns the Ropsten network genesis block.
-func DefaultRopstenGenesisBlock() *genesisT.Genesis {
-	return &genesisT.Genesis{
-		Config:     RopstenChainConfig,
-		Nonce:      66,
-		ExtraData:  hexutil.MustDecode("0x3535353535353535353535353535353535353535353535353535353535353535"),
-		GasLimit:   16777216,
-		Difficulty: big.NewInt(1048576),
-		Alloc:      genesisT.DecodePreAlloc(TestnetAllocData),
 	}
 }
 
@@ -90,15 +76,6 @@ func DefaultGoerliGenesisBlock() *genesisT.Genesis {
 		Difficulty: big.NewInt(1),
 		Alloc:      genesisT.DecodePreAlloc(GoerliAllocData),
 	}
-}
-
-func DefaultKilnGenesisBlock() *genesisT.Genesis {
-	g := new(genesisT.Genesis)
-	reader := strings.NewReader(KilnAllocData)
-	if err := json.NewDecoder(reader).Decode(g); err != nil {
-		panic(err)
-	}
-	return g
 }
 
 // DeveloperGenesisBlock returns the 'geth --dev' genesis block. Note, this must

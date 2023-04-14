@@ -31,7 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/clique"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/consensus/lyra2"
-	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/txpool"
 	"github.com/ethereum/go-ethereum/eth/downloader"
 	"github.com/ethereum/go-ethereum/eth/gasprice"
 	"github.com/ethereum/go-ethereum/ethdb"
@@ -88,16 +88,12 @@ var Defaults = Config{
 	TrieTimeout:             60 * time.Minute,
 	SnapshotCache:           102,
 	FilterLogCacheSize:      32,
-	Miner: miner.Config{
-		GasCeil:  30000000,
-		GasPrice: big.NewInt(vars.GWei),
-		Recommit: 3 * time.Second,
-	},
-	TxPool:        core.DefaultTxPoolConfig,
-	RPCGasCap:     50000000,
-	RPCEVMTimeout: 5 * time.Second,
-	GPO:           FullNodeGPO,
-	RPCTxFeeCap:   1, // 1 ether
+	Miner:                   miner.DefaultConfig,
+	TxPool:                  txpool.DefaultConfig,
+	RPCGasCap:               50000000,
+	RPCEVMTimeout:           5 * time.Second,
+	GPO:                     FullNodeGPO,
+	RPCTxFeeCap:             1, // 1 ether
 }
 
 func init() {
@@ -188,7 +184,7 @@ type Config struct {
 	Ethash ethash.Config
 
 	// Transaction pool options
-	TxPool core.TxPoolConfig
+	TxPool txpool.Config
 
 	// Gas Price Oracle options
 	GPO gasprice.Config
@@ -228,30 +224,20 @@ type Config struct {
 	// When this value is *true, ECBP100 will not (ever) be disabled; when *false, it will never be enabled.
 	ECBP1100NoDisable *bool `toml:",omitempty"`
 
-	// Mystique block override (TODO: remove after the fork)
-	OverrideMystique *big.Int `toml:",omitempty"`
-
-	// OverrideTerminalTotalDifficulty (TODO: remove after the fork)
-	OverrideTerminalTotalDifficulty *big.Int `toml:",omitempty"`
-
-	// OverrideTerminalTotalDifficultyPassed (TODO: remove after the fork)
-	OverrideTerminalTotalDifficultyPassed *bool `toml:",omitempty"`
+	// OverrideShanghai (TODO: remove after the fork)
+	OverrideShanghai *uint64 `toml:",omitempty"`
 }
 
 // CreateConsensusEngine creates a consensus engine for the given chain configuration.
-func CreateConsensusEngine(stack *node.Node, chainConfig ctypes.ChainConfigurator, config *ethash.Config, notify []string, noverify bool, db ethdb.Database) consensus.Engine {
+func CreateConsensusEngine(stack *node.Node, ethashConfig *ethash.Config, cliqueConfig *ctypes.CliqueConfig, lyra2Config *lyra2.Config, notify []string, noverify bool, db ethdb.Database) consensus.Engine {
 	// If proof-of-authority is requested, set it up
 	var engine consensus.Engine
-	if chainConfig.GetConsensusEngineType().IsClique() {
-		engine = clique.New(&ctypes.CliqueConfig{
-			Period: chainConfig.GetCliquePeriod(),
-			Epoch:  chainConfig.GetCliqueEpoch(),
-		}, db)
-	} else if chainConfig.GetConsensusEngineType().IsLyra2() {
-		engine = lyra2.New(notify, noverify)
+	if cliqueConfig != nil {
+		engine = clique.New(cliqueConfig, db)
+	} else if lyra2Config != nil {
+		engine = lyra2.New(lyra2Config, notify, noverify)
 	} else {
-		// Otherwise assume proof-of-work
-		switch config.PowMode {
+		switch ethashConfig.PowMode {
 		case ethash.ModeFake:
 			log.Warn("Ethash used in fake mode")
 			engine = ethash.NewFaker()
@@ -266,17 +252,17 @@ func CreateConsensusEngine(stack *node.Node, chainConfig ctypes.ChainConfigurato
 			engine = ethash.NewPoissonFaker()
 		default:
 			engine = ethash.New(ethash.Config{
-				PowMode:          config.PowMode,
-				CacheDir:         stack.ResolvePath(config.CacheDir),
-				CachesInMem:      config.CachesInMem,
-				CachesOnDisk:     config.CachesOnDisk,
-				CachesLockMmap:   config.CachesLockMmap,
-				DatasetDir:       config.DatasetDir,
-				DatasetsInMem:    config.DatasetsInMem,
-				DatasetsOnDisk:   config.DatasetsOnDisk,
-				DatasetsLockMmap: config.DatasetsLockMmap,
-				NotifyFull:       config.NotifyFull,
-				ECIP1099Block:    chainConfig.GetEthashECIP1099Transition(),
+				PowMode:          ethashConfig.PowMode,
+				CacheDir:         stack.ResolvePath(ethashConfig.CacheDir),
+				CachesInMem:      ethashConfig.CachesInMem,
+				CachesOnDisk:     ethashConfig.CachesOnDisk,
+				CachesLockMmap:   ethashConfig.CachesLockMmap,
+				DatasetDir:       ethashConfig.DatasetDir,
+				DatasetsInMem:    ethashConfig.DatasetsInMem,
+				DatasetsOnDisk:   ethashConfig.DatasetsOnDisk,
+				DatasetsLockMmap: ethashConfig.DatasetsLockMmap,
+				NotifyFull:       ethashConfig.NotifyFull,
+				ECIP1099Block:    ethashConfig.ECIP1099Block,
 			}, notify, noverify)
 			engine.(*ethash.Ethash).SetThreads(-1) // Disable CPU mining
 		}

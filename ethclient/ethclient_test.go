@@ -255,15 +255,6 @@ func newTestBackend(t *testing.T) (*node.Node, []*types.Block) {
 
 // generateTestChain generates 2 blocks. The first block contains 2 transactions.
 func generateTestChain() []*types.Block {
-	db := rawdb.NewMemoryDatabase()
-	config := params.AllEthashProtocolChanges
-	genesis := &genesisT.Genesis{
-		Config:    config,
-		Alloc:     genesisT.GenesisAlloc{testAddr: {Balance: testBalance}},
-		ExtraData: []byte("test genesis"),
-		Timestamp: 9000,
-		BaseFee:   big.NewInt(vars.InitialBaseFee),
-	}
 	generate := func(i int, g *core.BlockGen) {
 		g.OffsetTime(5)
 		g.SetExtra([]byte("test"))
@@ -273,11 +264,9 @@ func generateTestChain() []*types.Block {
 			g.AddTx(testTx2)
 		}
 	}
-	gblock := core.GenesisToBlock(genesis, db)
-	engine := ethash.NewFaker()
-	blocks, _ := core.GenerateChain(genesis.Config, gblock, engine, db, 2, generate)
-	blocks = append([]*types.Block{gblock}, blocks...)
-	return blocks
+	_, blocks, _ := core.GenerateChainWithGenesis(genesis, ethash.NewFaker(), 2, generate)
+	genesisBlock := core.MustCommitGenesis(rawdb.NewMemoryDatabase(), genesis)
+	return append([]*types.Block{genesisBlock}, blocks...)
 }
 
 func TestEthClient(t *testing.T) {
@@ -460,7 +449,7 @@ func testTransactionInBlockInterrupted(t *testing.T, client *rpc.Client) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	// Test tx in block interupted.
+	// Test tx in block interrupted.
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	tx, err := ec.TransactionInBlock(ctx, block.Hash(), 0)
@@ -1010,11 +999,6 @@ waiting:
 			t.Errorf("hash: want: %s, got: %s", b.Hash().Hex()[:8], got[i].Hash().Hex()[:8])
 		}
 	}
-
-	if t.Failed() {
-		unAuthed, authed := backend.GetAPIs()
-		t.Logf("backend APIS: unAuthed=%v authed=%v", unAuthed, authed)
-	}
 }
 
 // mustNewTestBackend is the same logic as newTestBackend(t *testing.T) but without the testing.T argument.
@@ -1142,11 +1126,12 @@ var allRPCMethods = []string{
 	"debug_gcStats",
 	"debug_getAccessibleState",
 	"debug_getBadBlocks",
-	"debug_getBlockRlp",
-	"debug_getHeaderRlp",
 	"debug_getModifiedAccountsByHash",
 	"debug_getModifiedAccountsByNumber",
+	"debug_getRawBlock",
+	"debug_getRawHeader",
 	"debug_getRawReceipts",
+	"debug_getRawTransaction",
 	"debug_goTrace",
 	"debug_intermediateRoots",
 	"debug_memStats",
@@ -1159,6 +1144,7 @@ var allRPCMethods = []string{
 	"debug_setGCPercent",
 	"debug_setHead",
 	"debug_setMutexProfileFraction",
+	"debug_setTrieFlushInterval",
 	"debug_stacks",
 	"debug_standardTraceBadBlockToFile",
 	"debug_standardTraceBlockToFile",

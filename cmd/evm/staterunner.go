@@ -23,13 +23,13 @@ import (
 	"os"
 
 	"github.com/ethereum/go-ethereum/cmd/utils"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/eth/tracers/logger"
 	"github.com/ethereum/go-ethereum/internal/flags"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/tests"
-
 	"github.com/urfave/cli/v2"
 )
 
@@ -61,11 +61,12 @@ var stateTestForkFlag = &cli.StringFlag{
 // StatetestResult contains the execution status after running a state test, any
 // error that might have occurred and a dump of the final state if requested.
 type StatetestResult struct {
-	Name  string      `json:"name"`
-	Pass  bool        `json:"pass"`
-	Fork  string      `json:"fork"`
-	Error string      `json:"error,omitempty"`
-	State *state.Dump `json:"state,omitempty"`
+	Name  string       `json:"name"`
+	Pass  bool         `json:"pass"`
+	Root  *common.Hash `json:"stateRoot,omitempty"`
+	Fork  string       `json:"fork"`
+	Error string       `json:"error,omitempty"`
+	State *state.Dump  `json:"state,omitempty"`
 }
 
 func stateTestCmd(ctx *cli.Context) error {
@@ -138,8 +139,12 @@ func stateTestCmd(ctx *cli.Context) error {
 			result := &StatetestResult{Name: key, Fork: st.Fork, Pass: true}
 			_, s, err := test.Run(st, cfg, false)
 			// print state root for evmlab tracing
-			if ctx.Bool(MachineFlag.Name) && s != nil {
-				fmt.Fprintf(os.Stderr, "{\"stateRoot\": \"%x\"}\n", s.IntermediateRoot(false))
+			if s != nil {
+				root := s.IntermediateRoot(false)
+				result.Root = &root
+				if ctx.Bool(MachineFlag.Name) {
+					fmt.Fprintf(os.Stderr, "{\"stateRoot\": \"%#x\"}\n", root)
+				}
 			}
 			if err != nil {
 				// Test failed, mark as so and dump any state to aid debugging

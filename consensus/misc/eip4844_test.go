@@ -21,7 +21,7 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 func TestCalcBlobFee(t *testing.T) {
@@ -35,8 +35,8 @@ func TestCalcBlobFee(t *testing.T) {
 		{10 * 1024 * 1024, 111},
 	}
 	have := CalcBlobFee(nil)
-	if have.Int64() != params.BlobTxMinDataGasprice {
-		t.Errorf("nil test: blobfee mismatch: have %v, want %v", have, params.BlobTxMinDataGasprice)
+	if have.Int64() != vars.BlobTxMinDataGasprice {
+		t.Errorf("nil test: blobfee mismatch: have %v, want %v", have, vars.BlobTxMinDataGasprice)
 	}
 	for i, tt := range tests {
 		have := CalcBlobFee(big.NewInt(tt.excessDataGas))

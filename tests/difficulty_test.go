@@ -55,7 +55,7 @@ var (
 		TerminalTotalDifficultyPassed: true,
 	}
 )
- */
+*/
 
 func TestDifficulty(t *testing.T) {
 	t.Parallel()

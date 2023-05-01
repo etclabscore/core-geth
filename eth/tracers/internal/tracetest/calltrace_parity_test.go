@@ -253,7 +253,7 @@ func stateDiffTracerTestRunner(tracerName string, filename string, dirPath strin
 	if err != nil {
 		return fmt.Errorf("failed to create state diff tracer: %v", err)
 	}
-	evm := vm.NewEVM(context, txContext, statedb, test.Genesis.Config, vm.Config{Debug: true, Tracer: tracer})
+	evm := vm.NewEVM(context, txContext, statedb, test.Genesis.Config, vm.Config{Tracer: tracer})
 
 	if traceStateCapturer, ok := tracer.(vm.EVMLogger_StateCapturer); ok {
 		traceStateCapturer.CapturePreEVM(evm)

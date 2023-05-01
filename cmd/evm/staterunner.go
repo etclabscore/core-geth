@@ -117,7 +117,6 @@ func stateTestCmd(ctx *cli.Context) error {
 	// Iterate over all the tests, run them and aggregate the results
 	cfg := vm.Config{
 		Tracer:           tracer,
-		Debug:            ctx.Bool(DebugFlag.Name) || ctx.Bool(MachineFlag.Name),
 		EWASMInterpreter: ctx.String(stateTestEVMCEWASMFlag.Name),
 		EVMInterpreter:   ctx.String(utils.EVMInterpreterFlag.Name),
 	}

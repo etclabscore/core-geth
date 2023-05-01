@@ -393,7 +393,7 @@ type dataset struct {
 	mmap        mmap.MMap // Memory map itself to unmap before releasing
 	dataset     []uint32  // The actual cache data content
 	once        sync.Once // Ensures the cache is generated only once
-	done        uint32    // Atomic flag to determine generation status
+	done    atomic.Bool // Atomic flag to determine generation status
 }
 
 // newDataset creates a new ethash mining dataset and returns it as a plain Go
@@ -406,7 +406,8 @@ func newDataset(epoch uint64, epochLength uint64) *dataset {
 func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 	d.once.Do(func() {
 		// Mark the dataset generated after we're done. This is needed for remote
-		defer atomic.StoreUint32(&d.done, 1)
+		defer d.done.Store(true)
+
 		csize := cacheSize(d.epoch)
 		dsize := datasetSize(d.epoch)
 		seed := seedHash(d.epoch, d.epochLength)
@@ -492,7 +493,7 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 // or not (it may not have been started at all). This is useful for remote miners
 // to default to verification caches instead of blocking on DAG generations.
 func (d *dataset) generated() bool {
-	return atomic.LoadUint32(&d.done) == 1
+	return d.done.Load()
 }
 
 // finalizer closes any file handlers and memory maps open.

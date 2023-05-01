@@ -18,40 +18,20 @@ package vm
 
 import (
 	"errors"
+	"math/big"
 
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
 // LookupInstructionSet returns the instructionset for the fork configured by
 // the rules.
-func LookupInstructionSet(rules params.Rules) (JumpTable, error) {
-	switch {
-	case rules.IsPrague:
-		return newShanghaiInstructionSet(), errors.New("prague-fork not defined yet")
-	case rules.IsCancun:
-		return newShanghaiInstructionSet(), errors.New("cancun-fork not defined yet")
-	case rules.IsShanghai:
-		return newShanghaiInstructionSet(), nil
-	case rules.IsMerge:
-		return newMergeInstructionSet(), nil
-	case rules.IsLondon:
-		return newLondonInstructionSet(), nil
-	case rules.IsBerlin:
-		return newBerlinInstructionSet(), nil
-	case rules.IsIstanbul:
-		return newIstanbulInstructionSet(), nil
-	case rules.IsConstantinople:
-		return newConstantinopleInstructionSet(), nil
-	case rules.IsByzantium:
-		return newByzantiumInstructionSet(), nil
-	case rules.IsEIP158:
-		return newSpuriousDragonInstructionSet(), nil
-	case rules.IsEIP150:
-		return newTangerineWhistleInstructionSet(), nil
-	case rules.IsHomestead:
-		return newHomesteadInstructionSet(), nil
+// PTAL(meowsbits)
+func LookupInstructionSet(config ctypes.ChainConfigurator, blockN *big.Int, blockTime *uint64) (JumpTable, error) {
+	is := instructionSetForConfig(config, config.GetEthashTerminalTotalDifficultyPassed(), blockN, blockTime)
+	if is != nil {
+		return *is, nil
 	}
-	return newFrontierInstructionSet(), nil
+	return JumpTable{}, errors.New("no instruction set available")
 }
 
 // Stack returns the mininum and maximum stack requirements.

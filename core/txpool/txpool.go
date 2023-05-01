@@ -645,7 +645,14 @@ func (pool *TxPool) validateTxBasics(tx *types.Transaction, local bool) error {
 		return ErrUnderpriced
 	}
 	// Ensure the transaction has more gas than the basic tx fee.
-	intrGas, err := core.IntrinsicGas(tx.Data(), tx.AccessList(), tx.To() == nil, true, pool.istanbul.Load(), pool.shanghai.Load())
+	/*
+		eip2f    atomic.Bool // Fork indicator whether we are using EIP-2 (Homestead).
+		eip2028f atomic.Bool // Fork indicator whether we are using EIP-2028 (Istanbul).
+		eip2718  atomic.Bool // Fork indicator whether we are using EIP-2718 type transactions.
+		eip1559  atomic.Bool // Fork indicator whether we are using EIP-1559 type transactions.
+		eip3860  atomic.Bool // Fork indicator whether we are in the Shanghai stage; specifically, whether we are using EIP-3860 type transactions, which limit initcode size.
+	*/
+	intrGas, err := core.IntrinsicGas(tx.Data(), tx.AccessList(), tx.To() == nil, true, pool.eip2028f.Load(), pool.eip3860.Load())
 	if err != nil {
 		return err
 	}

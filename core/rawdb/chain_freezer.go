@@ -25,7 +25,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 const (
@@ -62,7 +62,7 @@ func newChainFreezer(datadir string, namespace string, readonly bool) (*chainFre
 		quit:    make(chan struct{}),
 		trigger: make(chan chan struct{}),
 	}
-	cf.threshold.Store(params.FullImmutabilityThreshold)
+	cf.threshold.Store(vars.FullImmutabilityThreshold)
 	return &cf, nil
 }
 

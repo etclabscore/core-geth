@@ -181,7 +181,6 @@ func Transition(ctx *cli.Context) error {
 
 	vmConfig := vm.Config{
 		Tracer:           tracer,
-		Debug:            (tracer != nil),
 		EVMInterpreter:   ctx.String(utils.EVMInterpreterFlag.Name),
 		EWASMInterpreter: ctx.String(utils.EWASMInterpreterFlag.Name),
 	}

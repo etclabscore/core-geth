@@ -269,7 +269,7 @@ func (beacon *Beacon) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 		return fmt.Errorf("invalid withdrawalsHash: have %x, expected nil", header.WithdrawalsHash)
 	}
 	// Verify the existence / non-existence of excessDataGas
-	cancun := chain.Config().IsCancun(header.Time)
+	cancun := chain.Config().IsEnabledByTime(chain.Config().GetEIP4844TransitionTime, &header.Time)
 	if cancun && header.ExcessDataGas == nil {
 		return errors.New("missing excessDataGas")
 	}

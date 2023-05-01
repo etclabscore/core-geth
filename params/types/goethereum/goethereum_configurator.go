@@ -592,6 +592,16 @@ func (c *ChainConfig) SetEIP6049TransitionTime(n *uint64) error {
 	return nil
 }
 
+// GetEIP4844TransitionTime EIP4844: Shard Block Transactions
+func (c *ChainConfig) GetEIP4844TransitionTime() *uint64 {
+	return c.CancunTime
+}
+
+func (c *ChainConfig) SetEIP4844TransitionTime(n *uint64) error {
+	c.CancunTime = n
+	return nil
+}
+
 func (c *ChainConfig) GetMergeVirtualTransition() *uint64 {
 	return bigNewU64(c.MergeNetsplitBlock)
 }

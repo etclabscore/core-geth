@@ -19,19 +19,19 @@ package misc
 import (
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 var (
-	minDataGasPrice            = big.NewInt(params.BlobTxMinDataGasprice)
-	dataGaspriceUpdateFraction = big.NewInt(params.BlobTxDataGaspriceUpdateFraction)
+	minDataGasPrice            = big.NewInt(vars.BlobTxMinDataGasprice)
+	dataGaspriceUpdateFraction = big.NewInt(vars.BlobTxDataGaspriceUpdateFraction)
 )
 
 // CalcBlobFee calculates the blobfee from the header's excess data gas field.
 func CalcBlobFee(excessDataGas *big.Int) *big.Int {
 	// If this block does not yet have EIP-4844 enabled, return the starting fee
 	if excessDataGas == nil {
-		return big.NewInt(params.BlobTxMinDataGasprice)
+		return big.NewInt(vars.BlobTxMinDataGasprice)
 	}
 	return fakeExponential(minDataGasPrice, excessDataGas, dataGaspriceUpdateFraction)
 }

@@ -277,7 +277,6 @@ type TxPool struct {
 
 	changesSinceReorg int // A counter for how many drops we've performed in-between reorg.
 
-	eip2f    atomic.Bool // Fork indicator whether we are using EIP-2 (Homestead).
 	eip2028f atomic.Bool // Fork indicator whether we are using EIP-2028 (Istanbul).
 	eip2718  atomic.Bool // Fork indicator whether we are using EIP-2718 type transactions.
 	eip1559  atomic.Bool // Fork indicator whether we are using EIP-1559 type transactions.

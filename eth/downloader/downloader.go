@@ -840,7 +840,7 @@ func (d *Downloader) findAncestor(p *peerConnection, remoteHeader *types.Header)
 	case LightSync:
 		localHeight = d.lightchain.CurrentHeader().Number.Uint64()
 	default:
-		log.Crit("unknown sync mode", "mode", d.mode)
+		log.Crit("unknown sync mode", "mode", mode)
 	}
 	p.log.Debug("Looking for common ancestor", "local", localHeight, "remote", remoteHeight)
 
@@ -935,7 +935,7 @@ func (d *Downloader) findAncestorSpanSearch(p *peerConnection, mode SyncMode, re
 		case LightSync:
 			known = d.lightchain.HasHeader(h, n)
 		default:
-			log.Crit("unknown sync mode", "mode", d.mode)
+			log.Crit("unknown sync mode", "mode", mode)
 		}
 		if known {
 			number, hash = n, h
@@ -990,7 +990,7 @@ func (d *Downloader) findAncestorBinarySearch(p *peerConnection, mode SyncMode, 
 		case LightSync:
 			known = d.lightchain.HasHeader(h, n)
 		default:
-			log.Crit("unknown sync mode", "mode", d.mode)
+			log.Crit("unknown sync mode", "mode", mode)
 		}
 		if !known {
 			end = check

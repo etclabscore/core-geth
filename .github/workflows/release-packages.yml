@@ -76,6 +76,14 @@ jobs:
           go run build/ci.go install -dlgo -arch arm64 -cc aarch64-linux-gnu-gcc
           env BUILD_OS_NAME=arm64 ./build/archive-signing.sh
 
+      - name: Print Core-Geth version (Linux/MacOS)
+        if: ${{ matrix.BUILD_OS_NAME == 'linux' || matrix.BUILD_OS_NAME == 'osx'}}
+        run: ./build/bin/geth version
+
+      - name: Print Core-Geth version (Windows)
+        if: ${{ matrix.BUILD_OS_NAME == 'win64' }}
+        run: ./build/bin/geth.exe version
+
       - name: Prepare archives for release
         if: ${{ matrix.BUILD_OS_NAME != 'arm' }}
         run: ./build/archive-signing.sh

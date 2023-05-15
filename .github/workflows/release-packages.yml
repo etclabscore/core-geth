@@ -44,6 +44,39 @@ jobs:
         with:
           go-version: ^1.19
 
+      - name: Cache lookup (Linux/ARM)
+        uses: actions/cache@v3
+        if: ${{ matrix.BUILD_OS_NAME == 'linux' || matrix.BUILD_OS_NAME == 'arm'}}
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ matrix.BUILD_OS_NAME }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ matrix.BUILD_OS_NAME }}-go-
+
+      - name: Cache lookup (MacOS)
+        uses: actions/cache@v3
+        if: ${{ matrix.BUILD_OS_NAME == 'osx'}}
+        with:
+          path: |
+            ~/Library/Caches/go-build
+            ~/go/pkg/mod
+          key: ${{ matrix.BUILD_OS_NAME }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ matrix.BUILD_OS_NAME }}-go-
+
+      - name: Cache lookup (Windows)
+        uses: actions/cache@v3
+        if: ${{ matrix.BUILD_OS_NAME == 'win64'}}
+        with:
+          path: |
+            ~\AppData\Local\go-build
+            ~\go\pkg\mod
+          key: ${{ matrix.BUILD_OS_NAME }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ matrix.BUILD_OS_NAME }}-go-
+
       - name: Build all packages (non ARM)
         if: ${{ matrix.BUILD_OS_NAME != 'arm' }}
         id: build-non-arm-images

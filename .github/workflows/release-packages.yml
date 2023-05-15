@@ -20,14 +20,10 @@ jobs:
         - os: macos-latest
           BUILD_OS_NAME: osx
 
-        # Build on 18.04 (Bionic) because the OS GLIBC is bumped above 2.26 in later versions (eg. 20.04).
-        # This GLIBC version included and used by default in at least Amazon Linux 2 and Ubuntu Bionic.
-        # The C compiler used by default in the 18.04 runner produces an executable which is runnable
-        # on Ubuntu Disco and Focal (tested by meowsbits); it is forward compatible.
-        - os: ubuntu-18.04
+        - os: ubuntu-20.04
           BUILD_OS_NAME: linux
 
-        - os: ubuntu-18.04
+        - os: ubuntu-20.04
           BUILD_OS_NAME: arm
 
         - os: windows-latest

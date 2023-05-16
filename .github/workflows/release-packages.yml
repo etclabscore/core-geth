@@ -20,14 +20,10 @@ jobs:
         - os: macos-latest
           BUILD_OS_NAME: osx
 
-        # Build on 18.04 (Bionic) because the OS GLIBC is bumped above 2.26 in later versions (eg. 20.04).
-        # This GLIBC version included and used by default in at least Amazon Linux 2 and Ubuntu Bionic.
-        # The C compiler used by default in the 18.04 runner produces an executable which is runnable
-        # on Ubuntu Disco and Focal (tested by meowsbits); it is forward compatible.
-        - os: ubuntu-18.04
+        - os: ubuntu-20.04
           BUILD_OS_NAME: linux
 
-        - os: ubuntu-18.04
+        - os: ubuntu-20.04
           BUILD_OS_NAME: arm
 
         - os: windows-latest
@@ -35,14 +31,47 @@ jobs:
 
     steps:
       - name: Checkout etclabscore/core-geth
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Go 1.19
         if: ${{ matrix.BUILD_OS_NAME != 'arm' }}
         id: go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v4
         with:
           go-version: ^1.19
+
+      - name: Cache lookup (Linux/ARM)
+        uses: actions/cache@v3
+        if: ${{ matrix.BUILD_OS_NAME == 'linux' || matrix.BUILD_OS_NAME == 'arm'}}
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ matrix.BUILD_OS_NAME }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ matrix.BUILD_OS_NAME }}-go-
+
+      - name: Cache lookup (MacOS)
+        uses: actions/cache@v3
+        if: ${{ matrix.BUILD_OS_NAME == 'osx'}}
+        with:
+          path: |
+            ~/Library/Caches/go-build
+            ~/go/pkg/mod
+          key: ${{ matrix.BUILD_OS_NAME }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ matrix.BUILD_OS_NAME }}-go-
+
+      - name: Cache lookup (Windows)
+        uses: actions/cache@v3
+        if: ${{ matrix.BUILD_OS_NAME == 'win64'}}
+        with:
+          path: |
+            ~\AppData\Local\go-build
+            ~\go\pkg\mod
+          key: ${{ matrix.BUILD_OS_NAME }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ matrix.BUILD_OS_NAME }}-go-
 
       - name: Build all packages (non ARM)
         if: ${{ matrix.BUILD_OS_NAME != 'arm' }}
@@ -75,6 +104,14 @@ jobs:
           env BUILD_OS_NAME=arm7 ./build/archive-signing.sh
           go run build/ci.go install -dlgo -arch arm64 -cc aarch64-linux-gnu-gcc
           env BUILD_OS_NAME=arm64 ./build/archive-signing.sh
+
+      - name: Print Core-Geth version (Linux/MacOS)
+        if: ${{ matrix.BUILD_OS_NAME == 'linux' || matrix.BUILD_OS_NAME == 'osx'}}
+        run: ./build/bin/geth version
+
+      - name: Print Core-Geth version (Windows)
+        if: ${{ matrix.BUILD_OS_NAME == 'win64' }}
+        run: ./build/bin/geth.exe version
 
       - name: Prepare archives for release
         if: ${{ matrix.BUILD_OS_NAME != 'arm' }}

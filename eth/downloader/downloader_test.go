@@ -158,9 +158,15 @@ type downloadTesterPeer struct {
 
 // Head constructs a function to retrieve a peer's current head hash
 // and total difficulty.
-func (dlp *downloadTesterPeer) Head() (common.Hash, *big.Int) {
+func (dlp *downloadTesterPeer) Head() (common.Hash, *big.Int, *big.Int) {
 	head := dlp.chain.CurrentBlock()
-	return head.Hash(), dlp.chain.GetTd(head.Hash(), head.Number.Uint64())
+	return head.Hash(), dlp.chain.GetTd(head.Hash(), head.Number.Uint64()), new(big.Int).Set(dlp.chain.CurrentBlock().Difficulty)
+}
+
+// SetHead constructs a function to retrieve a peer's current head hash
+// and total difficulty.
+func (dlp *downloadTesterPeer) SetHead(common.Hash, *big.Int, *big.Int) {
+	// noop
 }
 
 func unmarshalRlpHeaders(rlpdata []rlp.RawValue) []*types.Header {

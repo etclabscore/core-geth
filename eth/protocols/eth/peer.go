@@ -73,9 +73,10 @@ type Peer struct {
 	rw        p2p.MsgReadWriter // Input/output streams for snap
 	version   uint              // Protocol version negotiated
 
-	head   common.Hash // Latest advertised head block hash
-	td     *big.Int    // Latest advertised head block total difficulty
-	forkid forkid.ID   // Advertised forkid at time of handshake
+	head            common.Hash // Latest advertised head block hash
+	td              *big.Int    // Latest advertised head block total difficulty
+	forkid          forkid.ID   // Advertised forkid at time of handshake
+	blockDifficulty *big.Int    // Latest advertised head block difficulty
 
 	knownBlocks     *knownCache            // Set of block hashes known to be known by this peer
 	queuedBlocks    chan *blockPropagation // Queue of blocks to broadcast to the peer
@@ -113,6 +114,7 @@ func NewPeer(version uint, p *p2p.Peer, rw p2p.MsgReadWriter, txpool TxPool) *Pe
 		resDispatch:     make(chan *response),
 		txpool:          txpool,
 		term:            make(chan struct{}),
+		blockDifficulty: big.NewInt(0),
 	}
 	// Start up all the broadcasters
 	go peer.broadcastBlocks()
@@ -141,21 +143,24 @@ func (p *Peer) Version() uint {
 }
 
 // Head retrieves the current head hash and total difficulty of the peer.
-func (p *Peer) Head() (hash common.Hash, td *big.Int) {
+func (p *Peer) Head() (hash common.Hash, td, blockDifficulty *big.Int) {
 	p.lock.RLock()
 	defer p.lock.RUnlock()
 
 	copy(hash[:], p.head[:])
-	return hash, new(big.Int).Set(p.td)
+	return hash, new(big.Int).Set(p.td), new(big.Int).Set(p.blockDifficulty)
 }
 
 // SetHead updates the head hash and total difficulty of the peer.
-func (p *Peer) SetHead(hash common.Hash, td *big.Int) {
+func (p *Peer) SetHead(hash common.Hash, td, blockDifficulty *big.Int) {
 	p.lock.Lock()
 	defer p.lock.Unlock()
 
 	copy(p.head[:], hash[:])
 	p.td.Set(td)
+	p.blockDifficulty.Set(blockDifficulty)
+	//TODO: Remove following line
+	p.Peer.Log().Info("Updating head", "peer", p.ID(), "td", td)
 }
 
 // ForkID retrieves the reported forkid at the time of handshake.

@@ -159,8 +159,6 @@ func (p *Peer) SetHead(hash common.Hash, td, blockDifficulty *big.Int) {
 	copy(p.head[:], hash[:])
 	p.td.Set(td)
 	p.blockDifficulty.Set(blockDifficulty)
-	//TODO: Remove following line
-	p.Peer.Log().Info("Updating head", "peer", p.ID(), "td", td)
 }
 
 // ForkID retrieves the reported forkid at the time of handshake.

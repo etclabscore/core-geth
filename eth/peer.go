@@ -57,7 +57,7 @@ type ethPeer struct {
 
 // info gathers and returns some `eth` protocol metadata known about a peer.
 func (p *ethPeer) info() *ethPeerInfo {
-	hash, td := p.Head()
+	hash, td, _ := p.Head()
 
 	info := &ethPeerInfo{
 		Version:    p.Version(),

@@ -58,6 +58,9 @@ var (
 	fsHeaderForceVerify    = 24              // Number of headers to verify before and after the pivot to accept it
 	fsHeaderContCheck      = 3 * time.Second // Time interval to check for header continuations during state download
 	fsMinFullBlocks        = 64              // Number of blocks to retrieve fully even in snap sync
+
+	maxTotalDifficultyDistance = 10               // Maximum amount of block difficulty units the master peer can lag behind w.r.t. other peers
+	totalDifficultyContCheck   = 13 * time.Second // Time interval to wait between total difficulty checks
 )
 
 var (
@@ -129,6 +132,7 @@ type Downloader struct {
 
 	// Channels
 	headerProcCh chan *headerTask // Channel to feed the header processor new tasks
+	totalDiffCh  chan struct{}    // Channel to notify the total difficulty checker about end of header processing
 
 	// Skeleton sync
 	skeleton *skeleton // Header skeleton to backfill the chain with (eth2 mode)
@@ -139,6 +143,9 @@ type Downloader struct {
 
 	SnapSyncer     *snap.Syncer // TODO(karalabe): make private! hack for now
 	stateSyncStart chan *stateSync
+
+	// Sync target total difficulty
+	td *big.Int
 
 	// Cancellation and termination
 	cancelPeer string         // Identifier of the peer currently being used as the master (cancel on drop)
@@ -233,6 +240,7 @@ func New(checkpoint uint64, stateDb ethdb.Database, mux *event.TypeMux, chain Bl
 		lightchain:     lightchain,
 		dropPeer:       dropPeer,
 		headerProcCh:   make(chan *headerTask, 1),
+		totalDiffCh:    make(chan struct{}),
 		quitCh:         make(chan struct{}),
 		SnapSyncer:     snap.NewSyncer(stateDb, chain.TrieDB().Scheme()),
 		stateSyncStart: make(chan *stateSync),
@@ -419,6 +427,10 @@ func (d *Downloader) synchronise(id string, hash common.Hash, td, ttd *big.Int, 
 		default:
 		}
 	}
+	select {
+	case <-d.totalDiffCh:
+	default:
+	}
 	for empty := false; !empty; {
 		select {
 		case <-d.headerProcCh:
@@ -430,6 +442,7 @@ func (d *Downloader) synchronise(id string, hash common.Hash, td, ttd *big.Int, 
 	d.cancelLock.Lock()
 	d.cancelCh = make(chan struct{})
 	d.cancelPeer = id
+	d.td = td
 	d.cancelLock.Unlock()
 
 	defer d.Cancel() // No matter what, we can't leave the cancel channel open
@@ -637,7 +650,7 @@ func (d *Downloader) syncWithPeer(p *peerConnection, hash common.Hash, td, ttd *
 		headerFetcher, // Headers are always retrieved
 		func() error { return d.fetchBodies(origin+1, beaconMode) },   // Bodies are retrieved during normal and snap sync
 		func() error { return d.fetchReceipts(origin+1, beaconMode) }, // Receipts are retrieved during snap sync
-		func() error { return d.processHeaders(origin+1, td, ttd, beaconMode) },
+		func() error { return d.processHeaders(origin+1, ttd, beaconMode) },
 	}
 	if mode == SnapSync {
 		d.pivotLock.Lock()
@@ -648,6 +661,8 @@ func (d *Downloader) syncWithPeer(p *peerConnection, hash common.Hash, td, ttd *
 	} else if mode == FullSync {
 		fetchers = append(fetchers, func() error { return d.processFullSyncContent(ttd, beaconMode) })
 	}
+	fetchers = append(fetchers, func() error { return d.fetchTotalDifficulty(p, latest) })
+
 	return d.spawnSync(fetchers)
 }
 
@@ -729,7 +744,8 @@ func (d *Downloader) fetchHead(p *peerConnection) (head *types.Header, pivot *ty
 	mode := d.getMode()
 
 	// Request the advertised remote head block and wait for the response
-	latest, _ := p.peer.Head()
+	latest, peerTd, _ := p.peer.Head()
+	d.td = peerTd
 	fetch := 1
 	if mode == SnapSync {
 		fetch = 2 // head + pivot headers
@@ -1013,6 +1029,59 @@ func (d *Downloader) findAncestorBinarySearch(p *peerConnection, mode SyncMode, 
 	return start, nil
 }
 
+func (d *Downloader) fetchTotalDifficulty(p *peerConnection, latest *types.Header) error {
+	var head *types.Header
+	head = latest
+
+	for {
+		select {
+		case <-d.cancelCh:
+			return errCanceled
+		case <-d.totalDiffCh:
+			return nil
+		case <-time.After(totalDifficultyContCheck):
+
+			// Check if the peer is lagging behind
+			for _, peer := range d.peers.AllPeers() {
+				_, peerTd, peerDifficulty := peer.peer.Head()
+				distance := new(big.Int).Sub(peerTd, d.td)
+				if distance.Sign() <= 0 || peerDifficulty.Sign() == 0 {
+					continue
+				}
+
+				threshold := big.NewInt(int64(maxTotalDifficultyDistance))
+				threshold.Mul(threshold, peerDifficulty)
+				if distance.Cmp(threshold) > 0 {
+					log.Warn("Found significantly higher total difficulty", "td", d.td, "better", peerTd)
+					return fmt.Errorf("%w: other peers have significantly heavier chains", errUnsyncedPeer)
+				}
+			}
+
+			// Check for chain progress on the peer's side
+			headers, _, err := d.fetchHeadersByNumber(p, head.Number.Uint64()+1, 8, 0, false)
+			if err != nil {
+				return fmt.Errorf("%w: header request failed: %v", errBadPeer, err)
+			}
+			ignore := reorgProtHeaderDelay
+			if ignore > len(headers) {
+				ignore = len(headers)
+			}
+			headers = headers[:len(headers)-ignore]
+			newTd := new(big.Int).Set(d.td)
+			for _, header := range headers {
+				newTd.Add(newTd, header.Difficulty)
+			}
+
+			if newTd.Cmp(d.td) > 0 {
+				head = headers[len(headers)-1]
+				p.peer.SetHead(head.Hash(), newTd, head.Difficulty)
+				log.Debug("Updating sync target total difficulty", "old", d.td, "new", newTd)
+				d.td = newTd
+			}
+		}
+	}
+}
+
 // fetchHeaders keeps retrieving headers concurrently from the number
 // requested, until no more are returned, potentially throttling on the way. To
 // facilitate concurrency but still protect against malicious nodes sending bad
@@ -1284,7 +1353,7 @@ func (d *Downloader) fetchReceipts(from uint64, beaconMode bool) error {
 // processHeaders takes batches of retrieved headers from an input channel and
 // keeps processing and scheduling them into the header chain and downloader's
 // queue until the stream ends or a failure occurs.
-func (d *Downloader) processHeaders(origin uint64, td, ttd *big.Int, beaconMode bool) error {
+func (d *Downloader) processHeaders(origin uint64, ttd *big.Int, beaconMode bool) error {
 	// Keep a count of uncertain headers to roll back
 	var (
 		rollback    uint64 // Zero means no rollback (fine as you can't unroll the genesis)
@@ -1332,6 +1401,10 @@ func (d *Downloader) processHeaders(origin uint64, td, ttd *big.Int, beaconMode 
 					case <-d.cancelCh:
 					}
 				}
+				select {
+				case d.totalDiffCh <- struct{}{}:
+				case <-d.cancelCh:
+				}
 				// If we're in legacy sync mode, we need to check total difficulty
 				// violations from malicious peers. That is not needed in beacon
 				// mode and we can skip to terminating sync.
@@ -1350,7 +1423,7 @@ func (d *Downloader) processHeaders(origin uint64, td, ttd *big.Int, beaconMode 
 					// R: Nothing to give
 					if mode != LightSync {
 						head := d.blockchain.CurrentBlock()
-						if !gotHeaders && td.Cmp(d.blockchain.GetTd(head.Hash(), head.Number.Uint64())) > 0 {
+						if !gotHeaders && d.td.Cmp(d.blockchain.GetTd(head.Hash(), head.Number.Uint64())) > 0 {
 							return errStallingPeer
 						}
 					}
@@ -1363,7 +1436,7 @@ func (d *Downloader) processHeaders(origin uint64, td, ttd *big.Int, beaconMode 
 					// peer gave us something useful, we're already happy/progressed (above check).
 					if mode == SnapSync || mode == LightSync {
 						head := d.lightchain.CurrentHeader()
-						if td.Cmp(d.lightchain.GetTd(head.Hash(), head.Number.Uint64())) > 0 {
+						if d.td.Cmp(d.lightchain.GetTd(head.Hash(), head.Number.Uint64())) > 0 {
 							return errStallingPeer
 						}
 					}

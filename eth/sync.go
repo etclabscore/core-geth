@@ -258,7 +258,7 @@ func (cs *chainSyncer) nextSyncOp() *chainSyncOp {
 }
 
 func peerToSyncOp(mode downloader.SyncMode, p *eth.Peer) *chainSyncOp {
-	peerHead, peerTD := p.Head()
+	peerHead, peerTD, _ := p.Head()
 	return &chainSyncOp{mode: mode, peer: p, td: peerTD, head: peerHead}
 }
 

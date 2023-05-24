@@ -240,7 +240,7 @@ func (ps *peerSet) peerWithHighestTD() *eth.Peer {
 		bestTd   *big.Int
 	)
 	for _, p := range ps.peers {
-		if _, td := p.Head(); bestPeer == nil || td.Cmp(bestTd) > 0 {
+		if _, td, _ := p.Head(); bestPeer == nil || td.Cmp(bestTd) > 0 {
 			bestPeer, bestTd = p.Peer, td
 		}
 	}
@@ -268,7 +268,7 @@ func (ps *peerSet) WorstPeer() *ethPeer {
 		worstTD   *big.Int
 	)
 	for _, p := range ps.peers {
-		if _, td := p.Head(); worstPeer == nil || td.Cmp(worstTD) < 0 {
+		if _, td, _ := p.Head(); worstPeer == nil || td.Cmp(worstTD) < 0 {
 			worstPeer, worstTD = p, td
 		}
 	}

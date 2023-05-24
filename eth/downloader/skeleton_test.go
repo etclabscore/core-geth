@@ -188,7 +188,11 @@ func (p *skeletonTestPeer) RequestHeadersByNumber(origin uint64, amount int, ski
 	return req, nil
 }
 
-func (p *skeletonTestPeer) Head() (common.Hash, *big.Int) {
+func (p *skeletonTestPeer) Head() (common.Hash, *big.Int, *big.Int) {
+	panic("skeleton sync must not request the remote head")
+}
+
+func (p *skeletonTestPeer) SetHead(common.Hash, *big.Int, *big.Int) {
 	panic("skeleton sync must not request the remote head")
 }
 
@@ -514,7 +518,7 @@ func TestSkeletonSyncExtend(t *testing.T) {
 // Tests that the skeleton sync correctly retrieves headers from one or more
 // peers without duplicates or other strange side effects.
 func TestSkeletonSyncRetrievals(t *testing.T) {
-	//log.Root().SetHandler(log.LvlFilterHandler(log.LvlTrace, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
+	// log.Root().SetHandler(log.LvlFilterHandler(log.LvlTrace, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
 
 	// Since skeleton headers don't need to be meaningful, beyond a parent hash
 	// progression, create a long fake chain to test with.

@@ -225,6 +225,9 @@ type CoreGethChainConfig struct {
 	EIP4895FTime *uint64 `json:"eip4895FTime,omitempty"` // EIP-4895: Beacon chain push withdrawals as operations
 	EIP6049FTime *uint64 `json:"eip6049FTime,omitempty"` // EIP-6049: Deprecate SELFDESTRUCT. Note: EIP-6049 does not change the behavior of SELFDESTRUCT in and of itself, but formally announces client developers' intention of changing it in future upgrades. It is recommended that software which exposes the SELFDESTRUCT opcode to users warn them about an upcoming change in semantics.
 
+	// Cancun
+	EIP4844FTime *uint64 `json:"eip4844FTime,omitempty"` // EIP-4844: Shard Blob Transactions https://eips.ethereum.org/EIPS/eip-4844
+
 	MergeNetsplitVBlock *big.Int `json:"mergeNetsplitVBlock,omitempty"` // Virtual fork after The Merge to use as a network splitter
 
 	DisposalBlock *big.Int `json:"disposalBlock,omitempty"` // Bomb disposal HF block

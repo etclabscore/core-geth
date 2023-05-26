@@ -114,6 +114,14 @@ func (g *Genesis) SetEIP6049TransitionTime(n *uint64) error {
 	return g.Config.SetEIP6049TransitionTime(n)
 }
 
+func (g *Genesis) GetEIP4844TransitionTime() *uint64 {
+	return g.Config.GetEIP4844TransitionTime()
+}
+
+func (g *Genesis) SetEIP4844TransitionTime(n *uint64) error {
+	return g.Config.SetEIP4844TransitionTime(n)
+}
+
 func (g *Genesis) IsEnabledByTime(fn func() *uint64, n *uint64) bool {
 	return g.Config.IsEnabledByTime(fn, n)
 }

@@ -302,9 +302,8 @@ func (c *Clique) verifyHeader(chain consensus.ChainHeaderReader, header *types.H
 	if chain.Config().IsEnabledByTime(chain.Config().GetEIP3855TransitionTime, &header.Time) {
 		return fmt.Errorf("clique does not support shanghai fork")
 	}
-	// If all checks passed, validate any special fields for hard forks
-	if err := misc.VerifyForkHashes(chain.Config(), header, false); err != nil {
-		return err
+	if chain.Config().IsEnabledByTime(chain.Config().GetEIP4844TransitionTime, &header.Time) {
+		return fmt.Errorf("clique does not support cancun fork")
 	}
 	// All basic checks passed, verify cascading fields
 	return c.verifyCascadingFields(chain, header, parents)

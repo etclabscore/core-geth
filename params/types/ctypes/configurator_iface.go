@@ -199,6 +199,11 @@ type ProtocolSpecifier interface {
 	// GetMergeVirtualTransition is a Virtual fork after The Merge to use as a network splitter
 	GetMergeVirtualTransition() *uint64
 	SetMergeVirtualTransition(n *uint64) error
+
+	// Cancun:
+	// 4844 - Shard Blob Transactions - https://eips.ethereum.org/EIPS/eip-4844
+	GetEIP4844TransitionTime() *uint64
+	SetEIP4844TransitionTime(n *uint64) error
 }
 
 type Forker interface {

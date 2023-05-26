@@ -3079,7 +3079,6 @@ func TestDeleteRecreateSlots(t *testing.T) {
 	})
 	// Import the canonical chain
 	chain, err := NewBlockChain(rawdb.NewMemoryDatabase(), nil, gspec, nil, engine, vm.Config{
-		Debug:  true,
 		Tracer: logger.NewJSONLogger(nil, os.Stdout),
 	}, nil, nil)
 	if err != nil {
@@ -3157,7 +3156,6 @@ func TestDeleteRecreateAccount(t *testing.T) {
 	})
 	// Import the canonical chain
 	chain, err := NewBlockChain(rawdb.NewMemoryDatabase(), nil, gspec, nil, engine, vm.Config{
-		Debug:  true,
 		Tracer: logger.NewJSONLogger(nil, os.Stdout),
 	}, nil, nil)
 	if err != nil {

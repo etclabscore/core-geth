@@ -564,6 +564,16 @@ func (c *CoreGethChainConfig) SetEIP6049TransitionTime(n *uint64) error {
 	return nil
 }
 
+// GetEIP4844TransitionTime EIP4844: Shard Blob Transactions
+func (c *CoreGethChainConfig) GetEIP4844TransitionTime() *uint64 {
+	return c.EIP4844FTime
+}
+
+func (c *CoreGethChainConfig) SetEIP4844TransitionTime(n *uint64) error {
+	c.EIP4844FTime = n
+	return nil
+}
+
 func (c *CoreGethChainConfig) GetMergeVirtualTransition() *uint64 {
 	return bigNewU64(c.MergeNetsplitVBlock)
 }

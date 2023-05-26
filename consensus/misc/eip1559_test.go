@@ -36,7 +36,6 @@ func copyConfig(original *goethereum.ChainConfig) *goethereum.ChainConfig {
 		DAOForkBlock:            original.DAOForkBlock,
 		DAOForkSupport:          original.DAOForkSupport,
 		EIP150Block:             original.EIP150Block,
-		EIP150Hash:              original.EIP150Hash,
 		EIP155Block:             original.EIP155Block,
 		EIP158Block:             original.EIP158Block,
 		ByzantiumBlock:          original.ByzantiumBlock,

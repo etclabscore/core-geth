@@ -194,7 +194,7 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, isPostMerge bool, 
 		enable3198(instructionSet) // BASEFEE opcode https://eips.ethereum.org/EIPS/eip-3198
 	}
 	if isPostMerge {
-		instructionSet[RANDOM] = &operation{
+		instructionSet[PREVRANDAO] = &operation{
 			execute:     opRandom,
 			constantGas: GasQuickStep,
 			minStack:    minStack(0, 1),

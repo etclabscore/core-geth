@@ -25,17 +25,14 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
-	"sync/atomic"
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/mclock"
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
-	"github.com/ethereum/go-ethereum/contracts/checkpointoracle/contract"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/forkid"
 	"github.com/ethereum/go-ethereum/core/rawdb"
@@ -75,18 +72,11 @@ var (
 	testEventEmitterCode = common.Hex2Bytes("60606040523415600e57600080fd5b7f57050ab73f6b9ebdd9f76b8d4997793f48cf956e965ee070551b9ca0bb71584e60405160405180910390a160358060476000396000f3006060604052600080fd00a165627a7a723058203f727efcad8b5811f8cb1fc2620ce5e8c63570d697aef968172de296ea3994140029")
 
 	// Checkpoint oracle relative fields
-	oracleAddr   common.Address
 	signerKey, _ = crypto.GenerateKey()
 	signerAddr   = crypto.PubkeyToAddress(signerKey.PublicKey)
 )
 
 var (
-	// The block frequency for creating checkpoint(only used in test)
-	sectionSize = big.NewInt(128)
-
-	// The number of confirmations needed to generate a checkpoint(only used in test).
-	processConfirms = big.NewInt(1)
-
 	// The token bucket buffer limit for testing purpose.
 	testBufLimit = uint64(1000000)
 
@@ -120,11 +110,7 @@ func prepare(n int, backend *backends.SimulatedBackend) {
 		case 0:
 			// Builtin-block
 			//    number: 1
-			//    txs:    2
-
-			// deploy checkpoint contract
-			auth, _ := bind.NewKeyedTransactorWithChainID(bankKey, big.NewInt(1337))
-			oracleAddr, _, _, _ = contract.DeployCheckpointOracle(auth, backend, []common.Address{signerAddr}, sectionSize, processConfirms, big.NewInt(1))
+			//    txs:    1
 
 			// bankUser transfers some ether to user1
 			nonce, _ := backend.PendingNonceAt(ctx, bankAddr)
@@ -204,7 +190,6 @@ func newTestClientHandler(backend *backends.SimulatedBackend, odr *LesOdr, index
 			GasLimit: 100000000,
 			BaseFee:  big.NewInt(vars.InitialBaseFee),
 		}
-		oracle *checkpointoracle.CheckpointOracle
 	)
 	genesis := core.MustCommitGenesis(db, &gspec)
 	chain, _ := light.NewLightChain(odr, gspec.Config, engine, nil)
@@ -233,7 +218,6 @@ func newTestClientHandler(backend *backends.SimulatedBackend, odr *LesOdr, index
 			chainConfig: params.AllEthashProtocolChanges,
 			iConfig:     light.TestClientIndexerConfig,
 			chainDb:     db,
-			oracle:      oracle,
 			chainReader: chain,
 			closeCh:     make(chan struct{}),
 		},
@@ -246,11 +230,8 @@ func newTestClientHandler(backend *backends.SimulatedBackend, odr *LesOdr, index
 		eventMux:   evmux,
 		merger:     consensus.NewMerger(rawdb.NewMemoryDatabase()),
 	}
-	client.handler = newClientHandler(ulcServers, ulcFraction, nil, client)
+	client.handler = newClientHandler(ulcServers, ulcFraction, client)
 
-	if client.oracle != nil {
-		client.oracle.Start(backend)
-	}
 	client.handler.start()
 	return client.handler, func() {
 		client.handler.stop()
@@ -265,7 +246,6 @@ func newTestServerHandler(blocks int, indexers []*core.ChainIndexer, db ethdb.Da
 			GasLimit: 100000000,
 			BaseFee:  big.NewInt(vars.InitialBaseFee),
 		}
-		oracle *checkpointoracle.CheckpointOracle
 	)
 	genesis := core.MustCommitGenesis(db, &gspec)
 
@@ -302,7 +282,6 @@ func newTestServerHandler(blocks int, indexers []*core.ChainIndexer, db ethdb.Da
 			iConfig:     light.TestServerIndexerConfig,
 			chainDb:     db,
 			chainReader: simulation.Blockchain(),
-			oracle:      oracle,
 			closeCh:     make(chan struct{}),
 		},
 		peers:        newClientPeerSet(),
@@ -319,9 +298,6 @@ func newTestServerHandler(blocks int, indexers []*core.ChainIndexer, db ethdb.Da
 	server.clientPool.Start()
 	server.clientPool.SetLimits(10000, 10000) // Assign enough capacity for clientpool
 	server.handler = newServerHandler(server, simulation.Blockchain(), db, txpool, func() bool { return true })
-	if server.oracle != nil {
-		server.oracle.Start(simulation)
-	}
 	server.servingQueue.setThreads(4)
 	server.handler.start()
 	closer := func() { server.Stop() }
@@ -441,7 +417,7 @@ func newTestPeerPair(name string, version int, server *serverHandler, client *cl
 			return nil, nil, fmt.Errorf("failed to establish protocol connection %v", err)
 		default:
 		}
-		if atomic.LoadUint32(&peer1.serving) == 1 && atomic.LoadUint32(&peer2.serving) == 1 {
+		if peer1.serving.Load() && peer2.serving.Load() {
 			break
 		}
 		time.Sleep(50 * time.Millisecond)
@@ -502,7 +478,7 @@ func (client *testClient) newRawPeer(t *testing.T, name string, version int, rec
 			return nil, nil, nil
 		default:
 		}
-		if atomic.LoadUint32(&peer.serving) == 1 {
+		if peer.serving.Load() {
 			break
 		}
 		time.Sleep(50 * time.Millisecond)
@@ -566,7 +542,7 @@ func (server *testServer) newRawPeer(t *testing.T, name string, version int) (*t
 			return nil, nil, nil
 		default:
 		}
-		if atomic.LoadUint32(&peer.serving) == 1 {
+		if peer.serving.Load() {
 			break
 		}
 		time.Sleep(50 * time.Millisecond)

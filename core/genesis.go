@@ -319,7 +319,7 @@ func gaDeriveHash(ga *genesisT.GenesisAlloc) (common.Hash, error) {
 	// Create an ephemeral in-memory database for computing hash,
 	// all the derived states will be discarded to not pollute disk.
 	db := state.NewDatabase(rawdb.NewMemoryDatabase())
-	statedb, err := state.New(common.Hash{}, db, nil)
+	statedb, err := state.New(types.EmptyRootHash, db, nil)
 	if err != nil {
 		return common.Hash{}, err
 	}
@@ -332,6 +332,42 @@ func gaDeriveHash(ga *genesisT.GenesisAlloc) (common.Hash, error) {
 		}
 	}
 	return statedb.Commit(false)
+}
+
+// TODO (ziogaschr): fix
+// flush is very similar with deriveHash, but the main difference is
+// all the generated states will be persisted into the given database.
+// Also, the genesis state specification will be flushed as well.
+func (ga *GenesisAlloc) flush(db ethdb.Database, triedb *trie.Database, blockhash common.Hash) error {
+	statedb, err := state.New(types.EmptyRootHash, state.NewDatabaseWithNodeDB(db, triedb), nil)
+	if err != nil {
+		return err
+	}
+	for addr, account := range *ga {
+		statedb.AddBalance(addr, account.Balance)
+		statedb.SetCode(addr, account.Code)
+		statedb.SetNonce(addr, account.Nonce)
+		for key, value := range account.Storage {
+			statedb.SetState(addr, key, value)
+		}
+	}
+	root, err := statedb.Commit(false)
+	if err != nil {
+		return err
+	}
+	// Commit newly generated states into disk if it's not empty.
+	if root != types.EmptyRootHash {
+		if err := triedb.Commit(root, true); err != nil {
+			return err
+		}
+	}
+	// Marshal the genesis state specification and persist.
+	blob, err := json.Marshal(ga)
+	if err != nil {
+		return err
+	}
+	rawdb.WriteGenesisStateSpec(db, blockhash, blob)
+	return nil
 }
 
 // Write writes the json marshaled genesis state into database

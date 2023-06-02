@@ -21,7 +21,6 @@ import (
 	"math/big"
 	"math/rand"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -58,7 +57,6 @@ type clientHandler struct {
 func newClientHandler(ulcServers []string, ulcFraction int, checkpoint *ctypes.TrustedCheckpoint, backend *LightEthereum) *clientHandler {
 	handler := &clientHandler{
 		forkFilter: forkid.NewFilter(backend.blockchain),
-		checkpoint: checkpoint,
 		backend:    backend,
 		closeCh:    make(chan struct{}),
 	}
@@ -75,7 +73,7 @@ func newClientHandler(ulcServers []string, ulcFraction int, checkpoint *ctypes.T
 		height = (checkpoint.SectionIndex+1)*vars.CHTFrequency - 1
 	}
 	handler.fetcher = newLightFetcher(backend.blockchain, backend.engine, backend.peers, handler.ulc, backend.chainDb, backend.reqDist, handler.synchronise)
-	handler.downloader = downloader.New(height, backend.chainDb, backend.eventMux, nil, backend.blockchain, handler.removePeer)
+	handler.downloader = downloader.New(0, backend.chainDb, backend.eventMux, nil, backend.blockchain, handler.removePeer)
 	handler.backend.peers.subscribe((*downloaderPeerNotify)(handler))
 	return handler
 }
@@ -152,8 +150,8 @@ func (h *clientHandler) handle(p *serverPeer, noInitAnnounce bool) error {
 	}
 
 	// Mark the peer starts to be served.
-	atomic.StoreUint32(&p.serving, 1)
-	defer atomic.StoreUint32(&p.serving, 0)
+	p.serving.Store(true)
+	defer p.serving.Store(false)
 
 	// Spawn a main loop to handle all incoming messages.
 	for {

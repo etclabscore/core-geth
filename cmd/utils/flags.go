@@ -40,16 +40,17 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/fdlimit"
+	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/consensus/lyra2"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/txpool"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/crypto/kzg4844"
 	"github.com/ethereum/go-ethereum/eth"
 	ethcatalyst "github.com/ethereum/go-ethereum/eth/catalyst"
 	"github.com/ethereum/go-ethereum/eth/downloader"
@@ -107,8 +108,8 @@ var (
 	}
 	DBEngineFlag = &cli.StringFlag{
 		Name:     "db.engine",
-		Usage:    "Backing database implementation to use ('leveldb' or 'pebble')",
-		Value:    "leveldb",
+		Usage:    "Backing database implementation to use ('pebble' or 'leveldb')",
+		Value:    node.DefaultConfig.DBEngine,
 		Category: flags.EthCategory,
 	}
 	AncientFlag = &flags.DirectoryFlag{
@@ -314,9 +315,9 @@ var (
 		Value:    2048,
 		Category: flags.EthCategory,
 	}
-	OverrideShanghai = &cli.Uint64Flag{
-		Name:     "override.shanghai",
-		Usage:    "Manually specify the Shanghai fork timestamp, overriding the bundled setting",
+	OverrideCancun = &cli.Uint64Flag{
+		Name:     "override.cancun",
+		Usage:    "Manually specify the Cancun fork timestamp, overriding the bundled setting",
 		Category: flags.EthCategory,
 	}
 	// Light server and client settings
@@ -555,27 +556,17 @@ var (
 		Usage:    "Raise the open file descriptor resource limit (default = system fd limit)",
 		Category: flags.PerfCategory,
 	}
+	CryptoKZGFlag = &cli.StringFlag{
+		Name:     "crypto.kzg",
+		Usage:    "KZG library implementation to use; gokzg (recommended) or ckzg",
+		Value:    "gokzg",
+		Category: flags.PerfCategory,
+	}
 
 	// Miner settings
 	MiningEnabledFlag = &cli.BoolFlag{
 		Name:     "mine",
 		Usage:    "Enable mining",
-		Category: flags.MinerCategory,
-	}
-	MinerThreadsFlag = &cli.IntFlag{
-		Name:     "miner.threads",
-		Usage:    "Number of CPU threads to use for mining",
-		Value:    0,
-		Category: flags.MinerCategory,
-	}
-	MinerNotifyFlag = &cli.StringFlag{
-		Name:     "miner.notify",
-		Usage:    "Comma separated HTTP URL list to notify of new work packages",
-		Category: flags.MinerCategory,
-	}
-	MinerNotifyFullFlag = &cli.BoolFlag{
-		Name:     "miner.notify.full",
-		Usage:    "Notify with pending block headers instead of work packages",
 		Category: flags.MinerCategory,
 	}
 	MinerGasLimitFlag = &cli.Uint64Flag{
@@ -604,11 +595,6 @@ var (
 		Name:     "miner.recommit",
 		Usage:    "Time interval to recreate the block being mined",
 		Value:    ethconfig.Defaults.Miner.Recommit,
-		Category: flags.MinerCategory,
-	}
-	MinerNoVerifyFlag = &cli.BoolFlag{
-		Name:     "miner.noverify",
-		Usage:    "Disable remote sealing verification",
 		Category: flags.MinerCategory,
 	}
 	MinerNewPayloadTimeout = &cli.DurationFlag{
@@ -1823,10 +1809,6 @@ func setEthash(ctx *cli.Context, cfg *eth.Config) {
 }
 
 func setMiner(ctx *cli.Context, cfg *miner.Config) {
-	if ctx.IsSet(MinerNotifyFlag.Name) {
-		cfg.Notify = strings.Split(ctx.String(MinerNotifyFlag.Name), ",")
-	}
-	cfg.NotifyFull = ctx.Bool(MinerNotifyFullFlag.Name)
 	if ctx.IsSet(MinerExtraDataFlag.Name) {
 		cfg.ExtraData = []byte(ctx.String(MinerExtraDataFlag.Name))
 	}
@@ -1838,9 +1820,6 @@ func setMiner(ctx *cli.Context, cfg *miner.Config) {
 	}
 	if ctx.IsSet(MinerRecommitIntervalFlag.Name) {
 		cfg.Recommit = ctx.Duration(MinerRecommitIntervalFlag.Name)
-	}
-	if ctx.IsSet(MinerNoVerifyFlag.Name) {
-		cfg.Noverify = ctx.Bool(MinerNoVerifyFlag.Name)
 	}
 	if ctx.IsSet(MinerNewPayloadTimeout.Name) {
 		cfg.NewPayloadTimeout = ctx.Duration(MinerNewPayloadTimeout.Name)
@@ -1933,7 +1912,6 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	setEtherbase(ctx, cfg)
 	setGPO(ctx, &cfg.GPO, ctx.String(SyncModeFlag.Name) == "light")
 	setTxPool(ctx, &cfg.TxPool)
-	setEthash(ctx, cfg)
 	setMiner(ctx, &cfg.Miner)
 	setRequiredBlocks(ctx, cfg)
 	setLes(ctx, cfg)
@@ -2060,7 +2038,6 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 			cfg.EthDiscoveryURLs = SplitAndTrim(urls)
 		}
 	}
-
 	// Override any default configs for hard coded networks.
 
 	// Override genesis configuration if a --<chain> flag.
@@ -2225,6 +2202,14 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		if !ctx.IsSet(MinerGasPriceFlag.Name) {
 			cfg.Miner.GasPrice = big.NewInt(1)
 		}
+	}
+	// Set any dangling config values
+	if ctx.String(CryptoKZGFlag.Name) != "gokzg" && ctx.String(CryptoKZGFlag.Name) != "ckzg" {
+		Fatalf("--%s flag must be 'gokzg' or 'ckzg'", CryptoKZGFlag.Name)
+	}
+	log.Info("Initializing the KZG library", "backend", ctx.String(CryptoKZGFlag.Name))
+	if err := kzg4844.UseCKZG(ctx.String(CryptoKZGFlag.Name) == "ckzg"); err != nil {
+		Fatalf("Failed to set KZG library implementation to %s: %v", ctx.String(CryptoKZGFlag.Name), err)
 	}
 }
 

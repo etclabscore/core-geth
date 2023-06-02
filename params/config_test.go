@@ -17,6 +17,7 @@
 package params
 
 import (
+	"math"
 	"math/big"
 	"testing"
 	"time"
@@ -366,5 +367,24 @@ func TestGenesisHashes(t *testing.T) {
 		if got := b.Hash(); got != c.hash {
 			t.Errorf("case: %d, want: %s, got: %s", i, c.hash.Hex(), got.Hex())
 		}
+	}
+}
+
+func TestConfigRules(t *testing.T) {
+	c := &ChainConfig{
+		LondonBlock:  new(big.Int),
+		ShanghaiTime: newUint64(500),
+	}
+	var stamp uint64
+	if r := c.Rules(big.NewInt(0), true, stamp); r.IsShanghai {
+		t.Errorf("expected %v to not be shanghai", stamp)
+	}
+	stamp = 500
+	if r := c.Rules(big.NewInt(0), true, stamp); !r.IsShanghai {
+		t.Errorf("expected %v to be shanghai", stamp)
+	}
+	stamp = math.MaxInt64
+	if r := c.Rules(big.NewInt(0), true, stamp); !r.IsShanghai {
+		t.Errorf("expected %v to be shanghai", stamp)
 	}
 }

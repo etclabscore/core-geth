@@ -70,9 +70,8 @@ type LightChain struct {
 	wg      sync.WaitGroup
 
 	// Atomic boolean switches:
-	running          int32 // whether LightChain is running or stopped
-	procInterrupt    int32 // interrupts chain insert
-	disableCheckFreq int32 // disables header verification
+	stopped       atomic.Bool // whether LightChain is stopped or running
+	procInterrupt atomic.Bool // interrupts chain insert
 }
 
 // NewLightChain returns a fully initialised light chain using information
@@ -98,9 +97,6 @@ func NewLightChain(odr OdrBackend, config ctypes.ChainConfigurator, engine conse
 	bc.genesisBlock, _ = bc.GetBlockByNumber(NoOdr, 0)
 	if bc.genesisBlock == nil {
 		return nil, core.ErrNoGenesis
-	}
-	if checkpoint != nil {
-		bc.AddTrustedCheckpoint(checkpoint)
 	}
 	if err := bc.loadLastState(); err != nil {
 		return nil, err
@@ -133,7 +129,7 @@ func (lc *LightChain) AddTrustedCheckpoint(cp *ctypes.TrustedCheckpoint) {
 }
 
 func (lc *LightChain) getProcInterrupt() bool {
-	return atomic.LoadInt32(&lc.procInterrupt) == 1
+	return lc.procInterrupt.Load()
 }
 
 // Odr returns the ODR backend of the chain
@@ -321,7 +317,7 @@ func (lc *LightChain) GetBlockByNumber(ctx context.Context, number uint64) (*typ
 // Stop stops the blockchain service. If any imports are currently in progress
 // it will abort them using the procInterrupt.
 func (lc *LightChain) Stop() {
-	if !atomic.CompareAndSwapInt32(&lc.running, 0, 1) {
+	if !lc.stopped.CompareAndSwap(false, true) {
 		return
 	}
 	close(lc.quit)
@@ -334,7 +330,7 @@ func (lc *LightChain) Stop() {
 // errInsertionInterrupted as soon as possible. Insertion is permanently disabled after
 // calling this method.
 func (lc *LightChain) StopInsert() {
-	atomic.StoreInt32(&lc.procInterrupt, 1)
+	lc.procInterrupt.Store(true)
 }
 
 // Rollback is designed to remove a chain of links from the database that aren't
@@ -364,7 +360,7 @@ func (lc *LightChain) Rollback(chain []common.Hash) {
 func (lc *LightChain) InsertHeader(header *types.Header) error {
 	// Verify the header first before obtaining the lock
 	headers := []*types.Header{header}
-	if _, err := lc.hc.ValidateHeaderChain(headers, 100); err != nil {
+	if _, err := lc.hc.ValidateHeaderChain(headers); err != nil {
 		return err
 	}
 	// Make sure only one thread manipulates the chain at once
@@ -400,23 +396,15 @@ func (lc *LightChain) SetCanonical(header *types.Header) error {
 // InsertHeaderChain attempts to insert the given header chain in to the local
 // chain, possibly creating a reorg. If an error is returned, it will return the
 // index number of the failing header as well an error describing what went wrong.
-//
-// The verify parameter can be used to fine tune whether nonce verification
-// should be done or not. The reason behind the optional check is because some
-// of the header retrieval mechanisms already need to verify nonces, as well as
-// because nonces can be verified sparsely, not needing to check each.
-//
+
 // In the case of a light chain, InsertHeaderChain also creates and posts light
 // chain events when necessary.
-func (lc *LightChain) InsertHeaderChain(chain []*types.Header, checkFreq int) (int, error) {
+func (lc *LightChain) InsertHeaderChain(chain []*types.Header) (int, error) {
 	if len(chain) == 0 {
 		return 0, nil
 	}
-	if atomic.LoadInt32(&lc.disableCheckFreq) == 1 {
-		checkFreq = 0
-	}
 	start := time.Now()
-	if i, err := lc.hc.ValidateHeaderChain(chain, checkFreq); err != nil {
+	if i, err := lc.hc.ValidateHeaderChain(chain); err != nil {
 		return i, err
 	}
 
@@ -588,14 +576,4 @@ func (lc *LightChain) SubscribeLogsEvent(ch chan<- []*types.Log) event.Subscript
 // LightChain does not send core.RemovedLogsEvent, so return an empty subscription.
 func (lc *LightChain) SubscribeRemovedLogsEvent(ch chan<- core.RemovedLogsEvent) event.Subscription {
 	return lc.scope.Track(new(event.Feed).Subscribe(ch))
-}
-
-// DisableCheckFreq disables header validation. This is used for ultralight mode.
-func (lc *LightChain) DisableCheckFreq() {
-	atomic.StoreInt32(&lc.disableCheckFreq, 1)
-}
-
-// EnableCheckFreq enables header validation.
-func (lc *LightChain) EnableCheckFreq() {
-	atomic.StoreInt32(&lc.disableCheckFreq, 0)
 }

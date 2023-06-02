@@ -86,7 +86,7 @@ func genValueTx(nbytes int) func(int, *BlockGen) {
 		toaddr := common.Address{}
 		data := make([]byte, nbytes)
 		gas, _ := IntrinsicGas(data, nil, false, false, false, false)
-		signer := types.MakeSigner(gen.config, big.NewInt(int64(i)))
+		signer := types.MakeSigner(gen.config, big.NewInt(int64(i)), gen.header.Time)
 		gasPrice := big.NewInt(0)
 		if gen.header.BaseFee != nil {
 			gasPrice = gen.header.BaseFee
@@ -130,7 +130,7 @@ func genTxRing(naccounts int) func(int, *BlockGen) {
 		if gen.header.BaseFee != nil {
 			gasPrice = gen.header.BaseFee
 		}
-		signer := types.MakeSigner(gen.config, big.NewInt(int64(i)))
+		signer := types.MakeSigner(gen.config, big.NewInt(int64(i)), gen.header.Time)
 		for {
 			gas -= vars.TxGas
 			if gas < vars.TxGas {
@@ -319,7 +319,7 @@ func benchReadChain(b *testing.B, full bool, count uint64) {
 			if full {
 				hash := header.Hash()
 				rawdb.ReadBody(db, hash, n)
-				rawdb.ReadReceipts(db, hash, n, chain.Config())
+				rawdb.ReadReceipts(db, hash, n, header.Time, chain.Config())
 			}
 		}
 		chain.Stop()

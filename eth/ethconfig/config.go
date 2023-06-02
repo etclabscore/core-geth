@@ -19,10 +19,6 @@ package ethconfig
 
 import (
 	"math/big"
-	"os"
-	"os/user"
-	"path/filepath"
-	"runtime"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -96,27 +92,6 @@ var Defaults = Config{
 	RPCTxFeeCap:             1, // 1 ether
 }
 
-func init() {
-	home := os.Getenv("HOME")
-	if home == "" {
-		if user, err := user.Current(); err == nil {
-			home = user.HomeDir
-		}
-	}
-	if runtime.GOOS == "darwin" {
-		Defaults.Ethash.DatasetDir = filepath.Join(home, "Library", "Ethash")
-	} else if runtime.GOOS == "windows" {
-		localappdata := os.Getenv("LOCALAPPDATA")
-		if localappdata != "" {
-			Defaults.Ethash.DatasetDir = filepath.Join(localappdata, "Ethash")
-		} else {
-			Defaults.Ethash.DatasetDir = filepath.Join(home, "AppData", "Local", "Ethash")
-		}
-	} else {
-		Defaults.Ethash.DatasetDir = filepath.Join(home, ".ethash")
-	}
-}
-
 //go:generate go run github.com/fjl/gencodec -type Config -formats toml -out gen_config.go
 
 // Config contains configuration options for of the ETH and LES protocols.
@@ -146,13 +121,12 @@ type Config struct {
 	RequiredBlocks map[uint64]common.Hash `toml:"-"`
 
 	// Light client options
-	LightServ          int  `toml:",omitempty"` // Maximum percentage of time allowed for serving LES requests
-	LightIngress       int  `toml:",omitempty"` // Incoming bandwidth limit for light servers
-	LightEgress        int  `toml:",omitempty"` // Outgoing bandwidth limit for light servers
-	LightPeers         int  `toml:",omitempty"` // Maximum number of LES client peers
-	LightNoPrune       bool `toml:",omitempty"` // Whether to disable light chain pruning
-	LightNoSyncServe   bool `toml:",omitempty"` // Whether to serve light clients before syncing
-	SyncFromCheckpoint bool `toml:",omitempty"` // Whether to sync the header chain from the configured checkpoint
+	LightServ        int  `toml:",omitempty"` // Maximum percentage of time allowed for serving LES requests
+	LightIngress     int  `toml:",omitempty"` // Incoming bandwidth limit for light servers
+	LightEgress      int  `toml:",omitempty"` // Outgoing bandwidth limit for light servers
+	LightPeers       int  `toml:",omitempty"` // Maximum number of LES client peers
+	LightNoPrune     bool `toml:",omitempty"` // Whether to disable light chain pruning
+	LightNoSyncServe bool `toml:",omitempty"` // Whether to serve light clients before syncing
 
 	// Ultra Light client options
 	UltraLightServers      []string `toml:",omitempty"` // List of trusted ultra light servers
@@ -179,9 +153,6 @@ type Config struct {
 
 	// Mining options
 	Miner miner.Config
-
-	// Ethash options
-	Ethash ethash.Config
 
 	// Transaction pool options
 	TxPool txpool.Config

@@ -25,7 +25,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ledgerwatch/erigon-lib/chain"
 )
 
 var ErrInvalidChainId = errors.New("invalid chain id for signer")
@@ -41,8 +40,8 @@ type sigCache struct {
 func MakeSigner(config ctypes.ChainConfigurator, blockNumber *big.Int, blockTime uint64) Signer {
 	var signer Signer
 	switch {
-	case chain.Config().IsEnabledByTime(chain.Config().GetEIP4844TransitionTime, &blockTime):
-		signer = NewCancunSigner(config.ChainID)
+	case config.IsEnabledByTime(config.GetEIP4844TransitionTime, &blockTime):
+		signer = NewCancunSigner(config.GetChainID())
 	case config.IsEnabled(config.GetEIP1559Transition, blockNumber):
 		signer = NewEIP1559Signer(config.GetChainID())
 	case config.IsEnabled(config.GetEIP2930Transition, blockNumber):

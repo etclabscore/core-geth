@@ -20,7 +20,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/holiman/uint256"
 )
 
@@ -105,7 +105,7 @@ func (tx *BlobTx) gasPrice() *big.Int        { return tx.GasFeeCap.ToBig() }
 func (tx *BlobTx) value() *big.Int           { return tx.Value.ToBig() }
 func (tx *BlobTx) nonce() uint64             { return tx.Nonce }
 func (tx *BlobTx) to() *common.Address       { return tx.To }
-func (tx *BlobTx) blobGas() uint64           { return params.BlobTxDataGasPerBlob * uint64(len(tx.BlobHashes)) }
+func (tx *BlobTx) blobGas() uint64           { return vars.BlobTxDataGasPerBlob * uint64(len(tx.BlobHashes)) }
 func (tx *BlobTx) blobGasFeeCap() *big.Int   { return tx.BlobFeeCap.ToBig() }
 func (tx *BlobTx) blobHashes() []common.Hash { return tx.BlobHashes }
 

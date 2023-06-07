@@ -97,6 +97,9 @@ type handler struct {
 	snapSync  atomic.Bool // Flag whether snap sync is enabled (gets disabled if we already have blocks)
 	acceptTxs atomic.Bool // Flag whether we're considered synchronised (enables transaction processing)
 
+	checkpointNumber uint64      // Block number for the sync progress validator to cross reference
+	checkpointHash   common.Hash // Block hash for the sync progress validator to cross reference
+
 	database ethdb.Database
 	txpool   txPool
 	chain    *core.BlockChain

@@ -31,9 +31,17 @@ import (
 )
 
 // Test light syncing which will download all headers from genesis.
-func TestLightSyncingLes3(t *testing.T) { testSyncing(t, lpv3) }
+func TestLightSyncingLes3(t *testing.T) { testCheckpointSyncing(t, lpv3, 0) }
 
-func testSyncing(t *testing.T, protocol int) {
+// Test legacy checkpoint syncing which will download tail headers
+// based on a hardcoded checkpoint.
+func TestLegacyCheckpointSyncingLes3(t *testing.T) { testCheckpointSyncing(t, lpv3, 1) }
+
+// Test checkpoint syncing which will download tail headers based
+// on a verified checkpoint.
+func TestCheckpointSyncingLes3(t *testing.T) { testCheckpointSyncing(t, lpv3, 2) }
+
+func testCheckpointSyncing(t *testing.T, protocol int, syncMode int) {
 	config := light.TestServerIndexerConfig
 
 	waitIndexers := func(cIndexer, bIndexer, btIndexer *core.ChainIndexer) {

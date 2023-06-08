@@ -55,6 +55,7 @@ type lesCommons struct {
 	chainDb, lesDb               ethdb.Database
 	chainReader                  chainReader
 	chtIndexer, bloomTrieIndexer *core.ChainIndexer
+	oracle                       *checkpointoracle.CheckpointOracle
 
 	closeCh chan struct{}
 	wg      sync.WaitGroup
@@ -101,6 +102,7 @@ func (c *lesCommons) nodeInfo() interface{} {
 		Genesis:    c.genesis,
 		Config:     c.chainConfig,
 		Head:       hash,
+		CHT:        c.latestLocalCheckpoint(),
 	}
 }
 

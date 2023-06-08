@@ -661,6 +661,9 @@ func (p *serverPeer) Handshake(genesis common.Hash, forkid forkid.ID, forkFilter
 		p.fcServer = flowcontrol.NewServerNode(sParams, &mclock.System{})
 		p.fcCosts = MRC.decode(ProtocolLengths[uint(p.version)])
 
+		recv.get("checkpoint/value", &p.checkpoint)
+		recv.get("checkpoint/registerHeight", &p.checkpointNumber)
+
 		if !p.onlyAnnounce {
 			for msgCode := range reqAvgTimeCost {
 				if p.fcCosts[msgCode] == nil {
@@ -1043,6 +1046,16 @@ func (p *clientPeer) Handshake(td *big.Int, head common.Hash, headNum uint64, ge
 		*lists = (*lists).add("flowControl/MRC", costList)
 		p.fcCosts = costList.decode(ProtocolLengths[uint(p.version)])
 		p.fcParams = server.defParams
+
+		// Add advertised checkpoint and register block height which
+		// client can verify the checkpoint validity.
+		if server.oracle != nil && server.oracle.IsRunning() {
+			cp, height := server.oracle.StableCheckpoint()
+			if cp != nil {
+				*lists = (*lists).add("checkpoint/value", cp)
+				*lists = (*lists).add("checkpoint/registerHeight", height)
+			}
+		}
 	}, func(recv keyValueMap) error {
 		p.server = recv.get("flowControl/MRR", nil) == nil
 		if p.server {

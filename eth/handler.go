@@ -100,6 +100,9 @@ type handler struct {
 	checkpointNumber uint64      // Block number for the sync progress validator to cross reference
 	checkpointHash   common.Hash // Block hash for the sync progress validator to cross reference
 
+	checkpointNumber uint64      // Block number for the sync progress validator to cross reference
+	checkpointHash   common.Hash // Block hash for the sync progress validator to cross reference
+
 	database ethdb.Database
 	txpool   txPool
 	chain    *core.BlockChain
@@ -238,6 +241,16 @@ func newHandler(config *handlerConfig) (*handler, error) {
 			log.Warn("Unexpected insertion activity", ctx...)
 			return 0, errors.New("unexpected behavior after transition")
 		}
+		// If sync hasn't reached the checkpoint yet, deny importing weird blocks.
+		//
+		// Ideally we would also compare the head block's timestamp and similarly reject
+		// the propagated block if the head is too old. Unfortunately there is a corner
+		// case when starting new networks, where the genesis might be ancient (0 unix)
+		// which would prevent full nodes from accepting it.
+		if h.chain.CurrentBlock().Number.Uint64() < h.checkpointNumber {
+			log.Warn("Unsynced yet, discarded propagated block", "number", blocks[0].Number(), "hash", blocks[0].Hash())
+			return 0, nil
+		}
 		// If snap sync is running, deny importing weird blocks. This is a problematic
 		// clause when starting up a new network, because snap-syncing miners might not
 		// accept each others' blocks until a restart. Unfortunately we haven't figured
@@ -371,6 +384,58 @@ func (h *handler) runEthPeer(peer *eth.Peer, handler eth.Handler) error {
 	dead := make(chan struct{})
 	defer close(dead)
 
+	// If we have a trusted CHT, reject all peers below that (avoid fast sync eclipse)
+	if h.checkpointHash != (common.Hash{}) {
+		// Request the peer's checkpoint header for chain height/weight validation
+		resCh := make(chan *eth.Response)
+
+		req, err := peer.RequestHeadersByNumber(h.checkpointNumber, 1, 0, false, resCh)
+		if err != nil {
+			return err
+		}
+		// Start a timer to disconnect if the peer doesn't reply in time
+		go func() {
+			// Ensure the request gets cancelled in case of error/drop
+			defer req.Close()
+
+			timeout := time.NewTimer(syncChallengeTimeout)
+			defer timeout.Stop()
+
+			select {
+			case res := <-resCh:
+				headers := ([]*types.Header)(*res.Res.(*eth.BlockHeadersPacket))
+				if len(headers) == 0 {
+					// If we're doing a snap sync, we must enforce the checkpoint
+					// block to avoid eclipse attacks. Unsynced nodes are welcome
+					// to connect after we're done joining the network.
+					if atomic.LoadUint32(&h.snapSync) == 1 {
+						peer.Log().Warn("Dropping unsynced node during sync", "addr", peer.RemoteAddr(), "type", peer.Name())
+						res.Done <- errors.New("unsynced node cannot serve sync")
+						return
+					}
+					res.Done <- nil
+					return
+				}
+				// Validate the header and either drop the peer or continue
+				if len(headers) > 1 {
+					res.Done <- errors.New("too many headers in checkpoint response")
+					return
+				}
+				if headers[0].Hash() != h.checkpointHash {
+					res.Done <- errors.New("checkpoint hash mismatch")
+					return
+				}
+				res.Done <- nil
+
+			case <-timeout.C:
+				peer.Log().Warn("Checkpoint challenge timed out, dropping", "addr", peer.RemoteAddr(), "type", peer.Name())
+				h.removePeer(peer.ID())
+
+			case <-dead:
+				// Peer handler terminated, abort all goroutines
+			}
+		}()
+	}
 	// If we have any explicit peer required block hashes, request them
 	for number, hash := range h.requiredBlocks {
 		resCh := make(chan *eth.Response)

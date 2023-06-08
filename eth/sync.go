@@ -19,6 +19,7 @@ package eth
 import (
 	"errors"
 	"math/big"
+	"sync/atomic"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -323,6 +324,13 @@ func (h *handler) doSync(op *chainSyncOp) error {
 	h.acceptTxs.Store(true)
 
 	head := h.chain.CurrentBlock()
+	if head.Number.Uint64() >= h.checkpointNumber {
+		// Checkpoint passed, sanity check the timestamp to have a fallback mechanism
+		// for non-checkpointed (number = 0) private networks.
+		if head.Time >= uint64(time.Now().AddDate(0, -1, 0).Unix()) {
+			atomic.StoreUint32(&h.acceptTxs, 1)
+		}
+	}
 	if head.Number.Uint64() > 0 {
 		// We've completed a sync cycle, notify all peers of new state. This path is
 		// essential in star-topology networks where a gateway node needs to notify

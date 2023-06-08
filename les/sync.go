@@ -17,14 +17,75 @@
 package les
 
 import (
+	"context"
+	"errors"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/les/downloader"
+	"github.com/ethereum/go-ethereum/light"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
+
+var errInvalidCheckpoint = errors.New("invalid advertised checkpoint")
+
+const (
+	// lightSync starts syncing from the current highest block.
+	// If the chain is empty, syncing the entire header chain.
+	lightSync = iota
+
+	// legacyCheckpointSync starts syncing from a hardcoded checkpoint.
+	legacyCheckpointSync
+
+	// checkpointSync starts syncing from a checkpoint signed by trusted
+	// signer or hardcoded checkpoint for compatibility.
+	checkpointSync
+)
+
+// validateCheckpoint verifies the advertised checkpoint by peer is valid or not.
+//
+// Each network has several hard-coded checkpoint signer addresses. Only the
+// checkpoint issued by the specified signer is considered valid.
+//
+// In addition to the checkpoint registered in the registrar contract, there are
+// several legacy hardcoded checkpoints in our codebase. These checkpoints are
+// also considered as valid.
+func (h *clientHandler) validateCheckpoint(peer *serverPeer) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	// Fetch the block header corresponding to the checkpoint registration.
+	wrapPeer := &peerConnection{handler: h, peer: peer}
+	header, err := wrapPeer.RetrieveSingleHeaderByNumber(ctx, peer.checkpointNumber)
+	if err != nil {
+		return err
+	}
+	// Fetch block logs associated with the block header.
+	logs, err := light.GetUntrustedBlockLogs(ctx, h.backend.odr, header)
+	if err != nil {
+		return err
+	}
+	events := h.backend.oracle.Contract().LookupCheckpointEvents(logs, peer.checkpoint.SectionIndex, peer.checkpoint.Hash())
+	if len(events) == 0 {
+		return errInvalidCheckpoint
+	}
+	var (
+		index      = events[0].Index
+		hash       = events[0].CheckpointHash
+		signatures [][]byte
+	)
+	for _, event := range events {
+		signatures = append(signatures, append(event.R[:], append(event.S[:], event.V)...))
+	}
+	valid, signers := h.backend.oracle.VerifySigners(index, hash, signatures)
+	if !valid {
+		return errInvalidCheckpoint
+	}
+	log.Warn("Verified advertised checkpoint", "peer", peer.id, "signers", len(signers))
+	return nil
+}
 
 // synchronise tries to sync up our local chain with a remote peer.
 func (h *clientHandler) synchronise(peer *serverPeer) {
@@ -101,7 +162,36 @@ func (h *clientHandler) synchronise(peer *serverPeer) {
 			h.syncEnd(h.backend.blockchain.CurrentHeader())
 		}
 	}()
+
 	start := time.Now()
+	if mode == checkpointSync || mode == legacyCheckpointSync {
+		// Validate the advertised checkpoint
+		if mode == checkpointSync {
+			if err := h.validateCheckpoint(peer); err != nil {
+				log.Debug("Failed to validate checkpoint", "reason", err)
+				h.removePeer(peer.id)
+				return
+			}
+			h.backend.blockchain.AddTrustedCheckpoint(checkpoint)
+		}
+		log.Debug("Checkpoint syncing start", "peer", peer.id, "checkpoint", checkpoint.SectionIndex)
+
+		// Fetch the start point block header.
+		//
+		// For the ethash consensus engine, the start header is the block header
+		// of the checkpoint.
+		//
+		// For the clique consensus engine, the start header is the block header
+		// of the latest epoch covered by checkpoint.
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+		defer cancel()
+		if !checkpoint.Empty() && !h.backend.blockchain.SyncCheckpoint(ctx, checkpoint) {
+			log.Debug("Sync checkpoint failed")
+			h.removePeer(peer.id)
+			return
+		}
+	}
+
 	if h.syncStart != nil {
 		h.syncStart(h.backend.blockchain.CurrentHeader())
 	}

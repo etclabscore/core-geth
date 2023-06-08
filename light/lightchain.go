@@ -99,6 +99,9 @@ func NewLightChain(odr OdrBackend, config ctypes.ChainConfigurator, engine conse
 	if bc.genesisBlock == nil {
 		return nil, core.ErrNoGenesis
 	}
+	if checkpoint != nil {
+		bc.AddTrustedCheckpoint(checkpoint)
+	}
 	if err := bc.loadLastState(); err != nil {
 		return nil, err
 	}
@@ -529,6 +532,38 @@ func (lc *LightChain) SyncCheckpoint(ctx context.Context, checkpoint *ctypes.Tru
 	latest := (checkpoint.SectionIndex+1)*lc.indexerConfig.ChtSize - 1
 	if lc.hc.Config().GetConsensusEngineType().IsClique() {
 		latest -= latest % lc.hc.Config().GetCliqueEpoch()
+	}
+	if head >= latest {
+		return true
+	}
+	// Retrieve the latest useful header and update to it
+	if header, err := GetHeaderByNumber(ctx, lc.odr, latest); header != nil && err == nil {
+		lc.chainmu.Lock()
+		defer lc.chainmu.Unlock()
+
+		// Ensure the chain didn't move past the latest block while retrieving it
+		if lc.hc.CurrentHeader().Number.Uint64() < header.Number.Uint64() {
+			log.Info("Updated latest header based on CHT", "number", header.Number, "hash", header.Hash(), "age", common.PrettyAge(time.Unix(int64(header.Time), 0)))
+			rawdb.WriteHeadHeaderHash(lc.chainDb, header.Hash())
+			lc.hc.SetCurrentHeader(header)
+		}
+		return true
+	}
+	return false
+}
+
+// SyncCheckpoint fetches the checkpoint point block header according to
+// the checkpoint provided by the remote peer.
+//
+// Note if we are running the clique, fetches the last epoch snapshot header
+// which covered by checkpoint.
+func (lc *LightChain) SyncCheckpoint(ctx context.Context, checkpoint *params.TrustedCheckpoint) bool {
+	// Ensure the remote checkpoint head is ahead of us
+	head := lc.CurrentHeader().Number.Uint64()
+
+	latest := (checkpoint.SectionIndex+1)*lc.indexerConfig.ChtSize - 1
+	if clique := lc.hc.Config().Clique; clique != nil {
+		latest -= latest % clique.Epoch // epoch snapshot for clique
 	}
 	if head >= latest {
 		return true

@@ -378,7 +378,10 @@ func createNode(t *testing.T) *node.Node {
 
 func newGQLService(t *testing.T, stack *node.Node, gspec *genesisT.Genesis, genBlocks int, genfunc func(i int, gen *core.BlockGen)) (*handler, []*types.Block) {
 	ethConf := &ethconfig.Config{
-		Genesis:                 gspec,
+		Genesis: gspec,
+		Ethash: ethash.Config{
+			PowMode: ethash.ModeFake,
+		},
 		NetworkId:               1337,
 		TrieCleanCache:          5,
 		TrieCleanCacheJournal:   "triecache",

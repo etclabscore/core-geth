@@ -182,7 +182,7 @@ type LightChain interface {
 	GetTd(common.Hash, uint64) *big.Int
 
 	// InsertHeaderChain inserts a batch of headers into the local chain.
-	InsertHeaderChain([]*types.Header) (int, error)
+	InsertHeaderChain([]*types.Header, int) (int, error)
 
 	// SetHead rewinds the local chain to a new head.
 	SetHead(uint64) error
@@ -1463,6 +1463,19 @@ func (d *Downloader) processHeaders(origin uint64, ttd *big.Int, beaconMode bool
 
 				// In case of header only syncing, validate the chunk immediately
 				if mode == SnapSync || mode == LightSync {
+					// If we're importing pure headers, verify based on their recentness
+					var pivot uint64
+
+					d.pivotLock.RLock()
+					if d.pivotHeader != nil {
+						pivot = d.pivotHeader.Number.Uint64()
+					}
+					d.pivotLock.RUnlock()
+
+					frequency := fsHeaderCheckFrequency
+					if chunkHeaders[len(chunkHeaders)-1].Number.Uint64()+uint64(fsHeaderForceVerify) > pivot {
+						frequency = 1
+					}
 					// Although the received headers might be all valid, a legacy
 					// PoW/PoA sync must not accept post-merge headers. Make sure
 					// that any transition is rejected at this point.
@@ -1495,11 +1508,11 @@ func (d *Downloader) processHeaders(origin uint64, ttd *big.Int, beaconMode bool
 						}
 					}
 					if len(chunkHeaders) > 0 {
-						if n, err := d.lightchain.InsertHeaderChain(chunkHeaders); err != nil {
+						if n, err := d.lightchain.InsertHeaderChain(chunkHeaders, frequency); err != nil {
 							rollbackErr = err
 
 							// If some headers were inserted, track them as uncertain
-							if mode == SnapSync && n > 0 && rollback == 0 {
+							if (mode == SnapSync || frequency > 1) && n > 0 && rollback == 0 {
 								rollback = chunkHeaders[0].Number.Uint64()
 							}
 							log.Warn("Invalid header encountered", "number", chunkHeaders[n].Number, "hash", chunkHashes[n], "parent", chunkHeaders[n].ParentHash, "err", err)

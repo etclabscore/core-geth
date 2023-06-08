@@ -225,6 +225,7 @@ func startLesService(t *testing.T, genesis *genesisT.Genesis, headers []*types.H
 	}
 	ethcfg := &ethconfig.Config{
 		Genesis:        genesis,
+		Ethash:         ethash.Config{PowMode: ethash.ModeFake},
 		SyncMode:       downloader.LightSync,
 		TrieDirtyCache: 256,
 		TrieCleanCache: 256,
@@ -237,7 +238,7 @@ func startLesService(t *testing.T, genesis *genesisT.Genesis, headers []*types.H
 	if err := n.Start(); err != nil {
 		t.Fatal("can't start node:", err)
 	}
-	if _, err := lesService.BlockChain().InsertHeaderChain(headers); err != nil {
+	if _, err := lesService.BlockChain().InsertHeaderChain(headers, 0); err != nil {
 		n.Close()
 		t.Fatal("can't import test headers:", err)
 	}

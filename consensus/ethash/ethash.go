@@ -110,7 +110,6 @@ func memoryMap(path string, lock bool) (*os.File, mmap.MMap, []uint32, error) {
 	if err != nil {
 		return nil, nil, nil, err
 	}
-
 	mem, buffer, err := memoryMapFile(file, false)
 	if err != nil {
 		file.Close()

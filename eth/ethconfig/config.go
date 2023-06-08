@@ -19,6 +19,10 @@ package ethconfig
 
 import (
 	"math/big"
+	"os"
+	"os/user"
+	"path/filepath"
+	"runtime"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -92,6 +96,27 @@ var Defaults = Config{
 	RPCTxFeeCap:             1, // 1 ether
 }
 
+func init() {
+	home := os.Getenv("HOME")
+	if home == "" {
+		if user, err := user.Current(); err == nil {
+			home = user.HomeDir
+		}
+	}
+	if runtime.GOOS == "darwin" {
+		Defaults.Ethash.DatasetDir = filepath.Join(home, "Library", "Ethash")
+	} else if runtime.GOOS == "windows" {
+		localappdata := os.Getenv("LOCALAPPDATA")
+		if localappdata != "" {
+			Defaults.Ethash.DatasetDir = filepath.Join(localappdata, "Ethash")
+		} else {
+			Defaults.Ethash.DatasetDir = filepath.Join(home, "AppData", "Local", "Ethash")
+		}
+	} else {
+		Defaults.Ethash.DatasetDir = filepath.Join(home, ".ethash")
+	}
+}
+
 //go:generate go run github.com/fjl/gencodec -type Config -formats toml -out gen_config.go
 
 // Config contains configuration options for of the ETH and LES protocols.
@@ -153,6 +178,9 @@ type Config struct {
 
 	// Mining options
 	Miner miner.Config
+
+	// Ethash options
+	Ethash ethash.Config
 
 	// Transaction pool options
 	TxPool txpool.Config

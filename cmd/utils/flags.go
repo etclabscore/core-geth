@@ -44,6 +44,7 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/lyra2"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/txpool"
@@ -569,6 +570,22 @@ var (
 		Usage:    "Enable mining",
 		Category: flags.MinerCategory,
 	}
+	MinerThreadsFlag = &cli.IntFlag{
+		Name:     "miner.threads",
+		Usage:    "Number of CPU threads to use for mining",
+		Value:    0,
+		Category: flags.MinerCategory,
+	}
+	MinerNotifyFlag = &cli.StringFlag{
+		Name:     "miner.notify",
+		Usage:    "Comma separated HTTP URL list to notify of new work packages",
+		Category: flags.MinerCategory,
+	}
+	MinerNotifyFullFlag = &cli.BoolFlag{
+		Name:     "miner.notify.full",
+		Usage:    "Notify with pending block headers instead of work packages",
+		Category: flags.MinerCategory,
+	}
 	MinerGasLimitFlag = &cli.Uint64Flag{
 		Name:     "miner.gaslimit",
 		Usage:    "Target gas ceiling for mined blocks",
@@ -595,6 +612,11 @@ var (
 		Name:     "miner.recommit",
 		Usage:    "Time interval to recreate the block being mined",
 		Value:    ethconfig.Defaults.Miner.Recommit,
+		Category: flags.MinerCategory,
+	}
+	MinerNoVerifyFlag = &cli.BoolFlag{
+		Name:     "miner.noverify",
+		Usage:    "Disable remote sealing verification",
 		Category: flags.MinerCategory,
 	}
 	MinerNewPayloadTimeout = &cli.DurationFlag{
@@ -1809,6 +1831,10 @@ func setEthash(ctx *cli.Context, cfg *eth.Config) {
 }
 
 func setMiner(ctx *cli.Context, cfg *miner.Config) {
+	if ctx.IsSet(MinerNotifyFlag.Name) {
+		cfg.Notify = strings.Split(ctx.String(MinerNotifyFlag.Name), ",")
+	}
+	cfg.NotifyFull = ctx.Bool(MinerNotifyFullFlag.Name)
 	if ctx.IsSet(MinerExtraDataFlag.Name) {
 		cfg.ExtraData = []byte(ctx.String(MinerExtraDataFlag.Name))
 	}
@@ -1820,6 +1846,9 @@ func setMiner(ctx *cli.Context, cfg *miner.Config) {
 	}
 	if ctx.IsSet(MinerRecommitIntervalFlag.Name) {
 		cfg.Recommit = ctx.Duration(MinerRecommitIntervalFlag.Name)
+	}
+	if ctx.IsSet(MinerNoVerifyFlag.Name) {
+		cfg.Noverify = ctx.Bool(MinerNoVerifyFlag.Name)
 	}
 	if ctx.IsSet(MinerNewPayloadTimeout.Name) {
 		cfg.NewPayloadTimeout = ctx.Duration(MinerNewPayloadTimeout.Name)
@@ -1912,6 +1941,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	setEtherbase(ctx, cfg)
 	setGPO(ctx, &cfg.GPO, ctx.String(SyncModeFlag.Name) == "light")
 	setTxPool(ctx, &cfg.TxPool)
+	setEthash(ctx, cfg)
 	setMiner(ctx, &cfg.Miner)
 	setRequiredBlocks(ctx, cfg)
 	setLes(ctx, cfg)

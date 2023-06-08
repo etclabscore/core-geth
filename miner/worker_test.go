@@ -211,6 +211,10 @@ func newTestWorker(t *testing.T, chainConfig ctypes.ChainConfigurator, engine co
 	return w, backend
 }
 
+func TestGenerateBlockAndImportEthash(t *testing.T) {
+	testGenerateBlockAndImport(t, false)
+}
+
 func TestGenerateBlockAndImportClique(t *testing.T) {
 	testGenerateBlockAndImport(t, true)
 }

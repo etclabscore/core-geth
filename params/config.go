@@ -65,8 +65,6 @@ var (
 		TerminalTotalDifficultyPassed: true,
 		ShanghaiTime:                  newUint64(1681338455),
 		Ethash:                        new(ctypes.EthashConfig),
-		TrustedCheckpoint:             MainnetTrustedCheckpoint,
-		TrustedCheckpointOracle:       MainnetCheckpointOracle,
 	}
 	// SepoliaChainConfig contains the chain parameters to run a node on the Sepolia test network.
 	SepoliaChainConfig = &goethereum.ChainConfig{
@@ -89,7 +87,6 @@ var (
 		MergeNetsplitBlock:            big.NewInt(1735371),
 		ShanghaiTime:                  newUint64(1677557088),
 		Ethash:                        new(ctypes.EthashConfig),
-		TrustedCheckpoint:             SepoliaTrustedCheckpoint,
 	}
 	// RinkebyChainConfig contains the chain parameters to run a node on the Rinkeby test network.
 	RinkebyChainConfig = &goethereum.ChainConfig{
@@ -109,8 +106,6 @@ var (
 		BerlinBlock:               big.NewInt(8_290_928),
 		LondonBlock:               big.NewInt(8_897_988),
 		ArrowGlacierBlock:         nil,
-		TrustedCheckpoint:         RinkebyTrustedCheckpoint,
-		TrustedCheckpointOracle:   RinkebyCheckpointOracle,
 		Clique: &ctypes.CliqueConfig{
 			Period: 15,
 			Epoch:  30000,
@@ -137,8 +132,6 @@ var (
 		TerminalTotalDifficulty:       big.NewInt(10_790_000),
 		TerminalTotalDifficultyPassed: true,
 		ShanghaiTime:                  newUint64(1678832736),
-		TrustedCheckpoint:             GoerliTrustedCheckpoint,
-		TrustedCheckpointOracle:       GoerliCheckpointOracle,
 		Clique: &ctypes.CliqueConfig{
 			Period: 15,
 			Epoch:  30000,

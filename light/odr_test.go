@@ -286,7 +286,7 @@ func testChainOdr(t *testing.T, protocol int, fn odrTestFn) {
 
 	core.MustCommitGenesis(ldb, gspec)
 	odr := &testOdr{sdb: sdb, ldb: ldb, serverState: blockchain.StateCache(), indexerConfig: TestClientIndexerConfig}
-	lightchain, err := NewLightChain(odr, gspec.Config, ethash.NewFullFaker())
+	lightchain, err := NewLightChain(odr, gspec.Config, ethash.NewFullFaker(), nil)
 	if err != nil {
 		t.Fatal(err)
 	}

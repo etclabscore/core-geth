@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"math/big"
 	"math/rand"
-	"sync/atomic"
 	"testing"
 	"time"
 
@@ -512,9 +511,9 @@ func testCheckpointChallenge(t *testing.T, syncmode downloader.SyncMode, checkpo
 	defer handler.close()
 
 	if syncmode == downloader.SnapSync {
-		atomic.StoreUint32(&handler.handler.snapSync, 1)
+		handler.handler.snapSync.Store(true)
 	} else {
-		atomic.StoreUint32(&handler.handler.snapSync, 0)
+		handler.handler.snapSync.Store(false)
 	}
 	var response *types.Header
 	if checkpoint {

@@ -100,9 +100,6 @@ type handler struct {
 	checkpointNumber uint64      // Block number for the sync progress validator to cross reference
 	checkpointHash   common.Hash // Block hash for the sync progress validator to cross reference
 
-	checkpointNumber uint64      // Block number for the sync progress validator to cross reference
-	checkpointHash   common.Hash // Block hash for the sync progress validator to cross reference
-
 	database ethdb.Database
 	txpool   txPool
 	chain    *core.BlockChain
@@ -408,7 +405,7 @@ func (h *handler) runEthPeer(peer *eth.Peer, handler eth.Handler) error {
 					// If we're doing a snap sync, we must enforce the checkpoint
 					// block to avoid eclipse attacks. Unsynced nodes are welcome
 					// to connect after we're done joining the network.
-					if atomic.LoadUint32(&h.snapSync) == 1 {
+					if h.snapSync.Load() {
 						peer.Log().Warn("Dropping unsynced node during sync", "addr", peer.RemoteAddr(), "type", peer.Name())
 						res.Done <- errors.New("unsynced node cannot serve sync")
 						return

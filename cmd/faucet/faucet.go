@@ -1256,22 +1256,3 @@ func authNoAuth(url string) (string, string, common.Address, error) {
 	}
 	return address.Hex() + "@noauth", "", address, nil
 }
-
-// TODO (ziogaschr): check, do we need this?
-// getGenesis returns a genesis based on input args
-func getGenesis(genesisFlag string, goerliFlag bool, rinkebyFlag bool, sepoliaFlag bool) (*core.Genesis, error) {
-	switch {
-	case genesisFlag != "":
-		var genesis core.Genesis
-		err := common.LoadJSON(genesisFlag, &genesis)
-		return &genesis, err
-	case goerliFlag:
-		return core.DefaultGoerliGenesisBlock(), nil
-	case rinkebyFlag:
-		return core.DefaultRinkebyGenesisBlock(), nil
-	case sepoliaFlag:
-		return core.DefaultSepoliaGenesisBlock(), nil
-	default:
-		return nil, errors.New("no genesis flag provided")
-	}
-}

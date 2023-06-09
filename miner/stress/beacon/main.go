@@ -47,6 +47,8 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 type nodetype int
@@ -78,7 +80,7 @@ func (typ nodetype) String() string {
 
 var (
 	// transitionDifficulty is the target total difficulty for transition
-	transitionDifficulty = new(big.Int).Mul(big.NewInt(20), params.MinimumDifficulty)
+	transitionDifficulty = new(big.Int).Mul(big.NewInt(20), vars.MinimumDifficulty)
 
 	// blockInterval is the time interval for creating a new eth2 block
 	blockIntervalInt = 3
@@ -98,7 +100,7 @@ type ethNode struct {
 	lesBackend *les.LightEthereum
 }
 
-func newNode(typ nodetype, genesis *core.Genesis, enodes []*enode.Node) *ethNode {
+func newNode(typ nodetype, genesis *genesisT.Genesis, enodes []*enode.Node) *ethNode {
 	var (
 		err        error
 		api        *ethcatalyst.ConsensusAPI
@@ -231,18 +233,18 @@ func (n *ethNode) insertBlockAndSetHead(parent *types.Header, ed engine.Executab
 }
 
 type nodeManager struct {
-	genesis      *core.Genesis
+	genesis      *genesisT.Genesis
 	genesisBlock *types.Block
 	nodes        []*ethNode
 	enodes       []*enode.Node
 	close        chan struct{}
 }
 
-func newNodeManager(genesis *core.Genesis) *nodeManager {
+func newNodeManager(genesis *genesisT.Genesis) *nodeManager {
 	return &nodeManager{
 		close:        make(chan struct{}),
 		genesis:      genesis,
-		genesisBlock: genesis.ToBlock(),
+		genesisBlock: core.GenesisToBlock(genesis, nil),
 	}
 }
 
@@ -394,7 +396,7 @@ func main() {
 		faucets[i], _ = crypto.GenerateKey()
 	}
 	// Pre-generate the ethash mining DAG so we don't race
-	ethash.MakeDataset(1, filepath.Join(os.Getenv("HOME"), ".ethash"))
+	ethash.MakeDataset(1, ethash.CalcEpochLength(0, nil), filepath.Join(os.Getenv("HOME"), ".ethash"))
 
 	// Create an Ethash network
 	genesis := makeGenesis(faucets)
@@ -443,25 +445,25 @@ func main() {
 
 // makeGenesis creates a custom Ethash genesis block based on some pre-defined
 // faucet accounts.
-func makeGenesis(faucets []*ecdsa.PrivateKey) *core.Genesis {
-	genesis := core.DefaultGenesisBlock()
-	genesis.Difficulty = params.MinimumDifficulty
+func makeGenesis(faucets []*ecdsa.PrivateKey) *genesisT.Genesis {
+	genesis := params.DefaultGenesisBlock()
+	genesis.Difficulty = vars.MinimumDifficulty
 	genesis.GasLimit = 25000000
 
-	genesis.BaseFee = big.NewInt(params.InitialBaseFee)
+	genesis.BaseFee = big.NewInt(vars.InitialBaseFee)
 	genesis.Config = params.AllEthashProtocolChanges
-	genesis.Config.TerminalTotalDifficulty = transitionDifficulty
+	genesis.Config.SetEthashTerminalTotalDifficulty(transitionDifficulty)
 
-	genesis.Alloc = core.GenesisAlloc{}
+	genesis.Alloc = genesisT.GenesisAlloc{}
 	for _, faucet := range faucets {
-		genesis.Alloc[crypto.PubkeyToAddress(faucet.PublicKey)] = core.GenesisAccount{
+		genesis.Alloc[crypto.PubkeyToAddress(faucet.PublicKey)] = genesisT.GenesisAccount{
 			Balance: new(big.Int).Exp(big.NewInt(2), big.NewInt(128), nil),
 		}
 	}
 	return genesis
 }
 
-func makeFullNode(genesis *core.Genesis) (*node.Node, *eth.Ethereum, *ethcatalyst.ConsensusAPI, error) {
+func makeFullNode(genesis *genesisT.Genesis) (*node.Node, *eth.Ethereum, *ethcatalyst.ConsensusAPI, error) {
 	// Define the basic configurations for the Ethereum node
 	datadir, _ := os.MkdirTemp("", "")
 
@@ -483,7 +485,7 @@ func makeFullNode(genesis *core.Genesis) (*node.Node, *eth.Ethereum, *ethcatalys
 	}
 	econfig := &ethconfig.Config{
 		Genesis:         genesis,
-		NetworkId:       genesis.Config.ChainID.Uint64(),
+		NetworkId:       genesis.Config.GetChainID().Uint64(),
 		SyncMode:        downloader.FullSync,
 		DatabaseCache:   256,
 		DatabaseHandles: 256,
@@ -512,7 +514,7 @@ func makeFullNode(genesis *core.Genesis) (*node.Node, *eth.Ethereum, *ethcatalys
 	return stack, ethBackend, ethcatalyst.NewConsensusAPI(ethBackend), err
 }
 
-func makeLightNode(genesis *core.Genesis) (*node.Node, *les.LightEthereum, *lescatalyst.ConsensusAPI, error) {
+func makeLightNode(genesis *genesisT.Genesis) (*node.Node, *les.LightEthereum, *lescatalyst.ConsensusAPI, error) {
 	// Define the basic configurations for the Ethereum node
 	datadir, _ := os.MkdirTemp("", "")
 
@@ -534,7 +536,7 @@ func makeLightNode(genesis *core.Genesis) (*node.Node, *les.LightEthereum, *lesc
 	}
 	lesBackend, err := les.New(stack, &ethconfig.Config{
 		Genesis:         genesis,
-		NetworkId:       genesis.Config.ChainID.Uint64(),
+		NetworkId:       genesis.Config.GetChainID().Uint64(),
 		SyncMode:        downloader.LightSync,
 		DatabaseCache:   256,
 		DatabaseHandles: 256,

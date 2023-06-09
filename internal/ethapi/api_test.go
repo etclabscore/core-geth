@@ -46,6 +46,8 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
 	"golang.org/x/crypto/sha3"
 )
@@ -186,7 +188,7 @@ type testBackend struct {
 	chain *core.BlockChain
 }
 
-func newTestBackend(t *testing.T, n int, gspec *core.Genesis, generator func(i int, b *core.BlockGen)) *testBackend {
+func newTestBackend(t *testing.T, n int, gspec *genesisT.Genesis, generator func(i int, b *core.BlockGen)) *testBackend {
 	var (
 		engine  = ethash.NewFaker()
 		backend = &testBackend{
@@ -328,8 +330,8 @@ func (b testBackend) TxPoolContentFrom(addr common.Address) (types.Transactions,
 func (b testBackend) SubscribeNewTxsEvent(events chan<- core.NewTxsEvent) event.Subscription {
 	panic("implement me")
 }
-func (b testBackend) ChainConfig() *params.ChainConfig { return b.chain.Config() }
-func (b testBackend) Engine() consensus.Engine         { return b.chain.Engine() }
+func (b testBackend) ChainConfig() ctypes.ChainConfigurator { return b.chain.Config() }
+func (b testBackend) Engine() consensus.Engine              { return b.chain.Engine() }
 func (b testBackend) GetLogs(ctx context.Context, blockHash common.Hash, number uint64) ([][]*types.Log, error) {
 	panic("implement me")
 }
@@ -352,11 +354,11 @@ func TestEstimateGas(t *testing.T) {
 	// Initialize test accounts
 	var (
 		accounts = newAccounts(2)
-		genesis  = &core.Genesis{
+		genesis  = &genesisT.Genesis{
 			Config: params.TestChainConfig,
-			Alloc: core.GenesisAlloc{
-				accounts[0].addr: {Balance: big.NewInt(params.Ether)},
-				accounts[1].addr: {Balance: big.NewInt(params.Ether)},
+			Alloc: genesisT.GenesisAlloc{
+				accounts[0].addr: {Balance: big.NewInt(vars.Ether)},
+				accounts[1].addr: {Balance: big.NewInt(vars.Ether)},
 			},
 		}
 		genBlocks      = 10
@@ -367,7 +369,7 @@ func TestEstimateGas(t *testing.T) {
 		// Transfer from account[0] to account[1]
 		//    value: 1000 wei
 		//    fee:   0 wei
-		tx, _ := types.SignTx(types.NewTx(&types.LegacyTx{Nonce: uint64(i), To: &accounts[1].addr, Value: big.NewInt(1000), Gas: params.TxGas, GasPrice: b.BaseFee(), Data: nil}), signer, accounts[0].key)
+		tx, _ := types.SignTx(types.NewTx(&types.LegacyTx{Nonce: uint64(i), To: &accounts[1].addr, Value: big.NewInt(1000), Gas: vars.TxGas, GasPrice: b.BaseFee(), Data: nil}), signer, accounts[0].key)
 		b.AddTx(tx)
 	}))
 	var testSuite = []struct {
@@ -433,12 +435,12 @@ func TestCall(t *testing.T) {
 	// Initialize test accounts
 	var (
 		accounts = newAccounts(3)
-		genesis  = &core.Genesis{
+		genesis  = &genesisT.Genesis{
 			Config: params.TestChainConfig,
-			Alloc: core.GenesisAlloc{
-				accounts[0].addr: {Balance: big.NewInt(params.Ether)},
-				accounts[1].addr: {Balance: big.NewInt(params.Ether)},
-				accounts[2].addr: {Balance: big.NewInt(params.Ether)},
+			Alloc: genesisT.GenesisAlloc{
+				accounts[0].addr: {Balance: big.NewInt(vars.Ether)},
+				accounts[1].addr: {Balance: big.NewInt(vars.Ether)},
+				accounts[2].addr: {Balance: big.NewInt(vars.Ether)},
 			},
 		}
 		genBlocks = 10
@@ -448,7 +450,7 @@ func TestCall(t *testing.T) {
 		// Transfer from account[0] to account[1]
 		//    value: 1000 wei
 		//    fee:   0 wei
-		tx, _ := types.SignTx(types.NewTx(&types.LegacyTx{Nonce: uint64(i), To: &accounts[1].addr, Value: big.NewInt(1000), Gas: params.TxGas, GasPrice: b.BaseFee(), Data: nil}), signer, accounts[0].key)
+		tx, _ := types.SignTx(types.NewTx(&types.LegacyTx{Nonce: uint64(i), To: &accounts[1].addr, Value: big.NewInt(1000), Gas: vars.TxGas, GasPrice: b.BaseFee(), Data: nil}), signer, accounts[0].key)
 		b.AddTx(tx)
 	}))
 	randomAccounts := newAccounts(3)
@@ -512,7 +514,7 @@ func TestCall(t *testing.T) {
 				Value: (*hexutil.Big)(big.NewInt(1000)),
 			},
 			overrides: StateOverride{
-				randomAccounts[0].addr: OverrideAccount{Balance: newRPCBalance(new(big.Int).Mul(big.NewInt(1), big.NewInt(params.Ether)))},
+				randomAccounts[0].addr: OverrideAccount{Balance: newRPCBalance(new(big.Int).Mul(big.NewInt(1), big.NewInt(vars.Ether)))},
 			},
 			want: "0x",
 		},

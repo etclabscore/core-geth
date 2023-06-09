@@ -75,11 +75,6 @@ func stateTestCmd(ctx *cli.Context) error {
 	glogger.Verbosity(log.Lvl(ctx.Int(VerbosityFlag.Name)))
 	log.Root().SetHandler(glogger)
 
-	if s := ctx.String(stateTestEVMCEWASMFlag.Name); s != "" {
-		log.Info("Running tests with %s=%s", "evmc.ewasm", s)
-		vm.InitEVMCEwasm(s)
-	}
-
 	// Configure the EVM logger
 	config := &logger.Config{
 		EnableMemory:     !ctx.Bool(DisableMemoryFlag.Name),
@@ -95,9 +90,22 @@ func stateTestCmd(ctx *cli.Context) error {
 	case ctx.Bool(DebugFlag.Name):
 		cfg.Tracer = logger.NewStructLogger(config)
 	}
+
+	cfg.EWASMInterpreter = ctx.String(stateTestEVMCEWASMFlag.Name)
+	cfg.EVMInterpreter = ctx.String(utils.EVMInterpreterFlag.Name)
+
+	if cfg.EVMInterpreter != "" {
+		log.Info("Running tests with %s=%s", "evmc.evm", cfg.EVMInterpreter)
+		vm.InitEVMCEVM(cfg.EVMInterpreter)
+	}
+	if cfg.EWASMInterpreter != "" {
+		log.Info("Running tests with %s=%s", "evmc.ewasm", cfg.EWASMInterpreter)
+		vm.InitEVMCEwasm(cfg.EWASMInterpreter)
+	}
+
 	// Load the test content from the input file
 	if len(ctx.Args().First()) != 0 {
-		return runStateTest(ctx.Args().First(), cfg, ctx.Bool(MachineFlag.Name), ctx.Bool(DumpFlag.Name))
+		return runStateTest(ctx.Args().First(), cfg, ctx.Bool(MachineFlag.Name), ctx.Bool(DumpFlag.Name), ctx.String(stateTestForkFlag.Name))
 	}
 	// Read filenames from stdin and execute back-to-back
 	scanner := bufio.NewScanner(os.Stdin)
@@ -106,7 +114,7 @@ func stateTestCmd(ctx *cli.Context) error {
 		if len(fname) == 0 {
 			return nil
 		}
-		if err := runStateTest(fname, cfg, ctx.Bool(MachineFlag.Name), ctx.Bool(DumpFlag.Name)); err != nil {
+		if err := runStateTest(fname, cfg, ctx.Bool(MachineFlag.Name), ctx.Bool(DumpFlag.Name), ctx.String(stateTestForkFlag.Name)); err != nil {
 			return err
 		}
 	}
@@ -114,7 +122,7 @@ func stateTestCmd(ctx *cli.Context) error {
 }
 
 // runStateTest loads the state-test given by fname, and executes the test.
-func runStateTest(fname string, cfg vm.Config, jsonOut, dump bool) error {
+func runStateTest(fname string, cfg vm.Config, jsonOut, dump bool, testFork string) error {
 	src, err := os.ReadFile(fname)
 	if err != nil {
 		return err
@@ -124,23 +132,10 @@ func runStateTest(fname string, cfg vm.Config, jsonOut, dump bool) error {
 		return err
 	}
 	// Iterate over all the tests, run them and aggregate the results
-	cfg := vm.Config{
-		Tracer:           tracer,
-		EWASMInterpreter: ctx.String(stateTestEVMCEWASMFlag.Name),
-		EVMInterpreter:   ctx.String(utils.EVMInterpreterFlag.Name),
-	}
-
-	if cfg.EVMInterpreter != "" {
-		vm.InitEVMCEVM(cfg.EVMInterpreter)
-	}
-	if cfg.EWASMInterpreter != "" {
-		vm.InitEVMCEwasm(cfg.EWASMInterpreter)
-	}
-
 	results := make([]StatetestResult, 0, len(tests))
 	for key, test := range tests {
 		for _, st := range test.Subtests(nil) {
-			if ctx.String(stateTestForkFlag.Name) != "" && ctx.String(stateTestForkFlag.Name) != st.Fork {
+			if testFork != "" && testFork != st.Fork {
 				continue
 			}
 			// Run the test and aggregate the result

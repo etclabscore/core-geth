@@ -58,7 +58,7 @@ jobs:
           # This commit implements genesis JSON unmarshaling for supported data types.
           git revert --no-edit db245033d654c18d5fd82ca7050dc2d72d2d6d0a
           # This commit implements omit-empty JSON marshaling for Receipt's effectiveGasPrice field.
-          git revert --no-edit 1e5b446042262be42637706620b2b353cc97e8cc
+          git revert --no-edit 2b3f1b0ea6c37d644f59fb0ce2b65c1aef7d70cd
 
       - name: Check for modified files
         id: git-check

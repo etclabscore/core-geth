@@ -144,8 +144,8 @@ github.com/etclabscore/go-jsonschema-walk v0.0.6 h1:DrNzoKWKd8f8XB5nFGBY00IcjakR
 github.com/etclabscore/go-jsonschema-walk v0.0.6/go.mod h1:VdfDY72AFAiUhy0ZXEaWSpveGjMT5JcDIm903NGqFwQ=
 github.com/etclabscore/go-openrpc-reflect v0.0.37 h1:IH0e7JqIvR9OhbbFWi/BHIkXrqbR3Zyia3RJ733eT6c=
 github.com/etclabscore/go-openrpc-reflect v0.0.37/go.mod h1:0404Ky3igAasAOpyj1eESjstTyneBAIk5PgJFbK4s5E=
-github.com/ethereum/c-kzg-4844 v0.2.0 h1:+cUvymlnoDDQgMInp25Bo3OmLajmmY8mLJ/tLjqd77Q=
-github.com/ethereum/c-kzg-4844 v0.2.0/go.mod h1:WI2Nd82DMZAAZI1wV2neKGost9EKjvbpQR9OqE5Qqa8=
+github.com/ethereum/c-kzg-4844 v0.3.0 h1:3Y3hD6l5i0dEYsBL50C+Om644kve3pNqoAcvE26o9zI=
+github.com/ethereum/c-kzg-4844 v0.3.0/go.mod h1:WI2Nd82DMZAAZI1wV2neKGost9EKjvbpQR9OqE5Qqa8=
 github.com/ethereum/evmc/v7 v7.5.0 h1:vwKcs1DINXqvaymranmlpO64fysJJkirCCJ+kkaPaCs=
 github.com/ethereum/evmc/v7 v7.5.0/go.mod h1:q2Q0rCSUlIkngd+mZwfCzEUbvB0IIopH1+7hcs9QuDg=
 github.com/fasthttp-contrib/websocket v0.0.0-20160511215533-1f3b11f56072/go.mod h1:duJ4Jxv5lDcvg4QuQr0oowTf7dz4/CR8NtyCooz9HL8=

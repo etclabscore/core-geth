@@ -237,8 +237,6 @@ func ethFilter(args []string) (nodeFilter, error) {
 		filter = forkid.NewStaticFilter(params.SepoliaChainConfig, params.SepoliaGenesisHash)
 	case "classic":
 		filter = forkid.NewStaticFilter(params.ClassicChainConfig, params.MainnetGenesisHash)
-	case "kotti":
-		filter = forkid.NewStaticFilter(params.KottiChainConfig, params.KottiGenesisHash)
 	case "mordor":
 		filter = forkid.NewStaticFilter(params.MordorChainConfig, params.MordorGenesisHash)
 	case "mintme":

@@ -179,11 +179,6 @@ var (
 		Usage:    "Rinkeby network: pre-configured proof-of-authority test network",
 		Category: flags.EthCategory,
 	}
-	KottiFlag = &cli.BoolFlag{
-		Name:     "kotti",
-		Usage:    "Kotti network: cross-client proof-of-authority test network",
-		Category: flags.EthCategory,
-	}
 	MordorFlag = &cli.BoolFlag{
 		Name:     "mordor",
 		Usage:    "Mordor network: Ethereum Classic's cross-client proof-of-work test network",
@@ -1086,7 +1081,6 @@ var (
 		GoerliFlag,
 		SepoliaFlag,
 		MordorFlag,
-		KottiFlag,
 	}
 	// NetworkFlags is the flag group of all built-in supported networks.
 	NetworkFlags = append([]cli.Flag{
@@ -1171,8 +1165,6 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.SepoliaBootnodes
 	case ctx.Bool(RinkebyFlag.Name):
 		urls = params.RinkebyBootnodes
-	case ctx.Bool(KottiFlag.Name):
-		urls = params.KottiBootnodes
 	case ctx.Bool(GoerliFlag.Name):
 		urls = params.GoerliBootnodes
 	}
@@ -1208,8 +1200,6 @@ func setBootstrapNodesV5(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.MordorBootnodes
 	case ctx.Bool(RinkebyFlag.Name):
 		urls = params.RinkebyBootnodes
-	case ctx.Bool(KottiFlag.Name):
-		urls = params.KottiBootnodes
 	case ctx.Bool(GoerliFlag.Name):
 		urls = params.GoerliBootnodes
 	case ctx.Bool(MintMeFlag.Name):
@@ -1668,8 +1658,6 @@ func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) stri
 		return filepath.Join(baseDataDirPath, "mordor")
 	case ctx.Bool(RinkebyFlag.Name):
 		return filepath.Join(baseDataDirPath, "rinkeby")
-	case ctx.Bool(KottiFlag.Name):
-		return filepath.Join(baseDataDirPath, "kotti")
 	case ctx.Bool(GoerliFlag.Name):
 		return filepath.Join(baseDataDirPath, "goerli")
 	case ctx.Bool(SepoliaFlag.Name):
@@ -1926,7 +1914,7 @@ func CheckExclusive(ctx *cli.Context, args ...interface{}) {
 // SetEthConfig applies eth-related command line flags to the config.
 func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	// Avoid conflicting network flags
-	CheckExclusive(ctx, MainnetFlag, DeveloperFlag, DeveloperPoWFlag, RinkebyFlag, GoerliFlag, SepoliaFlag, ClassicFlag, KottiFlag, MordorFlag, MintMeFlag)
+	CheckExclusive(ctx, MainnetFlag, DeveloperFlag, DeveloperPoWFlag, RinkebyFlag, GoerliFlag, SepoliaFlag, ClassicFlag, MordorFlag, MintMeFlag)
 	CheckExclusive(ctx, LightServeFlag, SyncModeFlag, "light")
 	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, ExternalSignerFlag) // Can't use both ephemeral unlocked and external signer
 	if ctx.String(GCModeFlag.Name) == "archive" && ctx.Uint64(TxLookupLimitFlag.Name) != 0 {
@@ -2155,8 +2143,6 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		SetDNSDiscoveryDefaults(cfg, params.GoerliGenesisHash)
 	case ctx.Bool(ClassicFlag.Name):
 		SetDNSDiscoveryDefaults2(cfg, params.ClassicDNSNetwork1)
-	case ctx.Bool(KottiFlag.Name):
-		SetDNSDiscoveryDefaults2(cfg, params.KottiDNSNetwork1)
 	case ctx.Bool(MordorFlag.Name):
 		SetDNSDiscoveryDefaults2(cfg, params.MordorDNSNetwork1)
 	default:
@@ -2505,8 +2491,6 @@ func genesisForCtxChainConfig(ctx *cli.Context) *genesisT.Genesis {
 		genesis = params.DefaultSepoliaGenesisBlock()
 	case ctx.Bool(RinkebyFlag.Name):
 		genesis = params.DefaultRinkebyGenesisBlock()
-	case ctx.Bool(KottiFlag.Name):
-		genesis = params.DefaultKottiGenesisBlock()
 	case ctx.Bool(GoerliFlag.Name):
 		genesis = params.DefaultGoerliGenesisBlock()
 	case ctx.Bool(MintMeFlag.Name):

@@ -67,7 +67,6 @@ var (
 	foundationFlag = flag.Bool("chain.foundation", false, "Configure genesis and bootnodes for foundation chain defaults")
 	classicFlag    = flag.Bool("chain.classic", false, "Configure genesis and bootnodes for classic chain defaults")
 	mordorFlag     = flag.Bool("chain.mordor", false, "Configure genesis and bootnodes for mordor chain defaults")
-	kottiFlag      = flag.Bool("chain.kotti", false, "Configure genesis and bootnodes for kotti chain defaults")
 	testnetFlag    = flag.Bool("chain.testnet", false, "Configure genesis and bootnodes for testnet chain defaults")
 	rinkebyFlag    = flag.Bool("chain.rinkeby", false, "Configure genesis and bootnodes for rinkeby chain defaults")
 	goerliFlag     = flag.Bool("chain.goerli", false, "Configure genesis and bootnodes for goerli chain defaults")
@@ -109,7 +108,6 @@ var chainFlags = []*bool{
 	foundationFlag,
 	classicFlag,
 	mordorFlag,
-	kottiFlag,
 	testnetFlag,
 	rinkebyFlag,
 	goerliFlag,
@@ -138,8 +136,6 @@ func faucetDirFromChainIndicators(chainID uint64, genesisHash common.Hash) strin
 		return filepath.Join(datadir, "rinkeby")
 	case params.GoerliGenesisHash:
 		return filepath.Join(datadir, "goerli")
-	case params.KottiGenesisHash:
-		return filepath.Join(datadir, "kotti")
 	case params.MordorGenesisHash:
 		return filepath.Join(datadir, "mordor")
 	case params.SepoliaGenesisHash:
@@ -158,7 +154,6 @@ func parseChainFlags() (gs *genesisT.Genesis, bs string, netid uint64) {
 		{*classicFlag, params.DefaultClassicGenesisBlock(), nil},
 		{*mordorFlag, params.DefaultMordorGenesisBlock(), nil},
 		{*rinkebyFlag, params.DefaultRinkebyGenesisBlock(), nil},
-		{*kottiFlag, params.DefaultKottiGenesisBlock(), nil},
 		{*goerliFlag, params.DefaultGoerliGenesisBlock(), nil},
 		{*sepoliaFlag, params.DefaultSepoliaGenesisBlock(), nil},
 	}
@@ -570,8 +565,6 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*enode
 		} else {
 			utils.SetDNSDiscoveryDefaults(&cfg, core.GenesisToBlock(genesis, nil).Hash())
 		}
-	case params.KottiGenesisHash:
-		utils.SetDNSDiscoveryDefaults2(&cfg, params.KottiDNSNetwork1)
 	case params.MordorGenesisHash:
 		utils.SetDNSDiscoveryDefaults2(&cfg, params.MordorDNSNetwork1)
 	default:

@@ -3,6 +3,5 @@ canonical export data files present on the Jenkins CI server data volume.
 
 These files are available for public download at the following URLs:
 
-- https://core-geth-chaindata-exports.s3.us-east-2.amazonaws.com/kotti.0-2544960.rlp.gz
 - https://core-geth-chaindata-exports.s3.us-east-2.amazonaws.com/mordor.0-1686858.rlp.gz
 - https://core-geth-chaindata-exports.s3.us-east-2.amazonaws.com/goerli.0-2000000.rlp.gz

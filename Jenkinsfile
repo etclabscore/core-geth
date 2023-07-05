@@ -10,7 +10,6 @@ pipeline {
     stages {
         stage('Notify Github of Pending Jobs') {
             steps {
-                githubNotify context: 'Kotti Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'PENDING', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}"
                 githubNotify context: 'Mordor Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'PENDING', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}"
                 githubNotify context: 'Goerli Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'PENDING', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}"
                 // githubNotify context: 'Classic Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'PENDING', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}"
@@ -19,25 +18,6 @@ pipeline {
         }
         stage("Run Regression Tests") {
             parallel {
-                stage('Kotti') {
-                    agent { label "aws-slave-m5-xlarge" }
-                    steps {
-                        sh "curl -L -O https://go.dev/dl/go1.20.3.linux-amd64.tar.gz"
-                        sh "sudo rm -rf /usr/bin/go && sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.20.3.linux-amd64.tar.gz"
-                        sh "sudo cp /usr/local/go/bin/go /usr/bin/go"
-                        sh "sudo cp /usr/local/go/bin/gofmt /usr/bin/gofmt"
-                        sh "go version"
-                        sh "make geth && ./build/bin/geth version"
-                        sh "rm -rf ${GETH_DATADIR}-kotti"
-                        sh "shasum -a 256 -c ./tests/regression/shasums/kotti.0-2544960.rlp.gz.sha256"
-                        sh "./build/bin/geth --kotti --cache=2048 --nocompaction --nousb --txlookuplimit=1 --datadir=${GETH_DATADIR}-kotti import ${GETH_EXPORTS}/kotti.0-2544960.rlp.gz"
-                    }
-                    post {
-                        always { sh "rm -rf ${GETH_DATADIR}-kotti" }
-                        success { githubNotify context: 'Kotti Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'SUCCESS', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
-                        unsuccessful { githubNotify context: 'Kotti Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'FAILURE', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
-                    }
-                }
                 stage('Mordor') {
                     agent { label "aws-slave-m5-xlarge" }
                     steps {
@@ -80,11 +60,11 @@ pipeline {
                 // Commented now because these take a looong time.
                 // One way of approaching a solution is to break each chain into a "stepladder" of imports, eg. 0-1150000, 1150000-1920000, 1920000-2500000, etc...
                 // This would allow further parallelization at the cost of duplicated base chaindata stores.
-                // Since the core focus of testing here is configuration (both user-facing and internal), and one of ugly limitations of our current testnets 
-                // being that they DO NOT reflect the production environment well in this regard (which is a very vulnerable reagard) 
+                // Since the core focus of testing here is configuration (both user-facing and internal), and one of ugly limitations of our current testnets
+                // being that they DO NOT reflect the production environment well in this regard (which is a very vulnerable reagard)
                 // another approach might be to condense the chain fork progressions of ETC and ETH into custom test-only chains, perhaps using retestest or a similar
                 // tool to make transactions and manage chain upgrades dynamically as a transactions are made.
-                // 
+                //
                 // stage('Classic') {
                 //     agent { label "aws-slave-m5-xlarge" }
                 //     steps {

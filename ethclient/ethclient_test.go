@@ -65,7 +65,7 @@ var (
 )
 
 func TestToFilterArg(t *testing.T) {
-	blockHashErr := fmt.Errorf("cannot specify both BlockHash and FromBlock/ToBlock")
+	blockHashErr := errors.New("cannot specify both BlockHash and FromBlock/ToBlock")
 	addresses := []common.Address{
 		common.HexToAddress("0xD36722ADeC3EdCB29c8e7b5a47f352D701393462"),
 	}
@@ -820,10 +820,10 @@ func TestRPCDiscover(t *testing.T) {
 			t.Logf(`Response Document:
 
 %s`, string(responseDocument))
-			t.Fatalf(`OVER (methods which do not appear in the current API, but exist in the hardcoded response document):): 
+			t.Fatalf(`OVER (methods which do not appear in the current API, but exist in the hardcoded response document):):
 %v
 
-UNDER (methods which appear in the current API, but do not appear in the hardcoded response document):): 
+UNDER (methods which appear in the current API, but do not appear in the hardcoded response document):):
 %v
 `, printList(over), printList(under))
 		}

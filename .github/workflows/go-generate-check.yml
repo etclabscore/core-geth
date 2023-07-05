@@ -57,8 +57,6 @@ jobs:
           # This way, this script can alert us on any code changes that have to be applied on if file gets changed.
           # This commit implements genesis JSON unmarshaling for supported data types.
           git revert --no-edit db245033d654c18d5fd82ca7050dc2d72d2d6d0a
-          # This commit implements omit-empty JSON marshaling for Receipt's effectiveGasPrice field.
-          git revert --no-edit 1e5b446042262be42637706620b2b353cc97e8cc
 
       - name: Check for modified files
         id: git-check

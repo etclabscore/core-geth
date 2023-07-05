@@ -41,7 +41,6 @@ var chainspecFormats = func() []string {
 
 var defaultChainspecValues = map[string]ctypes.Configurator{
 	"classic": params.DefaultClassicGenesisBlock(),
-	"kotti":   params.DefaultKottiGenesisBlock(),
 	"mordor":  params.DefaultMordorGenesisBlock(),
 
 	"foundation": params.DefaultGenesisBlock(),
@@ -195,10 +194,6 @@ EXAMPLES:
 	Print a default Ethereum Classic network chain configuration in coregeth format:
 
 		> {{.Name}} --default classic --outputf coregeth
-
-	Validate a default Kotti network chain configuration for block #3000000:
-
-		> {{.Name}} --default kotti validate 3000000
 
 VERSION:
    {{.Version}}

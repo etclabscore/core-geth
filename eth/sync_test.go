@@ -18,7 +18,6 @@ package eth
 
 import (
 	"math/big"
-	"sync/atomic"
 	"testing"
 	"time"
 
@@ -101,14 +100,14 @@ func testSnapSyncDisabling(t *testing.T, ethVer uint, snapVer uint) {
 
 	// Create an empty handler and ensure it's in snap sync mode
 	empty := newTestHandler()
-	if atomic.LoadUint32(&empty.handler.snapSync) == 0 {
+	if !empty.handler.snapSync.Load() {
 		t.Fatalf("snap sync disabled on pristine blockchain")
 	}
 	defer empty.close()
 
 	// Create a full handler and ensure snap sync ends up disabled
 	full := newTestHandlerWithBlocks(1024)
-	if atomic.LoadUint32(&full.handler.snapSync) == 1 {
+	if full.handler.snapSync.Load() {
 		t.Fatalf("snap sync not disabled on non-empty blockchain")
 	}
 	defer full.close()
@@ -153,7 +152,7 @@ func testSnapSyncDisabling(t *testing.T, ethVer uint, snapVer uint) {
 	if err := empty.handler.doSync(op); err != nil {
 		t.Fatal("sync failed:", err)
 	}
-	if atomic.LoadUint32(&empty.handler.snapSync) == 1 {
+	if empty.handler.snapSync.Load() {
 		t.Fatalf("snap sync not disabled after successful synchronisation")
 	}
 }
@@ -164,7 +163,7 @@ func TestArtificialFinalityFeatureEnablingDisabling(t *testing.T) {
 
 	// Create a full protocol manager, check that fast sync gets disabled
 	a := newTestHandlerWithBlocksWithOpts(1024, downloader.FullSync, genFunc)
-	if atomic.LoadUint32(&a.handler.snapSync) == 1 {
+	if a.handler.snapSync.Load() {
 		t.Fatalf("snap sync not disabled on non-empty blockchain")
 	}
 	defer a.close()
@@ -181,7 +180,7 @@ func TestArtificialFinalityFeatureEnablingDisabling(t *testing.T) {
 
 	// Create a full protocol manager, check that fast sync gets disabled
 	b := newTestHandlerWithBlocksWithOpts(0, downloader.FullSync, genFunc)
-	if atomic.LoadUint32(&b.handler.snapSync) == 1 {
+	if b.handler.snapSync.Load() {
 		t.Fatalf("snap sync not disabled on non-empty blockchain")
 	}
 	defer b.close()

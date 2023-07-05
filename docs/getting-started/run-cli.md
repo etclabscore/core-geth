@@ -16,7 +16,7 @@ particular use-case the user doesn't care about years-old historical data, so we
 fast-sync quickly to the current state of the network. To do so:
 
 ```
-$ geth [|--classic|--testnet|--rinkeby|--kotti|--goerli|--mordor] console
+$ geth [|--classic|--testnet|--rinkeby|--goerli|--mordor] console
 ```
 
 This command will:
@@ -133,11 +133,10 @@ ETHEREUM OPTIONS:
   --keystore value                    Directory for the keystore (default = inside the datadir)
   --nousb                             Disables monitoring for and managing USB hardware wallets
   --pcscdpath value                   Path to the smartcard daemon (pcscd) socket file
-  --networkid value                   Explicitly set network id (integer)(For testnets: use --ropsten, --rinkeby, --goerli, --kotti, --mordor, --yolov2 instead) (default: 1)
+  --networkid value                   Explicitly set network id (integer)(For testnets: use --ropsten, --rinkeby, --goerli, --mordor, --yolov2 instead) (default: 1)
   --classic                           Ethereum Classic network: pre-configured Ethereum Classic mainnet
   --mordor                            Mordor network: Ethereum Classic's cross-client proof-of-work test network
   --rinkeby                           Rinkeby network: pre-configured proof-of-authority test network
-  --kotti                             Kotti network: cross-client proof-of-authority test network
   --goerli                            Görli network: pre-configured proof-of-authority test network
   --rinkeby                           Rinkeby network: pre-configured proof-of-authority test network
   --yolov2                            YOLOv2 network: pre-configured proof-of-authority shortlived test network.

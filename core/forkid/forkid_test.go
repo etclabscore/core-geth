@@ -187,29 +187,6 @@ func TestCreation(t *testing.T) {
 			},
 		},
 		{
-			"kotti",
-			params.KottiChainConfig,
-			params.KottiGenesisHash,
-			[]testcase{
-				{0, 0, ID{Hash: checksumToBytes(0x0550152e), Next: 716617}},
-				{716616, 0, ID{Hash: checksumToBytes(0x0550152e), Next: 716617}},
-				{716617, 0, ID{Hash: checksumToBytes(0xa3270822), Next: 1705549}},
-				{716618, 0, ID{Hash: checksumToBytes(0xa3270822), Next: 1705549}},
-				{1705548, 0, ID{Hash: checksumToBytes(0xa3270822), Next: 1705549}},
-				{1705549, 0, ID{Hash: checksumToBytes(0x8f3698e0), Next: 2200013}},
-				{1705550, 0, ID{Hash: checksumToBytes(0x8f3698e0), Next: 2200013}},
-				{2200012, 0, ID{Hash: checksumToBytes(0x8f3698e0), Next: 2200013}},
-				{2200013, 0, ID{Hash: checksumToBytes(0x6f402821), Next: 4_368_634}},
-				{2200014, 0, ID{Hash: checksumToBytes(0x6f402821), Next: 4_368_634}},
-				{4_368_633, 0, ID{Hash: checksumToBytes(0x6f402821), Next: 4_368_634}},
-				{4_368_634, 0, ID{Hash: checksumToBytes(0xf03e54e7), Next: 5_578_000}},
-				{4_368_635, 0, ID{Hash: checksumToBytes(0xf03e54e7), Next: 5_578_000}},
-				{5_577_999, 0, ID{Hash: checksumToBytes(0xf03e54e7), Next: 5_578_000}},
-				{5_578_000, 0, ID{Hash: checksumToBytes(0xc5459816), Next: 0}},
-				{5_578_001, 0, ID{Hash: checksumToBytes(0xc5459816), Next: 0}},
-			},
-		},
-		{
 			"mordor",
 			params.MordorChainConfig,
 			params.MordorGenesisHash,
@@ -548,11 +525,6 @@ func TestGatherForks(t *testing.T) {
 			[]uint64{301_243, 999_983, 2_520_000, 3_985_893, 5_520_000},
 		},
 		{
-			"kotti",
-			params.KottiChainConfig,
-			[]uint64{716_617, 1_705_549, 2_200_013, 4_368_634, 5_578_000},
-		},
-		{
 			"mintme",
 			params.MintMeChainConfig,
 			[]uint64{252_500},
@@ -608,11 +580,6 @@ func TestGenerateSpecificationCases(t *testing.T) {
 		{"Ethereum Classic Mainnet (ETC)",
 			params.ClassicChainConfig,
 			params.MainnetGenesisHash,
-		},
-		{
-			"Kotti",
-			params.KottiChainConfig,
-			params.KottiGenesisHash,
 		},
 		{
 			"Mordor",

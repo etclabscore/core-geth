@@ -1,7 +1,7 @@
 These directories contain gzipped RLP-encoded blockchain data files along with respective JSON configuration files.
 
 The blockchains contained in these data files use configurations that are designed to reflect the stages of their namesake production counterparts, eg. Ethereum Classic and Foundation main networks, albeit in smaller "condensed" versions.
-Whereas the prominent test networks used in staging and development for these communities often (in the case of Goerli, Kotti, Mordor, Ropsten, and Rinkeby) use abbreviated fork configurations,
+Whereas the prominent test networks used in staging and development for these communities often (in the case of Goerli, Mordor, Ropsten, and Rinkeby) use abbreviated fork configurations,
 where mainnet forks prior to the launch of the given testnet are "squashed" into the testnet's configuration at block 0, and thus never actually transitioned through at any point in the testnets' progress.
 
 This testnet/mainnet configuration discrepency is in principle a cause of concern since:
@@ -16,7 +16,7 @@ The test blockchains included in these directories were generated as follows:
 
 State tests are grouped by fork, with names like "Homestead" and "Byzantium". The adhoc tool applies tests for "Homestead" only during the relative "Homestead"-equivalent phase of the test blockchain. In order to fit tests in to these respective phases of the test blockchains, some "wiggling" with these fork activations were necessary. That's why for the most part the respective fork numbers are `mainnet/1000`, but a few are fudged up or down. This wiggling does not impact the integrity of the chain configurations as heuristics for the mainnet counterparts, since what matters most is chronology and relative activation.
 
-In general, the integrity of the GeneralStateTests to blockchain transactions are not of critical concern, and they are more-or-less used as arbitrary simulated transactions. 
+In general, the integrity of the GeneralStateTests to blockchain transactions are not of critical concern, and they are more-or-less used as arbitrary simulated transactions.
 
 - Once all of the forks have been progressed through and all StateTests (`GeneralStateTests`) have completed being processed as transactions, the chain is stopped and `export`ed to the gzipped RLP file.
 - This produced `export.rlp.gz` file can then, as a regression test, be `import`ed into a new database, and in doing so, cause geth to validate all available aspects of its chain configuration, feature application, and data storage mechanisms. At the time of writing, geth's `import` command uses `blockchain.InsertChain` to do the work of the import, which is the very same function used by geth during a networked sync. As such, `ValidateState`, `ValidateHeaders`, and `ValidateBody` are all invoked. This proves geth's consistency in EVM processing, state mutations, and header verification; all consensus-relevant values are tested.

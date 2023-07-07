@@ -25,7 +25,7 @@ title: Publishing a Release
   > Push the branch. This will get PR'd, eg. https://github.com/etclabscore/core-geth/pull/197
 - [ ] Draft a new release, following the existing patterns for naming and notes. https://github.com/etclabscore/core-geth/releases/new
     - Define the tag the release should be associated with (eg `v1.11.16`).
-    - Linux, OSX, and Windows artifacts will be uploaded automatically to this release draft by the CI jobs. There should be CI-generated 16 assets total.
+    - Linux, OSX, and Windows artifacts will be uploaded automatically to this release draft by the CI jobs. There should be CI-generated 34 assets total.
 
         !!! Note
 

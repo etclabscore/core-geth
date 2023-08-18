@@ -19,7 +19,7 @@ mkdocs-material-extensions==1.0.3
 mkdocs-minify-plugin==0.3.0
 nltk==3.6.6
 Pygments==2.12
-pymdown-extensions==9.4
+pymdown-extensions==10.0
 python-dateutil==2.8.1
 pytz==2020.5
 PyYAML>=5.4

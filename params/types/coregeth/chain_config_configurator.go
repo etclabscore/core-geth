@@ -564,6 +564,57 @@ func (c *CoreGethChainConfig) SetEIP6049TransitionTime(n *uint64) error {
 	return nil
 }
 
+// Shanghai by block
+// EIP3651: Warm COINBASE
+func (c *CoreGethChainConfig) GetEIP3651Transition() *uint64 {
+	return c.EIP3651FBlock
+}
+
+func (c *CoreGethChainConfig) SetEIP3651Transition(n *uint64) error {
+	c.EIP6049FBlock = n
+	return nil
+}
+
+// GetEIP3855Transition EIP3855: PUSH0 instruction
+func (c *CoreGethChainConfig) GetEIP3855Transition() *uint64 {
+	return c.EIP3855FBlock
+}
+
+func (c *CoreGethChainConfig) SetEIP3855Transition(n *uint64) error {
+	c.EIP6049FBlock = n
+	return nil
+}
+
+// GetEIP3860Transition EIP3860: Limit and meter initcode
+func (c *CoreGethChainConfig) GetEIP3860Transition() *uint64 {
+	return c.EIP3860FBlock
+}
+
+func (c *CoreGethChainConfig) SetEIP3860Transition(n *uint64) error {
+	c.EIP6049FBlock = n
+	return nil
+}
+
+// GetEIP4895Transition EIP4895: Beacon chain push withdrawals as operations
+func (c *CoreGethChainConfig) GetEIP4895Transition() *uint64 {
+	return c.EIP4895FBlock
+}
+
+func (c *CoreGethChainConfig) SetEIP4895Transition(n *uint64) error {
+	c.EIP6049FBlock = n
+	return nil
+}
+
+// GetEIP6049Transition EIP6049: Deprecate SELFDESTRUCT
+func (c *CoreGethChainConfig) GetEIP6049Transition() *uint64 {
+	return c.EIP6049FBlock
+}
+
+func (c *CoreGethChainConfig) SetEIP6049Transition(n *uint64) error {
+	c.EIP6049FBlock = n
+	return nil
+}
+
 // GetEIP4844TransitionTime EIP4844: Shard Blob Transactions
 func (c *CoreGethChainConfig) GetEIP4844TransitionTime() *uint64 {
 	return c.EIP4844FTime

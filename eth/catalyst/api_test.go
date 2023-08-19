@@ -1263,7 +1263,7 @@ func setupBodies(t *testing.T) (*node.Node, *eth.Ethereum, []*types.Block) {
 	time := blocks[len(blocks)-1].Header().Time + 1
 	// enable shanghai on the last block
 	genesis.Config.SetEIP3651TransitionTime(&time) // SetEIP3651Transition is not implemented in this test helper.
-	genesis.Config.SetEIP3855TransitionTime(&time)
+	genesis.Config.SetEIP3855TransitionTime(&time) // SetEIP3855TransitionTime is not implemented in this test helper.
 	genesis.Config.SetEIP3860TransitionTime(&time)
 	genesis.Config.SetEIP4895TransitionTime(&time)
 	genesis.Config.SetEIP6049TransitionTime(&time)

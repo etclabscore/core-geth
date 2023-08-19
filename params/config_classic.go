@@ -94,7 +94,7 @@ var (
 		EIP3529FBlock: big.NewInt(14_525_000),
 		EIP3541FBlock: big.NewInt(14_525_000),
 
-		EIP4399FBlock: big.NewInt(18_000_000),
+		// EIP4399FBlock: big.NewInt(18_000_000), // Commented for transparency. ETC does not spec 4399 because still PoW, and 4399 is only applicable for the PoS system.
 
 		RequireBlockHashes: map[uint64]common.Hash{
 			1920000: common.HexToHash("0x94365e3a8c0b35089c1d1195081fe7489b528a84b22199c916180db8b28ade7f"),

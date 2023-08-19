@@ -193,7 +193,7 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, isPostMerge bool, 
 	if config.IsEnabled(config.GetEIP3198Transition, bn) {
 		enable3198(instructionSet) // BASEFEE opcode https://eips.ethereum.org/EIPS/eip-3198
 	}
-	if isPostMerge {
+	if isPostMerge || config.IsEnabled(config.GetEIP4399Transition, bn) { // EIP4399: Supplant DIFFICULTY opcode with PREVRANDAO (ETH @ PoS)
 		instructionSet[PREVRANDAO] = &operation{
 			execute:     opRandom,
 			constantGas: GasQuickStep,

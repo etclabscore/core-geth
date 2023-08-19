@@ -1266,7 +1266,7 @@ func setupBodies(t *testing.T) (*node.Node, *eth.Ethereum, []*types.Block) {
 	genesis.Config.SetEIP3855TransitionTime(&time) // SetEIP3855Transition is not implemented in this test helper.
 	genesis.Config.SetEIP3860TransitionTime(&time) // SetEIP3860Transition is not implemented in this test helper.
 	genesis.Config.SetEIP4895TransitionTime(&time) // SetEIP4895Transition is not implemented in this test helper.
-	genesis.Config.SetEIP6049TransitionTime(&time)
+	genesis.Config.SetEIP6049TransitionTime(&time) // SetEIP6049Transition is not implemented in this test helper.
 	n, ethservice := startEthService(t, genesis, blocks)
 
 	var (

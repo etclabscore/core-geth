@@ -204,7 +204,7 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, isPostMerge bool, 
 	if config.IsEnabledByTime(config.GetEIP3855TransitionTime, bt) || config.IsEnabled(config.GetEIP3855Transition, bn) {
 		enable3855(instructionSet) // PUSH0 instruction
 	}
-	if config.IsEnabledByTime(config.GetEIP3860TransitionTime, bt) {
+	if config.IsEnabledByTime(config.GetEIP3860TransitionTime, bt) || config.IsEnabled(config.GetEIP3860Transition, bn) {
 		enable3860(instructionSet) // Limit and meter initcode
 	}
 	return validate(instructionSet)

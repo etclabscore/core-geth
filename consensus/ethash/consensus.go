@@ -277,7 +277,7 @@ func (ethash *Ethash) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 	if diff := new(big.Int).Sub(header.Number, parent.Number); diff.Cmp(big.NewInt(1)) != 0 {
 		return consensus.ErrInvalidNumber
 	}
-	if chain.Config().IsEnabledByTime(chain.Config().GetEIP3860TransitionTime, &header.Time) {
+	if chain.Config().IsEnabledByTime(chain.Config().GetEIP3860TransitionTime, &header.Time) || chain.Config().IsEnabled(chain.Config().GetEIP3860Transition, header.Number) {
 		return fmt.Errorf("ethash does not support shanghai fork")
 	}
 	if chain.Config().IsEnabledByTime(chain.Config().GetEIP4844TransitionTime, &header.Time) {

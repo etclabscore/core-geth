@@ -145,7 +145,7 @@ func Transaction(ctx *cli.Context) error {
 		eip2f := chainConfig.IsEnabled(chainConfig.GetEIP2Transition, new(big.Int))
 		eip2028f := chainConfig.IsEnabled(chainConfig.GetEIP2028Transition, new(big.Int))
 		zero := uint64(0)
-		eip3860f := chainConfig.IsEnabledByTime(chainConfig.GetEIP3860TransitionTime, &zero)
+		eip3860f := chainConfig.IsEnabledByTime(chainConfig.GetEIP3860TransitionTime, &zero) || chainConfig.IsEnabled(chainConfig.GetEIP3860Transition, new(big.Int))
 
 		// Check intrinsic gas
 		if gas, err := core.IntrinsicGas(tx.Data(), tx.AccessList(), tx.To() == nil,
@@ -182,7 +182,7 @@ func Transaction(ctx *cli.Context) error {
 		}
 		// Check whether the init code size has been exceeded.
 		// EIP-3860: Limit and meter initcode
-		if chainConfig.IsEnabledByTime(chainConfig.GetEIP3860TransitionTime, &zero) && tx.To() == nil && uint64(len(tx.Data())) > vars.MaxInitCodeSize {
+		if (chainConfig.IsEnabledByTime(chainConfig.GetEIP3860TransitionTime, &zero) || chainConfig.IsEnabled(chainConfig.GetEIP3860Transition, new(big.Int))) && tx.To() == nil && uint64(len(tx.Data())) > vars.MaxInitCodeSize {
 			r.Error = errors.New("max initcode size exceeded")
 		}
 		results = append(results, r)

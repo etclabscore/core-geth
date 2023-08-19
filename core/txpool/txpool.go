@@ -1417,7 +1417,7 @@ func (pool *TxPool) reset(oldHead, newHead *types.Header) {
 	pool.eip2718.Store(pool.chainconfig.IsEnabled(pool.chainconfig.GetEIP2718Transition, next))
 	pool.eip1559.Store(pool.chainconfig.IsEnabled(pool.chainconfig.GetEIP1559Transition, next))
 	now := uint64(time.Now().Unix())
-	pool.eip3860.Store(pool.chainconfig.IsEnabledByTime(pool.chainconfig.GetEIP3860TransitionTime, &now))
+	pool.eip3860.Store(pool.chainconfig.IsEnabledByTime(pool.chainconfig.GetEIP3860TransitionTime, &now) || pool.chainconfig.IsEnabled(pool.chainconfig.GetEIP3860Transition, next))
 }
 
 // promoteExecutables moves transactions that have become processable from the

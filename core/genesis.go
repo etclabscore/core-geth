@@ -91,6 +91,8 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, gen
 
 	applyOverrides := func(config ctypes.ChainConfigurator) {
 		if config != nil {
+			// Block-based overrides are not provided because Shanghai is
+			// ETH-network specific and that protocol is defined exclusively in time-based forks.
 			if overrides != nil && overrides.OverrideShanghai != nil {
 				config.SetEIP3651TransitionTime(overrides.OverrideShanghai)
 				config.SetEIP3855TransitionTime(overrides.OverrideShanghai)

@@ -201,7 +201,7 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, isPostMerge bool, 
 			maxStack:    maxStack(0, 1),
 		}
 	}
-	if config.IsEnabledByTime(config.GetEIP3855TransitionTime, bt) {
+	if config.IsEnabledByTime(config.GetEIP3855TransitionTime, bt) || config.IsEnabled(config.GetEIP3855Transition, bn) {
 		enable3855(instructionSet) // PUSH0 instruction
 	}
 	if config.IsEnabledByTime(config.GetEIP3860TransitionTime, bt) {

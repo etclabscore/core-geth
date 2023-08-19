@@ -299,7 +299,7 @@ func (c *Clique) verifyHeader(chain consensus.ChainHeaderReader, header *types.H
 	if header.GasLimit > vars.MaxGasLimit {
 		return fmt.Errorf("invalid gasLimit: have %v, max %v", header.GasLimit, vars.MaxGasLimit)
 	}
-	if chain.Config().IsEnabledByTime(chain.Config().GetEIP3855TransitionTime, &header.Time) {
+	if chain.Config().IsEnabledByTime(chain.Config().GetEIP3855TransitionTime, &header.Time) || chain.Config().IsEnabled(chain.Config().GetEIP3855Transition, header.Number) {
 		return fmt.Errorf("clique does not support shanghai fork")
 	}
 	if chain.Config().IsEnabledByTime(chain.Config().GetEIP4844TransitionTime, &header.Time) {

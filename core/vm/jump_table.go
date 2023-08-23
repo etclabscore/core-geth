@@ -201,12 +201,29 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, isPostMerge bool, 
 			maxStack:    maxStack(0, 1),
 		}
 	}
+
+	// Shangai
 	if config.IsEnabledByTime(config.GetEIP3855TransitionTime, bt) {
 		enable3855(instructionSet) // PUSH0 instruction
 	}
 	if config.IsEnabledByTime(config.GetEIP3860TransitionTime, bt) {
 		enable3860(instructionSet) // Limit and meter initcode
 	}
+
+	// Cancun
+	if config.IsEnabledByTime(config.GetEIP4844TransitionTime, bt) {
+		enable4844(instructionSet) // EIP-4844 (DATAHASH opcode)
+	}
+	if config.IsEnabledByTime(config.GetEIP1153TransitionTime, bt) {
+		enable1153(instructionSet) // EIP-1153 "Transient Storage"
+	}
+	if config.IsEnabledByTime(config.GetEIP5656TransitionTime, bt) {
+		enable5656(instructionSet) // EIP-5656 (MCOPY opcode)
+	}
+	if config.IsEnabledByTime(config.GetEIP6780TransitionTime, bt) {
+		enable6780(instructionSet) // EIP-6780 SELFDESTRUCT only in same transaction
+	}
+
 	return validate(instructionSet)
 }
 

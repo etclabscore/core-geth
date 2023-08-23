@@ -18,8 +18,8 @@
 // +build none
 
 /*
+	The mkalloc tool creates the genesis allocation constants in alloc.go
 
-   The mkalloc tool creates the genesis allocation constants in alloc.go
 It outputs a const declaration that contains an RLP-encoded list of (address, balance) tuples.
 
 	go run mkalloc.go genesis.json
@@ -31,32 +31,28 @@ import (
 	"fmt"
 	"math/big"
 	"os"
-	"sort"
 	"strconv"
 
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/rlp"
+	"golang.org/x/exp/slices"
 )
 
 type allocItem struct{ Addr, Balance *big.Int }
 
-type allocList []allocItem
-
-func (a allocList) Len() int           { return len(a) }
-func (a allocList) Less(i, j int) bool { return a[i].Addr.Cmp(a[j].Addr) < 0 }
-func (a allocList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-
 func makelist(g *genesisT.Genesis) allocList {
-	a := make(allocList, 0, len(g.Alloc))
+	items := make([]allocItem, 0, len(g.Alloc))
 	for addr, account := range g.Alloc {
 		if len(account.Storage) > 0 || len(account.Code) > 0 || account.Nonce != 0 {
 			panic(fmt.Sprintf("can't encode account %x", addr))
 		}
 		bigAddr := new(big.Int).SetBytes(addr.Bytes())
-		a = append(a, allocItem{bigAddr, account.Balance})
+		items = append(items, allocItem{bigAddr, account.Balance})
 	}
-	sort.Sort(a)
-	return a
+	slices.SortFunc(items, func(a, b allocItem) bool {
+		return a.Addr.Cmp(b.Addr) < 0
+	})
+	return items
 }
 
 func makealloc(g *genesisT.Genesis) string {

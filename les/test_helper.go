@@ -39,6 +39,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/forkid"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/txpool"
+	"github.com/ethereum/go-ethereum/core/txpool/legacypool"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/eth/ethconfig"
@@ -272,9 +273,12 @@ func newTestServerHandler(blocks int, indexers []*core.ChainIndexer, db ethdb.Da
 	simulation := backends.NewSimulatedBackendWithDatabase(db, gspec.Alloc, 100000000)
 	prepare(blocks, simulation)
 
-	txpoolConfig := txpool.DefaultConfig
+	txpoolConfig := legacypool.DefaultConfig
 	txpoolConfig.Journal = ""
-	txpool := txpool.NewTxPool(txpoolConfig, gspec.Config, simulation.Blockchain())
+
+	pool := legacypool.New(txpoolConfig, gspec.Config, simulation.Blockchain())
+	txpool, _ := txpool.New(new(big.Int).SetUint64(txpoolConfig.PriceLimit), simulation.Blockchain(), []txpool.SubPool{pool})
+
 	if indexers != nil {
 		checkpointConfig := &ctypes.CheckpointOracleConfig{
 			Address:   crypto.CreateAddress(bankAddr, 0),

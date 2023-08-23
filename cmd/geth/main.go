@@ -39,6 +39,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethereum/go-ethereum/node"
+	"go.uber.org/automaxprocs/maxprocs"
 
 	// Force-load the tracer engines to trigger registration
 	_ "github.com/ethereum/go-ethereum/eth/tracers/js"
@@ -67,6 +68,8 @@ var (
 		utils.USBPathIDFlag,
 		utils.SmartCardDaemonPathFlag,
 		utils.OverrideShanghai,
+		utils.OverrideCancun,
+		utils.OverrideVerkle,
 		utils.EnablePersonal,
 		utils.EthashCacheDirFlag,
 		utils.EthashCachesInMemoryFlag,
@@ -87,6 +90,9 @@ var (
 		utils.TxPoolAccountQueueFlag,
 		utils.TxPoolGlobalQueueFlag,
 		utils.TxPoolLifetimeFlag,
+		utils.BlobPoolDataDirFlag,
+		utils.BlobPoolDataCapFlag,
+		utils.BlobPoolPriceBumpFlag,
 		utils.SyncModeFlag,
 		utils.SyncTargetFlag,
 		utils.ExitWhenSyncedFlag,
@@ -134,7 +140,9 @@ var (
 		utils.MinerNewPayloadTimeout,
 		utils.NATFlag,
 		utils.NoDiscoverFlag,
+		utils.DiscoveryV4Flag,
 		utils.DiscoveryV5Flag,
+		utils.LegacyDiscoveryV5Flag,
 		utils.NetrestrictFlag,
 		utils.NodeKeyFileFlag,
 		utils.NodeKeyHexFlag,
@@ -144,6 +152,7 @@ var (
 		utils.DeveloperPeriodFlag,
 		utils.DeveloperPoWFlag,
 		utils.DeveloperGasLimitFlag,
+		utils.DeveloperPeriodFlag,
 		utils.VMEnableDebugFlag,
 		utils.NetworkIdFlag,
 		utils.EthStatsURLFlag,
@@ -190,6 +199,8 @@ var (
 		utils.RPCGlobalEVMTimeoutFlag,
 		utils.RPCGlobalTxFeeCapFlag,
 		utils.AllowUnprotectedTxs,
+		utils.BatchRequestLimit,
+		utils.BatchResponseMaxSize,
 	}
 
 	metricsFlags = []cli.Flag{
@@ -261,6 +272,7 @@ func init() {
 	)
 
 	app.Before = func(ctx *cli.Context) error {
+		maxprocs.Set() // Automatically set GOMAXPROCS to match Linux container CPU quota.
 		flags.MigrateGlobalFlags(ctx)
 		return debug.Setup(ctx)
 	}
@@ -282,9 +294,6 @@ func checkMainnet(ctx *cli.Context) bool {
 	isMainnet := false
 
 	switch {
-	case ctx.IsSet(utils.RinkebyFlag.Name):
-		log.Info("Starting Geth on Rinkeby testnet...")
-
 	case ctx.IsSet(utils.GoerliFlag.Name):
 		log.Info("Starting Geth on Görli testnet...")
 
@@ -406,10 +415,7 @@ func startNode(ctx *cli.Context, stack *node.Node, backend ethapi.Backend, isCon
 	stack.AccountManager().Subscribe(events)
 
 	// Create a client to interact with local geth node.
-	rpcClient, err := stack.Attach()
-	if err != nil {
-		utils.Fatalf("Failed to attach to self: %v", err)
-	}
+	rpcClient := stack.Attach()
 	ethClient := ethclient.NewClient(rpcClient)
 
 	go func() {
@@ -482,7 +488,7 @@ func startNode(ctx *cli.Context, stack *node.Node, backend ethapi.Backend, isCon
 		}
 		// Set the gas price to the limits from the CLI and start mining
 		gasprice := flags.GlobalBig(ctx, utils.MinerGasPriceFlag.Name)
-		ethBackend.TxPool().SetGasPrice(gasprice)
+		ethBackend.TxPool().SetGasTip(gasprice)
 		// start mining
 		threads := ctx.Int(utils.MinerThreadsFlag.Name)
 		if err := ethBackend.StartMining(threads); err != nil {

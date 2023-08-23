@@ -29,6 +29,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/txpool"
+	"github.com/ethereum/go-ethereum/core/txpool/legacypool"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/eth/downloader"
@@ -63,9 +64,14 @@ func (m *mockBackend) StateAtBlock(block *types.Block, reexec uint64, base *stat
 }
 
 type testBlockChain struct {
+	config        *params.ChainConfig
 	statedb       *state.StateDB
 	gasLimit      uint64
 	chainHeadFeed *event.Feed
+}
+
+func (bc *testBlockChain) Config() *params.ChainConfig {
+	return bc.config
 }
 
 func (bc *testBlockChain) CurrentBlock() *types.Header {
@@ -270,10 +276,12 @@ func createMiner(t *testing.T) (*Miner, *event.TypeMux, func(skipMiner bool)) {
 		t.Fatalf("can't create new chain %v", err)
 	}
 	statedb, _ := state.New(types.EmptyRootHash, state.NewDatabase(chainDB), nil)
-	blockchain := &testBlockChain{statedb, 10000000, new(event.Feed)}
+	blockchain := &testBlockChain{chainConfig, statedb, 10000000, new(event.Feed)}
 
-	pool := txpool.NewTxPool(testTxPoolConfig, chainConfig, blockchain)
-	backend := NewMockBackend(bc, pool)
+	pool := legacypool.New(testTxPoolConfig, blockchain)
+	txpool, _ := txpool.New(new(big.Int).SetUint64(testTxPoolConfig.PriceLimit), blockchain, []txpool.SubPool{pool})
+
+	backend := NewMockBackend(bc, txpool)
 	// Create event Mux
 	mux := new(event.TypeMux)
 	// Create Miner
@@ -281,7 +289,7 @@ func createMiner(t *testing.T) (*Miner, *event.TypeMux, func(skipMiner bool)) {
 	cleanup := func(skipMiner bool) {
 		bc.Stop()
 		engine.Close()
-		pool.Stop()
+		txpool.Close()
 		if !skipMiner {
 			miner.Close()
 		}

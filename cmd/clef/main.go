@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"io"
 	"math/big"
+	"net"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -100,7 +101,7 @@ var (
 	chainIdFlag = &cli.Int64Flag{
 		Name:  "chainid",
 		Value: params.MainnetChainConfig.ChainID.Int64(),
-		Usage: "Chain id to use for signing (1=foundation, 61=classic, 3=Ropsten, 4=Rinkeby, 5=Goerli, 63=Mordor, 133519467574834=Yolo)",
+		Usage: "Chain id to use for signing (1=foundation, 61=classic, 5=Goerli, 63=Mordor, 133519467574834=Yolo)",
 	}
 	rpcPortFlag = &cli.IntFlag{
 		Name:     "http.port",
@@ -733,6 +734,7 @@ func signer(c *cli.Context) error {
 		cors := utils.SplitAndTrim(c.String(utils.HTTPCORSDomainFlag.Name))
 
 		srv := rpc.NewServer()
+		srv.SetBatchLimits(node.DefaultConfig.BatchRequestLimit, node.DefaultConfig.BatchResponseMaxSize)
 		err := node.RegisterApis(rpcAPI, []string{"account"}, srv)
 		if err != nil {
 			utils.Fatalf("Could not register API: %w", err)
@@ -743,7 +745,7 @@ func signer(c *cli.Context) error {
 		port := c.Int(rpcPortFlag.Name)
 
 		// start http server
-		httpEndpoint := fmt.Sprintf("%s:%d", c.String(utils.HTTPListenAddrFlag.Name), port)
+		httpEndpoint := net.JoinHostPort(c.String(utils.HTTPListenAddrFlag.Name), fmt.Sprintf("%d", port))
 		httpServer, addr, err := node.StartHTTPEndpoint(httpEndpoint, rpc.DefaultHTTPTimeouts, handler)
 		if err != nil {
 			utils.Fatalf("Could not start RPC api: %v", err)

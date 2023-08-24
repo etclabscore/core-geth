@@ -240,7 +240,7 @@ func (st *StateTransition) buyGas() error {
 		balanceCheck = balanceCheck.Mul(balanceCheck, st.msg.GasFeeCap)
 		balanceCheck.Add(balanceCheck, st.msg.Value)
 	}
-	if st.evm.ChainConfig().IsCancun(st.evm.Context.BlockNumber, st.evm.Context.Time) {
+	if st.evm.ChainConfig().IsEnabledByTime(st.evm.ChainConfig().GetEIP4844TransitionTime, &st.evm.Context.Time) {
 		if blobGas := st.blobGasUsed(); blobGas > 0 {
 			// Check that the user has enough funds to cover blobGasUsed * tx.BlobGasFeeCap
 			blobBalanceCheck := new(big.Int).SetUint64(blobGas)
@@ -319,14 +319,14 @@ func (st *StateTransition) preCheck() error {
 			return errors.New("blob transaction missing blob hashes")
 		}
 		for i, hash := range msg.BlobHashes {
-			if hash[0] != params.BlobTxHashVersion {
+			if hash[0] != vars.BlobTxHashVersion {
 				return fmt.Errorf("blob %d hash version mismatch (have %d, supported %d)",
-					i, hash[0], params.BlobTxHashVersion)
+					i, hash[0], vars.BlobTxHashVersion)
 			}
 		}
 	}
 
-	if st.evm.ChainConfig().IsCancun(st.evm.Context.BlockNumber, st.evm.Context.Time) {
+	if st.evm.ChainConfig().IsEnabledByTime(st.evm.ChainConfig().GetEIP4844TransitionTime, &st.evm.Context.Time) {
 		if st.blobGasUsed() > 0 {
 			// Check that the user is paying at least the current blob fee
 			blobFee := eip4844.CalcBlobFee(*st.evm.Context.ExcessBlobGas)
@@ -499,5 +499,5 @@ func (st *StateTransition) gasUsed() uint64 {
 
 // blobGasUsed returns the amount of blob gas used by the message.
 func (st *StateTransition) blobGasUsed() uint64 {
-	return uint64(len(st.msg.BlobHashes) * params.BlobTxBlobGasPerBlob)
+	return uint64(len(st.msg.BlobHashes) * vars.BlobTxBlobGasPerBlob)
 }

@@ -86,9 +86,10 @@ type ChainConfig struct {
 	EWASMBlock *big.Int `json:"ewasmBlock,omitempty"` // EWASM switch block (nil = no fork, 0 = already activated)
 
 	// Various consensus engines
-	Ethash *ctypes.EthashConfig `json:"ethash,omitempty"`
-	Clique *ctypes.CliqueConfig `json:"clique,omitempty"`
-	Lyra2  *ctypes.Lyra2Config  `json:"lyra2,omitempty"`
+	Ethash    *ctypes.EthashConfig `json:"ethash,omitempty"`
+	Clique    *ctypes.CliqueConfig `json:"clique,omitempty"`
+	Lyra2     *ctypes.Lyra2Config  `json:"lyra2,omitempty"`
+	IsDevMode bool                 `json:"isDev,omitempty"`
 
 	// NOTE: These are not included in this type upstream.
 	TrustedCheckpoint       *ctypes.TrustedCheckpoint      `json:"trustedCheckpoint"`

@@ -145,7 +145,7 @@ var (
 		Clique:                        nil,
 	}
 
-	AllDevChainProtocolChanges = &ChainConfig{
+	AllDevChainProtocolChanges = &goethereum.ChainConfig{
 		ChainID:                       big.NewInt(1337),
 		HomesteadBlock:                big.NewInt(0),
 		EIP150Block:                   big.NewInt(0),

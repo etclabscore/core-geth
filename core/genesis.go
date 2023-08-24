@@ -299,7 +299,7 @@ func gaFlush(ga *genesisT.GenesisAlloc, db ethdb.Database) error {
 			statedb.SetState(addr, key, value)
 		}
 	}
-	root, err := statedb.Commit(false)
+	root, err := statedb.Commit(0, false)
 	if err != nil {
 		return err
 	}
@@ -435,13 +435,12 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 	}
 	var withdrawals []*types.Withdrawal
 	if conf := g.Config; conf != nil {
-		num := big.NewInt(int64(g.Number))
 		isShangai := conf.IsEnabledByTime(g.Config.GetEIP4895TransitionTime, &g.Timestamp)
 		if isShangai {
 			head.WithdrawalsHash = &types.EmptyWithdrawalsHash
 			withdrawals = make([]*types.Withdrawal, 0)
 		}
-		isCancun := conf.IsEnabledByTime(g.Config.GetEIP4844TransitionTime, &header.Time)
+		isCancun := conf.IsEnabledByTime(g.Config.GetEIP4844TransitionTime, &g.Timestamp)
 		if isCancun {
 			head.ExcessBlobGas = g.ExcessBlobGas
 			head.BlobGasUsed = g.BlobGasUsed

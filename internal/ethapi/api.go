@@ -1451,9 +1451,9 @@ func (b *RPCMarshalBlockT) MarshalJSON() ([]byte, error) {
 // RPCMarshalBlock converts the given block to the RPC output which depends on fullTx. If inclTx is true transactions are
 // returned. When fullTx is true the returned block contains full transaction details, otherwise it will only contain
 // transaction hashes.
-func RPCMarshalBlock(block *types.Block, inclTx bool, fullTx bool, config ctypes.ChainConfigurator) (*RPCMarshalBlockT, error) {
+func RPCMarshalBlock(block *types.Block, inclTx bool, fullTx bool, config ctypes.ChainConfigurator) *RPCMarshalBlockT {
 	fields := &RPCMarshalBlockT{RPCMarshalHeaderT: NewRPCMarshalHeaderTFromHeader(block.Header())}
-	fields["size"] = hexutil.Uint64(block.Size())
+	fields.Size = hexutil.Uint64(block.Size())
 	fields.inclTx = inclTx
 	fields.fullTx = fullTx
 
@@ -1496,10 +1496,7 @@ func (s *BlockChainAPI) rpcMarshalHeader(ctx context.Context, header *types.Head
 // rpcMarshalBlock uses the generalized output filler, then adds the total difficulty field, which requires
 // a `BlockChainAPI`.
 func (s *BlockChainAPI) rpcMarshalBlock(ctx context.Context, b *types.Block, inclTx bool, fullTx bool) (*RPCMarshalBlockT, error) {
-	fields, err := RPCMarshalBlock(b, inclTx, fullTx, s.b.ChainConfig())
-	if err != nil {
-		return nil, err
-	}
+	fields := RPCMarshalBlock(b, inclTx, fullTx, s.b.ChainConfig())
 	if inclTx {
 		s.rpcMarshalHeaderTSetTotalDifficulty(ctx, fields.RPCMarshalHeaderT)
 	}

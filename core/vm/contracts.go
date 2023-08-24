@@ -69,7 +69,7 @@ func mergeContracts(base, target map[common.Address]PrecompiledContract) {
 }
 
 // PrecompiledContractsForConfig returns a map containing valid precompiled contracts for a given point in a chain config.
-func PrecompiledContractsForConfig(config ctypes.ChainConfigurator, bn *big.Int) map[common.Address]PrecompiledContract {
+func PrecompiledContractsForConfig(config ctypes.ChainConfigurator, bn *big.Int, bt *uint64) map[common.Address]PrecompiledContract {
 	// Copying to a new map is necessary because assigning to the original map
 	// creates a memory reference. Further, setting the vals to nil in case of nonconfiguration causes
 	// a panic during tests because they run asynchronously (also a valid reason for using an explicit copy).

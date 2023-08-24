@@ -210,8 +210,10 @@ func TestIsPrecompiledContractEnabled(t *testing.T) {
 		addCaseWhere(params.MainnetChainConfig, a, new(big.Int).Add(params.MainnetChainConfig.ByzantiumBlock, common.Big1), false)
 	}
 
+	// TODO (ziogaschr): add tests for the other precompiles, apply time activation on precompiles that use it
+	zero := uint64(0)
 	for i, c := range cases {
-		got := PrecompiledContractsForConfig(c.config, c.blockNum)[c.addr] != nil
+		got := PrecompiledContractsForConfig(c.config, c.blockNum, &zero)[c.addr] != nil
 		if c.want != got {
 			t.Errorf("test: %d, address: %x, want: %v, got: %v", i, c.addr, c.want, got)
 		}
@@ -236,7 +238,7 @@ func TestIsPrecompiledContractEnabled(t *testing.T) {
 			}
 		}
 		expect := precomps[c.addr] == nil
-		got = PrecompiledContractsForConfig(c.config, c.blockNum)[c.addr] == nil
+		got = PrecompiledContractsForConfig(c.config, c.blockNum, &zero)[c.addr] == nil
 		if got != expect {
 			t.Errorf("addr: %x, bn: %v, want: %v, got: %v", c.addr, c.blockNum, c.want, expect)
 		}

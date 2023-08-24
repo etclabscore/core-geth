@@ -129,7 +129,7 @@ func newFlatCallTracer(ctx *tracers.Context, cfg json.RawMessage) (tracers.Trace
 func (t *flatCallTracer) CaptureStart(env *vm.EVM, from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int) {
 	t.tracer.CaptureStart(env, from, to, create, input, gas, value)
 	// Update list of precompiles based on current block
-	precomps := vm.PrecompiledContractsForConfig(env.ChainConfig(), env.Context.BlockNumber)
+	precomps := vm.PrecompiledContractsForConfig(env.ChainConfig(), env.Context.BlockNumber, &env.Context.Time)
 	keys := make([]common.Address, len(precomps))
 	for k := range precomps {
 		keys = append(keys, k)

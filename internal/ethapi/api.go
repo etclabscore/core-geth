@@ -1682,7 +1682,7 @@ func AccessList(ctx context.Context, b Backend, blockNrOrHash rpc.BlockNumberOrH
 	}
 
 	// Retrieve the precompiles since they don't need to be added to the access list
-	precompileMap := vm.PrecompiledContractsForConfig(b.ChainConfig(), header.Number)
+	precompileMap := vm.PrecompiledContractsForConfig(b.ChainConfig(), header.Number, &header.Time)
 	precompiles := make([]common.Address, len(precompileMap))
 	for k := range precompileMap {
 		precompiles = append(precompiles, k)

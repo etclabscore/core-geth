@@ -42,7 +42,7 @@ type (
 
 // ActivePrecompiles returns the addresses of the precompiles enabled with the current configuration.
 func (evm *EVM) ActivePrecompiles() []common.Address {
-	p := PrecompiledContractsForConfig(evm.chainConfig, evm.Context.BlockNumber)
+	p := PrecompiledContractsForConfig(evm.chainConfig, evm.Context.BlockNumber, &evm.Context.Time)
 	addresses := []common.Address{}
 	for k := range p {
 		addresses = append(addresses, k)
@@ -51,7 +51,7 @@ func (evm *EVM) ActivePrecompiles() []common.Address {
 }
 
 func (evm *EVM) precompile(addr common.Address) (PrecompiledContract, bool) {
-	var precompiles = PrecompiledContractsForConfig(evm.ChainConfig(), evm.Context.BlockNumber)
+	var precompiles = PrecompiledContractsForConfig(evm.ChainConfig(), evm.Context.BlockNumber, &evm.Context.Time)
 	p, ok := precompiles[addr]
 	return p, ok
 }

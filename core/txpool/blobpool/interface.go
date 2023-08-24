@@ -20,14 +20,14 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
 // BlockChain defines the minimal set of methods needed to back a blob pool with
 // a chain. Exists to allow mocking the live chain out of tests.
 type BlockChain interface {
 	// Config retrieves the chain's fork configuration.
-	Config() *params.ChainConfig
+	Config() ctypes.ChainConfigurator
 
 	// CurrentBlock returns the current head of the chain.
 	CurrentBlock() *types.Header

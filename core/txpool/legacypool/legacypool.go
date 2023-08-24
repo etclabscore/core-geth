@@ -36,7 +36,6 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
@@ -111,7 +110,7 @@ var (
 // a chain. Exists to allow mocking the live chain out of tests.
 type BlockChain interface {
 	// Config retrieves the chain's fork configuration.
-	Config() *params.ChainConfig
+	Config() ctypes.ChainConfigurator
 
 	// CurrentBlock returns the current head of the chain.
 	CurrentBlock() *types.Header
@@ -1277,7 +1276,8 @@ func (pool *LegacyPool) runReorg(done chan struct{}, reset *txpoolResetRequest, 
 	if reset != nil {
 		pool.demoteUnexecutables()
 		if reset.newHead != nil {
-			if pool.chainconfig.IsLondon(new(big.Int).Add(reset.newHead.Number, big.NewInt(1))) {
+			isLondon := pool.chainconfig.IsEnabled(pool.chainconfig.GetEIP1559Transition, new(big.Int).Add(reset.newHead.Number, big.NewInt(1)))
+			if isLondon {
 				pendingBaseFee := eip1559.CalcBaseFee(pool.chainconfig, reset.newHead)
 				pool.priced.SetBaseFee(pendingBaseFee)
 			} else {

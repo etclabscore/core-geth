@@ -28,7 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/trie/trienode"
 	"github.com/ethereum/go-ethereum/trie/triestate"
 )
@@ -87,7 +87,7 @@ var (
 
 // Defaults contains default settings for Ethereum mainnet.
 var Defaults = &Config{
-	StateLimit: params.FullImmutabilityThreshold,
+	StateLimit: vars.FullImmutabilityThreshold,
 	CleanSize:  defaultCleanSize,
 	DirtySize:  defaultBufferSize,
 }

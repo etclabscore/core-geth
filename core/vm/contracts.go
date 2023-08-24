@@ -30,7 +30,6 @@ import (
 	"github.com/ethereum/go-ethereum/crypto/bls12381"
 	"github.com/ethereum/go-ethereum/crypto/bn256"
 	"github.com/ethereum/go-ethereum/crypto/kzg4844"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"golang.org/x/crypto/ripemd160"
@@ -1023,7 +1022,7 @@ type kzgPointEvaluation struct{}
 
 // RequiredGas estimates the gas required for running the point evaluation precompile.
 func (b *kzgPointEvaluation) RequiredGas(input []byte) uint64 {
-	return params.BlobTxPointEvaluationPrecompileGas
+	return vars.BlobTxPointEvaluationPrecompileGas
 }
 
 const (

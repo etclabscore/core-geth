@@ -41,8 +41,9 @@ var errGenesisNoConfig = errors.New("genesis has no chain configuration")
 
 // ChainOverrides contains the changes to chain config.
 type ChainOverrides struct {
-	OverrideCancun *uint64
-	OverrideVerkle *uint64
+	OverrideShanghai *uint64
+	OverrideCancun   *uint64
+	OverrideVerkle   *uint64
 }
 
 func ReadGenesis(db ethdb.Database) (*genesisT.Genesis, error) {

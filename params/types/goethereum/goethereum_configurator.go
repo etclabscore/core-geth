@@ -602,6 +602,36 @@ func (c *ChainConfig) SetEIP4844TransitionTime(n *uint64) error {
 	return nil
 }
 
+// GetEIP1153TransitionTime EIP1153: Transient Storage opcodes
+func (c *ChainConfig) GetEIP1153TransitionTime() *uint64 {
+	return c.CancunTime
+}
+
+func (c *ChainConfig) SetEIP1153TransitionTime(n *uint64) error {
+	c.CancunTime = n
+	return nil
+}
+
+// GetEIP5656TransitionTime EIP5656: MCOPY - Memory copying instruction
+func (c *ChainConfig) GetEIP5656TransitionTime() *uint64 {
+	return c.CancunTime
+}
+
+func (c *ChainConfig) SetEIP5656TransitionTime(n *uint64) error {
+	c.CancunTime = n
+	return nil
+}
+
+// GetEIP6780TransitionTime EIP6780: SELFDESTRUCT only in same transaction
+func (c *ChainConfig) GetEIP6780TransitionTime() *uint64 {
+	return c.CancunTime
+}
+
+func (c *ChainConfig) SetEIP6780TransitionTime(n *uint64) error {
+	c.CancunTime = n
+	return nil
+}
+
 func (c *ChainConfig) GetMergeVirtualTransition() *uint64 {
 	return bigNewU64(c.MergeNetsplitBlock)
 }

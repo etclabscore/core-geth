@@ -227,6 +227,9 @@ type CoreGethChainConfig struct {
 
 	// Cancun
 	EIP4844FTime *uint64 `json:"eip4844FTime,omitempty"` // EIP-4844: Shard Blob Transactions https://eips.ethereum.org/EIPS/eip-4844
+	EIP1153FTime *uint64 `json:"eip1153FTime,omitempty"` // EIP-1153: Transient Storage opcodes https://eips.ethereum.org/EIPS/eip-1153
+	EIP5656FTime *uint64 `json:"eip5656FTime,omitempty"` // EIP-5656: MCOPY - Memory copying instruction https://eips.ethereum.org/EIPS/eip-5656
+	EIP6780FTime *uint64 `json:"eip6780FTime,omitempty"` // EIP-6780: SELFDESTRUCT only in same transaction https://eips.ethereum.org/EIPS/eip-6780
 
 	MergeNetsplitVBlock *big.Int `json:"mergeNetsplitVBlock,omitempty"` // Virtual fork after The Merge to use as a network splitter
 

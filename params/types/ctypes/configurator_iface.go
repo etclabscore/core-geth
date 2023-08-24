@@ -201,9 +201,21 @@ type ProtocolSpecifier interface {
 	SetMergeVirtualTransition(n *uint64) error
 
 	// Cancun:
-	// 4844 - Shard Blob Transactions - https://eips.ethereum.org/EIPS/eip-4844
+	// EIP4844 - Shard Blob Transactions - https://eips.ethereum.org/EIPS/eip-4844
 	GetEIP4844TransitionTime() *uint64
 	SetEIP4844TransitionTime(n *uint64) error
+
+	// EIP1153 - Transient Storage opcodes - https://eips.ethereum.org/EIPS/eip-1153
+	GetEIP1153TransitionTime() *uint64
+	SetEIP1153TransitionTime(n *uint64) error
+
+	// EIP5656 - MCOPY - Memory copying instruction - https://eips.ethereum.org/EIPS/eip-5656
+	GetEIP5656TransitionTime() *uint64
+	SetEIP5656TransitionTime(n *uint64) error
+
+	// EIP6780 - SELFDESTRUCT only in same transaction - https://eips.ethereum.org/EIPS/eip-6780
+	GetEIP6780TransitionTime() *uint64
+	SetEIP6780TransitionTime(n *uint64) error
 }
 
 type Forker interface {

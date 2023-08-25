@@ -225,7 +225,7 @@ func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig ctypes.ChainConfigura
 			continue
 		}
 		if tx.Type() == types.BlobTxType {
-			blobGasUsed += params.BlobTxBlobGasPerBlob
+			blobGasUsed += vars.BlobTxBlobGasPerBlob
 		}
 		includedTxs = append(includedTxs, tx)
 		if hashError != nil {

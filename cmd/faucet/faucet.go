@@ -132,8 +132,6 @@ func faucetDirFromChainIndicators(chainID uint64, genesisHash common.Hash) strin
 			return filepath.Join(datadir, "classic")
 		}
 		return filepath.Join(datadir, "")
-	case params.RinkebyGenesisHash:
-		return filepath.Join(datadir, "rinkeby")
 	case params.GoerliGenesisHash:
 		return filepath.Join(datadir, "goerli")
 	case params.MordorGenesisHash:
@@ -153,7 +151,6 @@ func parseChainFlags() (gs *genesisT.Genesis, bs string, netid uint64) {
 		{*foundationFlag, params.DefaultGenesisBlock(), nil},
 		{*classicFlag, params.DefaultClassicGenesisBlock(), nil},
 		{*mordorFlag, params.DefaultMordorGenesisBlock(), nil},
-		{*rinkebyFlag, params.DefaultRinkebyGenesisBlock(), nil},
 		{*goerliFlag, params.DefaultGoerliGenesisBlock(), nil},
 		{*sepoliaFlag, params.DefaultSepoliaGenesisBlock(), nil},
 	}

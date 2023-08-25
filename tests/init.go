@@ -521,7 +521,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		TerminalTotalDifficulty: big.NewInt(0),
 		ShanghaiTime:            u64(15_000),
 	},
-	"Cancun": {
+	"Cancun": &goethereum.ChainConfig{
 		ChainID:                 big.NewInt(1),
 		HomesteadBlock:          big.NewInt(0),
 		EIP150Block:             big.NewInt(0),

@@ -207,7 +207,7 @@ func (n *ethNode) insertBlockAndSetHead(parent *types.Header, ed engine.Executab
 	if err := n.insertBlock(ed); err != nil {
 		return err
 	}
-	block, err := engine.ExecutableDataToBlock(ed)
+	block, err := engine.ExecutableDataToBlock(ed, nil)
 	if err != nil {
 		return err
 	}
@@ -368,7 +368,7 @@ func (mgr *nodeManager) run() {
 				log.Error("Failed to assemble the block", "err", err)
 				continue
 			}
-			block, _ := engine.ExecutableDataToBlock(*ed)
+			block, _ := engine.ExecutableDataToBlock(*ed, nil)
 
 			nodes := mgr.getNodes(eth2MiningNode)
 			nodes = append(nodes, mgr.getNodes(eth2NormalNode)...)

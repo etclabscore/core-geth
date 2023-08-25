@@ -516,57 +516,90 @@ func (c *CoreGethChainConfig) SetEIP4399Transition(n *uint64) error {
 
 // EIP3651: Warm COINBASE
 func (c *CoreGethChainConfig) GetEIP3651TransitionTime() *uint64 {
+	if c.EIP3651FBlock != nil && c.EIP3651FBlock.Cmp(big.NewInt(0)) == 0 {
+		return newU64(0)
+	}
 	return c.EIP3651FTime
 }
 
 func (c *CoreGethChainConfig) SetEIP3651TransitionTime(n *uint64) error {
 	c.EIP3651FTime = n
+	if n != nil && *n == 0 {
+		c.EIP3651FBlock = big.NewInt(0)
+	}
 	return nil
 }
 
 // GetEIP3855TransitionTime EIP3855: PUSH0 instruction
 func (c *CoreGethChainConfig) GetEIP3855TransitionTime() *uint64 {
+	if c.EIP3855FBlock != nil && c.EIP3855FBlock.Cmp(big.NewInt(0)) == 0 {
+		return newU64(0)
+	}
 	return c.EIP3855FTime
 }
 
 func (c *CoreGethChainConfig) SetEIP3855TransitionTime(n *uint64) error {
 	c.EIP3855FTime = n
+	if n != nil && *n == 0 {
+		c.EIP3855FBlock = big.NewInt(0)
+	}
 	return nil
 }
 
 // GetEIP3860TransitionTime EIP3860: Limit and meter initcode
 func (c *CoreGethChainConfig) GetEIP3860TransitionTime() *uint64 {
+	if c.EIP3860FBlock != nil && c.EIP3860FBlock.Cmp(big.NewInt(0)) == 0 {
+		return newU64(0)
+	}
 	return c.EIP3860FTime
 }
 
 func (c *CoreGethChainConfig) SetEIP3860TransitionTime(n *uint64) error {
 	c.EIP3860FTime = n
+	if n != nil && *n == 0 {
+		c.EIP3860FBlock = big.NewInt(0)
+	}
 	return nil
 }
 
 // GetEIP4895TransitionTime EIP4895: Beacon chain push withdrawals as operations
 func (c *CoreGethChainConfig) GetEIP4895TransitionTime() *uint64 {
+	if c.EIP4895FBlock != nil && c.EIP4895FBlock.Cmp(big.NewInt(0)) == 0 {
+		return newU64(0)
+	}
 	return c.EIP4895FTime
 }
 
 func (c *CoreGethChainConfig) SetEIP4895TransitionTime(n *uint64) error {
 	c.EIP4895FTime = n
+	if n != nil && *n == 0 {
+		c.EIP4895FBlock = big.NewInt(0)
+	}
 	return nil
 }
 
 // GetEIP6049TransitionTime EIP6049: Deprecate SELFDESTRUCT
 func (c *CoreGethChainConfig) GetEIP6049TransitionTime() *uint64 {
+	if c.EIP6049FBlock != nil && c.EIP6049FBlock.Cmp(big.NewInt(0)) == 0 {
+		return newU64(0)
+	}
 	return c.EIP6049FTime
 }
 
 func (c *CoreGethChainConfig) SetEIP6049TransitionTime(n *uint64) error {
 	c.EIP6049FTime = n
+	if n != nil && *n == 0 {
+		c.EIP6049FBlock = big.NewInt(0)
+	}
 	return nil
 }
 
 // Shanghai by block
 // EIP3651: Warm COINBASE
 func (c *CoreGethChainConfig) GetEIP3651Transition() *uint64 {
+	if c.EIP3651FTime != nil && *c.EIP3651FTime == 0 {
+		return newU64(0)
+	}
 	return bigNewU64(c.EIP3651FBlock)
 }
 
@@ -577,6 +610,9 @@ func (c *CoreGethChainConfig) SetEIP3651Transition(n *uint64) error {
 
 // GetEIP3855Transition EIP3855: PUSH0 instruction
 func (c *CoreGethChainConfig) GetEIP3855Transition() *uint64 {
+	if c.EIP3855FTime != nil && *c.EIP3855FTime == 0 {
+		return newU64(0)
+	}
 	return bigNewU64(c.EIP3855FBlock)
 }
 
@@ -587,6 +623,9 @@ func (c *CoreGethChainConfig) SetEIP3855Transition(n *uint64) error {
 
 // GetEIP3860Transition EIP3860: Limit and meter initcode
 func (c *CoreGethChainConfig) GetEIP3860Transition() *uint64 {
+	if c.EIP3860FTime != nil && *c.EIP3860FTime == 0 {
+		return newU64(0)
+	}
 	return bigNewU64(c.EIP3860FBlock)
 }
 
@@ -597,6 +636,9 @@ func (c *CoreGethChainConfig) SetEIP3860Transition(n *uint64) error {
 
 // GetEIP4895Transition EIP4895: Beacon chain push withdrawals as operations
 func (c *CoreGethChainConfig) GetEIP4895Transition() *uint64 {
+	if c.EIP4895FTime != nil && *c.EIP4895FTime == 0 {
+		return newU64(0)
+	}
 	return bigNewU64(c.EIP4895FBlock)
 }
 
@@ -607,6 +649,9 @@ func (c *CoreGethChainConfig) SetEIP4895Transition(n *uint64) error {
 
 // GetEIP6049Transition EIP6049: Deprecate SELFDESTRUCT
 func (c *CoreGethChainConfig) GetEIP6049Transition() *uint64 {
+	if c.EIP6049FTime != nil && *c.EIP6049FTime == 0 {
+		return newU64(0)
+	}
 	return bigNewU64(c.EIP6049FBlock)
 }
 

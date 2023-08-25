@@ -109,6 +109,7 @@ func (s *stTransaction) UnmarshalJSON(input []byte) error {
 	}
 	if dec.Sender != nil {
 		s.Sender = *dec.Sender
+	}
 	if dec.BlobVersionedHashes != nil {
 		s.BlobVersionedHashes = dec.BlobVersionedHashes
 	}

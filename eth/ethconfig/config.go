@@ -31,7 +31,6 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/clique"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/consensus/lyra2"
-	"github.com/ethereum/go-ethereum/core/txpool"
 	"github.com/ethereum/go-ethereum/core/txpool/blobpool"
 	"github.com/ethereum/go-ethereum/core/txpool/legacypool"
 	"github.com/ethereum/go-ethereum/eth/downloader"
@@ -89,7 +88,8 @@ var Defaults = Config{
 	SnapshotCache:      102,
 	FilterLogCacheSize: 32,
 	Miner:              miner.DefaultConfig,
-	TxPool:             txpool.DefaultConfig,
+	TxPool:             legacypool.DefaultConfig,
+	BlobPool:           blobpool.DefaultConfig,
 	RPCGasCap:          50000000,
 	RPCEVMTimeout:      5 * time.Second,
 	GPO:                FullNodeGPO,

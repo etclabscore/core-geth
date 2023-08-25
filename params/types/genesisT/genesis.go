@@ -773,6 +773,14 @@ func (g *Genesis) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) error {
 	return g.Config.MustSetConsensusEngineType(t)
 }
 
+func (g *Genesis) GetIsDevMode() bool {
+	return g.Config.GetIsDevMode()
+}
+
+func (g *Genesis) SetDevMode(devMode bool) error {
+	return g.Config.SetDevMode(devMode)
+}
+
 func (g *Genesis) GetEthashTerminalTotalDifficulty() *big.Int {
 	return g.Config.GetEthashTerminalTotalDifficulty()
 }

@@ -1222,8 +1222,6 @@ func setBootstrapNodesV5(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.ClassicBootnodes
 	case ctx.IsSet(MordorFlag.Name):
 		urls = params.MordorBootnodes
-	case ctx.Bool(RinkebyFlag.Name):
-		urls = params.RinkebyBootnodes
 	case ctx.Bool(GoerliFlag.Name):
 		urls = params.GoerliBootnodes
 	case ctx.Bool(MintMeFlag.Name):

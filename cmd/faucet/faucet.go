@@ -607,11 +607,7 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*enode
 		}
 	}
 	// Attach to the client and retrieve and interesting metadatas
-	api, err := stack.Attach()
-	if err != nil {
-		stack.Close()
-		return err
-	}
+	api := stack.Attach()
 	f.stack = stack
 	f.client = ethclient.NewClient(api)
 	return nil

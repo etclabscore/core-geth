@@ -135,16 +135,19 @@ func (miner *Miner) update() {
 					shouldStart = true
 					log.Info("Mining aborted due to sync")
 				}
+				miner.worker.syncing.Store(true)
 			case downloader.FailedEvent:
 				canStart = true
 				if shouldStart {
 					miner.worker.start()
 				}
+				miner.worker.syncing.Store(false)
 			case downloader.DoneEvent:
 				canStart = true
 				if shouldStart {
 					miner.worker.start()
 				}
+				miner.worker.syncing.Store(false)
 				// Stop reacting to downloader events
 				events.Unsubscribe()
 			}

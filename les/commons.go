@@ -154,7 +154,7 @@ func (c *lesCommons) setupOracle(node *node.Node, genesis common.Hash, ethconfig
 		return nil
 	}
 	oracle := checkpointoracle.New(config, c.localCheckpoint)
-	rpcClient, _ := node.Attach()
+	rpcClient := node.Attach()
 	client := ethclient.NewClient(rpcClient)
 	oracle.Start(client)
 	log.Info("Configured checkpoint oracle", "address", config.Address, "signers", len(config.Signers), "threshold", config.Threshold)

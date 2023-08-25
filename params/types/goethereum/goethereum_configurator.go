@@ -711,6 +711,15 @@ func (c *ChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) erro
 	}
 }
 
+func (c *ChainConfig) GetIsDevMode() bool {
+	return c.IsDevMode
+}
+
+func (c *ChainConfig) SetDevMode(devMode bool) error {
+	c.IsDevMode = devMode
+	return nil
+}
+
 func (c *ChainConfig) GetEthashTerminalTotalDifficulty() *big.Int {
 	return c.TerminalTotalDifficulty
 }

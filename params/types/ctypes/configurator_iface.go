@@ -234,6 +234,9 @@ type Forker interface {
 type ConsensusEnginator interface {
 	GetConsensusEngineType() ConsensusEngineT
 	MustSetConsensusEngineType(t ConsensusEngineT) error
+	GetIsDevMode() bool
+	SetDevMode(devMode bool) error
+
 	EthashConfigurator
 	CliqueConfigurator
 	Lyra2Configurator

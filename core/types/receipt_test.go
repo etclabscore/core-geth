@@ -26,6 +26,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/holiman/uint256"
 	"github.com/kylelemons/godebug/diff"
@@ -272,7 +273,7 @@ var (
 			TxHash:            txs[5].Hash(),
 			GasUsed:           6,
 			EffectiveGasPrice: big.NewInt(1066),
-			BlobGasUsed:       params.BlobTxBlobGasPerBlob,
+			BlobGasUsed:       vars.BlobTxBlobGasPerBlob,
 			BlobGasPrice:      big.NewInt(920),
 			BlockHash:         blockHash,
 			BlockNumber:       blockNumber,
@@ -287,7 +288,7 @@ var (
 			TxHash:            txs[6].Hash(),
 			GasUsed:           7,
 			EffectiveGasPrice: big.NewInt(1077),
-			BlobGasUsed:       3 * params.BlobTxBlobGasPerBlob,
+			BlobGasUsed:       3 * vars.BlobTxBlobGasPerBlob,
 			BlobGasPrice:      big.NewInt(920),
 			BlockHash:         blockHash,
 			BlockNumber:       blockNumber,

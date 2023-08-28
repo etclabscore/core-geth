@@ -20,6 +20,8 @@ import (
 	"fmt"
 	"math/big"
 	"testing"
+
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 func TestCalcExcessBlobGas(t *testing.T) {
@@ -32,23 +34,23 @@ func TestCalcExcessBlobGas(t *testing.T) {
 		// slots are below - or equal - to the target.
 		{0, 0, 0},
 		{0, 1, 0},
-		{0, params.BlobTxTargetBlobGasPerBlock / params.BlobTxBlobGasPerBlob, 0},
+		{0, vars.BlobTxTargetBlobGasPerBlock / vars.BlobTxBlobGasPerBlob, 0},
 
 		// If the target blob gas is exceeded, the excessBlobGas should increase
 		// by however much it was overshot
-		{0, (params.BlobTxTargetBlobGasPerBlock / params.BlobTxBlobGasPerBlob) + 1, params.BlobTxBlobGasPerBlob},
-		{1, (params.BlobTxTargetBlobGasPerBlock / params.BlobTxBlobGasPerBlob) + 1, params.BlobTxBlobGasPerBlob + 1},
-		{1, (params.BlobTxTargetBlobGasPerBlock / params.BlobTxBlobGasPerBlob) + 2, 2*params.BlobTxBlobGasPerBlob + 1},
+		{0, (vars.BlobTxTargetBlobGasPerBlock / vars.BlobTxBlobGasPerBlob) + 1, vars.BlobTxBlobGasPerBlob},
+		{1, (vars.BlobTxTargetBlobGasPerBlock / vars.BlobTxBlobGasPerBlob) + 1, vars.BlobTxBlobGasPerBlob + 1},
+		{1, (vars.BlobTxTargetBlobGasPerBlock / vars.BlobTxBlobGasPerBlob) + 2, 2*vars.BlobTxBlobGasPerBlob + 1},
 
 		// The excess blob gas should decrease by however much the target was
 		// under-shot, capped at zero.
-		{params.BlobTxTargetBlobGasPerBlock, params.BlobTxTargetBlobGasPerBlock / params.BlobTxBlobGasPerBlob, params.BlobTxTargetBlobGasPerBlock},
-		{params.BlobTxTargetBlobGasPerBlock, (params.BlobTxTargetBlobGasPerBlock / params.BlobTxBlobGasPerBlob) - 1, params.BlobTxBlobGasPerBlob},
-		{params.BlobTxTargetBlobGasPerBlock, (params.BlobTxTargetBlobGasPerBlock / params.BlobTxBlobGasPerBlob) - 2, 0},
-		{params.BlobTxBlobGasPerBlob - 1, (params.BlobTxTargetBlobGasPerBlock / params.BlobTxBlobGasPerBlob) - 1, 0},
+		{vars.BlobTxTargetBlobGasPerBlock, vars.BlobTxTargetBlobGasPerBlock / vars.BlobTxBlobGasPerBlob, vars.BlobTxTargetBlobGasPerBlock},
+		{vars.BlobTxTargetBlobGasPerBlock, (vars.BlobTxTargetBlobGasPerBlock / vars.BlobTxBlobGasPerBlob) - 1, vars.BlobTxBlobGasPerBlob},
+		{vars.BlobTxTargetBlobGasPerBlock, (vars.BlobTxTargetBlobGasPerBlock / vars.BlobTxBlobGasPerBlob) - 2, 0},
+		{vars.BlobTxBlobGasPerBlob - 1, (vars.BlobTxTargetBlobGasPerBlock / vars.BlobTxBlobGasPerBlob) - 1, 0},
 	}
 	for _, tt := range tests {
-		result := CalcExcessBlobGas(tt.excess, tt.blobs*params.BlobTxBlobGasPerBlob)
+		result := CalcExcessBlobGas(tt.excess, tt.blobs*vars.BlobTxBlobGasPerBlob)
 		if result != tt.want {
 			t.Errorf("excess blob gas mismatch: have %v, want %v", result, tt.want)
 		}

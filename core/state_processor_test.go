@@ -131,7 +131,7 @@ func TestStateProcessorErrors(t *testing.T) {
 				},
 			}
 			blockchain, _  = NewBlockChain(db, nil, gspec, nil, beacon.New(ethash.NewFaker()), vm.Config{}, nil, nil)
-			tooBigInitCode = [params.MaxInitCodeSize + 1]byte{}
+			tooBigInitCode = [vars.MaxInitCodeSize + 1]byte{}
 		)
 
 		defer blockchain.Stop()
@@ -238,19 +238,19 @@ func TestStateProcessorErrors(t *testing.T) {
 			},
 			{ // ErrMaxInitCodeSizeExceeded
 				txs: []*types.Transaction{
-					mkDynamicCreationTx(0, 500000, common.Big0, big.NewInt(params.InitialBaseFee), tooBigInitCode[:]),
+					mkDynamicCreationTx(0, 500000, common.Big0, big.NewInt(vars.InitialBaseFee), tooBigInitCode[:]),
 				},
 				want: "could not apply tx 0 [0xd491405f06c92d118dd3208376fcee18a57c54bc52063ee4a26b1cf296857c25]: max initcode size exceeded: code size 49153 limit 49152",
 			},
 			{ // ErrIntrinsicGas: Not enough gas to cover init code
 				txs: []*types.Transaction{
-					mkDynamicCreationTx(0, 54299, common.Big0, big.NewInt(params.InitialBaseFee), make([]byte, 320)),
+					mkDynamicCreationTx(0, 54299, common.Big0, big.NewInt(vars.InitialBaseFee), make([]byte, 320)),
 				},
 				want: "could not apply tx 0 [0xfd49536a9b323769d8472fcb3ebb3689b707a349379baee3e2ee3fe7baae06a1]: intrinsic gas too low: have 54299, want 54300",
 			},
 			{ // ErrBlobFeeCapTooLow
 				txs: []*types.Transaction{
-					mkBlobTx(0, common.Address{}, params.TxGas, big.NewInt(1), big.NewInt(1), []common.Hash{(common.Hash{1})}),
+					mkBlobTx(0, common.Address{}, vars.TxGas, big.NewInt(1), big.NewInt(1), []common.Hash{(common.Hash{1})}),
 				},
 				want: "could not apply tx 0 [0x6c11015985ce82db691d7b2d017acda296db88b811c3c60dc71449c76256c716]: max fee per gas less than block base fee: address 0x71562b71999873DB5b286dF957af199Ec94617F7, maxFeePerGas: 1 baseFee: 875000000",
 			},
@@ -474,14 +474,15 @@ func GenerateBadBlock(parent *types.Block, engine consensus.Engine, txs types.Tr
 		nBlobs += len(tx.BlobHashes())
 	}
 	header.Root = common.BytesToHash(hasher.Sum(nil))
-	if config.IsCancun(header.Number, header.Time) {
+	isEip4844 := config.IsEnabledByTime(config.GetEIP4844TransitionTime, &header.Time)
+	if isEip4844 {
 		var pExcess, pUsed = uint64(0), uint64(0)
 		if parent.ExcessBlobGas() != nil {
 			pExcess = *parent.ExcessBlobGas()
 			pUsed = *parent.BlobGasUsed()
 		}
 		excess := eip4844.CalcExcessBlobGas(pExcess, pUsed)
-		used := uint64(nBlobs * params.BlobTxBlobGasPerBlob)
+		used := uint64(nBlobs * vars.BlobTxBlobGasPerBlob)
 		header.ExcessBlobGas = &excess
 		header.BlobGasUsed = &used
 	}

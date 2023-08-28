@@ -327,6 +327,9 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 	if dec.OverrideShanghai != nil {
 		c.OverrideShanghai = dec.OverrideShanghai
 	}
+	if dec.OverrideCancun != nil {
+		c.OverrideCancun = dec.OverrideCancun
+	}
 	if dec.OverrideVerkle != nil {
 		c.OverrideVerkle = dec.OverrideVerkle
 	}

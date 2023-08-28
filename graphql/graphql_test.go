@@ -369,12 +369,12 @@ func TestWithdrawals(t *testing.T) {
 		key, _ = crypto.GenerateKey()
 		addr   = crypto.PubkeyToAddress(key.PublicKey)
 
-		genesis = &core.Genesis{
+		genesis = &genesisT.Genesis{
 			Config:     params.AllEthashProtocolChanges,
 			GasLimit:   11500000,
 			Difficulty: common.Big1,
-			Alloc: core.GenesisAlloc{
-				addr: {Balance: big.NewInt(params.Ether)},
+			Alloc: genesisT.GenesisAlloc{
+				addr: {Balance: big.NewInt(vars.Ether)},
 			},
 		}
 		signer = types.LatestSigner(genesis.Config)
@@ -383,7 +383,7 @@ func TestWithdrawals(t *testing.T) {
 	defer stack.Close()
 
 	handler, _ := newGQLService(t, stack, true, genesis, 1, func(i int, gen *core.BlockGen) {
-		tx, _ := types.SignNewTx(key, signer, &types.LegacyTx{To: &common.Address{}, Gas: 100000, GasPrice: big.NewInt(params.InitialBaseFee)})
+		tx, _ := types.SignNewTx(key, signer, &types.LegacyTx{To: &common.Address{}, Gas: 100000, GasPrice: big.NewInt(vars.InitialBaseFee)})
 		gen.AddTx(tx)
 		gen.AddWithdrawal(&types.Withdrawal{
 			Validator: 5,
@@ -438,7 +438,7 @@ func createNode(t *testing.T) *node.Node {
 	return stack
 }
 
-func newGQLService(t *testing.T, stack *node.Node, shanghai bool, gspec *core.Genesis, genBlocks int, genfunc func(i int, gen *core.BlockGen)) (*handler, []*types.Block) {
+func newGQLService(t *testing.T, stack *node.Node, shanghai bool, gspec *genesisT.Genesis, genBlocks int, genfunc func(i int, gen *core.BlockGen)) (*handler, []*types.Block) {
 	ethConf := &ethconfig.Config{
 		Genesis: gspec,
 		Ethash: ethash.Config{
@@ -454,12 +454,16 @@ func newGQLService(t *testing.T, stack *node.Node, shanghai bool, gspec *core.Ge
 	if shanghai {
 		engine = beacon.NewFaker()
 		chainCfg := gspec.Config
-		chainCfg.TerminalTotalDifficultyPassed = true
-		chainCfg.TerminalTotalDifficulty = common.Big0
+		chainCfg.SetEthashTerminalTotalDifficultyPassed(true)
+		chainCfg.SetEthashTerminalTotalDifficulty(common.Big0)
 		// GenerateChain will increment timestamps by 10.
 		// Shanghai upgrade at block 1.
 		shanghaiTime := uint64(5)
-		chainCfg.ShanghaiTime = &shanghaiTime
+		chainCfg.SetEIP3651TransitionTime(&shanghaiTime)
+		chainCfg.SetEIP3855TransitionTime(&shanghaiTime)
+		chainCfg.SetEIP3860TransitionTime(&shanghaiTime)
+		chainCfg.SetEIP4895TransitionTime(&shanghaiTime)
+		chainCfg.SetEIP6049TransitionTime(&shanghaiTime)
 	}
 	ethBackend, err := eth.New(stack, ethConf)
 	if err != nil {

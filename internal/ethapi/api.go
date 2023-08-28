@@ -1330,7 +1330,7 @@ type RPCMarshalHeaderT struct {
 	TransactionsRoot common.Hash       `json:"transactionsRoot"`
 	ReceiptsRoot     common.Hash       `json:"receiptsRoot"`
 	BaseFee          *hexutil.Big      `json:"baseFeePerGas,omitempty"`
-	Withdrawals      interface{}       `json:"withdrawals,omitempty"` // FIXME-meowsbits
+	WithdrawalsHash  *common.Hash      `json:"withdrawalsRoot,omitempty"`
 }
 
 // NewRPCMarshalHeaderTFromHeader constructs a new RPCMarshalHeaderT struct from a given header.
@@ -1364,6 +1364,10 @@ func NewRPCMarshalHeaderTFromHeader(header *types.Header) *RPCMarshalHeaderT {
 		head.BaseFee = (*hexutil.Big)(header.BaseFee)
 	}
 
+	if header.WithdrawalsHash != nil {
+		head.WithdrawalsHash = header.WithdrawalsHash
+	}
+
 	return head
 }
 
@@ -1383,9 +1387,10 @@ func (h *RPCMarshalHeaderT) setAsPending() {
 // RPCMarshalBlockT is a type handling RPC serialization for types.Block.
 type RPCMarshalBlockT struct {
 	*RPCMarshalHeaderT
-	Transactions []interface{}  `json:"transactions"`
-	Uncles       []common.Hash  `json:"uncles"`
-	Size         hexutil.Uint64 `json:"size"`
+	Transactions []interface{}     `json:"transactions"`
+	Withdrawals  types.Withdrawals `json:"withdrawals,omitempty"`
+	Uncles       []common.Hash     `json:"uncles"`
+	Size         hexutil.Uint64    `json:"size"`
 
 	Error string `json:"error,omitempty"`
 
@@ -1397,8 +1402,9 @@ type RPCMarshalBlockT struct {
 // This exists to avoid a circular reference when overriding the json marshaling interface.
 type RPCMarshalBlockTIR struct {
 	*RPCMarshalHeaderT
-	Transactions []interface{} `json:"transactions"`
-	Uncles       []common.Hash `json:"uncles"`
+	Transactions []interface{}     `json:"transactions"`
+	Withdrawals  types.Withdrawals `json:"withdrawals,omitempty"`
+	Uncles       []common.Hash     `json:"uncles"`
 	Size         hexutil.Uint64    `json:"size"`
 
 	Error string `json:"error,omitempty"`
@@ -1432,6 +1438,7 @@ func (b *RPCMarshalBlockT) MarshalJSON() ([]byte, error) {
 		ir := &RPCMarshalBlockTIR{
 			RPCMarshalHeaderT: b.RPCMarshalHeaderT,
 			Transactions:      b.Transactions,
+			Withdrawals:       b.Withdrawals,
 			Uncles:            b.Uncles,
 			Size:              b.Size,
 			Error:             "",

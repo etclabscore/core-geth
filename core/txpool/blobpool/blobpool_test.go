@@ -524,8 +524,8 @@ func TestOpenDrops(t *testing.T) {
 
 	chain := &testBlockChain{
 		config:  testChainConfig,
-		basefee: uint256.NewInt(params.InitialBaseFee),
-		blobfee: uint256.NewInt(params.BlobTxMinBlobGasprice),
+		basefee: uint256.NewInt(vars.InitialBaseFee),
+		blobfee: uint256.NewInt(vars.BlobTxMinBlobGasprice),
 		statedb: statedb,
 	}
 	pool := New(Config{Datadir: storage}, chain)

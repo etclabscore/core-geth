@@ -404,7 +404,7 @@ func testBalanceAt(t *testing.T, client *rpc.Client) {
 
 func TestHeader_TxesUnclesNotEmpty(t *testing.T) {
 	backend, blocks := newTestBackend(t)
-	client, _ := backend.Attach()
+	client := backend.Attach()
 	defer backend.Close()
 	defer client.Close()
 
@@ -830,7 +830,7 @@ UNDER (methods which appear in the current API, but do not appear in the hardcod
 	}
 
 	backend, _ := newTestBackend(t)
-	client, _ := backend.Attach()
+	client := backend.Attach()
 	defer backend.Close()
 	defer client.Close()
 
@@ -905,7 +905,7 @@ func TestEthSubscribeNewSideHeads(t *testing.T) {
 	}
 
 	// Create the client and newSideHeads subscription.
-	client, err := backend.Attach()
+	client := backend.Attach()
 	defer backend.Close()
 
 	defer client.Close()
@@ -1031,7 +1031,7 @@ func mustNewTestBackend() (*node.Node, []*types.Block) {
 // BenchmarkRPC_Discover shows that rpc.discover by reflection is slow.
 func BenchmarkRPC_Discover(b *testing.B) {
 	backend, _ := mustNewTestBackend()
-	client, _ := backend.Attach()
+	client := backend.Attach()
 	defer backend.Close()
 	defer client.Close()
 
@@ -1048,7 +1048,7 @@ func BenchmarkRPC_Discover(b *testing.B) {
 // BenchmarkRPC_BlockNumber shows that eth_blockNumber is a lot faster than rpc.discover.
 func BenchmarkRPC_BlockNumber(b *testing.B) {
 	backend, _ := mustNewTestBackend()
-	client, _ := backend.Attach()
+	client := backend.Attach()
 	defer backend.Close()
 	defer client.Close()
 

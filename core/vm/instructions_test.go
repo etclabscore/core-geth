@@ -780,7 +780,7 @@ func TestBlobHash(t *testing.T) {
 			evmInterpreter = env.interpreter
 		)
 		stack.push(uint256.NewInt(tt.idx))
-		opBlobHash(&pc, evmInterpreter, &ScopeContext{nil, stack, nil})
+		opBlobHash(&pc, evmInterpreter.(*EVMInterpreter), &ScopeContext{nil, stack, nil})
 		if len(stack.data) != 1 {
 			t.Errorf("Expected one item on stack after %v, got %d: ", tt.name, len(stack.data))
 		}
@@ -921,7 +921,7 @@ func TestOpMCopy(t *testing.T) {
 			mem.Resize(memorySize)
 		}
 		// Do the copy
-		opMcopy(&pc, evmInterpreter, &ScopeContext{mem, stack, nil})
+		opMcopy(&pc, evmInterpreter.(*EVMInterpreter), &ScopeContext{mem, stack, nil})
 		want := common.FromHex(strings.ReplaceAll(tc.want, " ", ""))
 		if have := mem.store; !bytes.Equal(want, have) {
 			t.Errorf("case %d: \nwant: %#x\nhave: %#x\n", i, want, have)

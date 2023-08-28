@@ -877,6 +877,7 @@ func TestRPCMarshalBlock(t *testing.T) {
 			fullTx: false,
 			want: `{
 				"difficulty": "0x0",
+				"totalDifficulty": null,
 				"extraData": "0x",
 				"gasLimit": "0x0",
 				"gasUsed": "0x0",
@@ -902,6 +903,7 @@ func TestRPCMarshalBlock(t *testing.T) {
 			fullTx: false,
 			want: `{
 				"difficulty": "0x0",
+				"totalDifficulty": null,
 				"extraData": "0x",
 				"gasLimit": "0x0",
 				"gasUsed": "0x0",
@@ -933,6 +935,7 @@ func TestRPCMarshalBlock(t *testing.T) {
 			fullTx: true,
 			want: `{
 				"difficulty": "0x0",
+				"totalDifficulty": null,
 				"extraData": "0x",
 				"gasLimit": "0x0",
 				"gasUsed": "0x0",

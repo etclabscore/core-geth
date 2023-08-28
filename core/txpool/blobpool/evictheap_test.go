@@ -22,7 +22,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/holiman/uint256"
 )
 
@@ -186,7 +186,7 @@ func BenchmarkPriceHeapReinit100GB(b *testing.B) { benchmarkPriceHeapReinit(b, 1
 func benchmarkPriceHeapReinit(b *testing.B, datacap uint64) {
 	// Calculate how many unique transactions we can fit into the provided disk
 	// data cap
-	blobs := datacap / (params.BlobTxBytesPerFieldElement * params.BlobTxFieldElementsPerBlob)
+	blobs := datacap / (vars.BlobTxBytesPerFieldElement * vars.BlobTxFieldElementsPerBlob)
 
 	// Create a random set of transactions with random fees. Use a separate account
 	// for each transaction to make it worse case.
@@ -246,7 +246,7 @@ func BenchmarkPriceHeapOverflow100GB(b *testing.B) { benchmarkPriceHeapOverflow(
 func benchmarkPriceHeapOverflow(b *testing.B, datacap uint64) {
 	// Calculate how many unique transactions we can fit into the provided disk
 	// data cap
-	blobs := datacap / (params.BlobTxBytesPerFieldElement * params.BlobTxFieldElementsPerBlob)
+	blobs := datacap / (vars.BlobTxBytesPerFieldElement * vars.BlobTxFieldElementsPerBlob)
 
 	// Create a random set of transactions with random fees. Use a separate account
 	// for each transaction to make it worse case.

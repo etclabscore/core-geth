@@ -64,19 +64,19 @@ func init() {
 }
 
 type testBlockChain struct {
-	config        *params.ChainConfig
+	config        ctypes.ChainConfigurator
 	gasLimit      atomic.Uint64
 	statedb       *state.StateDB
 	chainHeadFeed *event.Feed
 }
 
-func newTestBlockChain(config *params.ChainConfig, gasLimit uint64, statedb *state.StateDB, chainHeadFeed *event.Feed) *testBlockChain {
+func newTestBlockChain(config ctypes.ChainConfigurator, gasLimit uint64, statedb *state.StateDB, chainHeadFeed *event.Feed) *testBlockChain {
 	bc := testBlockChain{config: config, statedb: statedb, chainHeadFeed: new(event.Feed)}
 	bc.gasLimit.Store(gasLimit)
 	return &bc
 }
 
-func (bc *testBlockChain) Config() *params.ChainConfig {
+func (bc *testBlockChain) Config() ctypes.ChainConfigurator {
 	return bc.config
 }
 
@@ -279,7 +279,7 @@ func TestStateChangeDuringReset(t *testing.T) {
 
 	// setup pool with 2 transaction in it
 	statedb.SetBalance(address, new(big.Int).SetUint64(vars.Ether))
-	blockchain := &testChain{newTestBlockChain(1000000000, statedb, new(event.Feed)), address, &trigger}
+	blockchain := &testChain{newTestBlockChain(params.TestChainConfig, 1000000000, statedb, new(event.Feed)), address, &trigger}
 
 	tx0 := transaction(0, 100000, key)
 	tx1 := transaction(1, 100000, key)

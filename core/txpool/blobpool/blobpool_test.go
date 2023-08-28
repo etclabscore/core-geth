@@ -42,6 +42,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb/memorydb"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/holiman/billy"
@@ -70,10 +71,10 @@ func blobHash(commit kzg4844.Commitment) common.Hash {
 // Chain configuration with Cancun enabled.
 //
 // TODO(karalabe): replace with params.MainnetChainConfig after Cancun.
-var testChainConfig *params.ChainConfig
+var testChainConfig *goethereum.ChainConfig
 
 func init() {
-	testChainConfig = new(params.ChainConfig)
+	testChainConfig = new(goethereum.ChainConfig)
 	*testChainConfig = *params.MainnetChainConfig
 
 	testChainConfig.CancunTime = new(uint64)
@@ -82,13 +83,13 @@ func init() {
 
 // testBlockChain is a mock of the live chain for testing the pool.
 type testBlockChain struct {
-	config  *params.ChainConfig
+	config  *goethereum.ChainConfig
 	basefee *uint256.Int
 	blobfee *uint256.Int
 	statedb *state.StateDB
 }
 
-func (bc *testBlockChain) Config() *params.ChainConfig {
+func (bc *testBlockChain) Config() *goethereum.ChainConfig {
 	return bc.config
 }
 

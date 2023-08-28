@@ -42,6 +42,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb/memorydb"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
@@ -83,13 +84,13 @@ func init() {
 
 // testBlockChain is a mock of the live chain for testing the pool.
 type testBlockChain struct {
-	config  *goethereum.ChainConfig
+	config  ctypes.ChainConfigurator
 	basefee *uint256.Int
 	blobfee *uint256.Int
 	statedb *state.StateDB
 }
 
-func (bc *testBlockChain) Config() *goethereum.ChainConfig {
+func (bc *testBlockChain) Config() ctypes.ChainConfigurator {
 	return bc.config
 }
 
@@ -100,8 +101,8 @@ func (bc *testBlockChain) CurrentBlock() *types.Header {
 	// The base fee at 5714 ETH translates into the 21000 base gas higher than
 	// mainnet ether existence, use that as a cap for the tests.
 	var (
-		blockNumber = new(big.Int).Add(bc.config.LondonBlock, big.NewInt(1))
-		blockTime   = *bc.config.CancunTime + 1
+		blockNumber = new(big.Int).Add(new(big.Int).SetUint64(*bc.config.GetEIP1559Transition()), big.NewInt(1))
+		blockTime   = *bc.config.GetEIP4844TransitionTime() + 1
 		gasLimit    = uint64(30_000_000)
 	)
 	lo := new(big.Int)

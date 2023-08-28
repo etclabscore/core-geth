@@ -64,13 +64,13 @@ func (m *mockBackend) StateAtBlock(block *types.Block, reexec uint64, base *stat
 }
 
 type testBlockChain struct {
-	config        *params.ChainConfig
+	config        ctypes.ChainConfigurator
 	statedb       *state.StateDB
 	gasLimit      uint64
 	chainHeadFeed *event.Feed
 }
 
-func (bc *testBlockChain) Config() *params.ChainConfig {
+func (bc *testBlockChain) Config() ctypes.ChainConfigurator {
 	return bc.config
 }
 

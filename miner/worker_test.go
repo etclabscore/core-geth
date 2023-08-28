@@ -71,7 +71,7 @@ var (
 
 	// Test transactions
 	pendingTxs []*txpool.Transaction
-	newTxs     []*types.Transaction
+	newTxs     []*txpool.Transaction
 
 	testConfig = &Config{
 		Recommit: time.Second,
@@ -108,7 +108,8 @@ func init() {
 		Gas:      vars.TxGas,
 		GasPrice: big.NewInt(vars.InitialBaseFee),
 	})
-	newTxs = append(newTxs, tx2)
+
+	newTxs = append(newTxs, &txpool.Transaction{Tx: tx2})
 }
 
 // testWorkerBackend implements worker.Backend interfaces and wraps all information needed during the testing.
@@ -435,7 +436,7 @@ func testRegenerateMiningBlock(t *testing.T, chainConfig ctypes.ChainConfigurato
 			t.Error("new task timeout")
 		}
 	}
-	b.txPool.AddLocals(newTxs)
+	b.txPool.Add(newTxs, true, false)
 	time.Sleep(time.Second)
 
 	select {

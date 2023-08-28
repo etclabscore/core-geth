@@ -458,10 +458,7 @@ func TestBlockChain_GenerateMESSPlot(t *testing.T) {
 	maxHardLen := 400
 
 	generatePlot := func(title, fileName string) {
-		p, err := plot.New()
-		if err != nil {
-			log.Panic(err)
-		}
+		p := plot.New()
 		p.Title.Text = title
 		p.X.Label.Text = "Block Depth"
 		p.Y.Label.Text = "Mode Block Time Offset (10 seconds + y)"
@@ -514,7 +511,7 @@ func TestBlockChain_GenerateMESSPlot(t *testing.T) {
 
 		p.Legend.YOffs = -30
 
-		err = p.Save(pixelWidth, 300, fileName)
+		err := p.Save(pixelWidth, 300, fileName)
 		if err != nil {
 			log.Panic(err)
 		}

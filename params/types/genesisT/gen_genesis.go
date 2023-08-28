@@ -81,7 +81,7 @@ func (g *Genesis) UnmarshalJSON(input []byte) error {
 		BlobGasUsed   *math.HexOrDecimal64                        `json:"blobGasUsed"`
 	}
 	var dec Genesis
-		// We have to look at the raw input, decide what kind of configurator schema it's using,
+			// We have to look at the raw input, decide what kind of configurator schema it's using,
 	// then assign the decoder struct to use that schema type.
 	conf, err := generic.UnmarshalChainConfigurator(input)
 	if err != nil {

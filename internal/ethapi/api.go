@@ -1324,7 +1324,6 @@ type RPCMarshalHeaderT struct {
 	Difficulty       *hexutil.Big      `json:"difficulty"`
 	TotalDifficulty  *hexutil.Big      `json:"totalDifficulty"`
 	ExtraData        hexutil.Bytes     `json:"extraData"`
-	Size             hexutil.Uint64    `json:"size"`
 	GasLimit         hexutil.Uint64    `json:"gasLimit"`
 	GasUsed          hexutil.Uint64    `json:"gasUsed"`
 	Timestamp        hexutil.Uint64    `json:"timestamp"`
@@ -1354,7 +1353,6 @@ func NewRPCMarshalHeaderTFromHeader(header *types.Header) *RPCMarshalHeaderT {
 		Difficulty:       (*hexutil.Big)(header.Difficulty),
 		TotalDifficulty:  nil,
 		ExtraData:        header.Extra,
-		Size:             hexutil.Uint64(header.Size()),
 		GasLimit:         hexutil.Uint64(header.GasLimit),
 		GasUsed:          hexutil.Uint64(header.GasUsed),
 		Timestamp:        hexutil.Uint64(header.Time),
@@ -1385,8 +1383,9 @@ func (h *RPCMarshalHeaderT) setAsPending() {
 // RPCMarshalBlockT is a type handling RPC serialization for types.Block.
 type RPCMarshalBlockT struct {
 	*RPCMarshalHeaderT
-	Transactions []interface{} `json:"transactions"`
-	Uncles       []common.Hash `json:"uncles"`
+	Transactions []interface{}  `json:"transactions"`
+	Uncles       []common.Hash  `json:"uncles"`
+	Size         hexutil.Uint64 `json:"size"`
 
 	Error string `json:"error,omitempty"`
 
@@ -1400,6 +1399,7 @@ type RPCMarshalBlockTIR struct {
 	*RPCMarshalHeaderT
 	Transactions []interface{} `json:"transactions"`
 	Uncles       []common.Hash `json:"uncles"`
+	Size         hexutil.Uint64    `json:"size"`
 
 	Error string `json:"error,omitempty"`
 
@@ -1412,7 +1412,8 @@ type RPCMarshalBlockTIR struct {
 // This exists to avoid a circular reference when overriding the json marshaling interface.
 type RPCMarshalUncleTIR struct {
 	*RPCMarshalHeaderT
-	Uncles []common.Hash `json:"uncles"`
+	Uncles []common.Hash  `json:"uncles"`
+	Size   hexutil.Uint64 `json:"size"`
 
 	Error string `json:"error,omitempty"`
 
@@ -1432,6 +1433,7 @@ func (b *RPCMarshalBlockT) MarshalJSON() ([]byte, error) {
 			RPCMarshalHeaderT: b.RPCMarshalHeaderT,
 			Transactions:      b.Transactions,
 			Uncles:            b.Uncles,
+			Size:              b.Size,
 			Error:             "",
 			inclTx:            b.inclTx,
 			fullTx:            b.fullTx,
@@ -1441,6 +1443,7 @@ func (b *RPCMarshalBlockT) MarshalJSON() ([]byte, error) {
 	ir := &RPCMarshalUncleTIR{
 		RPCMarshalHeaderT: b.RPCMarshalHeaderT,
 		Uncles:            b.Uncles,
+		Size:              b.Size,
 		Error:             "",
 		inclTx:            b.inclTx,
 		fullTx:            b.fullTx,

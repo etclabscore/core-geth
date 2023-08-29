@@ -107,6 +107,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, gen
 				config.SetEIP4844TransitionTime(overrides.OverrideCancun)
 			}
 			if overrides != nil && overrides.OverrideVerkle != nil {
+				log.Warn("Verkle-fork is not yet supported")
 			}
 		}
 	}

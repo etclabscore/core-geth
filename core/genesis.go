@@ -96,6 +96,8 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, gen
 
 	applyOverrides := func(config ctypes.ChainConfigurator) {
 		if config != nil {
+			// Block-based overrides are not provided because Shanghai is
+			// ETH-network specific and that protocol is defined exclusively in time-based forks.
 			if overrides != nil && overrides.OverrideShanghai != nil {
 				config.SetEIP3651TransitionTime(overrides.OverrideShanghai)
 				config.SetEIP3855TransitionTime(overrides.OverrideShanghai)
@@ -436,7 +438,7 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 	}
 	var withdrawals []*types.Withdrawal
 	if conf := g.Config; conf != nil {
-		isShangai := conf.IsEnabledByTime(g.Config.GetEIP4895TransitionTime, &g.Timestamp)
+		isShangai := conf.IsEnabledByTime(g.Config.GetEIP4895TransitionTime, &g.Timestamp) || g.Config.IsEnabled(g.Config.GetEIP4895Transition, new(big.Int).SetUint64(g.Number))
 		if isShangai {
 			head.WithdrawalsHash = &types.EmptyWithdrawalsHash
 			withdrawals = make([]*types.Withdrawal, 0)

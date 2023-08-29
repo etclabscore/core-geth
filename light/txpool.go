@@ -339,7 +339,7 @@ func (pool *TxPool) setNewHead(head *types.Header) {
 	pool.eip2028f = pool.config.IsEnabled(pool.config.GetEIP2028Transition, next)
 	pool.eip2718 = pool.config.IsEnabled(pool.config.GetEIP2718Transition, next)
 	now := uint64(time.Now().Unix())
-	pool.eip3860 = pool.config.IsEnabledByTime(pool.config.GetEIP3860TransitionTime, &now)
+	pool.eip3860 = pool.config.IsEnabledByTime(pool.config.GetEIP3860TransitionTime, &now) || pool.config.IsEnabled(pool.config.GetEIP3860Transition, next)
 }
 
 // Stop stops the light transaction pool

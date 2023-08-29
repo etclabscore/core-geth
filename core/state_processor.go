@@ -96,7 +96,7 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 	// Fail if Shanghai not enabled and len(withdrawals) is non-zero.
 	withdrawals := block.Withdrawals()
 	blockTime := block.Time()
-	if len(withdrawals) > 0 && !p.config.IsEnabledByTime(p.config.GetEIP4895TransitionTime, &blockTime) {
+	if len(withdrawals) > 0 && !(p.config.IsEnabledByTime(p.config.GetEIP4895TransitionTime, &blockTime) || p.config.IsEnabled(p.config.GetEIP4895Transition, blockNumber)) {
 		return nil, nil, 0, fmt.Errorf("withdrawals before shanghai")
 	}
 	// Finalize the block, applying any consensus engine specific extras (e.g. block rewards)

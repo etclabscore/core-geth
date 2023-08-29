@@ -286,7 +286,8 @@ func runBenchmark(b *testing.B, t *StateTest) {
 
 				// Shanghai
 				// EIP-3651: Warm coinbase
-				eip3651f = config.IsEnabledByTime(config.GetEIP3651TransitionTime, &evm.Context.Time)
+				eip3651f = config.IsEnabledByTime(config.GetEIP3651TransitionTime, &evm.Context.Time) ||
+					config.IsEnabled(config.GetEIP3651Transition, evm.Context.BlockNumber)
 			)
 			b.ResetTimer()
 			for n := 0; n < b.N; n++ {

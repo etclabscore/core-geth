@@ -20,6 +20,7 @@ package catalyst
 import (
 	"errors"
 	"fmt"
+	"math/big"
 	"sync"
 	"time"
 
@@ -169,7 +170,8 @@ func (api *ConsensusAPI) ForkchoiceUpdatedV1(update engine.ForkchoiceStateV1, pa
 		if payloadAttributes.Withdrawals != nil {
 			return engine.STATUS_INVALID, engine.InvalidParams.With(errors.New("withdrawals not supported in V1"))
 		}
-		if api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4895TransitionTime, &payloadAttributes.Timestamp) {
+		if api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4895TransitionTime, &payloadAttributes.Timestamp) || // PTAL(meowsbits) Is it really safe/sensible to call the backing Blockchain here?
+			api.eth.BlockChain().Config().IsEnabled(api.eth.BlockChain().Config().GetEIP4895Transition, api.eth.BlockChain().CurrentHeader().Number) {
 			return engine.STATUS_INVALID, engine.InvalidParams.With(fmt.Errorf("forkChoiceUpdateV1 called post-shanghai"))
 		}
 	}
@@ -187,7 +189,7 @@ func (api *ConsensusAPI) ForkchoiceUpdatedV2(update engine.ForkchoiceStateV1, pa
 }
 
 func (api *ConsensusAPI) verifyPayloadAttributes(attr *engine.PayloadAttributes) error {
-	if !api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4895TransitionTime, &attr.Timestamp) {
+	if !api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4895TransitionTime, &attr.Timestamp) || api.eth.BlockChain().Config().IsEnabled(api.eth.BlockChain().Config().GetEIP4895Transition, api.eth.BlockChain().CurrentHeader().Number) { // PTAL(meowsbits) re: Number for 4985 block transition.
 		// Reject payload attributes with withdrawals before shanghai
 		if attr.Withdrawals != nil {
 			return errors.New("withdrawals before shanghai")
@@ -431,7 +433,7 @@ func (api *ConsensusAPI) NewPayloadV1(params engine.ExecutableData) (engine.Payl
 
 // NewPayloadV2 creates an Eth1 block, inserts it in the chain, and returns the status of the chain.
 func (api *ConsensusAPI) NewPayloadV2(params engine.ExecutableData) (engine.PayloadStatusV1, error) {
-	if api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4895TransitionTime, &params.Timestamp) {
+	if api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4895TransitionTime, &params.Timestamp) || api.eth.BlockChain().Config().IsEnabled(api.eth.BlockChain().Config().GetEIP4895Transition, new(big.Int).SetUint64(params.Number)) {
 		if params.Withdrawals == nil {
 			return engine.PayloadStatusV1{Status: engine.INVALID}, engine.InvalidParams.With(errors.New("nil withdrawals post-shanghai"))
 		}

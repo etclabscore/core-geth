@@ -592,6 +592,106 @@ func (c *ChainConfig) SetEIP6049TransitionTime(n *uint64) error {
 	return nil
 }
 
+// EIP3651: Warm COINBASE
+func (c *ChainConfig) GetEIP3651Transition() *uint64 {
+	if c.ShanghaiTime != nil && *c.ShanghaiTime == 0 {
+		return newU64(0)
+	}
+	return nil
+}
+
+func (c *ChainConfig) SetEIP3651Transition(n *uint64) error {
+	if n == nil {
+		c.ShanghaiTime = nil
+		return nil
+	}
+	if *n == 0 {
+		c.ShanghaiTime = newU64(0)
+		return nil
+	}
+	return ctypes.ErrUnsupportedConfigNoop
+}
+
+// GetEIP3855Transition EIP3855: PUSH0 instruction
+func (c *ChainConfig) GetEIP3855Transition() *uint64 {
+	if c.ShanghaiTime != nil && *c.ShanghaiTime == 0 {
+		return newU64(0)
+	}
+	return nil
+}
+
+func (c *ChainConfig) SetEIP3855Transition(n *uint64) error {
+	if n == nil {
+		c.ShanghaiTime = nil
+		return nil
+	}
+	if *n == 0 {
+		c.ShanghaiTime = newU64(0)
+		return nil
+	}
+	return ctypes.ErrUnsupportedConfigNoop
+}
+
+// GetEIP3860Transition EIP3860: Limit and meter initcode
+func (c *ChainConfig) GetEIP3860Transition() *uint64 {
+	if c.ShanghaiTime != nil && *c.ShanghaiTime == 0 {
+		return newU64(0)
+	}
+	return nil
+}
+
+func (c *ChainConfig) SetEIP3860Transition(n *uint64) error {
+	if n == nil {
+		c.ShanghaiTime = nil
+		return nil
+	}
+	if *n == 0 {
+		c.ShanghaiTime = newU64(0)
+		return nil
+	}
+	return ctypes.ErrUnsupportedConfigNoop
+}
+
+// GetEIP4895Transition EIP4895: Beacon chain push withdrawals as operations
+func (c *ChainConfig) GetEIP4895Transition() *uint64 {
+	if c.ShanghaiTime != nil && *c.ShanghaiTime == 0 {
+		return newU64(0)
+	}
+	return nil
+}
+
+func (c *ChainConfig) SetEIP4895Transition(n *uint64) error {
+	if n == nil {
+		c.ShanghaiTime = nil
+		return nil
+	}
+	if *n == 0 {
+		c.ShanghaiTime = newU64(0)
+		return nil
+	}
+	return ctypes.ErrUnsupportedConfigNoop
+}
+
+// GetEIP6049Transition EIP6049: Deprecate SELFDESTRUCT
+func (c *ChainConfig) GetEIP6049Transition() *uint64 {
+	if c.ShanghaiTime != nil && *c.ShanghaiTime == 0 {
+		return newU64(0)
+	}
+	return nil
+}
+
+func (c *ChainConfig) SetEIP6049Transition(n *uint64) error {
+	if n == nil {
+		c.ShanghaiTime = nil
+		return nil
+	}
+	if *n == 0 {
+		c.ShanghaiTime = newU64(0)
+		return nil
+	}
+	return ctypes.ErrUnsupportedConfigNoop
+}
+
 // GetEIP4844TransitionTime EIP4844: Shard Block Transactions
 func (c *ChainConfig) GetEIP4844TransitionTime() *uint64 {
 	return c.CancunTime

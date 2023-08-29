@@ -115,7 +115,7 @@ func TestFilters(t *testing.T) {
 		// Sender account
 		key1, _ = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 		addr    = crypto.PubkeyToAddress(key1.PublicKey)
-		signer  = types.NewLondonSigner(big.NewInt(1))
+		signer  = types.NewEIP1559Signer(big.NewInt(1))
 		// Logging contract
 		contract  = common.Address{0xfe}
 		contract2 = common.Address{0xff}
@@ -167,7 +167,7 @@ func TestFilters(t *testing.T) {
 		gspec = &genesisT.Genesis{
 			Config: params.TestChainConfig,
 			Alloc: genesisT.GenesisAlloc{
-				addr:      {Balance: big.NewInt(1000000)},
+				addr:      {Balance: big.NewInt(0).Mul(big.NewInt(100), big.NewInt(vars.Ether))},
 				contract:  {Balance: big.NewInt(0), Code: bytecode},
 				contract2: {Balance: big.NewInt(0), Code: bytecode},
 			},
@@ -182,11 +182,11 @@ func TestFilters(t *testing.T) {
 
 	// Hack: GenerateChainWithGenesis creates a new db.
 	// Commit the genesis manually and use GenerateChain.
-	_, err = gspec.Commit(db, trie.NewDatabase(db))
+	g, err := core.CommitGenesis(gspec, db, trie.NewDatabase(db))
 	if err != nil {
 		t.Fatal(err)
 	}
-	chain, _ := core.GenerateChain(gspec.Config, gspec.ToBlock(), ethash.NewFaker(), db, 1000, func(i int, gen *core.BlockGen) {
+	chain, _ := core.GenerateChain(gspec.Config, g, ethash.NewFaker(), db, 1000, func(i int, gen *core.BlockGen) {
 		switch i {
 		case 1:
 			data, err := contractABI.Pack("log1", hash1.Big())

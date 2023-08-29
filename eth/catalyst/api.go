@@ -189,7 +189,7 @@ func (api *ConsensusAPI) ForkchoiceUpdatedV2(update engine.ForkchoiceStateV1, pa
 }
 
 func (api *ConsensusAPI) verifyPayloadAttributes(attr *engine.PayloadAttributes) error {
-	if !api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4895TransitionTime, &attr.Timestamp) || api.eth.BlockChain().Config().IsEnabled(api.eth.BlockChain().Config().GetEIP4895Transition, api.eth.BlockChain().CurrentHeader().Number) { // PTAL(meowsbits) re: Number for 4985 block transition.
+	if !(api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4895TransitionTime, &attr.Timestamp) || api.eth.BlockChain().Config().IsEnabled(api.eth.BlockChain().Config().GetEIP4895Transition, api.eth.BlockChain().CurrentHeader().Number)) {
 		// Reject payload attributes with withdrawals before shanghai
 		if attr.Withdrawals != nil {
 			return errors.New("withdrawals before shanghai")

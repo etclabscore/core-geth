@@ -33,6 +33,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 func startSimulatedBeaconEthService(t *testing.T, genesis *genesisT.Genesis) (*node.Node, *eth.Ethereum, *SimulatedBeacon) {
@@ -86,7 +87,7 @@ func TestSimulatedBeaconSendWithdrawals(t *testing.T) {
 
 	// short period (1 second) for testing purposes
 	var gasLimit uint64 = 10_000_000
-	genesis := core.DeveloperGenesisBlock(gasLimit, testAddr)
+	genesis := params.DeveloperGenesisBlock(gasLimit, testAddr, false)
 	node, ethService, mock := startSimulatedBeaconEthService(t, genesis)
 	_ = mock
 	defer node.Close()
@@ -104,9 +105,9 @@ func TestSimulatedBeaconSendWithdrawals(t *testing.T) {
 	}
 
 	// generate a bunch of transactions
-	signer := types.NewEIP155Signer(ethService.BlockChain().Config().ChainID)
+	signer := types.NewEIP155Signer(ethService.BlockChain().Config().GetChainID())
 	for i := 0; i < 20; i++ {
-		tx, err := types.SignTx(types.NewTransaction(uint64(i), common.Address{}, big.NewInt(1000), params.TxGas, big.NewInt(params.InitialBaseFee), nil), signer, testKey)
+		tx, err := types.SignTx(types.NewTransaction(uint64(i), common.Address{}, big.NewInt(1000), vars.TxGas, big.NewInt(vars.InitialBaseFee), nil), signer, testKey)
 		if err != nil {
 			t.Fatalf("error signing transaction, err=%v", err)
 		}

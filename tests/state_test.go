@@ -82,6 +82,9 @@ func TestState(t *testing.T) {
 		st.skipFork("London")   // ETH
 		st.skipFork("Mystique") // ETC
 		st.skipFork("Merge")    // ETH
+		st.skipFork("Shanghai") // ETH
+		st.skipFork("Spiral")   // ETC
+		st.skipFork("Cancun")   // ETH
 	}
 
 	// Un-skip this when https://github.com/ethereum/tests/issues/908 is closed

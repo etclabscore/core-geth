@@ -30,7 +30,13 @@ type EngineAPIError struct {
 }
 
 func (e *EngineAPIError) ErrorCode() int { return e.code }
-func (e *EngineAPIError) Error() string  { return e.msg }
+func (e *EngineAPIError) Error() string {
+	str := e.msg
+	if e.err != nil {
+		str += ": " + e.err.Error()
+	}
+	return str
+}
 func (e *EngineAPIError) ErrorData() interface{} {
 	if e.err == nil {
 		return nil

@@ -60,7 +60,7 @@ func (s StateTest) GetTx() stTransaction {
 }
 
 func (s StateTest) GetPre() genesisT.GenesisAlloc {
-	return s.json.Pre
+	return s.json.Pre.toGenesisAlloc()
 }
 
 // StateSubtest selects a specific configuration of a General State Test.

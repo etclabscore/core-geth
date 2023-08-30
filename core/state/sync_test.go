@@ -39,10 +39,11 @@ type testAccount struct {
 }
 
 // makeTestState create a sample test state to test node-wise reconstruction.
-func makeTestState() (Database, common.Hash, []*testAccount) {
+func makeTestState() (ethdb.Database, Database, common.Hash, []*testAccount) {
 	// Create an empty state
-	db := NewDatabase(rawdb.NewMemoryDatabase())
-	state, _ := New(common.Hash{}, db, nil)
+	db := rawdb.NewMemoryDatabase()
+	sdb := NewDatabaseWithConfig(db, &trie.Config{Preimages: true})
+	state, _ := New(types.EmptyRootHash, sdb, nil)
 
 	// Fill it with some arbitrary data
 	var accounts []*testAccount
@@ -63,16 +64,16 @@ func makeTestState() (Database, common.Hash, []*testAccount) {
 		if i%5 == 0 {
 			for j := byte(0); j < 5; j++ {
 				hash := crypto.Keccak256Hash([]byte{i, i, i, i, i, j, j})
-				obj.SetState(db, hash, hash)
+				obj.SetState(hash, hash)
 			}
 		}
 		state.updateStateObject(obj)
 		accounts = append(accounts, acc)
 	}
-	root, _ := state.Commit(false)
+	root, _ := state.Commit(0, false)
 
 	// Return the generated state
-	return db, root, accounts
+	return db, sdb, root, accounts
 }
 
 // checkStateAccounts cross references a reconstructed state with an expected
@@ -99,32 +100,13 @@ func checkStateAccounts(t *testing.T, db ethdb.Database, root common.Hash, accou
 	}
 }
 
-// checkTrieConsistency checks that all nodes in a (sub-)trie are indeed present.
-func checkTrieConsistency(db ethdb.Database, root common.Hash) error {
-	if v, _ := db.Get(root[:]); v == nil {
-		return nil // Consider a non existent state consistent.
-	}
-	trie, err := trie.New(common.Hash{}, root, trie.NewDatabase(db))
-	if err != nil {
-		return err
-	}
-	it := trie.NodeIterator(nil)
-	for it.Next(true) {
-	}
-	return it.Error()
-}
-
 // checkStateConsistency checks that all data of a state root is present.
 func checkStateConsistency(db ethdb.Database, root common.Hash) error {
-	// Create and iterate a state trie rooted in a sub-node
-	if _, err := db.Get(root.Bytes()); err != nil {
-		return nil // Consider a non existent state consistent.
-	}
-	state, err := New(root, NewDatabase(db), nil)
+	state, err := New(root, NewDatabaseWithConfig(db, &trie.Config{Preimages: true}), nil)
 	if err != nil {
 		return err
 	}
-	it := NewNodeIterator(state)
+	it := newNodeIterator(state)
 	for it.Next() {
 	}
 	return it.Error
@@ -132,8 +114,8 @@ func checkStateConsistency(db ethdb.Database, root common.Hash) error {
 
 // Tests that an empty state is not scheduled for syncing.
 func TestEmptyStateSync(t *testing.T) {
-	empty := common.HexToHash("56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421")
-	sync := NewStateSync(empty, rawdb.NewMemoryDatabase(), nil)
+	db := trie.NewDatabase(rawdb.NewMemoryDatabase())
+	sync := NewStateSync(types.EmptyRootHash, rawdb.NewMemoryDatabase(), nil, db.Scheme())
 	if paths, nodes, codes := sync.Missing(1); len(paths) != 0 || len(nodes) != 0 || len(codes) != 0 {
 		t.Errorf("content requested for empty state: %v, %v, %v", nodes, paths, codes)
 	}
@@ -170,15 +152,15 @@ type stateElement struct {
 
 func testIterativeStateSync(t *testing.T, count int, commit bool, bypath bool) {
 	// Create a random state to copy
-	srcDb, srcRoot, srcAccounts := makeTestState()
+	srcDisk, srcDb, srcRoot, srcAccounts := makeTestState()
 	if commit {
-		srcDb.TrieDB().Commit(srcRoot, false, nil)
+		srcDb.TrieDB().Commit(srcRoot, false)
 	}
-	srcTrie, _ := trie.New(common.Hash{}, srcRoot, srcDb.TrieDB())
+	srcTrie, _ := trie.New(trie.StateTrieID(srcRoot), srcDb.TrieDB())
 
 	// Create a destination state and sync with the scheduler
 	dstDb := rawdb.NewMemoryDatabase()
-	sched := NewStateSync(srcRoot, dstDb, nil)
+	sched := NewStateSync(srcRoot, dstDb, nil, srcDb.TrieDB().Scheme())
 
 	var (
 		nodeElements []stateElement
@@ -203,7 +185,7 @@ func testIterativeStateSync(t *testing.T, count int, commit bool, bypath bool) {
 			codeResults = make([]trie.CodeSyncResult, len(codeElements))
 		)
 		for i, element := range codeElements {
-			data, err := srcDb.ContractCode(common.Hash{}, element.code)
+			data, err := srcDb.ContractCode(common.Address{}, element.code)
 			if err != nil {
 				t.Fatalf("failed to retrieve contract bytecode for hash %x", element.code)
 			}
@@ -212,21 +194,22 @@ func testIterativeStateSync(t *testing.T, count int, commit bool, bypath bool) {
 		for i, node := range nodeElements {
 			if bypath {
 				if len(node.syncPath) == 1 {
-					data, _, err := srcTrie.TryGetNode(node.syncPath[0])
+					data, _, err := srcTrie.GetNode(node.syncPath[0])
 					if err != nil {
 						t.Fatalf("failed to retrieve node data for path %x: %v", node.syncPath[0], err)
 					}
 					nodeResults[i] = trie.NodeSyncResult{Path: node.path, Data: data}
 				} else {
 					var acc types.StateAccount
-					if err := rlp.DecodeBytes(srcTrie.Get(node.syncPath[0]), &acc); err != nil {
+					if err := rlp.DecodeBytes(srcTrie.MustGet(node.syncPath[0]), &acc); err != nil {
 						t.Fatalf("failed to decode account on path %x: %v", node.syncPath[0], err)
 					}
-					stTrie, err := trie.New(common.BytesToHash(node.syncPath[0]), acc.Root, srcDb.TrieDB())
+					id := trie.StorageTrieID(srcRoot, common.BytesToHash(node.syncPath[0]), acc.Root)
+					stTrie, err := trie.New(id, srcDb.TrieDB())
 					if err != nil {
 						t.Fatalf("failed to retriev storage trie for path %x: %v", node.syncPath[1], err)
 					}
-					data, _, err := stTrie.TryGetNode(node.syncPath[1])
+					data, _, err := stTrie.GetNode(node.syncPath[1])
 					if err != nil {
 						t.Fatalf("failed to retrieve node data for path %x: %v", node.syncPath[1], err)
 					}
@@ -272,6 +255,10 @@ func testIterativeStateSync(t *testing.T, count int, commit bool, bypath bool) {
 			})
 		}
 	}
+	// Copy the preimages from source db in order to traverse the state.
+	srcDb.TrieDB().WritePreimages()
+	copyPreimages(srcDisk, dstDb)
+
 	// Cross check that the two states are in sync
 	checkStateAccounts(t, dstDb, srcRoot, srcAccounts)
 }
@@ -280,11 +267,11 @@ func testIterativeStateSync(t *testing.T, count int, commit bool, bypath bool) {
 // partial results are returned, and the others sent only later.
 func TestIterativeDelayedStateSync(t *testing.T) {
 	// Create a random state to copy
-	srcDb, srcRoot, srcAccounts := makeTestState()
+	srcDisk, srcDb, srcRoot, srcAccounts := makeTestState()
 
 	// Create a destination state and sync with the scheduler
 	dstDb := rawdb.NewMemoryDatabase()
-	sched := NewStateSync(srcRoot, dstDb, nil)
+	sched := NewStateSync(srcRoot, dstDb, nil, srcDb.TrieDB().Scheme())
 
 	var (
 		nodeElements []stateElement
@@ -310,7 +297,7 @@ func TestIterativeDelayedStateSync(t *testing.T) {
 		if len(codeElements) > 0 {
 			codeResults := make([]trie.CodeSyncResult, len(codeElements)/2+1)
 			for i, element := range codeElements[:len(codeResults)] {
-				data, err := srcDb.ContractCode(common.Hash{}, element.code)
+				data, err := srcDb.ContractCode(common.Address{}, element.code)
 				if err != nil {
 					t.Fatalf("failed to retrieve contract bytecode for %x", element.code)
 				}
@@ -361,6 +348,10 @@ func TestIterativeDelayedStateSync(t *testing.T) {
 			})
 		}
 	}
+	// Copy the preimages from source db in order to traverse the state.
+	srcDb.TrieDB().WritePreimages()
+	copyPreimages(srcDisk, dstDb)
+
 	// Cross check that the two states are in sync
 	checkStateAccounts(t, dstDb, srcRoot, srcAccounts)
 }
@@ -373,11 +364,11 @@ func TestIterativeRandomStateSyncBatched(t *testing.T)    { testIterativeRandomS
 
 func testIterativeRandomStateSync(t *testing.T, count int) {
 	// Create a random state to copy
-	srcDb, srcRoot, srcAccounts := makeTestState()
+	srcDisk, srcDb, srcRoot, srcAccounts := makeTestState()
 
 	// Create a destination state and sync with the scheduler
 	dstDb := rawdb.NewMemoryDatabase()
-	sched := NewStateSync(srcRoot, dstDb, nil)
+	sched := NewStateSync(srcRoot, dstDb, nil, srcDb.TrieDB().Scheme())
 
 	nodeQueue := make(map[string]stateElement)
 	codeQueue := make(map[common.Hash]struct{})
@@ -397,7 +388,7 @@ func testIterativeRandomStateSync(t *testing.T, count int) {
 		if len(codeQueue) > 0 {
 			results := make([]trie.CodeSyncResult, 0, len(codeQueue))
 			for hash := range codeQueue {
-				data, err := srcDb.ContractCode(common.Hash{}, hash)
+				data, err := srcDb.ContractCode(common.Address{}, hash)
 				if err != nil {
 					t.Fatalf("failed to retrieve node data for %x", hash)
 				}
@@ -445,6 +436,10 @@ func testIterativeRandomStateSync(t *testing.T, count int) {
 			codeQueue[hash] = struct{}{}
 		}
 	}
+	// Copy the preimages from source db in order to traverse the state.
+	srcDb.TrieDB().WritePreimages()
+	copyPreimages(srcDisk, dstDb)
+
 	// Cross check that the two states are in sync
 	checkStateAccounts(t, dstDb, srcRoot, srcAccounts)
 }
@@ -453,11 +448,11 @@ func testIterativeRandomStateSync(t *testing.T, count int) {
 // partial results are returned (Even those randomly), others sent only later.
 func TestIterativeRandomDelayedStateSync(t *testing.T) {
 	// Create a random state to copy
-	srcDb, srcRoot, srcAccounts := makeTestState()
+	srcDisk, srcDb, srcRoot, srcAccounts := makeTestState()
 
 	// Create a destination state and sync with the scheduler
 	dstDb := rawdb.NewMemoryDatabase()
-	sched := NewStateSync(srcRoot, dstDb, nil)
+	sched := NewStateSync(srcRoot, dstDb, nil, srcDb.TrieDB().Scheme())
 
 	nodeQueue := make(map[string]stateElement)
 	codeQueue := make(map[common.Hash]struct{})
@@ -479,7 +474,7 @@ func TestIterativeRandomDelayedStateSync(t *testing.T) {
 			for hash := range codeQueue {
 				delete(codeQueue, hash)
 
-				data, err := srcDb.ContractCode(common.Hash{}, hash)
+				data, err := srcDb.ContractCode(common.Address{}, hash)
 				if err != nil {
 					t.Fatalf("failed to retrieve node data for %x", hash)
 				}
@@ -535,6 +530,10 @@ func TestIterativeRandomDelayedStateSync(t *testing.T) {
 			codeQueue[hash] = struct{}{}
 		}
 	}
+	// Copy the preimages from source db in order to traverse the state.
+	srcDb.TrieDB().WritePreimages()
+	copyPreimages(srcDisk, dstDb)
+
 	// Cross check that the two states are in sync
 	checkStateAccounts(t, dstDb, srcRoot, srcAccounts)
 }
@@ -543,7 +542,7 @@ func TestIterativeRandomDelayedStateSync(t *testing.T) {
 // the database.
 func TestIncompleteStateSync(t *testing.T) {
 	// Create a random state to copy
-	srcDb, srcRoot, srcAccounts := makeTestState()
+	db, srcDb, srcRoot, srcAccounts := makeTestState()
 
 	// isCodeLookup to save some hashing
 	var isCode = make(map[common.Hash]struct{})
@@ -552,17 +551,21 @@ func TestIncompleteStateSync(t *testing.T) {
 			isCode[crypto.Keccak256Hash(acc.code)] = struct{}{}
 		}
 	}
-	isCode[common.BytesToHash(emptyCodeHash)] = struct{}{}
-	checkTrieConsistency(srcDb.TrieDB().DiskDB().(ethdb.Database), srcRoot)
+	isCode[types.EmptyCodeHash] = struct{}{}
 
 	// Create a destination state and sync with the scheduler
 	dstDb := rawdb.NewMemoryDatabase()
-	sched := NewStateSync(srcRoot, dstDb, nil)
+	sched := NewStateSync(srcRoot, dstDb, nil, srcDb.TrieDB().Scheme())
 
 	var (
-		addedCodes []common.Hash
-		addedNodes []common.Hash
+		addedCodes  []common.Hash
+		addedPaths  []string
+		addedHashes []common.Hash
 	)
+	reader, err := srcDb.TrieDB().Reader(srcRoot)
+	if err != nil {
+		t.Fatalf("state is not available %x", srcRoot)
+	}
 	nodeQueue := make(map[string]stateElement)
 	codeQueue := make(map[common.Hash]struct{})
 	paths, nodes, codes := sched.Missing(1)
@@ -581,7 +584,7 @@ func TestIncompleteStateSync(t *testing.T) {
 		if len(codeQueue) > 0 {
 			results := make([]trie.CodeSyncResult, 0, len(codeQueue))
 			for hash := range codeQueue {
-				data, err := srcDb.ContractCode(common.Hash{}, hash)
+				data, err := srcDb.ContractCode(common.Address{}, hash)
 				if err != nil {
 					t.Fatalf("failed to retrieve node data for %x", hash)
 				}
@@ -595,20 +598,20 @@ func TestIncompleteStateSync(t *testing.T) {
 				}
 			}
 		}
-		var nodehashes []common.Hash
 		if len(nodeQueue) > 0 {
 			results := make([]trie.NodeSyncResult, 0, len(nodeQueue))
-			for key, element := range nodeQueue {
-				data, err := srcDb.TrieDB().Node(element.hash)
+			for path, element := range nodeQueue {
+				owner, inner := trie.ResolvePath([]byte(element.path))
+				data, err := reader.Node(owner, inner, element.hash)
 				if err != nil {
 					t.Fatalf("failed to retrieve node data for %x", element.hash)
 				}
-				results = append(results, trie.NodeSyncResult{Path: key, Data: data})
+				results = append(results, trie.NodeSyncResult{Path: path, Data: data})
 
 				if element.hash != srcRoot {
-					addedNodes = append(addedNodes, element.hash)
+					addedPaths = append(addedPaths, element.path)
+					addedHashes = append(addedHashes, element.hash)
 				}
-				nodehashes = append(nodehashes, element.hash)
 			}
 			// Process each of the state nodes
 			for _, result := range results {
@@ -623,13 +626,6 @@ func TestIncompleteStateSync(t *testing.T) {
 		}
 		batch.Write()
 
-		for _, root := range nodehashes {
-			// Can't use checkStateConsistency here because subtrie keys may have odd
-			// length and crash in LeafKey.
-			if err := checkTrieConsistency(dstDb, root); err != nil {
-				t.Fatalf("state inconsistent: %v", err)
-			}
-		}
 		// Fetch the next batch to retrieve
 		nodeQueue = make(map[string]stateElement)
 		codeQueue = make(map[common.Hash]struct{})
@@ -645,6 +641,10 @@ func TestIncompleteStateSync(t *testing.T) {
 			codeQueue[hash] = struct{}{}
 		}
 	}
+	// Copy the preimages from source db in order to traverse the state.
+	srcDb.TrieDB().WritePreimages()
+	copyPreimages(db, dstDb)
+
 	// Sanity check that removing any node from the database is detected
 	for _, node := range addedCodes {
 		val := rawdb.ReadCode(dstDb, node)
@@ -654,12 +654,30 @@ func TestIncompleteStateSync(t *testing.T) {
 		}
 		rawdb.WriteCode(dstDb, node, val)
 	}
-	for _, node := range addedNodes {
-		val := rawdb.ReadTrieNode(dstDb, node)
-		rawdb.DeleteTrieNode(dstDb, node)
-		if err := checkStateConsistency(dstDb, srcRoot); err == nil {
-			t.Errorf("trie inconsistency not caught, missing: %v", node.Hex())
+	scheme := srcDb.TrieDB().Scheme()
+	for i, path := range addedPaths {
+		owner, inner := trie.ResolvePath([]byte(path))
+		hash := addedHashes[i]
+		val := rawdb.ReadTrieNode(dstDb, owner, inner, hash, scheme)
+		if val == nil {
+			t.Error("missing trie node")
 		}
-		rawdb.WriteTrieNode(dstDb, node, val)
+		rawdb.DeleteTrieNode(dstDb, owner, inner, hash, scheme)
+		if err := checkStateConsistency(dstDb, srcRoot); err == nil {
+			t.Errorf("trie inconsistency not caught, missing: %v", path)
+		}
+		rawdb.WriteTrieNode(dstDb, owner, inner, hash, val, scheme)
 	}
+}
+
+func copyPreimages(srcDb, dstDb ethdb.Database) {
+	it := srcDb.NewIterator(rawdb.PreimagePrefix, nil)
+	defer it.Release()
+
+	preimages := make(map[common.Hash][]byte)
+	for it.Next() {
+		hash := it.Key()[len(rawdb.PreimagePrefix):]
+		preimages[common.BytesToHash(hash)] = common.CopyBytes(it.Value())
+	}
+	rawdb.WritePreimages(dstDb, preimages)
 }

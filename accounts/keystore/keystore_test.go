@@ -20,7 +20,6 @@ import (
 	"math/rand"
 	"os"
 	"runtime"
-	"sort"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -31,6 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/event"
+	"golang.org/x/exp/slices"
 )
 
 var testSigData = make([]byte, 32)
@@ -113,6 +113,7 @@ func TestSignWithPassphrase(t *testing.T) {
 }
 
 func TestTimedUnlock(t *testing.T) {
+	t.Parallel()
 	_, ks := tmpKeyStore(t, true)
 
 	pass := "foo"
@@ -147,6 +148,7 @@ func TestTimedUnlock(t *testing.T) {
 }
 
 func TestOverrideUnlock(t *testing.T) {
+	t.Parallel()
 	_, ks := tmpKeyStore(t, false)
 
 	pass := "foo"
@@ -187,6 +189,7 @@ func TestOverrideUnlock(t *testing.T) {
 
 // This test should fail under -race if signing races the expiration goroutine.
 func TestSignRace(t *testing.T) {
+	t.Parallel()
 	_, ks := tmpKeyStore(t, false)
 
 	// Create a test account.
@@ -211,19 +214,33 @@ func TestSignRace(t *testing.T) {
 	t.Errorf("Account did not lock within the timeout")
 }
 
+// waitForKsUpdating waits until the updating-status of the ks reaches the
+// desired wantStatus.
+// It waits for a maximum time of maxTime, and returns false if it does not
+// finish in time
+func waitForKsUpdating(t *testing.T, ks *KeyStore, wantStatus bool, maxTime time.Duration) bool {
+	t.Helper()
+	// Wait max 250 ms, then return false
+	for t0 := time.Now(); time.Since(t0) < maxTime; {
+		if ks.isUpdating() == wantStatus {
+			return true
+		}
+		time.Sleep(25 * time.Millisecond)
+	}
+	return false
+}
+
 // Tests that the wallet notifier loop starts and stops correctly based on the
 // addition and removal of wallet event subscriptions.
 func TestWalletNotifierLifecycle(t *testing.T) {
+	t.Parallel()
 	// Create a temporary keystore to test with
 	_, ks := tmpKeyStore(t, false)
 
 	// Ensure that the notification updater is not running yet
 	time.Sleep(250 * time.Millisecond)
-	ks.mu.RLock()
-	updating := ks.updating
-	ks.mu.RUnlock()
 
-	if updating {
+	if ks.isUpdating() {
 		t.Errorf("wallet notifier running without subscribers")
 	}
 	// Subscribe to the wallet feed and ensure the updater boots up
@@ -233,38 +250,26 @@ func TestWalletNotifierLifecycle(t *testing.T) {
 	for i := 0; i < len(subs); i++ {
 		// Create a new subscription
 		subs[i] = ks.Subscribe(updates)
-
-		// Ensure the notifier comes online
-		time.Sleep(250 * time.Millisecond)
-		ks.mu.RLock()
-		updating = ks.updating
-		ks.mu.RUnlock()
-
-		if !updating {
+		if !waitForKsUpdating(t, ks, true, 250*time.Millisecond) {
 			t.Errorf("sub %d: wallet notifier not running after subscription", i)
 		}
 	}
-	// Unsubscribe and ensure the updater terminates eventually
-	for i := 0; i < len(subs); i++ {
+	// Close all but one sub
+	for i := 0; i < len(subs)-1; i++ {
 		// Close an existing subscription
 		subs[i].Unsubscribe()
-
-		// Ensure the notifier shuts down at and only at the last close
-		for k := 0; k < int(walletRefreshCycle/(250*time.Millisecond))+2; k++ {
-			ks.mu.RLock()
-			updating = ks.updating
-			ks.mu.RUnlock()
-
-			if i < len(subs)-1 && !updating {
-				t.Fatalf("sub %d: event notifier stopped prematurely", i)
-			}
-			if i == len(subs)-1 && !updating {
-				return
-			}
-			time.Sleep(250 * time.Millisecond)
-		}
 	}
-	t.Errorf("wallet notifier didn't terminate after unsubscribe")
+	// Check that it is still running
+	time.Sleep(250 * time.Millisecond)
+
+	if !ks.isUpdating() {
+		t.Fatal("event notifier stopped prematurely")
+	}
+	// Unsubscribe the last one and ensure the updater terminates eventually.
+	subs[len(subs)-1].Unsubscribe()
+	if !waitForKsUpdating(t, ks, false, 4*time.Second) {
+		t.Errorf("wallet notifier didn't terminate after unsubscribe")
+	}
 }
 
 type walletEvent struct {
@@ -392,19 +397,19 @@ func TestImportRace(t *testing.T) {
 		t.Fatalf("failed to export account: %v", acc)
 	}
 	_, ks2 := tmpKeyStore(t, true)
-	var atom uint32
+	var atom atomic.Uint32
 	var wg sync.WaitGroup
 	wg.Add(2)
 	for i := 0; i < 2; i++ {
 		go func() {
 			defer wg.Done()
 			if _, err := ks2.Import(json, "new", "new"); err != nil {
-				atomic.AddUint32(&atom, 1)
+				atom.Add(1)
 			}
 		}()
 	}
 	wg.Wait()
-	if atom != 1 {
+	if atom.Load() != 1 {
 		t.Errorf("Import is racy")
 	}
 }
@@ -419,7 +424,7 @@ func checkAccounts(t *testing.T, live map[common.Address]accounts.Account, walle
 	for _, account := range live {
 		liveList = append(liveList, account)
 	}
-	sort.Sort(accountsByURL(liveList))
+	slices.SortFunc(liveList, byURL)
 	for j, wallet := range wallets {
 		if accs := wallet.Accounts(); len(accs) != 1 {
 			t.Errorf("wallet %d: contains invalid number of accounts: have %d, want 1", j, len(accs))

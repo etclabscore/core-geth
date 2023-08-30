@@ -100,10 +100,10 @@ func (f *ForkChoice) CommonAncestor(current *types.Header, header *types.Header)
 // In the td mode, the new head is chosen if the corresponding
 // total difficulty is higher. In the extern mode, the trusted
 // header is always selected as the head.
-func (f *ForkChoice) ReorgNeeded(current *types.Header, header *types.Header) (bool, error) {
+func (f *ForkChoice) ReorgNeeded(current *types.Header, extern *types.Header) (bool, error) {
 	var (
 		localTD  = f.chain.GetTd(current.Hash(), current.Number.Uint64())
-		externTd = f.chain.GetTd(header.Hash(), header.Number.Uint64())
+		externTd = f.chain.GetTd(extern.Hash(), extern.Number.Uint64())
 	)
 	if localTD == nil || externTd == nil {
 		return false, errors.New("missing td")
@@ -114,18 +114,36 @@ func (f *ForkChoice) ReorgNeeded(current *types.Header, header *types.Header) (b
 	if ttd := f.chain.Config().GetEthashTerminalTotalDifficulty(); ttd != nil && ttd.Cmp(externTd) <= 0 {
 		return true, nil
 	}
-	// If the total difficulty is higher than our known, add it to the canonical chain
+
+	// // If the total difficulty is higher than our known, add it to the canonical chain
+	// if diff := externTd.Cmp(localTD); diff > 0 {
+	// 	return true, nil
+	// } else if diff < 0 {
+	// 	return false, nil
+	// }
+	/*
+		This is chunk was added with the following commit, citing it to be logically inoperative.
+		etclabscore/core-geth omits it because of subsequent Artificial Finality checks on the reorg var.
+
+			core: clarify code in forkchoice (#26257)
+
+			refactoring without logic change
+			0dc9b01c github.com/setunapo 20221128
+	*/
+
+	// Local and external difficulty is identical.
 	// Second clause in the if statement reduces the vulnerability to selfish mining.
 	// Please refer to http://www.cs.cornell.edu/~ie53/publications/btcProcFC.pdf
 	reorg := externTd.Cmp(localTD) > 0
-	if !reorg && externTd.Cmp(localTD) == 0 {
-		number, headNumber := header.Number.Uint64(), current.Number.Uint64()
-		if number < headNumber {
+	tie := externTd.Cmp(localTD) == 0
+	if tie {
+		externNum, localNum := extern.Number.Uint64(), current.Number.Uint64()
+		if externNum < localNum {
 			reorg = true
-		} else if number == headNumber {
+		} else if externNum == localNum {
 			var currentPreserve, externPreserve bool
 			if f.preserve != nil {
-				currentPreserve, externPreserve = f.preserve(current), f.preserve(header)
+				currentPreserve, externPreserve = f.preserve(current), f.preserve(extern)
 			}
 			reorg = !currentPreserve && (externPreserve || f.rand.Float64() < 0.5)
 		}
@@ -148,12 +166,12 @@ func (f *ForkChoice) ReorgNeeded(current *types.Header, header *types.Header) (b
 		return reorg, nil
 	}
 
-	commonHeader, err := f.CommonAncestor(current, header)
+	commonHeader, err := f.CommonAncestor(current, extern)
 	if err != nil {
 		return reorg, err
 	}
 
-	if err := ecbp1100(commonHeader, current, header, f.chain.GetTd); err != nil {
+	if err := ecbp1100(commonHeader, current, extern, f.chain.GetTd); err != nil {
 		reorg = false
 		log.Warn("Reorg disallowed", "error", err)
 	} else if current.Number.Uint64()-commonHeader.Number.Uint64() > 2 {
@@ -162,10 +180,10 @@ func (f *ForkChoice) ReorgNeeded(current *types.Header, header *types.Header) (b
 			"status", "accepted",
 			"age", common.PrettyAge(time.Unix(int64(commonHeader.Time), 0)),
 			"current.span", common.PrettyDuration(time.Duration(current.Time-commonHeader.Time)*time.Second),
-			"proposed.span", common.PrettyDuration(time.Duration(header.Time-commonHeader.Time)*time.Second),
+			"proposed.span", common.PrettyDuration(time.Duration(extern.Time-commonHeader.Time)*time.Second),
 			"common.bno", commonHeader.Number.Uint64(), "common.hash", commonHeader.Hash(),
 			"current.bno", current.Number.Uint64(), "current.hash", current.Hash(),
-			"proposed.bno", header.Number.Uint64(), "proposed.hash", header.Hash(),
+			"proposed.bno", extern.Number.Uint64(), "proposed.hash", extern.Hash(),
 		)
 	}
 

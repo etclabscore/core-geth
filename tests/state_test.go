@@ -26,6 +26,7 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
@@ -47,7 +48,6 @@ func TestState(t *testing.T) {
 	st.slow(`^stStaticCall/static_Return50000`)
 	st.slow(`^stSystemOperationsTest/CallRecursiveBomb`)
 	st.slow(`^stTransactionTest/Opcodes_TransactionInit`)
-
 	// Very time consuming
 	st.skipLoad(`^stTimeConsuming/`)
 	st.skipLoad(`.*vmPerformance/loop.*`)
@@ -81,29 +81,30 @@ func TestState(t *testing.T) {
 		st.skipFork("Magneto")  // ETC
 		st.skipFork("London")   // ETH
 		st.skipFork("Mystique") // ETC
-		st.skipFork("Merged")   // ETH
-	}
-	// The multigeth data type (like the Ethereum Foundation data type) doesn't support
-	// the ETC_Mystique fork/feature configuration, which omits EIP1559 and the associated BASEFEE
-	// opcode stuff. This configuration cannot be represented in their struct.
-	if os.Getenv(CG_CHAINCONFIG_FEATURE_EQ_MULTIGETHV0_KEY) != "" {
-		st.skipFork("ETC_Mystique")
+		st.skipFork("Merge")    // ETH
+		st.skipFork("Shanghai") // ETH
+		st.skipFork("Spiral")   // ETC
+		st.skipFork("Cancun")   // ETH
 	}
 
 	// Un-skip this when https://github.com/ethereum/tests/issues/908 is closed
 	st.skipLoad(`^stQuadraticComplexityTest/QuadraticComplexitySolidity_CallDataCopy`)
 
 	// Broken tests:
+	// EOF is not part of cancun
+	st.skipLoad(`^stEOF/`)
+
+	// EIP-4844 tests need to be regenerated due to the data-to-blob rename
+	st.skipLoad(`^stEIP4844-blobtransactions/`)
+
 	// Expected failures:
-	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Byzantium/0`, "bug in test")
-	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Byzantium/3`, "bug in test")
-	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Constantinople/0`, "bug in test")
-	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Constantinople/3`, "bug in test")
-	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/0`, "bug in test")
-	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/3`, "bug in test")
+	// These EIP-4844 tests need to be regenerated.
+	st.fails(`stEIP4844-blobtransactions/opcodeBlobhashOutOfRange.json`, "test has incorrect state root")
+	st.fails(`stEIP4844-blobtransactions/opcodeBlobhBounds.json`, "test has incorrect state root")
 
 	// For Istanbul, older tests were moved into LegacyTests
 	for _, dir := range []string{
+		filepath.Join(baseDir, "EIPTests", "StateTests"),
 		stateTestDir,
 		legacyStateTestDir,
 		benchmarksDir,
@@ -163,8 +164,7 @@ func withTrace(t *testing.T, gasLimit uint64, test func(vm.Config) error) {
 	}
 	buf := new(bytes.Buffer)
 	w := bufio.NewWriter(buf)
-	tracer := logger.NewJSONLogger(&logger.Config{}, w)
-	config.Debug, config.Tracer = true, tracer
+	config.Tracer = logger.NewJSONLogger(&logger.Config{}, w)
 	err2 := test(config)
 	if !reflect.DeepEqual(err, err2) {
 		t.Errorf("different error for second run: %v", err2)
@@ -274,20 +274,50 @@ func runBenchmark(b *testing.B, t *StateTest) {
 			evm := vm.NewEVM(context, txContext, statedb, config, vmconfig)
 
 			// Create "contract" for sender to cache code analysis.
-			sender := vm.NewContract(vm.AccountRef(msg.From()), vm.AccountRef(msg.From()),
+			sender := vm.NewContract(vm.AccountRef(msg.From), vm.AccountRef(msg.From),
 				nil, 0)
 
+			var (
+				gasUsed uint64
+				elapsed uint64
+				refund  uint64
+
+				// Berlin
+				// https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/berlin.md
+				// EIP-2930: Optional access lists
+				eip2930f = config.IsEnabled(config.GetEIP2930Transition, evm.Context.BlockNumber)
+
+				// Shanghai
+				// EIP-3651: Warm coinbase
+				eip3651f = config.IsEnabledByTime(config.GetEIP3651TransitionTime, &evm.Context.Time)
+			)
 			b.ResetTimer()
 			for n := 0; n < b.N; n++ {
-				// Execute the message.
 				snapshot := statedb.Snapshot()
-				_, _, err = evm.Call(sender, *msg.To(), msg.Data(), msg.Gas(), msg.Value())
+				statedb.Prepare(eip2930f, eip3651f, msg.From, context.Coinbase, msg.To, evm.ActivePrecompiles(), msg.AccessList)
+				b.StartTimer()
+				start := time.Now()
+
+				// Execute the message.
+				_, leftOverGas, err := evm.Call(sender, *msg.To, msg.Data, msg.GasLimit, msg.Value)
 				if err != nil {
 					b.Error(err)
 					return
 				}
+
+				b.StopTimer()
+				elapsed += uint64(time.Since(start))
+				refund += statedb.GetRefund()
+				gasUsed += msg.GasLimit - leftOverGas
+
 				statedb.RevertToSnapshot(snapshot)
 			}
+			if elapsed < 1 {
+				elapsed = 1
+			}
+			// Keep it as uint64, multiply 100 to get two digit float later
+			mgasps := (100 * 1000 * (gasUsed - refund)) / elapsed
+			b.ReportMetric(float64(mgasps)/100, "mgas/s")
 		})
 	}
 }

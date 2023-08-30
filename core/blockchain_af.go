@@ -147,6 +147,7 @@ The if tdRatio < antiGravity check would then be
 
 if proposed_subchain_td * CURVE_FUNCTION_DENOMINATOR < get_curve_function_numerator(current.Time - commonAncestor.Time) * local_subchain_td.
 */
+// nolint:goimports
 func ecbp1100PolynomialV(x *big.Int) *big.Int {
 	// Make a copy; do not mutate argument value.
 
@@ -214,7 +215,6 @@ ecbp1100AGSinusoidalA is a sinusoidal function.
 
 OPTION 3: Yet slower takeoff, yet steeper eventual ascent. Has a differentiable ceiling transition.
 h(x)=15 sin((x+12000 π)/(8000))+15+1
-
 */
 func ecbp1100AGSinusoidalA(x float64) (antiGravity float64) {
 	ampl := float64(15)   // amplitude

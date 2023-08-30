@@ -19,11 +19,13 @@ package trie
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethdb/memorydb"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/trie"
+	"github.com/ethereum/go-ethereum/trie/trienode"
 )
 
 // randTest performs random trie operations.
@@ -118,12 +120,15 @@ func Generate(input []byte) randTest {
 	return steps
 }
 
+// Fuzz is the fuzzing entry-point.
 // The function must return
-// 1 if the fuzzer should increase priority of the
-//    given input during subsequent fuzzing (for example, the input is lexically
-//    correct and was parsed successfully);
-// -1 if the input must not be added to corpus even if gives new coverage; and
-// 0  otherwise
+//
+//   - 1 if the fuzzer should increase priority of the
+//     given input during subsequent fuzzing (for example, the input is lexically
+//     correct and was parsed successfully);
+//   - -1 if the input must not be added to corpus even if gives new coverage; and
+//   - 0 otherwise
+//
 // other values are reserved for future use.
 func Fuzz(input []byte) int {
 	program := Generate(input)
@@ -137,21 +142,22 @@ func Fuzz(input []byte) int {
 }
 
 func runRandTest(rt randTest) error {
-	triedb := trie.NewDatabase(memorydb.New())
-
-	tr := trie.NewEmpty(triedb)
-	values := make(map[string]string) // tracks content of the trie
-
+	var (
+		triedb = trie.NewDatabase(rawdb.NewMemoryDatabase())
+		tr     = trie.NewEmpty(triedb)
+		origin = types.EmptyRootHash
+		values = make(map[string]string) // tracks content of the trie
+	)
 	for i, step := range rt {
 		switch step.op {
 		case opUpdate:
-			tr.Update(step.key, step.value)
+			tr.MustUpdate(step.key, step.value)
 			values[string(step.key)] = string(step.value)
 		case opDelete:
-			tr.Delete(step.key)
+			tr.MustDelete(step.key)
 			delete(values, string(step.key))
 		case opGet:
-			v := tr.Get(step.key)
+			v := tr.MustGet(step.key)
 			want := values[string(step.key)]
 			if string(v) != want {
 				rt[i].err = fmt.Errorf("mismatch for key %#x, got %#x want %#x", step.key, v, want)
@@ -164,26 +170,27 @@ func runRandTest(rt randTest) error {
 				return err
 			}
 			if nodes != nil {
-				if err := triedb.Update(trie.NewWithNodeSet(nodes)); err != nil {
+				if err := triedb.Update(hash, origin, 0, trienode.NewWithNodeSet(nodes), nil); err != nil {
 					return err
 				}
 			}
-			newtr, err := trie.New(common.Hash{}, hash, triedb)
+			newtr, err := trie.New(trie.TrieID(hash), triedb)
 			if err != nil {
 				return err
 			}
 			tr = newtr
+			origin = hash
 		case opItercheckhash:
 			checktr := trie.NewEmpty(triedb)
-			it := trie.NewIterator(tr.NodeIterator(nil))
+			it := trie.NewIterator(tr.MustNodeIterator(nil))
 			for it.Next() {
-				checktr.Update(it.Key, it.Value)
+				checktr.MustUpdate(it.Key, it.Value)
 			}
 			if tr.Hash() != checktr.Hash() {
-				return fmt.Errorf("hash mismatch in opItercheckhash")
+				return errors.New("hash mismatch in opItercheckhash")
 			}
 		case opProve:
-			rt[i].err = tr.Prove(step.key, 0, proofDb{})
+			rt[i].err = tr.Prove(step.key, proofDb{})
 		}
 		// Abort the test on error.
 		if rt[i].err != nil {

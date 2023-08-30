@@ -14,8 +14,12 @@ var forksCommand = cli.Command{
 }
 
 func forks(ctx *cli.Context) error {
-	for _, f := range confp.Forks(globalChainspecValue) {
+	for _, f := range confp.BlockForks(globalChainspecValue) {
 		fmt.Println(f)
 	}
+	for _, f := range confp.TimeForks(globalChainspecValue) {
+		fmt.Printf("@%d\n", f)
+	}
+
 	return nil
 }

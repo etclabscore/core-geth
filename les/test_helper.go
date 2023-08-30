@@ -25,7 +25,6 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
-	"sync/atomic"
 	"testing"
 	"time"
 
@@ -39,6 +38,8 @@ import (
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/forkid"
 	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/txpool"
+	"github.com/ethereum/go-ethereum/core/txpool/legacypool"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/eth/ethconfig"
@@ -272,9 +273,12 @@ func newTestServerHandler(blocks int, indexers []*core.ChainIndexer, db ethdb.Da
 	simulation := backends.NewSimulatedBackendWithDatabase(db, gspec.Alloc, 100000000)
 	prepare(blocks, simulation)
 
-	txpoolConfig := core.DefaultTxPoolConfig
+	txpoolConfig := legacypool.DefaultConfig
 	txpoolConfig.Journal = ""
-	txpool := core.NewTxPool(txpoolConfig, gspec.Config, simulation.Blockchain())
+
+	pool := legacypool.New(txpoolConfig, simulation.Blockchain())
+	txpool, _ := txpool.New(new(big.Int).SetUint64(txpoolConfig.PriceLimit), simulation.Blockchain(), []txpool.SubPool{pool})
+
 	if indexers != nil {
 		checkpointConfig := &ctypes.CheckpointOracleConfig{
 			Address:   crypto.CreateAddress(bankAddr, 0),
@@ -440,7 +444,7 @@ func newTestPeerPair(name string, version int, server *serverHandler, client *cl
 			return nil, nil, fmt.Errorf("failed to establish protocol connection %v", err)
 		default:
 		}
-		if atomic.LoadUint32(&peer1.serving) == 1 && atomic.LoadUint32(&peer2.serving) == 1 {
+		if peer1.serving.Load() && peer2.serving.Load() {
 			break
 		}
 		time.Sleep(50 * time.Millisecond)
@@ -491,7 +495,7 @@ func (client *testClient) newRawPeer(t *testing.T, name string, version int, rec
 		head    = client.handler.backend.blockchain.CurrentHeader()
 		td      = client.handler.backend.blockchain.GetTd(head.Hash(), head.Number.Uint64())
 	)
-	forkID := forkid.NewID(client.handler.backend.blockchain.Config(), genesis.Hash(), head.Number.Uint64())
+	forkID := forkid.NewID(client.handler.backend.blockchain.Config(), genesis.Hash(), head.Number.Uint64(), head.Time)
 	tp.handshakeWithClient(t, td, head.Hash(), head.Number.Uint64(), genesis.Hash(), forkID, testCostList(0), recentTxLookup) // disable flow control by default
 
 	// Ensure the connection is established or exits when any error occurs
@@ -501,7 +505,7 @@ func (client *testClient) newRawPeer(t *testing.T, name string, version int, rec
 			return nil, nil, nil
 		default:
 		}
-		if atomic.LoadUint32(&peer.serving) == 1 {
+		if peer.serving.Load() {
 			break
 		}
 		time.Sleep(50 * time.Millisecond)
@@ -555,7 +559,7 @@ func (server *testServer) newRawPeer(t *testing.T, name string, version int) (*t
 		head    = server.handler.blockchain.CurrentHeader()
 		td      = server.handler.blockchain.GetTd(head.Hash(), head.Number.Uint64())
 	)
-	forkID := forkid.NewID(server.handler.blockchain.Config(), genesis.Hash(), head.Number.Uint64())
+	forkID := forkid.NewID(server.handler.blockchain.Config(), genesis.Hash(), head.Number.Uint64(), head.Time)
 	tp.handshakeWithServer(t, td, head.Hash(), head.Number.Uint64(), genesis.Hash(), forkID)
 
 	// Ensure the connection is established or exits when any error occurs
@@ -565,7 +569,7 @@ func (server *testServer) newRawPeer(t *testing.T, name string, version int) (*t
 			return nil, nil, nil
 		default:
 		}
-		if atomic.LoadUint32(&peer.serving) == 1 {
+		if peer.serving.Load() {
 			break
 		}
 		time.Sleep(50 * time.Millisecond)

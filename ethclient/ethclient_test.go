@@ -65,7 +65,7 @@ var (
 )
 
 func TestToFilterArg(t *testing.T) {
-	blockHashErr := fmt.Errorf("cannot specify both BlockHash and FromBlock/ToBlock")
+	blockHashErr := errors.New("cannot specify both BlockHash and FromBlock/ToBlock")
 	addresses := []common.Address{
 		common.HexToAddress("0xD36722ADeC3EdCB29c8e7b5a47f352D701393462"),
 	}
@@ -255,15 +255,6 @@ func newTestBackend(t *testing.T) (*node.Node, []*types.Block) {
 
 // generateTestChain generates 2 blocks. The first block contains 2 transactions.
 func generateTestChain() []*types.Block {
-	db := rawdb.NewMemoryDatabase()
-	config := params.AllEthashProtocolChanges
-	genesis := &genesisT.Genesis{
-		Config:    config,
-		Alloc:     genesisT.GenesisAlloc{testAddr: {Balance: testBalance}},
-		ExtraData: []byte("test genesis"),
-		Timestamp: 9000,
-		BaseFee:   big.NewInt(vars.InitialBaseFee),
-	}
 	generate := func(i int, g *core.BlockGen) {
 		g.OffsetTime(5)
 		g.SetExtra([]byte("test"))
@@ -273,16 +264,14 @@ func generateTestChain() []*types.Block {
 			g.AddTx(testTx2)
 		}
 	}
-	gblock := core.GenesisToBlock(genesis, db)
-	engine := ethash.NewFaker()
-	blocks, _ := core.GenerateChain(genesis.Config, gblock, engine, db, 2, generate)
-	blocks = append([]*types.Block{gblock}, blocks...)
-	return blocks
+	_, blocks, _ := core.GenerateChainWithGenesis(genesis, ethash.NewFaker(), 2, generate)
+	genesisBlock := core.MustCommitGenesis(rawdb.NewMemoryDatabase(), genesis)
+	return append([]*types.Block{genesisBlock}, blocks...)
 }
 
 func TestEthClient(t *testing.T) {
 	backend, chain := newTestBackend(t)
-	client, _ := backend.Attach()
+	client := backend.Attach()
 	defer backend.Close()
 	defer client.Close()
 
@@ -415,7 +404,7 @@ func testBalanceAt(t *testing.T, client *rpc.Client) {
 
 func TestHeader_TxesUnclesNotEmpty(t *testing.T) {
 	backend, blocks := newTestBackend(t)
-	client, _ := backend.Attach()
+	client := backend.Attach()
 	defer backend.Close()
 	defer client.Close()
 
@@ -460,7 +449,7 @@ func testTransactionInBlockInterrupted(t *testing.T, client *rpc.Client) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	// Test tx in block interupted.
+	// Test tx in block interrupted.
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	tx, err := ec.TransactionInBlock(ctx, block.Hash(), 0)
@@ -831,17 +820,17 @@ func TestRPCDiscover(t *testing.T) {
 			t.Logf(`Response Document:
 
 %s`, string(responseDocument))
-			t.Fatalf(`OVER (methods which do not appear in the current API, but exist in the hardcoded response document):): 
+			t.Fatalf(`OVER (methods which do not appear in the current API, but exist in the hardcoded response document):):
 %v
 
-UNDER (methods which appear in the current API, but do not appear in the hardcoded response document):): 
+UNDER (methods which appear in the current API, but do not appear in the hardcoded response document):):
 %v
 `, printList(over), printList(under))
 		}
 	}
 
 	backend, _ := newTestBackend(t)
-	client, _ := backend.Attach()
+	client := backend.Attach()
 	defer backend.Close()
 	defer client.Close()
 
@@ -916,7 +905,7 @@ func TestEthSubscribeNewSideHeads(t *testing.T) {
 	}
 
 	// Create the client and newSideHeads subscription.
-	client, err := backend.Attach()
+	client := backend.Attach()
 	defer backend.Close()
 
 	defer client.Close()
@@ -1010,11 +999,6 @@ waiting:
 			t.Errorf("hash: want: %s, got: %s", b.Hash().Hex()[:8], got[i].Hash().Hex()[:8])
 		}
 	}
-
-	if t.Failed() {
-		unAuthed, authed := backend.GetAPIs()
-		t.Logf("backend APIS: unAuthed=%v authed=%v", unAuthed, authed)
-	}
 }
 
 // mustNewTestBackend is the same logic as newTestBackend(t *testing.T) but without the testing.T argument.
@@ -1047,7 +1031,7 @@ func mustNewTestBackend() (*node.Node, []*types.Block) {
 // BenchmarkRPC_Discover shows that rpc.discover by reflection is slow.
 func BenchmarkRPC_Discover(b *testing.B) {
 	backend, _ := mustNewTestBackend()
-	client, _ := backend.Attach()
+	client := backend.Attach()
 	defer backend.Close()
 	defer client.Close()
 
@@ -1064,7 +1048,7 @@ func BenchmarkRPC_Discover(b *testing.B) {
 // BenchmarkRPC_BlockNumber shows that eth_blockNumber is a lot faster than rpc.discover.
 func BenchmarkRPC_BlockNumber(b *testing.B) {
 	backend, _ := mustNewTestBackend()
-	client, _ := backend.Attach()
+	client := backend.Attach()
 	defer backend.Close()
 	defer client.Close()
 
@@ -1142,11 +1126,12 @@ var allRPCMethods = []string{
 	"debug_gcStats",
 	"debug_getAccessibleState",
 	"debug_getBadBlocks",
-	"debug_getBlockRlp",
-	"debug_getHeaderRlp",
 	"debug_getModifiedAccountsByHash",
 	"debug_getModifiedAccountsByNumber",
+	"debug_getRawBlock",
+	"debug_getRawHeader",
 	"debug_getRawReceipts",
+	"debug_getRawTransaction",
 	"debug_goTrace",
 	"debug_intermediateRoots",
 	"debug_memStats",

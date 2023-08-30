@@ -17,9 +17,7 @@
 package params
 
 import (
-	"encoding/json"
 	"math/big"
-	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -43,18 +41,6 @@ func DefaultGenesisBlock() *genesisT.Genesis {
 	}
 }
 
-// DefaultRopstenGenesisBlock returns the Ropsten network genesis block.
-func DefaultRopstenGenesisBlock() *genesisT.Genesis {
-	return &genesisT.Genesis{
-		Config:     RopstenChainConfig,
-		Nonce:      66,
-		ExtraData:  hexutil.MustDecode("0x3535353535353535353535353535353535353535353535353535353535353535"),
-		GasLimit:   16777216,
-		Difficulty: big.NewInt(1048576),
-		Alloc:      genesisT.DecodePreAlloc(TestnetAllocData),
-	}
-}
-
 // DefaultSepoliaGenesisBlock returns the Sepolia network genesis block.
 func DefaultSepoliaGenesisBlock() *genesisT.Genesis {
 	return &genesisT.Genesis{
@@ -65,18 +51,6 @@ func DefaultSepoliaGenesisBlock() *genesisT.Genesis {
 		Difficulty: big.NewInt(131072),
 		Timestamp:  1633267481,
 		Alloc:      genesisT.DecodePreAlloc(SepoliaAllocData),
-	}
-}
-
-// DefaultRinkebyGenesisBlock returns the Rinkeby network genesis block.
-func DefaultRinkebyGenesisBlock() *genesisT.Genesis {
-	return &genesisT.Genesis{
-		Config:     RinkebyChainConfig,
-		Timestamp:  1492009146,
-		ExtraData:  hexutil.MustDecode("0x52657370656374206d7920617574686f7269746168207e452e436172746d616e42eb768f2244c8811c63729a21a3569731535f067ffc57839b00206d1ad20c69a1981b489f772031b279182d99e65703f0076e4812653aab85fca0f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-		GasLimit:   4700000,
-		Difficulty: big.NewInt(1),
-		Alloc:      genesisT.DecodePreAlloc(RinkebyAllocData),
 	}
 }
 
@@ -92,32 +66,20 @@ func DefaultGoerliGenesisBlock() *genesisT.Genesis {
 	}
 }
 
-func DefaultKilnGenesisBlock() *genesisT.Genesis {
-	g := new(genesisT.Genesis)
-	reader := strings.NewReader(KilnAllocData)
-	if err := json.NewDecoder(reader).Decode(g); err != nil {
-		panic(err)
-	}
-	return g
-}
-
 // DeveloperGenesisBlock returns the 'geth --dev' genesis block. Note, this must
 // be seeded with the
-func DeveloperGenesisBlock(period uint64, gasLimit uint64, faucet common.Address, useEthash bool) *genesisT.Genesis {
+func DeveloperGenesisBlock(gasLimit uint64, faucet common.Address, useEthash bool) *genesisT.Genesis {
 	if !useEthash {
 		// Make a copy to avoid unpredicted contamination.
 		config := &goethereum.ChainConfig{}
-		*config = *AllCliqueProtocolChanges
+		*config = *AllDevChainProtocolChanges
 
-		// Override the default period to the user requested one
-		config.Clique.Period = period
 		// Assemble and return the genesis with the precompiles and faucet pre-funded
 		return &genesisT.Genesis{
 			Config:     config,
-			ExtraData:  append(append(make([]byte, 32), faucet[:]...), make([]byte, crypto.SignatureLength)...),
 			GasLimit:   gasLimit,
 			BaseFee:    big.NewInt(vars.InitialBaseFee),
-			Difficulty: big.NewInt(1),
+			Difficulty: big.NewInt(0),
 			Alloc: map[common.Address]genesisT.GenesisAccount{
 				common.BytesToAddress([]byte{1}): {Balance: big.NewInt(1)}, // ECRecover
 				common.BytesToAddress([]byte{2}): {Balance: big.NewInt(1)}, // SHA256
@@ -127,6 +89,7 @@ func DeveloperGenesisBlock(period uint64, gasLimit uint64, faucet common.Address
 				common.BytesToAddress([]byte{6}): {Balance: big.NewInt(1)}, // ECAdd
 				common.BytesToAddress([]byte{7}): {Balance: big.NewInt(1)}, // ECScalarMul
 				common.BytesToAddress([]byte{8}): {Balance: big.NewInt(1)}, // ECPairing
+				common.BytesToAddress([]byte{9}): {Balance: big.NewInt(1)}, // BLAKE2b
 				faucet:                           {Balance: new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 256), big.NewInt(9))},
 			},
 		}

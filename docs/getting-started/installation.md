@@ -54,10 +54,20 @@ $ docker pull etclabscore/core-geth:latest
 
 #### Image: `<tag>`
 
-Repository tags like `v1.2.3` correspond to Docker tags like __`version-1.2.3`__.
+##### ⛔ `version-X.Y.Z` Deprecation Notice (2023-01-31)
+
+tl;dr: Use `etclabscore/core-geth:v1.12.9` instead of `etclabscore/core-geth:version-1.12.9`. 
+
+~~Repository tags like `v1.2.3` correspond to Docker tags like __`version-1.2.3`__.~~
+
+__Update (2023-01-31)__
+
+Docker Hub tags are now formatted as __`v1.2.3`__, corresponding exactly with the repository tag (eg. `v1.2.3`).
+The previous format (`version-X.Y.Z`) will be supported through `version-1.12.11` (=`v1.12.11`), but will be discontinued after that.
 
 !!! Example
 
     ```shell
-    $ docker pull etclabscore/core-geth:version-1.11.1
+    $ docker pull etclabscore/core-geth:v1.12.9        # <-- all versions from 1.12.9 and later use this format
+    $ docker pull etclabscore/core-geth:version-1.11.1 # <-- all versions from 1.12.8 and earlier use this format
     ```

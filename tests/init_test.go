@@ -18,6 +18,7 @@ package tests
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -153,6 +154,7 @@ func (tm *testMatcher) skipFork(pattern string) {
 }
 
 // fails adds an expected failure for tests matching the pattern.
+//
 //nolint:unused
 func (tm *testMatcher) fails(pattern string, reason string) {
 	if reason == "" {
@@ -206,7 +208,7 @@ func (tm *testMatcher) checkFailure(t *testing.T, err error) error {
 			t.Logf("error: %v", err)
 			return nil
 		}
-		return fmt.Errorf("test succeeded unexpectedly")
+		return errors.New("test succeeded unexpectedly")
 	}
 	return err
 }

@@ -19,6 +19,7 @@ package tests
 import (
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math/big"
 	"regexp"
@@ -39,6 +40,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/ethereum/go-ethereum/trie"
 	"golang.org/x/crypto/sha3"
 )
 
@@ -156,6 +158,8 @@ type stTransaction struct {
 	Value                []string            `json:"value"`
 	PrivateKey           []byte              `json:"secretKey"`
 	Sender               common.Address      `json:"sender,omitempty"`
+	BlobVersionedHashes  []common.Hash       `json:"blobVersionedHashes,omitempty"`
+	BlobGasFeeCap        *big.Int            `json:"maxFeePerBlobGas,omitempty"`
 }
 
 type stTransactionMarshaling struct {
@@ -165,6 +169,7 @@ type stTransactionMarshaling struct {
 	Nonce                math.HexOrDecimal64
 	GasLimit             []math.HexOrDecimal64
 	PrivateKey           hexutil.Bytes
+	BlobGasFeeCap        *math.HexOrDecimal256
 }
 
 // GetChainConfig takes a fork definition and returns a chain config.
@@ -246,12 +251,17 @@ func (t *StateTest) Run(subtest StateSubtest, vmconfig vm.Config, snapshotter bo
 	}
 	post := t.json.Post[subtest.Fork][subtest.Index]
 	// N.B: We need to do this in a two-step process, because the first Commit takes care
-	// of suicides, and we need to touch the coinbase _after_ it has potentially suicided.
+	// of self-destructs, and we need to touch the coinbase _after_ it has potentially self-destructed.
 	if root != common.Hash(post.Root) {
 		return snaps, statedb, fmt.Errorf("post state root mismatch: got %x, want %x", root, post.Root)
 	}
 	if logs := rlpHash(statedb.Logs()); logs != common.Hash(post.Logs) {
 		return snaps, statedb, fmt.Errorf("post state logs hash mismatch: got %x, want %x", logs, post.Logs)
+	}
+	// Re-init the post-state instance for further operation
+	statedb, err = state.New(root, statedb.Database(), snaps)
+	if err != nil {
+		return nil, nil, err
 	}
 	return snaps, statedb, nil
 }
@@ -326,12 +336,13 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 	context.GetHash = vmTestBlockHash
 	context.BaseFee = baseFee
 	context.Random = nil
+	if t.json.Env.Difficulty != nil {
+		context.Difficulty = t.json.Env.Difficulty
+	}
 	if config.IsEnabled(config.GetEIP1559Transition, new(big.Int)) && t.json.Env.Random != nil {
 		rnd := common.BigToHash(t.json.Env.Random)
 		context.Random = &rnd
 		context.Difficulty = big.NewInt(0)
-	} else {
-		context.Difficulty = t.json.Env.Difficulty
 	}
 	evm := vm.NewEVM(context, txContext, statedb, config, vmconfig)
 	// Execute the message.
@@ -344,12 +355,12 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 	}
 	// Add 0-value mining reward. This only makes a difference in the cases
 	// where
-	// - the coinbase suicided, or
+	// - the coinbase self-destructed, or
 	// - there are only 'bad' transactions, which aren't executed. In those cases,
 	//   the coinbase gets no txfee, so isn't created, and thus needs to be touched
 	statedb.AddBalance(block.Coinbase(), new(big.Int))
 	// Commit block
-	statedb.Commit(config.IsEnabled(config.GetEIP161dTransition, block.Number()))
+	statedb.Commit(block.NumberU64(), config.IsEnabled(config.GetEIP161dTransition, block.Number()))
 	// And _now_ get the state root
 	root := statedb.IntermediateRoot(config.IsEnabled(config.GetEIP161dTransition, block.Number()))
 	return snaps, statedb, root, err
@@ -360,8 +371,8 @@ func (t *StateTest) gasLimit(subtest StateSubtest) uint64 {
 }
 
 func MakePreState(db ethdb.Database, accounts genesisT.GenesisAlloc, snapshotter bool) (*snapshot.Tree, *state.StateDB) {
-	sdb := state.NewDatabase(db)
-	statedb, _ := state.New(common.Hash{}, sdb, nil)
+	sdb := state.NewDatabaseWithConfig(db, &trie.Config{Preimages: true})
+	statedb, _ := state.New(types.EmptyRootHash, sdb, nil)
 	for addr, a := range accounts {
 		statedb.SetCode(addr, a.Code)
 		statedb.SetNonce(addr, a.Nonce)
@@ -371,11 +382,17 @@ func MakePreState(db ethdb.Database, accounts genesisT.GenesisAlloc, snapshotter
 		}
 	}
 	// Commit and re-open to start with a clean state.
-	root, _ := statedb.Commit(false)
+	root, _ := statedb.Commit(0, false)
 
 	var snaps *snapshot.Tree
 	if snapshotter {
-		snaps, _ = snapshot.New(db, sdb.TrieDB(), 1, root, false, true, false)
+		snapconfig := snapshot.Config{
+			CacheSize:  1,
+			Recovery:   false,
+			NoBuild:    false,
+			AsyncBuild: false,
+		}
+		snaps, _ = snapshot.New(snapconfig, db, sdb.TrieDB(), root)
 	}
 	statedb, _ = state.New(root, sdb, snaps)
 	return snaps, statedb
@@ -399,7 +416,7 @@ func (t *StateTest) genesis(config ctypes.ChainConfigurator) *genesisT.Genesis {
 	return genesis
 }
 
-func (tx *stTransaction) toMessage(ps stPostState, baseFee *big.Int) (core.Message, error) {
+func (tx *stTransaction) toMessage(ps stPostState, baseFee *big.Int) (*core.Message, error) {
 	// Derive sender from private key if present.
 	var from common.Address
 	if len(tx.PrivateKey) > 0 {
@@ -464,11 +481,23 @@ func (tx *stTransaction) toMessage(ps stPostState, baseFee *big.Int) (core.Messa
 			tx.MaxFeePerGas)
 	}
 	if gasPrice == nil {
-		return nil, fmt.Errorf("no gas price provided")
+		return nil, errors.New("no gas price provided")
 	}
 
-	msg := types.NewMessage(from, to, tx.Nonce, value, gasLimit, gasPrice,
-		tx.MaxFeePerGas, tx.MaxPriorityFeePerGas, data, accessList, false)
+	msg := &core.Message{
+		From:          from,
+		To:            to,
+		Nonce:         tx.Nonce,
+		Value:         value,
+		GasLimit:      gasLimit,
+		GasPrice:      gasPrice,
+		GasFeeCap:     tx.MaxFeePerGas,
+		GasTipCap:     tx.MaxPriorityFeePerGas,
+		Data:          data,
+		AccessList:    accessList,
+		BlobHashes:    tx.BlobVersionedHashes,
+		BlobGasFeeCap: tx.BlobGasFeeCap,
+	}
 	return msg, nil
 }
 

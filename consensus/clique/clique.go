@@ -30,8 +30,10 @@ import (
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	lru "github.com/ethereum/go-ethereum/common/lru"
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/consensus/misc"
+	"github.com/ethereum/go-ethereum/consensus/misc/eip1559"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -42,7 +44,6 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/ethereum/go-ethereum/trie"
-	lru "github.com/hashicorp/golang-lru"
 	"golang.org/x/crypto/sha3"
 )
 
@@ -144,11 +145,11 @@ var (
 type SignerFn func(signer accounts.Account, mimeType string, message []byte) ([]byte, error)
 
 // ecrecover extracts the Ethereum account address from a signed header.
-func ecrecover(header *types.Header, sigcache *lru.ARCCache) (common.Address, error) {
+func ecrecover(header *types.Header, sigcache *sigLRU) (common.Address, error) {
 	// If the signature's already cached, return that
 	hash := header.Hash()
 	if address, known := sigcache.Get(hash); known {
-		return address.(common.Address), nil
+		return address, nil
 	}
 	// Retrieve the signature from the header extra-data
 	if len(header.Extra) < extraSeal {
@@ -174,8 +175,8 @@ type Clique struct {
 	config *ctypes.CliqueConfig // Consensus engine configuration parameters
 	db     ethdb.Database       // Database to store and retrieve snapshot checkpoints
 
-	recents    *lru.ARCCache // Snapshots for recent block to speed up reorgs
-	signatures *lru.ARCCache // Signatures of recent blocks to speed up mining
+	recents    *lru.Cache[common.Hash, *Snapshot] // Snapshots for recent block to speed up reorgs
+	signatures *sigLRU                            // Signatures of recent blocks to speed up mining
 
 	proposals map[common.Address]bool // Current list of proposals we are pushing
 
@@ -196,8 +197,8 @@ func New(config *ctypes.CliqueConfig, db ethdb.Database) *Clique {
 		conf.Epoch = epochLength
 	}
 	// Allocate the snapshot caches and create the engine
-	recents, _ := lru.NewARC(inmemorySnapshots)
-	signatures, _ := lru.NewARC(inmemorySignatures)
+	recents := lru.NewCache[common.Hash, *Snapshot](inmemorySnapshots)
+	signatures := lru.NewCache[common.Hash, common.Address](inmemorySignatures)
 
 	return &Clique{
 		config:     &conf,
@@ -299,9 +300,11 @@ func (c *Clique) verifyHeader(chain consensus.ChainHeaderReader, header *types.H
 	if header.GasLimit > vars.MaxGasLimit {
 		return fmt.Errorf("invalid gasLimit: have %v, max %v", header.GasLimit, vars.MaxGasLimit)
 	}
-	// If all checks passed, validate any special fields for hard forks
-	if err := misc.VerifyForkHashes(chain.Config(), header, false); err != nil {
-		return err
+	if chain.Config().IsEnabledByTime(chain.Config().GetEIP3855TransitionTime, &header.Time) {
+		return fmt.Errorf("clique does not support shanghai fork")
+	}
+	if chain.Config().IsEnabledByTime(chain.Config().GetEIP4844TransitionTime, &header.Time) {
+		return fmt.Errorf("clique does not support cancun fork")
 	}
 	// All basic checks passed, verify cascading fields
 	return c.verifyCascadingFields(chain, header, parents)
@@ -342,7 +345,7 @@ func (c *Clique) verifyCascadingFields(chain consensus.ChainHeaderReader, header
 		if err := misc.VerifyGaslimit(parent.GasLimit, header.GasLimit); err != nil {
 			return err
 		}
-	} else if err := misc.VerifyEip1559Header(chain.Config(), parent, header); err != nil {
+	} else if err := eip1559.VerifyEIP1559Header(chain.Config(), parent, header); err != nil {
 		// Verify the header's EIP-1559 attributes.
 		return err
 	}
@@ -376,7 +379,7 @@ func (c *Clique) snapshot(chain consensus.ChainHeaderReader, number uint64, hash
 	for snap == nil {
 		// If an in-memory snapshot was found, use that
 		if s, ok := c.recents.Get(hash); ok {
-			snap = s.(*Snapshot)
+			snap = s
 			break
 		}
 		// If an on-disk checkpoint snapshot can be found, use that
@@ -396,7 +399,7 @@ func (c *Clique) snapshot(chain consensus.ChainHeaderReader, number uint64, hash
 			if checkpoint != nil {
 				hash := checkpoint.Hash()
 
-				signers := make([]common.Address, (len(checkpoint.Extra)-extraVanity-extraSeal)/common.AddressLength)
+				signers := make([]common.Address, (len(checkpoint.Extra)-extraVanity-extraSeal)/common.AddressLength) // = (#extra - 32 - 65 ) / 20
 				for i := 0; i < len(signers); i++ {
 					copy(signers[i][:], checkpoint.Extra[extraVanity+i*common.AddressLength:])
 				}
@@ -563,21 +566,25 @@ func (c *Clique) Prepare(chain consensus.ChainHeaderReader, header *types.Header
 	return nil
 }
 
-// Finalize implements consensus.Engine, ensuring no uncles are set, nor block
-// rewards given.
-func (c *Clique) Finalize(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB, txs []*types.Transaction, uncles []*types.Header) {
-	// No block rewards in PoA, so the state remains as is and uncles are dropped
-	header.Root = state.IntermediateRoot(chain.Config().IsEnabled(chain.Config().GetEIP161dTransition, header.Number))
-	header.UncleHash = types.CalcUncleHash(nil)
+// Finalize implements consensus.Engine. There is no post-transaction
+// consensus rules in clique, do nothing here.
+func (c *Clique) Finalize(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB, txs []*types.Transaction, uncles []*types.Header, withdrawals []*types.Withdrawal) {
+	// No block rewards in PoA, so the state remains as is
 }
 
 // FinalizeAndAssemble implements consensus.Engine, ensuring no uncles are set,
 // nor block rewards given, and returns the final block.
-func (c *Clique) FinalizeAndAssemble(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB, txs []*types.Transaction, uncles []*types.Header, receipts []*types.Receipt) (*types.Block, error) {
+func (c *Clique) FinalizeAndAssemble(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB, txs []*types.Transaction, uncles []*types.Header, receipts []*types.Receipt, withdrawals []*types.Withdrawal) (*types.Block, error) {
+	if len(withdrawals) > 0 {
+		return nil, errors.New("clique does not support withdrawals")
+	}
 	// Finalize block
-	c.Finalize(chain, header, state, txs, uncles)
+	c.Finalize(chain, header, state, txs, uncles, nil)
 
-	// Assemble and return the final block for sealing
+	// Assign the final state root to header.
+	header.Root = state.IntermediateRoot(chain.Config().IsEnabled(chain.Config().GetEIP161dTransition, header.Number))
+
+	// Assemble and return the final block for sealing.
 	return types.NewBlock(header, txs, nil, receipts, trie.NewStackTrie(nil)), nil
 }
 
@@ -743,6 +750,9 @@ func encodeSigHeader(w io.Writer, header *types.Header) {
 	}
 	if header.BaseFee != nil {
 		enc = append(enc, header.BaseFee)
+	}
+	if header.WithdrawalsHash != nil {
+		panic("unexpected withdrawal hash value in clique")
 	}
 	if err := rlp.Encode(w, enc); err != nil {
 		panic("can't encode: " + err.Error())

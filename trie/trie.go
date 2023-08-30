@@ -23,33 +23,10 @@ import (
 	"fmt"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/trie/trienode"
 )
-
-var (
-	// emptyRoot is the known root hash of an empty trie.
-	emptyRoot = common.HexToHash("56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421")
-
-	// emptyState is the known hash of an empty state trie entry.
-	emptyState = crypto.Keccak256Hash(nil)
-)
-
-// LeafCallback is a callback type invoked when a trie operation reaches a leaf
-// node.
-//
-// The keys is a path tuple identifying a particular trie node either in a single
-// trie (account) or a layered trie (account -> storage). Each key in the tuple
-// is in the raw format(32 bytes).
-//
-// The path is a composite hexary path identifying the trie node. All the key
-// bytes are converted to the hexary nibbles and composited with the parent path
-// if the trie node is in a layered trie.
-//
-// It's used by state sync and commit to allow handling external references
-// between account and storage tries. And also it's used in the state healing
-// for extracting the raw states(leaf nodes) with corresponding paths.
-type LeafCallback func(keys [][]byte, path []byte, leaf []byte, parent common.Hash, parentPath []byte) error
 
 // Trie is a Merkle Patricia Trie. Use New to create a trie that sits on
 // top of a database. Whenever trie performs a commit operation, the generated
@@ -62,14 +39,17 @@ type Trie struct {
 	root  node
 	owner common.Hash
 
+	// Flag whether the commit operation is already performed. If so the
+	// trie is not usable(latest states is invisible).
+	committed bool
+
 	// Keep track of the number leaves which have been inserted since the last
 	// hashing operation. This number will not directly map to the number of
 	// actually unhashed nodes.
 	unhashed int
 
-	// db is the handler trie can retrieve nodes from. It's
-	// only for reading purpose and not available for writing.
-	db *Database
+	// reader is the handler trie can retrieve nodes from.
+	reader *trieReader
 
 	// tracer is the tool to track the trie changes.
 	// It will be reset after each commit operation.
@@ -84,29 +64,33 @@ func (t *Trie) newFlag() nodeFlag {
 // Copy returns a copy of Trie.
 func (t *Trie) Copy() *Trie {
 	return &Trie{
-		root:     t.root,
-		owner:    t.owner,
-		unhashed: t.unhashed,
-		db:       t.db,
-		tracer:   t.tracer.copy(),
+		root:      t.root,
+		owner:     t.owner,
+		committed: t.committed,
+		unhashed:  t.unhashed,
+		reader:    t.reader,
+		tracer:    t.tracer.copy(),
 	}
 }
 
-// New creates a trie with an existing root node from db and an assigned
-// owner for storage proximity.
-//
-// If root is the zero hash or the sha3 hash of an empty string, the
-// trie is initially empty and does not require a database. Otherwise,
-// New will panic if db is nil and returns a MissingNodeError if root does
-// not exist in the database. Accessing the trie loads nodes from db on demand.
-func New(owner common.Hash, root common.Hash, db *Database) (*Trie, error) {
-	trie := &Trie{
-		owner: owner,
-		db:    db,
-		//tracer: newTracer(),
+// New creates the trie instance with provided trie id and the read-only
+// database. The state specified by trie id must be available, otherwise
+// an error will be returned. The trie root specified by trie id can be
+// zero hash or the sha3 hash of an empty string, then trie is initially
+// empty, otherwise, the root node must be present in database or returns
+// a MissingNodeError if not.
+func New(id *ID, db *Database) (*Trie, error) {
+	reader, err := newTrieReader(id.StateRoot, id.Owner, db)
+	if err != nil {
+		return nil, err
 	}
-	if root != (common.Hash{}) && root != emptyRoot {
-		rootnode, err := trie.resolveHash(root[:], nil)
+	trie := &Trie{
+		owner:  id.Owner,
+		reader: reader,
+		tracer: newTracer(),
+	}
+	if id.Root != (common.Hash{}) && id.Root != types.EmptyRootHash {
+		rootnode, err := trie.resolveAndTrack(id.Root[:], nil)
 		if err != nil {
 			return nil, err
 		}
@@ -117,38 +101,58 @@ func New(owner common.Hash, root common.Hash, db *Database) (*Trie, error) {
 
 // NewEmpty is a shortcut to create empty tree. It's mostly used in tests.
 func NewEmpty(db *Database) *Trie {
-	tr, _ := New(common.Hash{}, common.Hash{}, db)
+	tr, _ := New(TrieID(types.EmptyRootHash), db)
 	return tr
+}
+
+// MustNodeIterator is a wrapper of NodeIterator and will omit any encountered
+// error but just print out an error message.
+func (t *Trie) MustNodeIterator(start []byte) NodeIterator {
+	it, err := t.NodeIterator(start)
+	if err != nil {
+		log.Error("Unhandled trie error in Trie.NodeIterator", "err", err)
+	}
+	return it
 }
 
 // NodeIterator returns an iterator that returns nodes of the trie. Iteration starts at
 // the key after the given start key.
-func (t *Trie) NodeIterator(start []byte) NodeIterator {
-	return newNodeIterator(t, start)
+func (t *Trie) NodeIterator(start []byte) (NodeIterator, error) {
+	// Short circuit if the trie is already committed and not usable.
+	if t.committed {
+		return nil, ErrCommitted
+	}
+	return newNodeIterator(t, start), nil
 }
 
-// Get returns the value for key stored in the trie.
-// The value bytes must not be modified by the caller.
-func (t *Trie) Get(key []byte) []byte {
-	res, err := t.TryGet(key)
+// MustGet is a wrapper of Get and will omit any encountered error but just
+// print out an error message.
+func (t *Trie) MustGet(key []byte) []byte {
+	res, err := t.Get(key)
 	if err != nil {
-		log.Error(fmt.Sprintf("Unhandled trie error: %v", err))
+		log.Error("Unhandled trie error in Trie.Get", "err", err)
 	}
 	return res
 }
 
-// TryGet returns the value for key stored in the trie.
+// Get returns the value for key stored in the trie.
 // The value bytes must not be modified by the caller.
-// If a node was not found in the database, a MissingNodeError is returned.
-func (t *Trie) TryGet(key []byte) ([]byte, error) {
-	value, newroot, didResolve, err := t.tryGet(t.root, keybytesToHex(key), 0)
+//
+// If the requested node is not present in trie, no error will be returned.
+// If the trie is corrupted, a MissingNodeError is returned.
+func (t *Trie) Get(key []byte) ([]byte, error) {
+	// Short circuit if the trie is already committed and not usable.
+	if t.committed {
+		return nil, ErrCommitted
+	}
+	value, newroot, didResolve, err := t.get(t.root, keybytesToHex(key), 0)
 	if err == nil && didResolve {
 		t.root = newroot
 	}
 	return value, err
 }
 
-func (t *Trie) tryGet(origNode node, key []byte, pos int) (value []byte, newnode node, didResolve bool, err error) {
+func (t *Trie) get(origNode node, key []byte, pos int) (value []byte, newnode node, didResolve bool, err error) {
 	switch n := (origNode).(type) {
 	case nil:
 		return nil, nil, false, nil
@@ -159,35 +163,52 @@ func (t *Trie) tryGet(origNode node, key []byte, pos int) (value []byte, newnode
 			// key not found in trie
 			return nil, n, false, nil
 		}
-		value, newnode, didResolve, err = t.tryGet(n.Val, key, pos+len(n.Key))
+		value, newnode, didResolve, err = t.get(n.Val, key, pos+len(n.Key))
 		if err == nil && didResolve {
 			n = n.copy()
 			n.Val = newnode
 		}
 		return value, n, didResolve, err
 	case *fullNode:
-		value, newnode, didResolve, err = t.tryGet(n.Children[key[pos]], key, pos+1)
+		value, newnode, didResolve, err = t.get(n.Children[key[pos]], key, pos+1)
 		if err == nil && didResolve {
 			n = n.copy()
 			n.Children[key[pos]] = newnode
 		}
 		return value, n, didResolve, err
 	case hashNode:
-		child, err := t.resolveHash(n, key[:pos])
+		child, err := t.resolveAndTrack(n, key[:pos])
 		if err != nil {
 			return nil, n, true, err
 		}
-		value, newnode, _, err := t.tryGet(child, key, pos)
+		value, newnode, _, err := t.get(child, key, pos)
 		return value, newnode, true, err
 	default:
 		panic(fmt.Sprintf("%T: invalid node: %v", origNode, origNode))
 	}
 }
 
-// TryGetNode attempts to retrieve a trie node by compact-encoded path. It is not
-// possible to use keybyte-encoding as the path might contain odd nibbles.
-func (t *Trie) TryGetNode(path []byte) ([]byte, int, error) {
-	item, newroot, resolved, err := t.tryGetNode(t.root, compactToHex(path), 0)
+// MustGetNode is a wrapper of GetNode and will omit any encountered error but
+// just print out an error message.
+func (t *Trie) MustGetNode(path []byte) ([]byte, int) {
+	item, resolved, err := t.GetNode(path)
+	if err != nil {
+		log.Error("Unhandled trie error in Trie.GetNode", "err", err)
+	}
+	return item, resolved
+}
+
+// GetNode retrieves a trie node by compact-encoded path. It is not possible
+// to use keybyte-encoding as the path might contain odd nibbles.
+//
+// If the requested node is not present in trie, no error will be returned.
+// If the trie is corrupted, a MissingNodeError is returned.
+func (t *Trie) GetNode(path []byte) ([]byte, int, error) {
+	// Short circuit if the trie is already committed and not usable.
+	if t.committed {
+		return nil, 0, ErrCommitted
+	}
+	item, newroot, resolved, err := t.getNode(t.root, compactToHex(path), 0)
 	if err != nil {
 		return nil, resolved, err
 	}
@@ -197,10 +218,10 @@ func (t *Trie) TryGetNode(path []byte) ([]byte, int, error) {
 	if item == nil {
 		return nil, resolved, nil
 	}
-	return item, resolved, err
+	return item, resolved, nil
 }
 
-func (t *Trie) tryGetNode(origNode node, path []byte, pos int) (item []byte, newnode node, resolved int, err error) {
+func (t *Trie) getNode(origNode node, path []byte, pos int) (item []byte, newnode node, resolved int, err error) {
 	// If non-existent path requested, abort
 	if origNode == nil {
 		return nil, nil, 0, nil
@@ -219,7 +240,7 @@ func (t *Trie) tryGetNode(origNode node, path []byte, pos int) (item []byte, new
 		if hash == nil {
 			return nil, origNode, 0, errors.New("non-consensus node")
 		}
-		blob, err := t.db.Node(common.BytesToHash(hash))
+		blob, err := t.reader.node(path, common.BytesToHash(hash))
 		return blob, origNode, 1, err
 	}
 	// Path still needs to be traversed, descend into children
@@ -233,7 +254,7 @@ func (t *Trie) tryGetNode(origNode node, path []byte, pos int) (item []byte, new
 			// Path branches off from short node
 			return nil, n, 0, nil
 		}
-		item, newnode, resolved, err = t.tryGetNode(n.Val, path, pos+len(n.Key))
+		item, newnode, resolved, err = t.getNode(n.Val, path, pos+len(n.Key))
 		if err == nil && resolved > 0 {
 			n = n.copy()
 			n.Val = newnode
@@ -241,7 +262,7 @@ func (t *Trie) tryGetNode(origNode node, path []byte, pos int) (item []byte, new
 		return item, n, resolved, err
 
 	case *fullNode:
-		item, newnode, resolved, err = t.tryGetNode(n.Children[path[pos]], path, pos+1)
+		item, newnode, resolved, err = t.getNode(n.Children[path[pos]], path, pos+1)
 		if err == nil && resolved > 0 {
 			n = n.copy()
 			n.Children[path[pos]] = newnode
@@ -249,15 +270,23 @@ func (t *Trie) tryGetNode(origNode node, path []byte, pos int) (item []byte, new
 		return item, n, resolved, err
 
 	case hashNode:
-		child, err := t.resolveHash(n, path[:pos])
+		child, err := t.resolveAndTrack(n, path[:pos])
 		if err != nil {
 			return nil, n, 1, err
 		}
-		item, newnode, resolved, err := t.tryGetNode(child, path, pos)
+		item, newnode, resolved, err := t.getNode(child, path, pos)
 		return item, newnode, resolved + 1, err
 
 	default:
 		panic(fmt.Sprintf("%T: invalid node: %v", origNode, origNode))
+	}
+}
+
+// MustUpdate is a wrapper of Update and will omit any encountered error but
+// just print out an error message.
+func (t *Trie) MustUpdate(key, value []byte) {
+	if err := t.Update(key, value); err != nil {
+		log.Error("Unhandled trie error in Trie.Update", "err", err)
 	}
 }
 
@@ -267,27 +296,18 @@ func (t *Trie) tryGetNode(origNode node, path []byte, pos int) (item []byte, new
 //
 // The value bytes must not be modified by the caller while they are
 // stored in the trie.
-func (t *Trie) Update(key, value []byte) {
-	if err := t.TryUpdate(key, value); err != nil {
-		log.Error(fmt.Sprintf("Unhandled trie error: %v", err))
+//
+// If the requested node is not present in trie, no error will be returned.
+// If the trie is corrupted, a MissingNodeError is returned.
+func (t *Trie) Update(key, value []byte) error {
+	// Short circuit if the trie is already committed and not usable.
+	if t.committed {
+		return ErrCommitted
 	}
+	return t.update(key, value)
 }
 
-// TryUpdate associates key with value in the trie. Subsequent calls to
-// Get will return value. If value has length zero, any existing value
-// is deleted from the trie and calls to Get will return nil.
-//
-// The value bytes must not be modified by the caller while they are
-// stored in the trie.
-//
-// If a node was not found in the database, a MissingNodeError is returned.
-func (t *Trie) TryUpdate(key, value []byte) error {
-	return t.tryUpdate(key, value)
-}
-
-// tryUpdate expects an RLP-encoded value and performs the core function
-// for TryUpdate and TryUpdateAccount.
-func (t *Trie) tryUpdate(key, value []byte) error {
+func (t *Trie) update(key, value []byte) error {
 	t.unhashed++
 	k := keybytesToHex(key)
 	if len(value) != 0 {
@@ -370,7 +390,7 @@ func (t *Trie) insert(n node, prefix, key []byte, value node) (bool, node, error
 		// We've hit a part of the trie that isn't loaded yet. Load
 		// the node and insert into it. This leaves all child nodes on
 		// the path to the value in the trie.
-		rn, err := t.resolveHash(n, prefix)
+		rn, err := t.resolveAndTrack(n, prefix)
 		if err != nil {
 			return false, nil, err
 		}
@@ -385,16 +405,23 @@ func (t *Trie) insert(n node, prefix, key []byte, value node) (bool, node, error
 	}
 }
 
-// Delete removes any existing value for key from the trie.
-func (t *Trie) Delete(key []byte) {
-	if err := t.TryDelete(key); err != nil {
-		log.Error(fmt.Sprintf("Unhandled trie error: %v", err))
+// MustDelete is a wrapper of Delete and will omit any encountered error but
+// just print out an error message.
+func (t *Trie) MustDelete(key []byte) {
+	if err := t.Delete(key); err != nil {
+		log.Error("Unhandled trie error in Trie.Delete", "err", err)
 	}
 }
 
-// TryDelete removes any existing value for key from the trie.
-// If a node was not found in the database, a MissingNodeError is returned.
-func (t *Trie) TryDelete(key []byte) error {
+// Delete removes any existing value for key from the trie.
+//
+// If the requested node is not present in trie, no error will be returned.
+// If the trie is corrupted, a MissingNodeError is returned.
+func (t *Trie) Delete(key []byte) error {
+	// Short circuit if the trie is already committed and not usable.
+	if t.committed {
+		return ErrCommitted
+	}
 	t.unhashed++
 	k := keybytesToHex(key)
 	_, n, err := t.delete(t.root, nil, k)
@@ -524,7 +551,7 @@ func (t *Trie) delete(n node, prefix, key []byte) (bool, node, error) {
 		// We've hit a part of the trie that isn't loaded yet. Load
 		// the node and delete from it. This leaves all child nodes on
 		// the path to the value in the trie.
-		rn, err := t.resolveHash(n, prefix)
+		rn, err := t.resolveAndTrack(n, prefix)
 		if err != nil {
 			return false, nil, err
 		}
@@ -548,51 +575,57 @@ func concat(s1 []byte, s2 ...byte) []byte {
 
 func (t *Trie) resolve(n node, prefix []byte) (node, error) {
 	if n, ok := n.(hashNode); ok {
-		return t.resolveHash(n, prefix)
+		return t.resolveAndTrack(n, prefix)
 	}
 	return n, nil
 }
 
-// resolveHash loads node from the underlying database with the provided
-// node hash and path prefix.
-func (t *Trie) resolveHash(n hashNode, prefix []byte) (node, error) {
-	hash := common.BytesToHash(n)
-	if node := t.db.node(hash); node != nil {
-		return node, nil
+// resolveAndTrack loads node from the underlying store with the given node hash
+// and path prefix and also tracks the loaded node blob in tracer treated as the
+// node's original value. The rlp-encoded blob is preferred to be loaded from
+// database because it's easy to decode node while complex to encode node to blob.
+func (t *Trie) resolveAndTrack(n hashNode, prefix []byte) (node, error) {
+	blob, err := t.reader.node(prefix, common.BytesToHash(n))
+	if err != nil {
+		return nil, err
 	}
-	return nil, &MissingNodeError{Owner: t.owner, NodeHash: hash, Path: prefix}
-}
-
-// resolveHash loads rlp-encoded node blob from the underlying database
-// with the provided node hash and path prefix.
-func (t *Trie) resolveBlob(n hashNode, prefix []byte) ([]byte, error) {
-	hash := common.BytesToHash(n)
-	blob, _ := t.db.Node(hash)
-	if len(blob) != 0 {
-		return blob, nil
-	}
-	return nil, &MissingNodeError{Owner: t.owner, NodeHash: hash, Path: prefix}
+	t.tracer.onRead(prefix, blob)
+	return mustDecodeNode(n, blob), nil
 }
 
 // Hash returns the root hash of the trie. It does not write to the
 // database and can be used even if the trie doesn't have one.
 func (t *Trie) Hash() common.Hash {
-	hash, cached, _ := t.hashRoot()
+	hash, cached := t.hashRoot()
 	t.root = cached
 	return common.BytesToHash(hash.(hashNode))
 }
 
-// Commit collects all dirty nodes in the trie and replace them with the
-// corresponding node hash. All collected nodes(including dirty leaves if
+// Commit collects all dirty nodes in the trie and replaces them with the
+// corresponding node hash. All collected nodes (including dirty leaves if
 // collectLeaf is true) will be encapsulated into a nodeset for return.
-// The returned nodeset can be nil if the trie is clean(nothing to commit).
+// The returned nodeset can be nil if the trie is clean (nothing to commit).
 // Once the trie is committed, it's not usable anymore. A new trie must
 // be created with new root and updated trie database for following usage
-func (t *Trie) Commit(collectLeaf bool) (common.Hash, *NodeSet, error) {
+func (t *Trie) Commit(collectLeaf bool) (common.Hash, *trienode.NodeSet, error) {
 	defer t.tracer.reset()
-
+	defer func() {
+		t.committed = true
+	}()
+	// Trie is empty and can be classified into two types of situations:
+	// (a) The trie was empty and no update happens => return nil
+	// (b) The trie was non-empty and all nodes are dropped => return
+	//     the node set includes all deleted nodes
 	if t.root == nil {
-		return emptyRoot, nil, nil
+		paths := t.tracer.deletedNodes()
+		if len(paths) == 0 {
+			return types.EmptyRootHash, nil, nil // case (a)
+		}
+		nodes := trienode.NewNodeSet(t.owner)
+		for _, path := range paths {
+			nodes.AddNode([]byte(path), trienode.NewDeleted())
+		}
+		return types.EmptyRootHash, nodes, nil // case (b)
 	}
 	// Derive the hash for all dirty nodes first. We hold the assumption
 	// in the following procedure that all nodes are hashed.
@@ -606,26 +639,27 @@ func (t *Trie) Commit(collectLeaf bool) (common.Hash, *NodeSet, error) {
 		t.root = hashedNode
 		return rootHash, nil, nil
 	}
-	h := newCommitter(t.owner, collectLeaf)
-	newRoot, nodes, err := h.Commit(t.root)
-	if err != nil {
-		return common.Hash{}, nil, err
+	nodes := trienode.NewNodeSet(t.owner)
+	for _, path := range t.tracer.deletedNodes() {
+		nodes.AddNode([]byte(path), trienode.NewDeleted())
 	}
-	t.root = newRoot
+	t.root = newCommitter(nodes, t.tracer, collectLeaf).Commit(t.root)
 	return rootHash, nodes, nil
 }
 
 // hashRoot calculates the root hash of the given trie
-func (t *Trie) hashRoot() (node, node, error) {
+func (t *Trie) hashRoot() (node, node) {
 	if t.root == nil {
-		return hashNode(emptyRoot.Bytes()), nil, nil
+		return hashNode(types.EmptyRootHash.Bytes()), nil
 	}
 	// If the number of changes is below 100, we let one thread handle it
 	h := newHasher(t.unhashed >= 100)
-	defer returnHasherToPool(h)
+	defer func() {
+		returnHasherToPool(h)
+		t.unhashed = 0
+	}()
 	hashed, cached := h.hash(t.root, true)
-	t.unhashed = 0
-	return hashed, cached, nil
+	return hashed, cached
 }
 
 // Reset drops the referenced root node and cleans all internal state.
@@ -633,6 +667,6 @@ func (t *Trie) Reset() {
 	t.root = nil
 	t.owner = common.Hash{}
 	t.unhashed = 0
-	//t.db = nil
 	t.tracer.reset()
+	t.committed = false
 }

@@ -51,6 +51,7 @@ import (
 	"github.com/ethereum/go-ethereum/eth/ethconfig"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/ethstats"
+	"github.com/ethereum/go-ethereum/internal/version"
 	"github.com/ethereum/go-ethereum/les"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/node"
@@ -66,7 +67,6 @@ var (
 	foundationFlag = flag.Bool("chain.foundation", false, "Configure genesis and bootnodes for foundation chain defaults")
 	classicFlag    = flag.Bool("chain.classic", false, "Configure genesis and bootnodes for classic chain defaults")
 	mordorFlag     = flag.Bool("chain.mordor", false, "Configure genesis and bootnodes for mordor chain defaults")
-	kottiFlag      = flag.Bool("chain.kotti", false, "Configure genesis and bootnodes for kotti chain defaults")
 	testnetFlag    = flag.Bool("chain.testnet", false, "Configure genesis and bootnodes for testnet chain defaults")
 	rinkebyFlag    = flag.Bool("chain.rinkeby", false, "Configure genesis and bootnodes for rinkeby chain defaults")
 	goerliFlag     = flag.Bool("chain.goerli", false, "Configure genesis and bootnodes for goerli chain defaults")
@@ -108,7 +108,6 @@ var chainFlags = []*bool{
 	foundationFlag,
 	classicFlag,
 	mordorFlag,
-	kottiFlag,
 	testnetFlag,
 	rinkebyFlag,
 	goerliFlag,
@@ -117,11 +116,6 @@ var chainFlags = []*bool{
 
 var (
 	ether = new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil)
-)
-
-var (
-	gitCommit = "" // Git SHA1 commit hash of the release (set via linker flags)
-	gitDate   = "" // Git commit date YYYYMMDD of the release (set via linker flags)
 )
 
 //go:embed faucet.html
@@ -138,14 +132,8 @@ func faucetDirFromChainIndicators(chainID uint64, genesisHash common.Hash) strin
 			return filepath.Join(datadir, "classic")
 		}
 		return filepath.Join(datadir, "")
-	case params.RopstenGenesisHash:
-		return filepath.Join(datadir, "ropsten")
-	case params.RinkebyGenesisHash:
-		return filepath.Join(datadir, "rinkeby")
 	case params.GoerliGenesisHash:
 		return filepath.Join(datadir, "goerli")
-	case params.KottiGenesisHash:
-		return filepath.Join(datadir, "kotti")
 	case params.MordorGenesisHash:
 		return filepath.Join(datadir, "mordor")
 	case params.SepoliaGenesisHash:
@@ -163,9 +151,6 @@ func parseChainFlags() (gs *genesisT.Genesis, bs string, netid uint64) {
 		{*foundationFlag, params.DefaultGenesisBlock(), nil},
 		{*classicFlag, params.DefaultClassicGenesisBlock(), nil},
 		{*mordorFlag, params.DefaultMordorGenesisBlock(), nil},
-		{*testnetFlag, params.DefaultRopstenGenesisBlock(), nil},
-		{*rinkebyFlag, params.DefaultRinkebyGenesisBlock(), nil},
-		{*kottiFlag, params.DefaultKottiGenesisBlock(), nil},
 		{*goerliFlag, params.DefaultGoerliGenesisBlock(), nil},
 		{*sepoliaFlag, params.DefaultSepoliaGenesisBlock(), nil},
 	}
@@ -531,9 +516,10 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*enode
 	}
 
 	// Assemble the raw devp2p protocol stack
+	git, _ := version.VCS()
 	stack, err := node.New(&node.Config{
 		Name:    coreFaucetNodeName,
-		Version: params.VersionWithCommit(gitCommit, gitDate),
+		Version: params.VersionWithCommit(git.Commit, git.Date),
 		DataDir: faucetDataDir,
 		P2P: p2p.Config{
 			NAT: nat.Any(),
@@ -576,8 +562,6 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*enode
 		} else {
 			utils.SetDNSDiscoveryDefaults(&cfg, core.GenesisToBlock(genesis, nil).Hash())
 		}
-	case params.KottiGenesisHash:
-		utils.SetDNSDiscoveryDefaults2(&cfg, params.KottiDNSNetwork1)
 	case params.MordorGenesisHash:
 		utils.SetDNSDiscoveryDefaults2(&cfg, params.MordorDNSNetwork1)
 	default:
@@ -623,11 +607,7 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*enode
 		}
 	}
 	// Attach to the client and retrieve and interesting metadatas
-	api, err := stack.Attach()
-	if err != nil {
-		stack.Close()
-		return err
-	}
+	api := stack.Attach()
 	f.stack = stack
 	f.client = ethclient.NewClient(api)
 	return nil
@@ -1131,7 +1111,7 @@ func authTwitter(url string, tokenV1, tokenV2 string) (string, string, string, c
 func authTwitterWithTokenV1(tweetID string, token string) (string, string, string, common.Address, error) {
 	// Query the tweet details from Twitter
 	url := fmt.Sprintf("https://api.twitter.com/1.1/statuses/show.json?id=%s", tweetID)
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return "", "", "", common.Address{}, err
 	}
@@ -1168,7 +1148,7 @@ func authTwitterWithTokenV1(tweetID string, token string) (string, string, strin
 func authTwitterWithTokenV2(tweetID string, token string) (string, string, string, common.Address, error) {
 	// Query the tweet details from Twitter
 	url := fmt.Sprintf("https://api.twitter.com/2/tweets/%s?expansions=author_id&user.fields=profile_image_url", tweetID)
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return "", "", "", common.Address{}, err
 	}

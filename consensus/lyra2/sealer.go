@@ -176,7 +176,7 @@ search:
 				// Correct nonce found, create a new header with it
 				header = types.CopyHeader(header)
 				header.Nonce = types.EncodeNonce(nonce)
-				//header.MixDigest = common.BytesToHash(digest)
+				// header.MixDigest = common.BytesToHash(digest)
 
 				// Seal and return a block (if still needed)
 				select {
@@ -344,10 +344,11 @@ func (s *remoteSealer) loop() {
 // makeWork creates a work package for external miner.
 //
 // The work package consists of 3 strings:
-//   result[0], 32 bytes hex encoded current block header pow-hash
-//   result[1], hex encoded header
-//   result[2], 32 bytes hex encoded boundary condition ("target"), 2^256/difficulty
-//   result[3], hex encoded block number
+//
+//	result[0], 32 bytes hex encoded current block header pow-hash
+//	result[1], hex encoded header
+//	result[2], 32 bytes hex encoded boundary condition ("target"), 2^256/difficulty
+//	result[3], hex encoded block number
 func (s *remoteSealer) makeWork(block *types.Block) {
 	hash := s.lyra2.SealHash(block.Header())
 	headerBytes, _ := s.lyra2.headerBytes(block.Header())

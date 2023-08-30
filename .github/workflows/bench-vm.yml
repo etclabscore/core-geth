@@ -14,7 +14,7 @@ jobs:
         id: go
         uses: actions/setup-go@v2
         with:
-          go-version: ^1.16
+          go-version: ^1.19
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
@@ -40,7 +40,7 @@ jobs:
         id: go
         uses: actions/setup-go@v2
         with:
-          go-version: ^1.16
+          go-version: ^1.19
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
@@ -52,7 +52,7 @@ jobs:
         run: |
           git remote add foundation https://github.com/ethereum/go-ethereum.git
           git fetch foundation
-          git checkout v1.10.26
+          git checkout v1.11.5
           # git submodule update
           git checkout $GITHUB_SHA -- tests/vm_bench_test.go
           go test -short ./tests -count 1 -p 1 -timeout 60m -run NONE -bench=VM -v |& tee go-ethereum.txt
@@ -72,7 +72,7 @@ jobs:
         id: go
         uses: actions/setup-go@v2
         with:
-          go-version: ^1.16
+          go-version: ^1.19
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2

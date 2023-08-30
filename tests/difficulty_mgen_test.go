@@ -26,7 +26,6 @@ import (
 	"sort"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
@@ -43,7 +42,6 @@ import (
 // The cases are written to files PER CHAIN CONFIG, following the upstream convention,
 // eg. tests/testdata_generated/BasicTests/difficultyETC_Agharta.json
 func TestDifficultyGen2(t *testing.T) {
-	rand.Seed(time.Now().UnixNano())
 	if os.Getenv(CG_GENERATE_DIFFICULTY_TESTS_KEY) == "" {
 		t.Skip()
 	}
@@ -126,8 +124,10 @@ func TestDifficultyGen2(t *testing.T) {
 func difficultyTestCaseHeights(config ctypes.ChainConfigurator) []uint64 {
 	blockHeights := []uint64{}
 
-	// Add the fork blocks.
-	forks := confp.Forks(config)
+	// Add the block-fork blocks.
+	// We do not handle time-forks, since it is assumed that under time-based chain configuration contexts,
+	// difficulty will be inoperative or otherwise disused.
+	forks := confp.BlockForks(config)
 	copy(blockHeights, forks)
 	for _, forkBlock := range forks {
 		if forkBlock > 0 {

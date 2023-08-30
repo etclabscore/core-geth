@@ -17,12 +17,12 @@
 package keystore
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"os"
 	"path/filepath"
 	"reflect"
-	"sort"
 	"testing"
 	"time"
 
@@ -30,6 +30,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common"
+	"golang.org/x/exp/slices"
 )
 
 var (
@@ -50,6 +51,38 @@ var (
 	}
 )
 
+// waitWatcherStarts waits up to 1s for the keystore watcher to start.
+func waitWatcherStart(ks *KeyStore) bool {
+	// On systems where file watch is not supported, just return "ok".
+	if !ks.cache.watcher.enabled() {
+		return true
+	}
+	// The watcher should start, and then exit.
+	for t0 := time.Now(); time.Since(t0) < 1*time.Second; time.Sleep(100 * time.Millisecond) {
+		if ks.cache.watcherStarted() {
+			return true
+		}
+	}
+	return false
+}
+
+func waitForAccounts(wantAccounts []accounts.Account, ks *KeyStore) error {
+	var list []accounts.Account
+	for t0 := time.Now(); time.Since(t0) < 5*time.Second; time.Sleep(200 * time.Millisecond) {
+		list = ks.Accounts()
+		if reflect.DeepEqual(list, wantAccounts) {
+			// ks should have also received change notifications
+			select {
+			case <-ks.changes:
+			default:
+				return errors.New("wasn't notified of new accounts")
+			}
+			return nil
+		}
+	}
+	return fmt.Errorf("\ngot  %v\nwant %v", list, wantAccounts)
+}
+
 func TestWatchNewFile(t *testing.T) {
 	t.Parallel()
 
@@ -57,8 +90,9 @@ func TestWatchNewFile(t *testing.T) {
 
 	// Ensure the watcher is started before adding any files.
 	ks.Accounts()
-	time.Sleep(1000 * time.Millisecond)
-
+	if !waitWatcherStart(ks) {
+		t.Fatal("keystore watcher didn't start in time")
+	}
 	// Move in the files.
 	wantAccounts := make([]accounts.Account, len(cachetestAccounts))
 	for i := range cachetestAccounts {
@@ -72,37 +106,24 @@ func TestWatchNewFile(t *testing.T) {
 	}
 
 	// ks should see the accounts.
-	var list []accounts.Account
-	for d := 200 * time.Millisecond; d < 5*time.Second; d *= 2 {
-		list = ks.Accounts()
-		if reflect.DeepEqual(list, wantAccounts) {
-			// ks should have also received change notifications
-			select {
-			case <-ks.changes:
-			default:
-				t.Fatalf("wasn't notified of new accounts")
-			}
-			return
-		}
-		time.Sleep(d)
+	if err := waitForAccounts(wantAccounts, ks); err != nil {
+		t.Error(err)
 	}
-	t.Errorf("got %s, want %s", spew.Sdump(list), spew.Sdump(wantAccounts))
 }
 
 func TestWatchNoDir(t *testing.T) {
 	t.Parallel()
-
 	// Create ks but not the directory that it watches.
-	rand.Seed(time.Now().UnixNano())
 	dir := filepath.Join(os.TempDir(), fmt.Sprintf("eth-keystore-watchnodir-test-%d-%d", os.Getpid(), rand.Int()))
 	ks := NewKeyStore(dir, LightScryptN, LightScryptP)
-
 	list := ks.Accounts()
 	if len(list) > 0 {
 		t.Error("initial account list not empty:", list)
 	}
-	time.Sleep(100 * time.Millisecond)
-
+	// The watcher should start, and then exit.
+	if !waitWatcherStart(ks) {
+		t.Fatal("keystore watcher didn't start in time")
+	}
 	// Create the directory and copy a key file into it.
 	os.MkdirAll(dir, 0700)
 	defer os.RemoveAll(dir)
@@ -182,7 +203,7 @@ func TestCacheAddDeleteOrder(t *testing.T) {
 	// Check that the account list is sorted by filename.
 	wantAccounts := make([]accounts.Account, len(accs))
 	copy(wantAccounts, accs)
-	sort.Sort(accountsByURL(wantAccounts))
+	slices.SortFunc(wantAccounts, byURL)
 	list := cache.accounts()
 	if !reflect.DeepEqual(list, wantAccounts) {
 		t.Fatalf("got accounts: %s\nwant %s", spew.Sdump(accs), spew.Sdump(wantAccounts))
@@ -295,31 +316,12 @@ func TestCacheFind(t *testing.T) {
 	}
 }
 
-func waitForAccounts(wantAccounts []accounts.Account, ks *KeyStore) error {
-	var list []accounts.Account
-	for d := 200 * time.Millisecond; d < 8*time.Second; d *= 2 {
-		list = ks.Accounts()
-		if reflect.DeepEqual(list, wantAccounts) {
-			// ks should have also received change notifications
-			select {
-			case <-ks.changes:
-			default:
-				return fmt.Errorf("wasn't notified of new accounts")
-			}
-			return nil
-		}
-		time.Sleep(d)
-	}
-	return fmt.Errorf("\ngot  %v\nwant %v", list, wantAccounts)
-}
-
 // TestUpdatedKeyfileContents tests that updating the contents of a keystore file
 // is noticed by the watcher, and the account cache is updated accordingly
 func TestUpdatedKeyfileContents(t *testing.T) {
 	t.Parallel()
 
 	// Create a temporary keystore to test with
-	rand.Seed(time.Now().UnixNano())
 	dir := filepath.Join(os.TempDir(), fmt.Sprintf("eth-keystore-updatedkeyfilecontents-test-%d-%d", os.Getpid(), rand.Int()))
 	ks := NewKeyStore(dir, LightScryptN, LightScryptP)
 
@@ -327,8 +329,9 @@ func TestUpdatedKeyfileContents(t *testing.T) {
 	if len(list) > 0 {
 		t.Error("initial account list not empty:", list)
 	}
-	time.Sleep(100 * time.Millisecond)
-
+	if !waitWatcherStart(ks) {
+		t.Fatal("keystore watcher didn't start in time")
+	}
 	// Create the directory and copy a key file into it.
 	os.MkdirAll(dir, 0700)
 	defer os.RemoveAll(dir)
@@ -346,9 +349,8 @@ func TestUpdatedKeyfileContents(t *testing.T) {
 		t.Error(err)
 		return
 	}
-
 	// needed so that modTime of `file` is different to its current value after forceCopyFile
-	time.Sleep(1000 * time.Millisecond)
+	time.Sleep(time.Second)
 
 	// Now replace file contents
 	if err := forceCopyFile(file, cachetestAccounts[1].URL.Path); err != nil {
@@ -364,7 +366,7 @@ func TestUpdatedKeyfileContents(t *testing.T) {
 	}
 
 	// needed so that modTime of `file` is different to its current value after forceCopyFile
-	time.Sleep(1000 * time.Millisecond)
+	time.Sleep(time.Second)
 
 	// Now replace file contents again
 	if err := forceCopyFile(file, cachetestAccounts[2].URL.Path); err != nil {
@@ -380,7 +382,7 @@ func TestUpdatedKeyfileContents(t *testing.T) {
 	}
 
 	// needed so that modTime of `file` is different to its current value after os.WriteFile
-	time.Sleep(1000 * time.Millisecond)
+	time.Sleep(time.Second)
 
 	// Now replace file contents with crap
 	if err := os.WriteFile(file, []byte("foo"), 0600); err != nil {

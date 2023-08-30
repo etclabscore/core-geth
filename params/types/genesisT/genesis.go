@@ -52,10 +52,104 @@ type Genesis struct {
 
 	// These fields are used for consensus tests. Please don't use them
 	// in actual genesis blocks.
-	Number     uint64      `json:"number"`
-	GasUsed    uint64      `json:"gasUsed"`
-	ParentHash common.Hash `json:"parentHash"`
-	BaseFee    *big.Int    `json:"baseFeePerGas"`
+	Number        uint64      `json:"number"`
+	GasUsed       uint64      `json:"gasUsed"`
+	ParentHash    common.Hash `json:"parentHash"`
+	BaseFee       *big.Int    `json:"baseFeePerGas"` // EIP-1559
+	ExcessBlobGas *uint64     `json:"excessBlobGas"` // EIP-4844
+	BlobGasUsed   *uint64     `json:"blobGasUsed"`   // EIP-4844
+}
+
+func (g *Genesis) GetElasticityMultiplier() uint64 {
+	return g.Config.GetElasticityMultiplier()
+}
+
+func (g *Genesis) SetElasticityMultiplier(n uint64) error {
+	return g.Config.SetElasticityMultiplier(n)
+}
+
+func (g *Genesis) GetBaseFeeChangeDenominator() uint64 {
+	return g.Config.GetBaseFeeChangeDenominator()
+}
+
+func (g *Genesis) SetBaseFeeChangeDenominator(n uint64) error {
+	return g.Config.SetBaseFeeChangeDenominator(n)
+}
+
+func (g *Genesis) GetEIP3651TransitionTime() *uint64 {
+	return g.Config.GetEIP3651TransitionTime()
+}
+
+func (g *Genesis) SetEIP3651TransitionTime(n *uint64) error {
+	return g.Config.SetEIP3651TransitionTime(n)
+}
+
+func (g *Genesis) GetEIP3855TransitionTime() *uint64 {
+	return g.Config.GetEIP3855TransitionTime()
+}
+
+func (g *Genesis) SetEIP3855TransitionTime(n *uint64) error {
+	return g.Config.SetEIP3855TransitionTime(n)
+}
+
+func (g *Genesis) GetEIP3860TransitionTime() *uint64 {
+	return g.Config.GetEIP3860TransitionTime()
+}
+
+func (g *Genesis) SetEIP3860TransitionTime(n *uint64) error {
+	return g.Config.SetEIP3860TransitionTime(n)
+}
+
+func (g *Genesis) GetEIP4895TransitionTime() *uint64 {
+	return g.Config.GetEIP4895TransitionTime()
+}
+
+func (g *Genesis) SetEIP4895TransitionTime(n *uint64) error {
+	return g.Config.SetEIP4895TransitionTime(n)
+}
+
+func (g *Genesis) GetEIP6049TransitionTime() *uint64 {
+	return g.Config.GetEIP6049TransitionTime()
+}
+
+func (g *Genesis) SetEIP6049TransitionTime(n *uint64) error {
+	return g.Config.SetEIP6049TransitionTime(n)
+}
+
+func (g *Genesis) GetEIP4844TransitionTime() *uint64 {
+	return g.Config.GetEIP4844TransitionTime()
+}
+
+func (g *Genesis) SetEIP4844TransitionTime(n *uint64) error {
+	return g.Config.SetEIP4844TransitionTime(n)
+}
+
+func (g *Genesis) GetEIP1153TransitionTime() *uint64 {
+	return g.Config.GetEIP1153TransitionTime()
+}
+
+func (g *Genesis) SetEIP1153TransitionTime(n *uint64) error {
+	return g.Config.SetEIP1153TransitionTime(n)
+}
+
+func (g *Genesis) GetEIP5656TransitionTime() *uint64 {
+	return g.Config.GetEIP5656TransitionTime()
+}
+
+func (g *Genesis) SetEIP5656TransitionTime(n *uint64) error {
+	return g.Config.SetEIP5656TransitionTime(n)
+}
+
+func (g *Genesis) GetEIP6780TransitionTime() *uint64 {
+	return g.Config.GetEIP6780TransitionTime()
+}
+
+func (g *Genesis) SetEIP6780TransitionTime(n *uint64) error {
+	return g.Config.SetEIP6780TransitionTime(n)
+}
+
+func (g *Genesis) IsEnabledByTime(fn func() *uint64, n *uint64) bool {
+	return g.Config.IsEnabledByTime(fn, n)
 }
 
 func (g *Genesis) ForEachAccount(fn func(address common.Address, bal *big.Int, nonce uint64, code []byte, storage map[common.Hash]common.Hash) error) error {
@@ -112,15 +206,17 @@ type GenesisAccount struct {
 
 // field type overrides for gencodec
 type genesisSpecMarshaling struct {
-	Nonce      math.HexOrDecimal64
-	Timestamp  math.HexOrDecimal64
-	ExtraData  hexutil.Bytes
-	GasLimit   math.HexOrDecimal64
-	GasUsed    math.HexOrDecimal64
-	Number     math.HexOrDecimal64
-	Difficulty *math.HexOrDecimal256
-	BaseFee    *math.HexOrDecimal256
-	Alloc      map[common.UnprefixedAddress]GenesisAccount
+	Nonce         math.HexOrDecimal64
+	Timestamp     math.HexOrDecimal64
+	ExtraData     hexutil.Bytes
+	GasLimit      math.HexOrDecimal64
+	GasUsed       math.HexOrDecimal64
+	Number        math.HexOrDecimal64
+	Difficulty    *math.HexOrDecimal256
+	Alloc         map[common.UnprefixedAddress]GenesisAccount
+	BaseFee       *math.HexOrDecimal256
+	ExcessBlobGas *math.HexOrDecimal64
+	BlobGasUsed   *math.HexOrDecimal64
 }
 
 type genesisAccountMarshaling struct {
@@ -675,6 +771,14 @@ func (g *Genesis) GetConsensusEngineType() ctypes.ConsensusEngineT {
 
 func (g *Genesis) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) error {
 	return g.Config.MustSetConsensusEngineType(t)
+}
+
+func (g *Genesis) GetIsDevMode() bool {
+	return g.Config.GetIsDevMode()
+}
+
+func (g *Genesis) SetDevMode(devMode bool) error {
+	return g.Config.SetDevMode(devMode)
 }
 
 func (g *Genesis) GetEthashTerminalTotalDifficulty() *big.Int {

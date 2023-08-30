@@ -138,6 +138,22 @@ func (c *CoreGethChainConfig) SetMaxCodeSize(n *uint64) error {
 	return internal.GlobalConfigurator().SetMaxCodeSize(n)
 }
 
+func (c *CoreGethChainConfig) GetElasticityMultiplier() uint64 {
+	return internal.GlobalConfigurator().GetElasticityMultiplier()
+}
+
+func (c *CoreGethChainConfig) SetElasticityMultiplier(n uint64) error {
+	return internal.GlobalConfigurator().SetElasticityMultiplier(n)
+}
+
+func (c *CoreGethChainConfig) GetBaseFeeChangeDenominator() uint64 {
+	return internal.GlobalConfigurator().GetBaseFeeChangeDenominator()
+}
+
+func (c *CoreGethChainConfig) SetBaseFeeChangeDenominator(n uint64) error {
+	return internal.GlobalConfigurator().SetBaseFeeChangeDenominator(n)
+}
+
 func (c *CoreGethChainConfig) GetEIP7Transition() *uint64 {
 	return bigNewU64(c.EIP7FBlock)
 }
@@ -498,6 +514,96 @@ func (c *CoreGethChainConfig) SetEIP4399Transition(n *uint64) error {
 	return nil
 }
 
+// EIP3651: Warm COINBASE
+func (c *CoreGethChainConfig) GetEIP3651TransitionTime() *uint64 {
+	return c.EIP3651FTime
+}
+
+func (c *CoreGethChainConfig) SetEIP3651TransitionTime(n *uint64) error {
+	c.EIP3651FTime = n
+	return nil
+}
+
+// GetEIP3855TransitionTime EIP3855: PUSH0 instruction
+func (c *CoreGethChainConfig) GetEIP3855TransitionTime() *uint64 {
+	return c.EIP3855FTime
+}
+
+func (c *CoreGethChainConfig) SetEIP3855TransitionTime(n *uint64) error {
+	c.EIP3855FTime = n
+	return nil
+}
+
+// GetEIP3860TransitionTime EIP3860: Limit and meter initcode
+func (c *CoreGethChainConfig) GetEIP3860TransitionTime() *uint64 {
+	return c.EIP3860FTime
+}
+
+func (c *CoreGethChainConfig) SetEIP3860TransitionTime(n *uint64) error {
+	c.EIP3860FTime = n
+	return nil
+}
+
+// GetEIP4895TransitionTime EIP4895: Beacon chain push withdrawals as operations
+func (c *CoreGethChainConfig) GetEIP4895TransitionTime() *uint64 {
+	return c.EIP4895FTime
+}
+
+func (c *CoreGethChainConfig) SetEIP4895TransitionTime(n *uint64) error {
+	c.EIP4895FTime = n
+	return nil
+}
+
+// GetEIP6049TransitionTime EIP6049: Deprecate SELFDESTRUCT
+func (c *CoreGethChainConfig) GetEIP6049TransitionTime() *uint64 {
+	return c.EIP6049FTime
+}
+
+func (c *CoreGethChainConfig) SetEIP6049TransitionTime(n *uint64) error {
+	c.EIP6049FTime = n
+	return nil
+}
+
+// GetEIP4844TransitionTime EIP4844: Shard Blob Transactions
+func (c *CoreGethChainConfig) GetEIP4844TransitionTime() *uint64 {
+	return c.EIP4844FTime
+}
+
+func (c *CoreGethChainConfig) SetEIP4844TransitionTime(n *uint64) error {
+	c.EIP4844FTime = n
+	return nil
+}
+
+// GetEIP1153TransitionTime EIP1153: Transient Storage opcodes
+func (c *CoreGethChainConfig) GetEIP1153TransitionTime() *uint64 {
+	return c.EIP1153FTime
+}
+
+func (c *CoreGethChainConfig) SetEIP1153TransitionTime(n *uint64) error {
+	c.EIP1153FTime = n
+	return nil
+}
+
+// GetEIP5656TransitionTime EIP5656: MCOPY - Memory copying instruction
+func (c *CoreGethChainConfig) GetEIP5656TransitionTime() *uint64 {
+	return c.EIP5656FTime
+}
+
+func (c *CoreGethChainConfig) SetEIP5656TransitionTime(n *uint64) error {
+	c.EIP5656FTime = n
+	return nil
+}
+
+// GetEIP6780TransitionTime EIP6780: SELFDESTRUCT only in same transaction
+func (c *CoreGethChainConfig) GetEIP6780TransitionTime() *uint64 {
+	return c.EIP6780FTime
+}
+
+func (c *CoreGethChainConfig) SetEIP6780TransitionTime(n *uint64) error {
+	c.EIP6780FTime = n
+	return nil
+}
+
 func (c *CoreGethChainConfig) GetMergeVirtualTransition() *uint64 {
 	return bigNewU64(c.MergeNetsplitVBlock)
 }
@@ -513,6 +619,14 @@ func (c *CoreGethChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 		return false
 	}
 	return big.NewInt(int64(*f)).Cmp(n) <= 0
+}
+
+func (c *CoreGethChainConfig) IsEnabledByTime(fn func() *uint64, n *uint64) bool {
+	f := fn()
+	if f == nil || n == nil {
+		return false
+	}
+	return *f <= *n
 }
 
 func (c *CoreGethChainConfig) GetForkCanonHash(n uint64) common.Hash {
@@ -570,6 +684,15 @@ func (c *CoreGethChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngin
 	default:
 		return ctypes.ErrUnsupportedConfigFatal
 	}
+}
+
+func (c *CoreGethChainConfig) GetIsDevMode() bool {
+	return c.IsDevMode
+}
+
+func (c *CoreGethChainConfig) SetDevMode(devMode bool) error {
+	c.IsDevMode = devMode
+	return nil
 }
 
 func (c *CoreGethChainConfig) GetEthashTerminalTotalDifficulty() *big.Int {

@@ -18,7 +18,7 @@
 package les
 
 import (
-	"fmt"
+	"errors"
 	"strings"
 	"time"
 
@@ -27,6 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/mclock"
 	"github.com/ethereum/go-ethereum/consensus"
+	"github.com/ethereum/go-ethereum/consensus/lyra2"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/bloombits"
 	"github.com/ethereum/go-ethereum/core/rawdb"
@@ -47,10 +48,12 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/enr"
 	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/ethereum/go-ethereum/trie"
 )
 
 type LightEthereum struct {
@@ -95,7 +98,17 @@ func New(stack *node.Node, config *ethconfig.Config) (*LightEthereum, error) {
 	if err != nil {
 		return nil, err
 	}
-	chainConfig, genesisHash, genesisErr := core.SetupGenesisBlockWithOverride(chainDb, config.Genesis, config.OverrideTerminalTotalDifficulty, config.OverrideTerminalTotalDifficultyPassed)
+	var overrides core.ChainOverrides
+	if config.OverrideShanghai != nil {
+		overrides.OverrideShanghai = config.OverrideShanghai
+	}
+	if config.OverrideCancun != nil {
+		overrides.OverrideCancun = config.OverrideCancun
+	}
+	if config.OverrideVerkle != nil {
+		overrides.OverrideVerkle = config.OverrideVerkle
+	}
+	chainConfig, genesisHash, genesisErr := core.SetupGenesisBlockWithOverride(chainDb, trie.NewDatabase(chainDb), config.Genesis, &overrides)
 	if _, isCompat := genesisErr.(*confp.ConfigCompatError); genesisErr != nil && !isCompat {
 		return nil, genesisErr
 	}
@@ -106,6 +119,19 @@ func New(stack *node.Node, config *ethconfig.Config) (*LightEthereum, error) {
 	}
 	log.Info(strings.Repeat("-", 153))
 	log.Info("")
+
+	var cliqueConfig *ctypes.CliqueConfig
+	var lyra2Config *lyra2.Config
+	if chainConfig.GetConsensusEngineType() == ctypes.ConsensusEngineT_Clique {
+		cliqueConfig = &ctypes.CliqueConfig{
+			Period: chainConfig.GetCliquePeriod(),
+			Epoch:  chainConfig.GetCliqueEpoch(),
+		}
+	} else if chainConfig.GetConsensusEngineType() == ctypes.ConsensusEngineT_Lyra2 {
+		lyra2Config = &lyra2.Config{}
+	} else if chainConfig.GetConsensusEngineType() == ctypes.ConsensusEngineT_Ethash {
+		config.Ethash.ECIP1099Block = chainConfig.GetEthashECIP1099Transition()
+	}
 
 	peers := newServerPeerSet()
 	merger := consensus.NewMerger(chainDb)
@@ -124,7 +150,7 @@ func New(stack *node.Node, config *ethconfig.Config) (*LightEthereum, error) {
 		reqDist:         newRequestDistributor(peers, &mclock.System{}),
 		accountManager:  stack.AccountManager(),
 		merger:          merger,
-		engine:          ethconfig.CreateConsensusEngine(stack, chainConfig, &config.Ethash, nil, false, chainDb),
+		engine:          ethconfig.CreateConsensusEngine(stack, &config.Ethash, cliqueConfig, lyra2Config, nil, false, chainDb),
 		bloomRequests:   make(chan chan *bloombits.Retrieval),
 		bloomIndexer:    core.NewBloomIndexer(chainDb, vars.BloomBitsBlocksClient, vars.HelperTrieConfirmations),
 		p2pServer:       stack.Server(),
@@ -178,7 +204,11 @@ func New(stack *node.Node, config *ethconfig.Config) (*LightEthereum, error) {
 	// Rewind the chain in case of an incompatible config upgrade.
 	if compat, ok := genesisErr.(*confp.ConfigCompatError); ok {
 		log.Warn("Rewinding chain to upgrade configuration", "err", compat)
-		leth.blockchain.SetHead(compat.RewindTo)
+		if compat.RewindToTime > 0 {
+			leth.blockchain.SetHeadWithTimestamp(compat.RewindToTime)
+		} else {
+			leth.blockchain.SetHead(compat.RewindToBlock)
+		}
 		rawdb.WriteChainConfig(chainDb, genesisHash, chainConfig)
 	}
 
@@ -272,14 +302,14 @@ func (s *LightEthereum) prenegQuery(n *enode.Node) int {
 
 type LightDummyAPI struct{}
 
-// Etherbase is the address that mining rewards will be send to
+// Etherbase is the address that mining rewards will be sent to
 func (s *LightDummyAPI) Etherbase() (common.Address, error) {
-	return common.Address{}, fmt.Errorf("mining is not supported in light mode")
+	return common.Address{}, errors.New("mining is not supported in light mode")
 }
 
-// Coinbase is the address that mining rewards will be send to (alias for Etherbase)
+// Coinbase is the address that mining rewards will be sent to (alias for Etherbase)
 func (s *LightDummyAPI) Coinbase() (common.Address, error) {
-	return common.Address{}, fmt.Errorf("mining is not supported in light mode")
+	return common.Address{}, errors.New("mining is not supported in light mode")
 }
 
 // Hashrate returns the POW hashrate

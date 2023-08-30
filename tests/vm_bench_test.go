@@ -55,7 +55,8 @@ import (
 //
 // runTest should be a function of type func(t *testing.T, name string, x <TestType>),
 // where TestType is the type of the test contained in test files.
-//nolint:unused
+// nolint:unused
+// nolint:goimports
 func (tm *testMatcher) walkB(b *testing.B, dir string, runTest interface{}) {
 	// Walk the directory.
 	dirinfo, err := os.Stat(dir)

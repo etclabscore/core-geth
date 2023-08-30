@@ -21,7 +21,6 @@ import (
 	"math/big"
 	"math/rand"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -112,7 +111,7 @@ func (h *clientHandler) handle(p *serverPeer, noInitAnnounce bool) error {
 	p.Log().Debug("Light Ethereum peer connected", "name", p.Name())
 
 	// Execute the LES handshake
-	forkid := forkid.NewID(h.backend.blockchain.Config(), h.backend.genesis, h.backend.blockchain.CurrentHeader().Number.Uint64())
+	forkid := forkid.NewID(h.backend.blockchain.Config(), h.backend.genesis, h.backend.blockchain.CurrentHeader().Number.Uint64(), h.backend.blockchain.CurrentHeader().Time)
 	if err := p.Handshake(h.backend.blockchain.Genesis().Hash(), forkid, h.forkFilter); err != nil {
 		p.Log().Debug("Light Ethereum handshake failed", "err", err)
 		return err
@@ -152,8 +151,8 @@ func (h *clientHandler) handle(p *serverPeer, noInitAnnounce bool) error {
 	}
 
 	// Mark the peer starts to be served.
-	atomic.StoreUint32(&p.serving, 1)
-	defer atomic.StoreUint32(&p.serving, 0)
+	p.serving.Store(true)
+	defer p.serving.Store(false)
 
 	// Spawn a main loop to handle all incoming messages.
 	for {

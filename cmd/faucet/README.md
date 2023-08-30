@@ -2,17 +2,16 @@
 
 The `faucet` is a simplistic web application with the goal of distributing small amounts of Ether in private and test networks.
 
-Users need to post their Ethereum addresses to fund in a Twitter status update or public Facebook post and share the link to the faucet. The faucet will in turn deduplicate user requests and send the Ether. After a funding round, the faucet prevents the same user requesting again for a pre-configured amount of time, proportional to the amount of Ether requested.
+Users need to post their Ethereum addresses to fund in a Twitter status update or public Facebook post and share the link to the faucet. The faucet will in turn deduplicate user requests and send the Ether. After a funding round, the faucet prevents the same user from requesting again for a pre-configured amount of time, proportional to the amount of Ether requested.
 
 ## Operation
 
 The `faucet` is a single binary app (everything included) with all configurations set via command line flags and a few files.
 
-First thing's first, the `faucet` needs to connect to an Ethereum network, for which it needs the necessary genesis and network infos. Each of the following flags must be set:
+First things first, the `faucet` needs to connect to an Ethereum network, for which it needs the necessary genesis and network infos. Each of the following flags must be set:
 
 - `-genesis` is a path to a file containing the network `genesis.json`. or using:
   - `-goerli` with the faucet with Görli network config
-  - `-rinkeby` with the faucet with Rinkeby network config
   - `-sepolia` with the faucet with Sepolia network config
 - `-network` is the devp2p network id used during connection
 - `-bootnodes` is a list of `enode://` ids to join the network through
@@ -50,4 +49,4 @@ Sybil protection via Facebook uses the website to directly download post data th
 
 ## Miscellaneous
 
-Beside the above - mostly essential - CLI flags, there are a number that can be used to fine tune the `faucet`'s operation. Please see `faucet --help` for a full list.
+Beside the above - mostly essential - CLI flags, there are a number that can be used to fine-tune the `faucet`'s operation. Please see `faucet --help` for a full list.

@@ -6,23 +6,25 @@ TARGET_VERSION=0.9.1
 # TARGET_VERSION=0.9.0
 # TARGET_VERSION=0.6.0
 
+EXTENSION="so"
 
-if [[ "$OSTYPE" != "linux"* ]]; then
-    echo "This script is only currently configured to work on Linux. Please see \"https://github.com/ethereum/evmone\" documentation for instructions to build in other environments."
-    exit 1
+_OSTYPE=${OSTYPE}
+if [[ ${_OSTYPE} == "linux"* ]]; then
+    _OSTYPE="linux"
+    EXTENSION="so"
+fi
+if [[ ${_OSTYPE} == "darwin"* ]]; then
+    _OSTYPE="darwin"
+    EXTENSION="dylib"
 fi
 
-download()
-{
-    wget -O build/_workspace/evmone/evmone-${TARGET_VERSION}-linux-x86_64.tar.gz https://github.com/ethereum/evmone/releases/download/v${TARGET_VERSION}/evmone-${TARGET_VERSION}-linux-x86_64.tar.gz
+main() {
+    mkdir -p build/_workspace
+    [ ! -d build/_workspace/evmone ] && git clone --recursive https://github.com/ethereum/evmone build/_workspace/evmone || echo "Evmone exists."
+    cd build/_workspace/evmone
+    git checkout v${TARGET_VERSION}
+    cmake -S . -B build -DEVMONE_TESTING=ON
+    cmake --build build --parallel
+    echo "Built library at: $(pwd)/build/lib/libevmone.${EXTENSION}"
 }
-
-unpack()
-{
-    tar xzvf build/_workspace/evmone/evmone-${TARGET_VERSION}-linux-x86_64.tar.gz -C build/_workspace/evmone/
-}
-
-mkdir -p build/_workspace/evmone
-[[ -f build/_workspace/evmone/evmone-${TARGET_VERSION}-linux-x86_64.tar.gz ]] || download
-unpack
-
+main

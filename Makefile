@@ -53,8 +53,8 @@ evmone:
 
 # Test EVMC support against various external interpreters.
 test-evmc: hera evmone
-	go test -count 1 ./tests -run TestState -evmc.ewasm=$(ROOT_DIR)/build/_workspace/hera/build/src/libhera.so
-	go test -count 1 ./tests -run TestState -evmc.evm=$(ROOT_DIR)/build/_workspace/evmone/lib/libevmone.so
+	go test -count 1 ./tests -run TestState -vm.ewasm=$(ROOT_DIR)/build/_workspace/hera/build/src/libhera.so
+	go test -count 1 ./tests -run TestState -vm.evm=$(ROOT_DIR)/build/_workspace/evmone/lib/libevmone.so
 
 clean-evmc:
 	rm -rf ./build/_workspace/hera ./build/_workspace/evmone

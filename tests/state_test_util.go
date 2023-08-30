@@ -51,6 +51,18 @@ type StateTest struct {
 	json stJSON
 }
 
+func (s StateTest) GetEnv() stEnv {
+	return s.json.Env
+}
+
+func (s StateTest) GetTx() stTransaction {
+	return s.json.Tx
+}
+
+func (s StateTest) GetPre() genesisT.GenesisAlloc {
+	return s.json.Pre
+}
+
 // StateSubtest selects a specific configuration of a General State Test.
 type StateSubtest struct {
 	Fork  string

@@ -8,6 +8,7 @@ GOBIN = ./build/bin
 GO ?= latest
 GORUN = env GO111MODULE=on go run
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+EXTENSION = $(shell [[ $(shell uname) == "Darwin" ]] && echo "dylib" || echo "so")
 
 geth:
 	$(GORUN) build/ci.go install ./cmd/geth
@@ -53,8 +54,8 @@ evmone:
 
 # Test EVMC support against various external interpreters.
 test-evmc: hera evmone
-	go test -count 1 ./tests -run TestState -vm.ewasm=$(ROOT_DIR)/build/_workspace/hera/build/src/libhera.so
-	go test -count 1 ./tests -run TestState -vm.evm=$(ROOT_DIR)/build/_workspace/evmone/lib/libevmone.so
+	go test -count 1 ./tests -run TestState -vm.ewasm=$(ROOT_DIR)/build/_workspace/hera/build/src/libhera.$(EXTENSION)
+	go test -count 1 ./tests -run TestState -vm.evm=$(ROOT_DIR)/build/_workspace/evmone/build/lib/libevmone.$(EXTENSION)
 
 clean-evmc:
 	rm -rf ./build/_workspace/hera ./build/_workspace/evmone

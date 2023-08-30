@@ -389,7 +389,9 @@ func (host *hostContext) Selfdestruct(evmcAddr evmc.Address, evmcBeneficiary evm
 		db.AddRefund(vars.SelfdestructRefundGas)
 	}
 	db.AddBalance(beneficiary, db.GetBalance(addr))
-	return db.SelfDestruct(addr)
+	db.SelfDestruct(addr)
+	// TODO (ziogaschr): check what to return
+	return true
 }
 
 func (host *hostContext) GetTxContext() evmc.TxContext {
@@ -398,7 +400,7 @@ func (host *hostContext) GetTxContext() evmc.TxContext {
 		Origin:    evmc.Address(host.env.TxContext.Origin),
 		Coinbase:  evmc.Address(host.env.Context.Coinbase),
 		Number:    host.env.Context.BlockNumber.Int64(),
-		Timestamp: host.env.Context.Time,
+		Timestamp: int64(host.env.Context.Time),
 		GasLimit:  int64(host.env.Context.GasLimit),
 		ChainID:   evmc.Hash(common.BigToHash(host.env.chainConfig.GetChainID())),
 		BaseFee:   evmc.Hash{},

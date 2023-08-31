@@ -482,11 +482,6 @@ web3._extend({
 			params: 1,
 		}),
 		new web3._extend.Method({
-			name: 'removePendingTransaction',
-			call: 'debug_removePendingTransaction',
-			params: 1
-		}),
-		new web3._extend.Method({
 			name: 'getAccessibleState',
 			call: 'debug_getAccessibleState',
 			params: 2,

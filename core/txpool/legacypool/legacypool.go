@@ -1133,15 +1133,6 @@ func (pool *LegacyPool) removeTx(hash common.Hash, outofbound bool, unreserve bo
 	return 0
 }
 
-// RemoveTx publicizes the removeTx method since the API method txpool_removeTx
-// needs to allow public access to internal `removeTx()`
-func (pool *LegacyPool) RemoveTx(hash common.Hash) *types.Transaction {
-	tx := pool.Get(hash)
-	pool.removeTx(hash, true, true)
-
-	return tx.Tx
-}
-
 // requestReset requests a pool reset to the new head block.
 // The returned channel is closed when the reset has occurred.
 func (pool *LegacyPool) requestReset(oldHead *types.Header, newHead *types.Header) chan struct{} {

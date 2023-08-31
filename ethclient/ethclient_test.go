@@ -1138,7 +1138,6 @@ var allRPCMethods = []string{
 	"debug_mutexProfile",
 	"debug_preimage",
 	"debug_printBlock",
-	"debug_removePendingTransaction",
 	"debug_seedHash",
 	"debug_setBlockProfileRate",
 	"debug_setGCPercent",

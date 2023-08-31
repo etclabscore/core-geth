@@ -302,7 +302,6 @@ func (api *API) traceChain(start, end *types.Block, config *TraceConfig, closed 
 						break
 					}
 					// Only delete empty objects if EIP158/161 (a.k.a Spurious Dragon) is in effect
-					// TODO (ziogaschr): task.statedb.Finalise(api.backend.ChainConfig().IsEIP158(task.block.Number()))
 					task.statedb.Finalise(api.backend.ChainConfig().IsEnabled(api.backend.ChainConfig().GetEIP161dTransition, task.block.Number()))
 					task.results[i] = &txTraceResult{Result: res}
 				}

@@ -170,8 +170,11 @@ func (api *ConsensusAPI) ForkchoiceUpdatedV1(update engine.ForkchoiceStateV1, pa
 		if payloadAttributes.Withdrawals != nil {
 			return engine.STATUS_INVALID, engine.InvalidParams.With(errors.New("withdrawals not supported in V1"))
 		}
-		if api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4895TransitionTime, &payloadAttributes.Timestamp) || // PTAL(meowsbits) Is it really safe/sensible to call the backing Blockchain here?
-			api.eth.BlockChain().Config().IsEnabled(api.eth.BlockChain().Config().GetEIP4895Transition, api.eth.BlockChain().CurrentHeader().Number) {
+		eip4895 := api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4895TransitionTime, &payloadAttributes.Timestamp)
+		if payloadAttributes.Number != nil {
+			eip4895 = eip4895 || api.eth.BlockChain().Config().IsEnabled(api.eth.BlockChain().Config().GetEIP4895Transition, new(big.Int).SetUint64(*payloadAttributes.Number))
+		}
+		if eip4895 {
 			return engine.STATUS_INVALID, engine.InvalidParams.With(fmt.Errorf("forkChoiceUpdateV1 called post-shanghai"))
 		}
 	}
@@ -189,7 +192,11 @@ func (api *ConsensusAPI) ForkchoiceUpdatedV2(update engine.ForkchoiceStateV1, pa
 }
 
 func (api *ConsensusAPI) verifyPayloadAttributes(attr *engine.PayloadAttributes) error {
-	if !(api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4895TransitionTime, &attr.Timestamp) || api.eth.BlockChain().Config().IsEnabled(api.eth.BlockChain().Config().GetEIP4895Transition, api.eth.BlockChain().CurrentHeader().Number)) {
+	eip4895 := api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4895TransitionTime, &attr.Timestamp)
+	if attr.Number != nil {
+		eip4895 = eip4895 || api.eth.BlockChain().Config().IsEnabled(api.eth.BlockChain().Config().GetEIP4895Transition, new(big.Int).SetUint64(*attr.Number))
+	}
+	if !eip4895 {
 		// Reject payload attributes with withdrawals before shanghai
 		if attr.Withdrawals != nil {
 			return errors.New("withdrawals before shanghai")

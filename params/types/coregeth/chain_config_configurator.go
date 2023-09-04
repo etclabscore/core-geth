@@ -571,7 +571,7 @@ func (c *CoreGethChainConfig) GetEIP3651Transition() *uint64 {
 }
 
 func (c *CoreGethChainConfig) SetEIP3651Transition(n *uint64) error {
-	c.EIP6049FBlock = setBig(c.EIP6049FBlock, n)
+	c.EIP3651FBlock = setBig(c.EIP3651FBlock, n)
 	return nil
 }
 
@@ -581,7 +581,7 @@ func (c *CoreGethChainConfig) GetEIP3855Transition() *uint64 {
 }
 
 func (c *CoreGethChainConfig) SetEIP3855Transition(n *uint64) error {
-	c.EIP6049FBlock = setBig(c.EIP6049FBlock, n)
+	c.EIP3855FBlock = setBig(c.EIP3855FBlock, n)
 	return nil
 }
 
@@ -591,7 +591,7 @@ func (c *CoreGethChainConfig) GetEIP3860Transition() *uint64 {
 }
 
 func (c *CoreGethChainConfig) SetEIP3860Transition(n *uint64) error {
-	c.EIP6049FBlock = setBig(c.EIP6049FBlock, n)
+	c.EIP3860FBlock = setBig(c.EIP3860FBlock, n)
 	return nil
 }
 
@@ -601,7 +601,7 @@ func (c *CoreGethChainConfig) GetEIP4895Transition() *uint64 {
 }
 
 func (c *CoreGethChainConfig) SetEIP4895Transition(n *uint64) error {
-	c.EIP6049FBlock = setBig(c.EIP6049FBlock, n)
+	c.EIP4895FBlock = setBig(c.EIP4895FBlock, n)
 	return nil
 }
 

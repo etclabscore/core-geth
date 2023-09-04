@@ -33,9 +33,9 @@ func (g Genesis) MarshalJSON() ([]byte, error) {
 		Number        math.HexOrDecimal64                         `json:"number"`
 		GasUsed       math.HexOrDecimal64                         `json:"gasUsed"`
 		ParentHash    common.Hash                                 `json:"parentHash"`
-		BaseFee       *math.HexOrDecimal256                       `json:"baseFeePerGas"`
-		ExcessBlobGas *math.HexOrDecimal64                        `json:"excessBlobGas"`
-		BlobGasUsed   *math.HexOrDecimal64                        `json:"blobGasUsed"`
+		BaseFee       *math.HexOrDecimal256                       `json:"baseFeePerGas,omitempty"`
+		ExcessBlobGas *math.HexOrDecimal64                        `json:"excessBlobGas,omitempty"`
+		BlobGasUsed   *math.HexOrDecimal64                        `json:"blobGasUsed,omitempty"`
 	}
 	var enc Genesis
 	enc.Config = g.Config

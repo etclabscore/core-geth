@@ -438,8 +438,9 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 	}
 	var withdrawals []*types.Withdrawal
 	if conf := g.Config; conf != nil {
-		isShangai := conf.IsEnabledByTime(g.Config.GetEIP4895TransitionTime, &g.Timestamp) || g.Config.IsEnabled(g.Config.GetEIP4895Transition, new(big.Int).SetUint64(g.Number))
-		if isShangai {
+		// EIP4895 defines the withdwrawals tx type, implemented on ETH in the Shanghai fork.
+		isEIP4895 := conf.IsEnabledByTime(g.Config.GetEIP4895TransitionTime, &g.Timestamp) || g.Config.IsEnabled(g.Config.GetEIP4895Transition, new(big.Int).SetUint64(g.Number))
+		if isEIP4895 {
 			head.WithdrawalsHash = &types.EmptyWithdrawalsHash
 			withdrawals = make([]*types.Withdrawal, 0)
 		}

@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.12.9-unstable/generated-at:2022-07-13T09:50:34-07:00</code> |
+| Source | <code>1.12.14-unstable/generated-at:2023-09-04T08:02:34-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -72,7 +72,7 @@ func (s *NetAPI) Listening() bool {
 }// Listening returns an indication if the node is listening for network connections.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2151" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2313" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -162,7 +162,7 @@ func (s *NetAPI) PeerCount() hexutil.Uint {
 }// PeerCount returns the number of connected peers
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2155" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2317" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -227,7 +227,7 @@ func (s *NetAPI) Version() string {
 }// Version returns the current ethereum protocol version.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2160" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2322" target="_">View on GitHub →</a>
 </p>
 </details>
 

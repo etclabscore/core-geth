@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.12.9-unstable/generated-at:2022-07-13T09:50:34-07:00</code> |
+| Source | <code>1.12.14-unstable/generated-at:2023-09-04T08:02:34-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -135,6 +135,12 @@ config <code>*TraceConfig</code>
 		- Tracer: 
 			- type: `string`
 
+		- TracerConfig: 
+			- media: 
+				- binaryEncoding: `base64`
+
+			- type: `string`
+
 		- overrides: 
 			- additionalProperties: `true`
 
@@ -182,6 +188,12 @@ config <code>*TraceConfig</code>
                 "type": "string"
             },
             "Tracer": {
+                "type": "string"
+            },
+            "TracerConfig": {
+                "media": {
+                    "binaryEncoding": "base64"
+                },
                 "type": "string"
             },
             "overrides": {
@@ -546,6 +558,11 @@ config <code>*TraceCallConfig</code>
 		- BlockOverrides: 
 			- additionalProperties: `false`
 			- properties: 
+				- BaseFee: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
 				- Coinbase: 
 					- pattern: `^0x[a-fA-F\d]{64}$`
 					- title: `keccak`
@@ -572,8 +589,8 @@ config <code>*TraceCallConfig</code>
 					- type: `string`
 
 				- Time: 
-					- pattern: `^0x[a-fA-F0-9]+$`
-					- title: `integer`
+					- pattern: `^0x([a-fA-F\d])+$`
+					- title: `uint64`
 					- type: `string`
 
 
@@ -661,6 +678,12 @@ config <code>*TraceCallConfig</code>
 		- Tracer: 
 			- type: `string`
 
+		- TracerConfig: 
+			- media: 
+				- binaryEncoding: `base64`
+
+			- type: `string`
+
 		- overrides: 
 			- additionalProperties: `true`
 
@@ -679,6 +702,11 @@ config <code>*TraceCallConfig</code>
             "BlockOverrides": {
                 "additionalProperties": false,
                 "properties": {
+                    "BaseFee": {
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    },
                     "Coinbase": {
                         "pattern": "^0x[a-fA-F\\d]{64}$",
                         "title": "keccak",
@@ -705,8 +733,8 @@ config <code>*TraceCallConfig</code>
                         "type": "string"
                     },
                     "Time": {
-                        "pattern": "^0x[a-fA-F0-9]+$",
-                        "title": "integer",
+                        "pattern": "^0x([a-fA-F\\d])+$",
+                        "title": "uint64",
                         "type": "string"
                     }
                 },
@@ -792,6 +820,12 @@ config <code>*TraceCallConfig</code>
                 "type": "string"
             },
             "Tracer": {
+                "type": "string"
+            },
+            "TracerConfig": {
+                "media": {
+                    "binaryEncoding": "base64"
+                },
                 "type": "string"
             },
             "overrides": {
@@ -1109,6 +1143,11 @@ config <code>*TraceCallConfig</code>
 		- BlockOverrides: 
 			- additionalProperties: `false`
 			- properties: 
+				- BaseFee: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
 				- Coinbase: 
 					- pattern: `^0x[a-fA-F\d]{64}$`
 					- title: `keccak`
@@ -1135,8 +1174,8 @@ config <code>*TraceCallConfig</code>
 					- type: `string`
 
 				- Time: 
-					- pattern: `^0x[a-fA-F0-9]+$`
-					- title: `integer`
+					- pattern: `^0x([a-fA-F\d])+$`
+					- title: `uint64`
 					- type: `string`
 
 
@@ -1224,6 +1263,12 @@ config <code>*TraceCallConfig</code>
 		- Tracer: 
 			- type: `string`
 
+		- TracerConfig: 
+			- media: 
+				- binaryEncoding: `base64`
+
+			- type: `string`
+
 		- overrides: 
 			- additionalProperties: `true`
 
@@ -1242,6 +1287,11 @@ config <code>*TraceCallConfig</code>
             "BlockOverrides": {
                 "additionalProperties": false,
                 "properties": {
+                    "BaseFee": {
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    },
                     "Coinbase": {
                         "pattern": "^0x[a-fA-F\\d]{64}$",
                         "title": "keccak",
@@ -1268,8 +1318,8 @@ config <code>*TraceCallConfig</code>
                         "type": "string"
                     },
                     "Time": {
-                        "pattern": "^0x[a-fA-F0-9]+$",
-                        "title": "integer",
+                        "pattern": "^0x([a-fA-F\\d])+$",
+                        "title": "uint64",
                         "type": "string"
                     }
                 },
@@ -1355,6 +1405,12 @@ config <code>*TraceCallConfig</code>
                 "type": "string"
             },
             "Tracer": {
+                "type": "string"
+            },
+            "TracerConfig": {
+                "media": {
+                    "binaryEncoding": "base64"
+                },
                 "type": "string"
             },
             "overrides": {
@@ -1581,6 +1637,12 @@ config <code>*TraceConfig</code>
 		- Tracer: 
 			- type: `string`
 
+		- TracerConfig: 
+			- media: 
+				- binaryEncoding: `base64`
+
+			- type: `string`
+
 		- overrides: 
 			- additionalProperties: `true`
 
@@ -1628,6 +1690,12 @@ config <code>*TraceConfig</code>
                 "type": "string"
             },
             "Tracer": {
+                "type": "string"
+            },
+            "TracerConfig": {
+                "media": {
+                    "binaryEncoding": "base64"
+                },
                 "type": "string"
             },
             "overrides": {
@@ -1842,7 +1910,7 @@ func (sub *RPCTraceSubscription) Subscribe(subscriptionName RPCTraceSubscription
 // Subscriptions are not available over HTTP; they are only available over WS, IPC, and Process connections.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L268" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L267" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1941,6 +2009,12 @@ config <code>*TraceConfig</code>
 		- Tracer: 
 			- type: `string`
 
+		- TracerConfig: 
+			- media: 
+				- binaryEncoding: `base64`
+
+			- type: `string`
+
 		- overrides: 
 			- additionalProperties: `true`
 
@@ -1988,6 +2062,12 @@ config <code>*TraceConfig</code>
                 "type": "string"
             },
             "Tracer": {
+                "type": "string"
+            },
+            "TracerConfig": {
+                "media": {
+                    "binaryEncoding": "base64"
+                },
                 "type": "string"
             },
             "overrides": {
@@ -2144,7 +2224,7 @@ func (sub *RPCTraceSubscription) Unsubscribe(id rpc.ID) error {
 }// Unsubscribe terminates an existing subscription by ID.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L259" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L258" target="_">View on GitHub →</a>
 </p>
 </details>
 

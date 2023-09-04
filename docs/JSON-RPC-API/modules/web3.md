@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.12.9-unstable/generated-at:2022-07-13T09:50:34-07:00</code> |
+| Source | <code>1.12.14-unstable/generated-at:2023-09-04T08:02:34-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -72,7 +72,7 @@ func (s *web3API) ClientVersion() string {
 }// ClientVersion returns the node name
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L324" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L329" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -200,7 +200,7 @@ func (s *web3API) Sha3(input hexutil.Bytes) hexutil.Bytes {
 // It assumes the input is hex encoded.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L330" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L335" target="_">View on GitHub →</a>
 </p>
 </details>
 

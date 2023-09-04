@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.12.9-unstable/generated-at:2022-07-13T09:50:34-07:00</code> |
+| Source | <code>1.12.14-unstable/generated-at:2023-09-04T08:02:34-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -158,6 +158,11 @@ mapstringmapstringmapstringRPCTransaction <code>map[string]map[string]map[string
 									- title: `integer`
 									- type: `string`
 
+								- yParity: 
+									- pattern: `^0x([a-fA-F\d])+$`
+									- title: `uint64`
+									- type: `string`
+
 
 							- type: `object`
 
@@ -297,6 +302,11 @@ mapstringmapstringmapstringRPCTransaction <code>map[string]map[string]map[string
                                         "pattern": "^0x[a-fA-F0-9]+$",
                                         "title": "integer",
                                         "type": "string"
+                                    },
+                                    "yParity": {
+                                        "pattern": "^0x([a-fA-F\\d])+$",
+                                        "title": "uint64",
+                                        "type": "string"
                                     }
                                 },
                                 "type": "object"
@@ -355,21 +365,21 @@ func (s *TxPoolAPI) Content() map // Content returns the transactions contained 
 	for account, txs := range pending {
 		dump := make(map[string]*RPCTransaction)
 		for _, tx := range txs {
-			dump[fmt.Sprintf("%d", tx.Nonce())] = newRPCPendingTransaction(tx, curHeader, s.b.ChainConfig())
+			dump[fmt.Sprintf("%d", tx.Nonce())] = NewRPCPendingTransaction(tx, curHeader, s.b.ChainConfig())
 		}
 		content["pending"][account.Hex()] = dump
 	}
 	for account, txs := range queue {
 		dump := make(map[string]*RPCTransaction)
 		for _, tx := range txs {
-			dump[fmt.Sprintf("%d", tx.Nonce())] = newRPCPendingTransaction(tx, curHeader, s.b.ChainConfig())
+			dump[fmt.Sprintf("%d", tx.Nonce())] = NewRPCPendingTransaction(tx, curHeader, s.b.ChainConfig())
 		}
 		content["queued"][account.Hex()] = dump
 	}
 	return content
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L163" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L166" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -554,6 +564,11 @@ mapstringmapstringRPCTransaction <code>map[string]map[string]*RPCTransaction</co
 							- title: `integer`
 							- type: `string`
 
+						- yParity: 
+							- pattern: `^0x([a-fA-F\d])+$`
+							- title: `uint64`
+							- type: `string`
+
 
 					- type: `object`
 
@@ -688,6 +703,11 @@ mapstringmapstringRPCTransaction <code>map[string]map[string]*RPCTransaction</co
                                 "pattern": "^0x[a-fA-F0-9]+$",
                                 "title": "integer",
                                 "type": "string"
+                            },
+                            "yParity": {
+                                "pattern": "^0x([a-fA-F\\d])+$",
+                                "title": "uint64",
+                                "type": "string"
                             }
                         },
                         "type": "object"
@@ -742,18 +762,18 @@ func (s *TxPoolAPI) ContentFrom(addr common.Address) map // ContentFrom returns 
 	curHeader := s.b.CurrentHeader()
 	dump := make(map[string]*RPCTransaction, len(pending))
 	for _, tx := range pending {
-		dump[fmt.Sprintf("%d", tx.Nonce())] = newRPCPendingTransaction(tx, curHeader, s.b.ChainConfig())
+		dump[fmt.Sprintf("%d", tx.Nonce())] = NewRPCPendingTransaction(tx, curHeader, s.b.ChainConfig())
 	}
 	content["pending"] = dump
 	dump = make(map[string]*RPCTransaction, len(queue))
 	for _, tx := range queue {
-		dump[fmt.Sprintf("%d", tx.Nonce())] = newRPCPendingTransaction(tx, curHeader, s.b.ChainConfig())
+		dump[fmt.Sprintf("%d", tx.Nonce())] = NewRPCPendingTransaction(tx, curHeader, s.b.ChainConfig())
 	}
 	content["queued"] = dump
 	return content
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L190" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L193" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -891,7 +911,7 @@ func (s *TxPoolAPI) Inspect() map // Inspect retrieves the content of the transa
 	return content
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L223" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L226" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -991,7 +1011,7 @@ func (s *TxPoolAPI) Status() map // Status returns the number of pending and que
 	return map[string]hexutil.Uint{"pending": hexutil.Uint(pending), "queued": hexutil.Uint(queue)}
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L213" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L216" target="_">View on GitHub →</a>
 </p>
 </details>
 

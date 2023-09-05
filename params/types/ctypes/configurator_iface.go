@@ -196,6 +196,18 @@ type ProtocolSpecifier interface {
 	GetEIP6049TransitionTime() *uint64
 	SetEIP6049TransitionTime(n *uint64) error
 
+	// Shanghai expressed as block activation numbers:
+	GetEIP3651Transition() *uint64
+	SetEIP3651Transition(n *uint64) error
+	GetEIP3855Transition() *uint64
+	SetEIP3855Transition(n *uint64) error
+	GetEIP3860Transition() *uint64
+	SetEIP3860Transition(n *uint64) error
+	GetEIP4895Transition() *uint64
+	SetEIP4895Transition(n *uint64) error
+	GetEIP6049Transition() *uint64
+	SetEIP6049Transition(n *uint64) error
+
 	// GetMergeVirtualTransition is a Virtual fork after The Merge to use as a network splitter
 	GetMergeVirtualTransition() *uint64
 	SetMergeVirtualTransition(n *uint64) error

@@ -193,7 +193,7 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, isPostMerge bool, 
 	if config.IsEnabled(config.GetEIP3198Transition, bn) {
 		enable3198(instructionSet) // BASEFEE opcode https://eips.ethereum.org/EIPS/eip-3198
 	}
-	if isPostMerge {
+	if isPostMerge || config.IsEnabled(config.GetEIP4399Transition, bn) { // EIP4399: Supplant DIFFICULTY opcode with PREVRANDAO (ETH @ PoS)
 		instructionSet[PREVRANDAO] = &operation{
 			execute:     opRandom,
 			constantGas: GasQuickStep,
@@ -203,10 +203,10 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, isPostMerge bool, 
 	}
 
 	// Shangai
-	if config.IsEnabledByTime(config.GetEIP3855TransitionTime, bt) {
+	if config.IsEnabledByTime(config.GetEIP3855TransitionTime, bt) || config.IsEnabled(config.GetEIP3855Transition, bn) {
 		enable3855(instructionSet) // PUSH0 instruction
 	}
-	if config.IsEnabledByTime(config.GetEIP3860TransitionTime, bt) {
+	if config.IsEnabledByTime(config.GetEIP3860TransitionTime, bt) || config.IsEnabled(config.GetEIP3860Transition, bn) {
 		enable3860(instructionSet) // Limit and meter initcode
 	}
 

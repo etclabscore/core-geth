@@ -276,7 +276,7 @@ func Transition(ctx *cli.Context) error {
 		}
 	}
 	// Withdrawals are only valid in Shanghai; EIP-4895.
-	if chainConfig.IsEnabledByTime(chainConfig.GetEIP4895TransitionTime, &prestate.Env.Number) && prestate.Env.Withdrawals == nil {
+	if (chainConfig.IsEnabledByTime(chainConfig.GetEIP4895TransitionTime, &prestate.Env.Timestamp) || chainConfig.IsEnabled(chainConfig.GetEIP4895Transition, new(big.Int).SetUint64(prestate.Env.Number))) && prestate.Env.Withdrawals == nil {
 		return NewError(ErrorConfig, errors.New("Shanghai config but missing 'withdrawals' in env section"))
 	}
 	isMerged := chainConfig.GetEthashTerminalTotalDifficulty() != nil && chainConfig.GetEthashTerminalTotalDifficulty().BitLen() == 0

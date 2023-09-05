@@ -33,6 +33,7 @@ import (
 // be built.
 type PayloadAttributes struct {
 	Timestamp             uint64              `json:"timestamp"             gencodec:"required"`
+	Number                *uint64             `json:"blockNumber,omitempty"`
 	Random                common.Hash         `json:"prevRandao"            gencodec:"required"`
 	SuggestedFeeRecipient common.Address      `json:"suggestedFeeRecipient" gencodec:"required"`
 	Withdrawals           []*types.Withdrawal `json:"withdrawals"`

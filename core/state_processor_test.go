@@ -451,7 +451,7 @@ func GenerateBadBlock(parent *types.Block, engine consensus.Engine, txs types.Tr
 	if config.IsEnabled(config.GetEIP1559Transition, header.Number) {
 		header.BaseFee = eip1559.CalcBaseFee(config, parent.Header())
 	}
-	if config.IsEnabledByTime(config.GetEIP4895TransitionTime, &header.Time) {
+	if config.IsEnabledByTime(config.GetEIP4895TransitionTime, &header.Time) || config.IsEnabled(config.GetEIP4895Transition, header.Number) {
 		header.WithdrawalsHash = &types.EmptyWithdrawalsHash
 	}
 	var receipts []*types.Receipt
@@ -485,7 +485,7 @@ func GenerateBadBlock(parent *types.Block, engine consensus.Engine, txs types.Tr
 		header.BlobGasUsed = &used
 	}
 	// Assemble and return the final block for sealing
-	if config.IsEnabledByTime(config.GetEIP4895TransitionTime, &header.Time) {
+	if config.IsEnabledByTime(config.GetEIP4895TransitionTime, &header.Time) || config.IsEnabled(config.GetEIP4895Transition, header.Number) {
 		return types.NewBlockWithWithdrawals(header, txs, nil, receipts, []*types.Withdrawal{}, trie.NewStackTrie(nil))
 	}
 	return types.NewBlock(header, txs, nil, receipts, trie.NewStackTrie(nil))

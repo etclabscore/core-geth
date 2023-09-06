@@ -17,12 +17,14 @@ var _ = (*payloadAttributesMarshaling)(nil)
 func (p PayloadAttributes) MarshalJSON() ([]byte, error) {
 	type PayloadAttributes struct {
 		Timestamp             hexutil.Uint64      `json:"timestamp"             gencodec:"required"`
+		Number                *uint64             `json:"blockNumber,omitempty"`
 		Random                common.Hash         `json:"prevRandao"            gencodec:"required"`
 		SuggestedFeeRecipient common.Address      `json:"suggestedFeeRecipient" gencodec:"required"`
 		Withdrawals           []*types.Withdrawal `json:"withdrawals"`
 	}
 	var enc PayloadAttributes
 	enc.Timestamp = hexutil.Uint64(p.Timestamp)
+	enc.Number = p.Number
 	enc.Random = p.Random
 	enc.SuggestedFeeRecipient = p.SuggestedFeeRecipient
 	enc.Withdrawals = p.Withdrawals
@@ -33,6 +35,7 @@ func (p PayloadAttributes) MarshalJSON() ([]byte, error) {
 func (p *PayloadAttributes) UnmarshalJSON(input []byte) error {
 	type PayloadAttributes struct {
 		Timestamp             *hexutil.Uint64     `json:"timestamp"             gencodec:"required"`
+		Number                *uint64             `json:"blockNumber,omitempty"`
 		Random                *common.Hash        `json:"prevRandao"            gencodec:"required"`
 		SuggestedFeeRecipient *common.Address     `json:"suggestedFeeRecipient" gencodec:"required"`
 		Withdrawals           []*types.Withdrawal `json:"withdrawals"`
@@ -45,6 +48,9 @@ func (p *PayloadAttributes) UnmarshalJSON(input []byte) error {
 		return errors.New("missing required field 'timestamp' for PayloadAttributes")
 	}
 	p.Timestamp = uint64(*dec.Timestamp)
+	if dec.Number != nil {
+		p.Number = dec.Number
+	}
 	if dec.Random == nil {
 		return errors.New("missing required field 'prevRandao' for PayloadAttributes")
 	}

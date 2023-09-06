@@ -8,7 +8,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
-	"github.com/ethereum/go-ethereum/core/txpool"
+	"github.com/ethereum/go-ethereum/core/txpool/blobpool"
+	"github.com/ethereum/go-ethereum/core/txpool/legacypool"
 	"github.com/ethereum/go-ethereum/eth/downloader"
 	"github.com/ethereum/go-ethereum/eth/gasprice"
 	"github.com/ethereum/go-ethereum/miner"
@@ -45,8 +46,6 @@ func (c Config) MarshalTOML() (interface{}, error) {
 		DatabaseFreezer         string
 		DatabaseFreezerRemote   string
 		TrieCleanCache          int
-		TrieCleanCacheJournal   string        `toml:",omitempty"`
-		TrieCleanCacheRejournal time.Duration `toml:",omitempty"`
 		TrieDirtyCache          int
 		TrieTimeout             time.Duration
 		SnapshotCache           int
@@ -54,7 +53,8 @@ func (c Config) MarshalTOML() (interface{}, error) {
 		FilterLogCacheSize      int
 		Miner                   miner.Config
 		Ethash                  ethash.Config
-		TxPool                  txpool.Config
+		TxPool                  legacypool.Config
+		BlobPool                blobpool.Config
 		GPO                     gasprice.Config
 		EnablePreimageRecording bool
 		DocRoot                 string `toml:"-"`
@@ -68,6 +68,8 @@ func (c Config) MarshalTOML() (interface{}, error) {
 		ECBP1100                *big.Int
 		ECBP1100NoDisable       *bool   `toml:",omitempty"`
 		OverrideShanghai        *uint64 `toml:",omitempty"`
+		OverrideCancun          *uint64 `toml:",omitempty"`
+		OverrideVerkle          *uint64 `toml:",omitempty"`
 	}
 	var enc Config
 	enc.Genesis = c.Genesis
@@ -96,8 +98,6 @@ func (c Config) MarshalTOML() (interface{}, error) {
 	enc.DatabaseFreezer = c.DatabaseFreezer
 	enc.DatabaseFreezerRemote = c.DatabaseFreezerRemote
 	enc.TrieCleanCache = c.TrieCleanCache
-	enc.TrieCleanCacheJournal = c.TrieCleanCacheJournal
-	enc.TrieCleanCacheRejournal = c.TrieCleanCacheRejournal
 	enc.TrieDirtyCache = c.TrieDirtyCache
 	enc.TrieTimeout = c.TrieTimeout
 	enc.SnapshotCache = c.SnapshotCache
@@ -106,6 +106,7 @@ func (c Config) MarshalTOML() (interface{}, error) {
 	enc.Miner = c.Miner
 	enc.Ethash = c.Ethash
 	enc.TxPool = c.TxPool
+	enc.BlobPool = c.BlobPool
 	enc.GPO = c.GPO
 	enc.EnablePreimageRecording = c.EnablePreimageRecording
 	enc.DocRoot = c.DocRoot
@@ -119,6 +120,8 @@ func (c Config) MarshalTOML() (interface{}, error) {
 	enc.ECBP1100 = c.ECBP1100
 	enc.ECBP1100NoDisable = c.ECBP1100NoDisable
 	enc.OverrideShanghai = c.OverrideShanghai
+	enc.OverrideCancun = c.OverrideCancun
+	enc.OverrideVerkle = c.OverrideVerkle
 	return &enc, nil
 }
 
@@ -151,8 +154,6 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 		DatabaseFreezer         *string
 		DatabaseFreezerRemote   *string
 		TrieCleanCache          *int
-		TrieCleanCacheJournal   *string        `toml:",omitempty"`
-		TrieCleanCacheRejournal *time.Duration `toml:",omitempty"`
 		TrieDirtyCache          *int
 		TrieTimeout             *time.Duration
 		SnapshotCache           *int
@@ -160,7 +161,8 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 		FilterLogCacheSize      *int
 		Miner                   *miner.Config
 		Ethash                  *ethash.Config
-		TxPool                  *txpool.Config
+		TxPool                  *legacypool.Config
+		BlobPool                *blobpool.Config
 		GPO                     *gasprice.Config
 		EnablePreimageRecording *bool
 		DocRoot                 *string `toml:"-"`
@@ -174,6 +176,8 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 		ECBP1100                *big.Int
 		ECBP1100NoDisable       *bool   `toml:",omitempty"`
 		OverrideShanghai        *uint64 `toml:",omitempty"`
+		OverrideCancun          *uint64 `toml:",omitempty"`
+		OverrideVerkle          *uint64 `toml:",omitempty"`
 	}
 	var dec Config
 	if err := unmarshal(&dec); err != nil {
@@ -257,12 +261,6 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 	if dec.TrieCleanCache != nil {
 		c.TrieCleanCache = *dec.TrieCleanCache
 	}
-	if dec.TrieCleanCacheJournal != nil {
-		c.TrieCleanCacheJournal = *dec.TrieCleanCacheJournal
-	}
-	if dec.TrieCleanCacheRejournal != nil {
-		c.TrieCleanCacheRejournal = *dec.TrieCleanCacheRejournal
-	}
 	if dec.TrieDirtyCache != nil {
 		c.TrieDirtyCache = *dec.TrieDirtyCache
 	}
@@ -286,6 +284,9 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 	}
 	if dec.TxPool != nil {
 		c.TxPool = *dec.TxPool
+	}
+	if dec.BlobPool != nil {
+		c.BlobPool = *dec.BlobPool
 	}
 	if dec.GPO != nil {
 		c.GPO = *dec.GPO
@@ -325,6 +326,12 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 	}
 	if dec.OverrideShanghai != nil {
 		c.OverrideShanghai = dec.OverrideShanghai
+	}
+	if dec.OverrideCancun != nil {
+		c.OverrideCancun = dec.OverrideCancun
+	}
+	if dec.OverrideVerkle != nil {
+		c.OverrideVerkle = dec.OverrideVerkle
 	}
 	return nil
 }

@@ -296,8 +296,8 @@ func testGetCode(t *testing.T, protocol int) {
 	for i := uint64(0); i <= bc.CurrentBlock().Number.Uint64(); i++ {
 		header := bc.GetHeaderByNumber(i)
 		req := &CodeReq{
-			BHash:  header.Hash(),
-			AccKey: crypto.Keccak256(testContractAddr[:]),
+			BHash:          header.Hash(),
+			AccountAddress: testContractAddr[:],
 		}
 		codereqs = append(codereqs, req)
 		if i >= testContractDeployed {
@@ -332,8 +332,8 @@ func testGetStaleCode(t *testing.T, protocol int) {
 
 	check := func(number uint64, expected [][]byte) {
 		req := &CodeReq{
-			BHash:  bc.GetHeaderByNumber(number).Hash(),
-			AccKey: crypto.Keccak256(testContractAddr[:]),
+			BHash:          bc.GetHeaderByNumber(number).Hash(),
+			AccountAddress: testContractAddr[:],
 		}
 		sendRequest(rawPeer.app, GetCodeMsg, 42, []*CodeReq{req})
 		if err := expectResponse(rawPeer.app, CodeMsg, 42, testBufLimit, expected); err != nil {
@@ -415,7 +415,7 @@ func testGetProofs(t *testing.T, protocol int) {
 				Key:   crypto.Keccak256(acc[:]),
 			}
 			proofreqs = append(proofreqs, req)
-			trie.Prove(crypto.Keccak256(acc[:]), 0, proofsV2)
+			trie.Prove(crypto.Keccak256(acc[:]), proofsV2)
 		}
 	}
 	// Send the proof request and verify the response
@@ -459,7 +459,7 @@ func testGetStaleProof(t *testing.T, protocol int) {
 		if wantOK {
 			proofsV2 := light.NewNodeSet()
 			t, _ := trie.New(trie.StateTrieID(header.Root), trie.NewDatabase(server.db))
-			t.Prove(account, 0, proofsV2)
+			t.Prove(account, proofsV2)
 			expected = proofsV2.NodeList()
 		}
 		if err := expectResponse(rawPeer.app, ProofsV2Msg, 42, testBufLimit, expected); err != nil {
@@ -515,7 +515,7 @@ func testGetCHTProofs(t *testing.T, protocol int) {
 	}
 	root := light.GetChtRoot(server.db, 0, bc.GetHeaderByNumber(config.ChtSize-1).Hash())
 	trie, _ := trie.New(trie.TrieID(root), trie.NewDatabase(rawdb.NewTable(server.db, string(rawdb.ChtTablePrefix))))
-	trie.Prove(key, 0, &proofsV2.Proofs)
+	trie.Prove(key, &proofsV2.Proofs)
 	// Assemble the requests for the different protocols
 	requestsV2 := []HelperTrieReq{{
 		Type:    htCanonical,
@@ -580,7 +580,7 @@ func testGetBloombitsProofs(t *testing.T, protocol int) {
 
 		root := light.GetBloomTrieRoot(server.db, 0, bc.GetHeaderByNumber(config.BloomTrieSize-1).Hash())
 		trie, _ := trie.New(trie.TrieID(root), trie.NewDatabase(rawdb.NewTable(server.db, string(rawdb.BloomTrieTablePrefix))))
-		trie.Prove(key, 0, &proofs.Proofs)
+		trie.Prove(key, &proofs.Proofs)
 
 		// Send the proof request and verify the response
 		sendRequest(rawPeer.app, GetHelperTrieProofsMsg, 42, requests)
@@ -612,6 +612,8 @@ func testTransactionStatus(t *testing.T, protocol int) {
 	var reqID uint64
 
 	test := func(tx *types.Transaction, send bool, expStatus light.TxStatus) {
+		t.Helper()
+
 		reqID++
 		if send {
 			sendRequest(rawPeer.app, SendTxV2Msg, reqID, types.Transactions{tx})
@@ -619,14 +621,14 @@ func testTransactionStatus(t *testing.T, protocol int) {
 			sendRequest(rawPeer.app, GetTxStatusMsg, reqID, []common.Hash{tx.Hash()})
 		}
 		if err := expectResponse(rawPeer.app, TxStatusMsg, reqID, testBufLimit, []light.TxStatus{expStatus}); err != nil {
-			t.Errorf("transaction status mismatch")
+			t.Errorf("transaction status mismatch: %v", err)
 		}
 	}
 	signer := types.HomesteadSigner{}
 
 	// test error status by sending an underpriced transaction
 	tx0, _ := types.SignTx(types.NewTransaction(0, userAddr1, big.NewInt(10000), vars.TxGas, nil, nil), signer, bankKey)
-	test(tx0, true, light.TxStatus{Status: txpool.TxStatusUnknown, Error: txpool.ErrUnderpriced.Error()})
+	test(tx0, true, light.TxStatus{Status: txpool.TxStatusUnknown, Error: "transaction underpriced: tip needed 1, tip permitted 0"})
 
 	tx1, _ := types.SignTx(types.NewTransaction(0, userAddr1, big.NewInt(10000), vars.TxGas, big.NewInt(100000000000), nil), signer, bankKey)
 	test(tx1, false, light.TxStatus{Status: txpool.TxStatusUnknown}) // query before sending, should be unknown

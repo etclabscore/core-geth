@@ -31,7 +31,8 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/clique"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/consensus/lyra2"
-	"github.com/ethereum/go-ethereum/core/txpool"
+	"github.com/ethereum/go-ethereum/core/txpool/blobpool"
+	"github.com/ethereum/go-ethereum/core/txpool/legacypool"
 	"github.com/ethereum/go-ethereum/eth/downloader"
 	"github.com/ethereum/go-ethereum/eth/gasprice"
 	"github.com/ethereum/go-ethereum/ethdb"
@@ -75,25 +76,24 @@ var Defaults = Config{
 		DatasetsOnDisk:   2,
 		DatasetsLockMmap: false,
 	},
-	NetworkId:               vars.DefaultNetworkID,
-	ProtocolVersions:        vars.DefaultProtocolVersions,
-	TxLookupLimit:           2350000,
-	LightPeers:              100,
-	UltraLightFraction:      75,
-	DatabaseCache:           512,
-	TrieCleanCache:          154,
-	TrieCleanCacheJournal:   "triecache",
-	TrieCleanCacheRejournal: 60 * time.Minute,
-	TrieDirtyCache:          256,
-	TrieTimeout:             60 * time.Minute,
-	SnapshotCache:           102,
-	FilterLogCacheSize:      32,
-	Miner:                   miner.DefaultConfig,
-	TxPool:                  txpool.DefaultConfig,
-	RPCGasCap:               50000000,
-	RPCEVMTimeout:           5 * time.Second,
-	GPO:                     FullNodeGPO,
-	RPCTxFeeCap:             1, // 1 ether
+	NetworkId:          vars.DefaultNetworkID,
+	ProtocolVersions:   vars.DefaultProtocolVersions,
+	TxLookupLimit:      2350000,
+	LightPeers:         100,
+	UltraLightFraction: 75,
+	DatabaseCache:      512,
+	TrieCleanCache:     154,
+	TrieDirtyCache:     256,
+	TrieTimeout:        60 * time.Minute,
+	SnapshotCache:      102,
+	FilterLogCacheSize: 32,
+	Miner:              miner.DefaultConfig,
+	TxPool:             legacypool.DefaultConfig,
+	BlobPool:           blobpool.DefaultConfig,
+	RPCGasCap:          50000000,
+	RPCEVMTimeout:      5 * time.Second,
+	GPO:                FullNodeGPO,
+	RPCTxFeeCap:        1, // 1 ether
 }
 
 func init() {
@@ -166,13 +166,11 @@ type Config struct {
 	DatabaseFreezer       string
 	DatabaseFreezerRemote string
 
-	TrieCleanCache          int
-	TrieCleanCacheJournal   string        `toml:",omitempty"` // Disk journal directory for trie cache to survive node restarts
-	TrieCleanCacheRejournal time.Duration `toml:",omitempty"` // Time interval to regenerate the journal for clean cache
-	TrieDirtyCache          int
-	TrieTimeout             time.Duration
-	SnapshotCache           int
-	Preimages               bool
+	TrieCleanCache int
+	TrieDirtyCache int
+	TrieTimeout    time.Duration
+	SnapshotCache  int
+	Preimages      bool
 
 	// This is the number of blocks for which logs will be cached in the filter system.
 	FilterLogCacheSize int
@@ -184,7 +182,8 @@ type Config struct {
 	Ethash ethash.Config
 
 	// Transaction pool options
-	TxPool txpool.Config
+	TxPool   legacypool.Config
+	BlobPool blobpool.Config
 
 	// Gas Price Oracle options
 	GPO gasprice.Config
@@ -226,6 +225,12 @@ type Config struct {
 
 	// OverrideShanghai (TODO: remove after the fork)
 	OverrideShanghai *uint64 `toml:",omitempty"`
+
+	// OverrideCancun (TODO: remove after the fork)
+	OverrideCancun *uint64 `toml:",omitempty"`
+
+	// OverrideVerkle (TODO: remove after the fork)
+	OverrideVerkle *uint64 `toml:",omitempty"`
 }
 
 // CreateConsensusEngine creates a consensus engine for the given chain configuration.

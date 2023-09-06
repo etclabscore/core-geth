@@ -196,14 +196,38 @@ type ProtocolSpecifier interface {
 	GetEIP6049TransitionTime() *uint64
 	SetEIP6049TransitionTime(n *uint64) error
 
+	// Shanghai expressed as block activation numbers:
+	GetEIP3651Transition() *uint64
+	SetEIP3651Transition(n *uint64) error
+	GetEIP3855Transition() *uint64
+	SetEIP3855Transition(n *uint64) error
+	GetEIP3860Transition() *uint64
+	SetEIP3860Transition(n *uint64) error
+	GetEIP4895Transition() *uint64
+	SetEIP4895Transition(n *uint64) error
+	GetEIP6049Transition() *uint64
+	SetEIP6049Transition(n *uint64) error
+
 	// GetMergeVirtualTransition is a Virtual fork after The Merge to use as a network splitter
 	GetMergeVirtualTransition() *uint64
 	SetMergeVirtualTransition(n *uint64) error
 
 	// Cancun:
-	// 4844 - Shard Blob Transactions - https://eips.ethereum.org/EIPS/eip-4844
+	// EIP4844 - Shard Blob Transactions - https://eips.ethereum.org/EIPS/eip-4844
 	GetEIP4844TransitionTime() *uint64
 	SetEIP4844TransitionTime(n *uint64) error
+
+	// EIP1153 - Transient Storage opcodes - https://eips.ethereum.org/EIPS/eip-1153
+	GetEIP1153TransitionTime() *uint64
+	SetEIP1153TransitionTime(n *uint64) error
+
+	// EIP5656 - MCOPY - Memory copying instruction - https://eips.ethereum.org/EIPS/eip-5656
+	GetEIP5656TransitionTime() *uint64
+	SetEIP5656TransitionTime(n *uint64) error
+
+	// EIP6780 - SELFDESTRUCT only in same transaction - https://eips.ethereum.org/EIPS/eip-6780
+	GetEIP6780TransitionTime() *uint64
+	SetEIP6780TransitionTime(n *uint64) error
 }
 
 type Forker interface {
@@ -222,6 +246,9 @@ type Forker interface {
 type ConsensusEnginator interface {
 	GetConsensusEngineType() ConsensusEngineT
 	MustSetConsensusEngineType(t ConsensusEngineT) error
+	GetIsDevMode() bool
+	SetDevMode(devMode bool) error
+
 	EthashConfigurator
 	CliqueConfigurator
 	Lyra2Configurator

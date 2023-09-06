@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.12.9-unstable/generated-at:2022-07-13T09:50:34-07:00</code> |
+| Source | <code>1.12.14-unstable/generated-at:2023-09-04T08:02:34-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -17,7 +17,7 @@
 
 ### personal_deriveAccount
 
-DeriveAccount requests a HD wallet to derive a new account, optionally pinning
+DeriveAccount requests an HD wallet to derive a new account, optionally pinning
 it for later reuse.
 
 
@@ -169,11 +169,11 @@ func (s *PersonalAccountAPI) DeriveAccount(url string, path string, pin *bool) (
 		pin = new(bool)
 	}
 	return wallet.Derive(derivPath, *pin)
-}// DeriveAccount requests a HD wallet to derive a new account, optionally pinning
+}// DeriveAccount requests an HD wallet to derive a new account, optionally pinning
 // it for later reuse.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L341" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L344" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -342,7 +342,7 @@ func (s *PersonalAccountAPI) EcRecover(ctx context.Context, data, sig hexutil.By
 		return common.Address{}, fmt.Errorf("signature must be %d bytes long", crypto.SignatureLength)
 	}
 	if sig[crypto.RecoveryIDOffset] != 27 && sig[crypto.RecoveryIDOffset] != 28 {
-		return common.Address{}, fmt.Errorf("invalid Ethereum signature (V is not 27 or 28)")
+		return common.Address{}, errors.New("invalid Ethereum signature (V is not 27 or 28)")
 	}
 	sig[crypto.RecoveryIDOffset] -= 27
 	rpk, err := crypto.SigToPub(accounts.TextHash(data), sig)
@@ -362,7 +362,7 @@ func (s *PersonalAccountAPI) EcRecover(ctx context.Context, data, sig hexutil.By
 // https://github.com/ethereum/go-ethereum/wiki/Management-APIs#personal_ecRecover
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L546" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L549" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -483,7 +483,7 @@ func (s *PersonalAccountAPI) ImportRawKey(privkey string, password string) (comm
 // encrypting it with the passphrase.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L382" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L386" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -573,11 +573,11 @@ func (s *PersonalAccountAPI) InitializeWallet(ctx context.Context, url string) (
 	case *scwallet.Wallet:
 		return mnemonic, wallet.Initialize(seed)
 	default:
-		return "", fmt.Errorf("specified wallet does not support initialization")
+		return "", errors.New("specified wallet does not support initialization")
 	}
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L563" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L566" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -678,7 +678,7 @@ func (s *PersonalAccountAPI) ListAccounts() [ // ListAccounts will return a list
 	return s.am.Accounts()
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L291" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L294" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -858,7 +858,7 @@ func (s *PersonalAccountAPI) ListWallets() [ // ListWallets will return a list o
 	return wallets
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L305" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L308" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -962,7 +962,7 @@ func (s *PersonalAccountAPI) LockAccount(addr common.Address) bool {
 }// LockAccount will lock the account associated with the given address when it's unlocked.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L427" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L431" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -995,7 +995,7 @@ password <code>string</code>
 
 
 
-<code>common.Address</code> 
+<code>common.AddressEIP55</code> 
 
   + Required: ✓ Yes
 
@@ -1004,10 +1004,17 @@ password <code>string</code>
 
 	``` Schema
 	
-	- description: `Hex representation of a Keccak 256 hash POINTER`
-	- pattern: `^0x[a-fA-F\d]{64}$`
-	- title: `keccak`
-	- type: string
+	- items: 
+
+			- description: `Hex representation of the integer`
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: string
+
+
+	- maxItems: `20`
+	- minItems: `20`
+	- type: array
 
 
 	```
@@ -1016,11 +1023,20 @@ password <code>string</code>
 
 	``` Raw
 	{
-        "description": "Hex representation of a Keccak 256 hash POINTER",
-        "pattern": "^0x[a-fA-F\\d]{64}$",
-        "title": "keccak",
+        "items": [
+            {
+                "description": "Hex representation of the integer",
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": [
+                    "string"
+                ]
+            }
+        ],
+        "maxItems": 20,
+        "minItems": 20,
         "type": [
-            "string"
+            "array"
         ]
     }
 	```
@@ -1058,23 +1074,24 @@ password <code>string</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PersonalAccountAPI) NewAccount(password string) (common.Address, error) {
+func (s *PersonalAccountAPI) NewAccount(password string) (common.AddressEIP55, error) {
 	ks, err := fetchKeystore(s.am)
 	if err != nil {
-		return common.Address{}, err
+		return common.AddressEIP55{}, err
 	}
 	acc, err := ks.NewAccount(password)
 	if err == nil {
-		log.Info("Your new key was generated", "address", acc.Address)
+		addrEIP55 := common.AddressEIP55(acc.Address)
+		log.Info("Your new key was generated", "address", addrEIP55.String())
 		log.Warn("Please backup your key file!", "path", acc.URL.Path)
 		log.Warn("Please remember your password!")
-		return acc.Address, nil
+		return addrEIP55, nil
 	}
-	return common.Address{}, err
+	return common.AddressEIP55{}, err
 }// NewAccount will create a new account and returns the address for the new account.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L357" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L360" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1165,7 +1182,7 @@ func (s *PersonalAccountAPI) OpenWallet(url string, passphrase *string) error {
 // Trezor PIN matrix challenge).
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L327" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L330" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1469,7 +1486,7 @@ func (s *PersonalAccountAPI) SendTransaction(ctx context.Context, args Transacti
 // passwd isn't able to decrypt the key it fails.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L457" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L461" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1665,7 +1682,7 @@ func (s *PersonalAccountAPI) Sign(ctx context.Context, data hexutil.Bytes, addr 
 // https://github.com/ethereum/go-ethereum/wiki/Management-APIs#personal_sign
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L518" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L521" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1974,16 +1991,16 @@ passwd <code>string</code>
 ```go
 func (s *PersonalAccountAPI) SignTransaction(ctx context.Context, args TransactionArgs, passwd string) (*SignTransactionResult, error) {
 	if args.From == nil {
-		return nil, fmt.Errorf("sender not specified")
+		return nil, errors.New("sender not specified")
 	}
 	if args.Gas == nil {
-		return nil, fmt.Errorf("gas not specified")
+		return nil, errors.New("gas not specified")
 	}
 	if args.GasPrice == nil && (args.MaxFeePerGas == nil || args.MaxPriorityFeePerGas == nil) {
-		return nil, fmt.Errorf("missing gasPrice or maxFeePerGas/maxPriorityFeePerGas")
+		return nil, errors.New("missing gasPrice or maxFeePerGas/maxPriorityFeePerGas")
 	}
 	if args.Nonce == nil {
-		return nil, fmt.Errorf("nonce not specified")
+		return nil, errors.New("nonce not specified")
 	}
 	tx := args.toTransaction()
 	if err := checkTxFee(tx.GasPrice(), tx.Gas(), s.b.RPCTxFeeCap()); err != nil {
@@ -2005,7 +2022,7 @@ func (s *PersonalAccountAPI) SignTransaction(ctx context.Context, args Transacti
 // to other nodes
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L476" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L480" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2173,7 +2190,7 @@ func (s *PersonalAccountAPI) UnlockAccount(ctx context.Context, addr common.Addr
 // default of 300 seconds. It returns an indication if the account was unlocked.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L398" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L402" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2255,11 +2272,11 @@ func (s *PersonalAccountAPI) Unpair(ctx context.Context, url string, pin string)
 	case *scwallet.Wallet:
 		return wallet.Unpair([]byte(pin))
 	default:
-		return fmt.Errorf("specified wallet does not support pairing")
+		return errors.New("specified wallet does not support pairing")
 	}
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L590" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L593" target="_">View on GitHub →</a>
 </p>
 </details>
 

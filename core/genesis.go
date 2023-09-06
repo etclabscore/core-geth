@@ -42,6 +42,8 @@ var errGenesisNoConfig = errors.New("genesis has no chain configuration")
 // ChainOverrides contains the changes to chain config.
 type ChainOverrides struct {
 	OverrideShanghai *uint64
+	OverrideCancun   *uint64
+	OverrideVerkle   *uint64
 }
 
 func ReadGenesis(db ethdb.Database) (*genesisT.Genesis, error) {
@@ -52,7 +54,7 @@ func ReadGenesis(db ethdb.Database) (*genesisT.Genesis, error) {
 	}
 	blob := rawdb.ReadGenesisStateSpec(db, stored)
 	if blob == nil {
-		return nil, fmt.Errorf("genesis state missing from db")
+		return nil, errors.New("genesis state missing from db")
 	}
 	if len(blob) != 0 {
 		if err := genesis.Alloc.UnmarshalJSON(blob); err != nil {
@@ -61,11 +63,11 @@ func ReadGenesis(db ethdb.Database) (*genesisT.Genesis, error) {
 	}
 	genesis.Config = rawdb.ReadChainConfig(db, stored)
 	if genesis.Config == nil {
-		return nil, fmt.Errorf("genesis config missing from db")
+		return nil, errors.New("genesis config missing from db")
 	}
 	genesisBlock := rawdb.ReadBlock(db, stored, 0)
 	if genesisBlock == nil {
-		return nil, fmt.Errorf("genesis block missing from db")
+		return nil, errors.New("genesis block missing from db")
 	}
 	genesisHeader := genesisBlock.Header()
 	genesis.Nonce = genesisHeader.Nonce.Uint64()
@@ -75,6 +77,9 @@ func ReadGenesis(db ethdb.Database) (*genesisT.Genesis, error) {
 	genesis.Difficulty = genesisHeader.Difficulty
 	genesis.Mixhash = genesisHeader.MixDigest
 	genesis.Coinbase = genesisHeader.Coinbase
+	genesis.BaseFee = genesisHeader.BaseFee
+	genesis.ExcessBlobGas = genesisHeader.ExcessBlobGas
+	genesis.BlobGasUsed = genesisHeader.BlobGasUsed
 
 	return &genesis, nil
 }
@@ -91,12 +96,20 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, gen
 
 	applyOverrides := func(config ctypes.ChainConfigurator) {
 		if config != nil {
+			// Block-based overrides are not provided because Shanghai is
+			// ETH-network specific and that protocol is defined exclusively in time-based forks.
 			if overrides != nil && overrides.OverrideShanghai != nil {
 				config.SetEIP3651TransitionTime(overrides.OverrideShanghai)
 				config.SetEIP3855TransitionTime(overrides.OverrideShanghai)
 				config.SetEIP3860TransitionTime(overrides.OverrideShanghai)
 				config.SetEIP4895TransitionTime(overrides.OverrideShanghai)
 				config.SetEIP6049TransitionTime(overrides.OverrideShanghai)
+			}
+			if overrides != nil && overrides.OverrideCancun != nil {
+				config.SetEIP4844TransitionTime(overrides.OverrideCancun)
+			}
+			if overrides != nil && overrides.OverrideVerkle != nil {
+				log.Warn("Verkle-fork is not yet supported")
 			}
 		}
 	}
@@ -261,8 +274,6 @@ func configOrDefault(g *genesisT.Genesis, ghash common.Hash) ctypes.ChainConfigu
 		return g.Config
 	case ghash == params.MainnetGenesisHash:
 		return params.MainnetChainConfig
-	case ghash == params.RinkebyGenesisHash:
-		return params.RinkebyChainConfig
 	case ghash == params.GoerliGenesisHash:
 		return params.GoerliChainConfig
 	case ghash == params.MordorGenesisHash:
@@ -291,7 +302,7 @@ func gaFlush(ga *genesisT.GenesisAlloc, db ethdb.Database) error {
 			statedb.SetState(addr, key, value)
 		}
 	}
-	root, err := statedb.Commit(false)
+	root, err := statedb.Commit(0, false)
 	if err != nil {
 		return err
 	}
@@ -329,7 +340,7 @@ func gaDeriveHash(ga *genesisT.GenesisAlloc) (common.Hash, error) {
 			statedb.SetState(addr, key, value)
 		}
 	}
-	return statedb.Commit(false)
+	return statedb.Commit(0, false)
 }
 
 // Write writes the json marshaled genesis state into database
@@ -362,8 +373,6 @@ func CommitGenesisState(db ethdb.Database, hash common.Hash) error {
 		switch hash {
 		case params.MainnetGenesisHash:
 			genesis = params.DefaultGenesisBlock()
-		case params.RinkebyGenesisHash:
-			genesis = params.DefaultRinkebyGenesisBlock()
 		case params.GoerliGenesisHash:
 			genesis = params.DefaultGoerliGenesisBlock()
 		case params.SepoliaGenesisHash:
@@ -428,9 +437,24 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 		}
 	}
 	var withdrawals []*types.Withdrawal
-	if g.Config != nil && g.Config.IsEnabledByTime(g.Config.GetEIP4895TransitionTime, &g.Timestamp) {
-		head.WithdrawalsHash = &types.EmptyWithdrawalsHash
-		withdrawals = make([]*types.Withdrawal, 0)
+	if conf := g.Config; conf != nil {
+		// EIP4895 defines the withdwrawals tx type, implemented on ETH in the Shanghai fork.
+		isEIP4895 := conf.IsEnabledByTime(g.Config.GetEIP4895TransitionTime, &g.Timestamp) || g.Config.IsEnabled(g.Config.GetEIP4895Transition, new(big.Int).SetUint64(g.Number))
+		if isEIP4895 {
+			head.WithdrawalsHash = &types.EmptyWithdrawalsHash
+			withdrawals = make([]*types.Withdrawal, 0)
+		}
+		isCancun := conf.IsEnabledByTime(g.Config.GetEIP4844TransitionTime, &g.Timestamp)
+		if isCancun {
+			head.ExcessBlobGas = g.ExcessBlobGas
+			head.BlobGasUsed = g.BlobGasUsed
+			if head.ExcessBlobGas == nil {
+				head.ExcessBlobGas = new(uint64)
+			}
+			if head.BlobGasUsed == nil {
+				head.BlobGasUsed = new(uint64)
+			}
+		}
 	}
 	return types.NewBlock(head, nil, nil, nil, trie.NewStackTrie(nil)).WithWithdrawals(withdrawals)
 }

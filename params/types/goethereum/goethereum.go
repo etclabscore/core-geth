@@ -72,6 +72,7 @@ type ChainConfig struct {
 	ShanghaiTime *uint64 `json:"shanghaiTime,omitempty"` // Shanghai switch time (nil = no fork, 0 = already on shanghai)
 	CancunTime   *uint64 `json:"cancunTime,omitempty"`   // Cancun switch time (nil = no fork, 0 = already on cancun)
 	PragueTime   *uint64 `json:"pragueTime,omitempty"`   // Prague switch time (nil = no fork, 0 = already on prague)
+	VerkleTime   *uint64 `json:"verkleTime,omitempty"`   // Verkle switch time (nil = no fork, 0 = already on verkle)
 
 	// TerminalTotalDifficulty is the amount of total difficulty reached by
 	// the network that triggers the consensus upgrade.
@@ -85,9 +86,10 @@ type ChainConfig struct {
 	EWASMBlock *big.Int `json:"ewasmBlock,omitempty"` // EWASM switch block (nil = no fork, 0 = already activated)
 
 	// Various consensus engines
-	Ethash *ctypes.EthashConfig `json:"ethash,omitempty"`
-	Clique *ctypes.CliqueConfig `json:"clique,omitempty"`
-	Lyra2  *ctypes.Lyra2Config  `json:"lyra2,omitempty"`
+	Ethash    *ctypes.EthashConfig `json:"ethash,omitempty"`
+	Clique    *ctypes.CliqueConfig `json:"clique,omitempty"`
+	Lyra2     *ctypes.Lyra2Config  `json:"lyra2,omitempty"`
+	IsDevMode bool                 `json:"isDev,omitempty"`
 
 	// NOTE: These are not included in this type upstream.
 	TrustedCheckpoint       *ctypes.TrustedCheckpoint      `json:"trustedCheckpoint"`

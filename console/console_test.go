@@ -95,7 +95,7 @@ func newTester(t *testing.T, confOverride func(*ethconfig.Config)) *tester {
 		t.Fatalf("failed to create node: %v", err)
 	}
 	ethConf := &ethconfig.Config{
-		Genesis: params.DeveloperGenesisBlock(15, 11_500_000, common.Address{}, true),
+		Genesis: params.DeveloperGenesisBlock(11_500_000, common.Address{}, true),
 		Miner: miner.Config{
 			Etherbase: common.HexToAddress(testAddress),
 		},
@@ -114,10 +114,11 @@ func newTester(t *testing.T, confOverride func(*ethconfig.Config)) *tester {
 	if err = stack.Start(); err != nil {
 		t.Fatalf("failed to start test stack: %v", err)
 	}
-	client, err := stack.Attach()
-	if err != nil {
-		t.Fatalf("failed to attach to node: %v", err)
-	}
+	client := stack.Attach()
+	t.Cleanup(func() {
+		client.Close()
+	})
+
 	prompter := &hookedPrompter{scheduler: make(chan string)}
 	printer := new(bytes.Buffer)
 

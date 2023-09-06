@@ -33,6 +33,7 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/txpool"
+	"github.com/ethereum/go-ethereum/core/txpool/legacypool"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/eth"
@@ -207,7 +208,7 @@ func (n *ethNode) insertBlockAndSetHead(parent *types.Header, ed engine.Executab
 	if err := n.insertBlock(ed); err != nil {
 		return err
 	}
-	block, err := engine.ExecutableDataToBlock(ed)
+	block, err := engine.ExecutableDataToBlock(ed, nil)
 	if err != nil {
 		return err
 	}
@@ -368,7 +369,7 @@ func (mgr *nodeManager) run() {
 				log.Error("Failed to assemble the block", "err", err)
 				continue
 			}
-			block, _ := engine.ExecutableDataToBlock(*ed)
+			block, _ := engine.ExecutableDataToBlock(*ed, nil)
 
 			nodes := mgr.getNodes(eth2MiningNode)
 			nodes = append(nodes, mgr.getNodes(eth2NormalNode)...)
@@ -431,7 +432,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		if err := node.ethBackend.TxPool().AddLocal(tx); err != nil {
+		if err := node.ethBackend.TxPool().Add([]*txpool.Transaction{{Tx: tx}}, true, false); err != nil {
 			panic(err)
 		}
 		nonces[index]++
@@ -489,7 +490,7 @@ func makeFullNode(genesis *genesisT.Genesis) (*node.Node, *eth.Ethereum, *ethcat
 		SyncMode:        downloader.FullSync,
 		DatabaseCache:   256,
 		DatabaseHandles: 256,
-		TxPool:          txpool.DefaultConfig,
+		TxPool:          legacypool.DefaultConfig,
 		GPO:             ethconfig.Defaults.GPO,
 		Ethash:          ethconfig.Defaults.Ethash,
 		Miner: miner.Config{
@@ -540,7 +541,7 @@ func makeLightNode(genesis *genesisT.Genesis) (*node.Node, *les.LightEthereum, *
 		SyncMode:        downloader.LightSync,
 		DatabaseCache:   256,
 		DatabaseHandles: 256,
-		TxPool:          txpool.DefaultConfig,
+		TxPool:          legacypool.DefaultConfig,
 		GPO:             ethconfig.Defaults.GPO,
 		Ethash:          ethconfig.Defaults.Ethash,
 		LightPeers:      10,

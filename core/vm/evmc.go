@@ -226,11 +226,11 @@ func (host *hostContext) Selfdestruct(evmcAddr evmc.Address, evmcBeneficiary evm
 	addr := common.Address(evmcAddr)
 	beneficiary := common.Address(evmcBeneficiary)
 	db := host.env.StateDB
-	if !db.HasSuicided(addr) {
+	if !db.HasSelfDestructed(addr) {
 		db.AddRefund(vars.SelfdestructRefundGas)
 	}
 	db.AddBalance(beneficiary, db.GetBalance(addr))
-	db.Suicide(addr)
+	db.SelfDestruct(addr)
 }
 
 func (host *hostContext) GetTxContext() evmc.TxContext {

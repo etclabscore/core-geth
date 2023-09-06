@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.12.9-unstable/generated-at:2022-07-13T09:50:34-07:00</code> |
+| Source | <code>1.12.14-unstable/generated-at:2023-09-04T08:02:34-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -325,18 +325,25 @@ func (api *DebugAPI) AccountRange(blockNrOrHash rpc.BlockNumberOrHash, start hex
 		if number == rpc.PendingBlockNumber {
 			_, stateDb = api.eth.miner.Pending()
 		} else {
-			var block *types.Block
-			if number == rpc.LatestBlockNumber {
-				block = api.eth.blockchain.CurrentBlock()
-			} else if number == rpc.FinalizedBlockNumber {
-				block = api.eth.blockchain.CurrentFinalizedBlock()
-			} else {
-				block = api.eth.blockchain.GetBlockByNumber(uint64(number))
+			var header *types.Header
+			switch number {
+			case rpc.LatestBlockNumber:
+				header = api.eth.blockchain.CurrentBlock()
+			case rpc.FinalizedBlockNumber:
+				header = api.eth.blockchain.CurrentFinalBlock()
+			case rpc.SafeBlockNumber:
+				header = api.eth.blockchain.CurrentSafeBlock()
+			default:
+				block := api.eth.blockchain.GetBlockByNumber(uint64(number))
+				if block == nil {
+					return state.IteratorDump{}, fmt.Errorf("block #%d not found", number)
+				}
+				header = block.Header()
 			}
-			if block == nil {
+			if header == nil {
 				return state.IteratorDump{}, fmt.Errorf("block #%d not found", number)
 			}
-			stateDb, err = api.eth.BlockChain().StateAt(block.Root())
+			stateDb, err = api.eth.BlockChain().StateAt(header.Root)
 			if err != nil {
 				return state.IteratorDump{}, err
 			}
@@ -361,7 +368,7 @@ func (api *DebugAPI) AccountRange(blockNrOrHash rpc.BlockNumberOrHash, start hex
 }// AccountRange enumerates all accounts in the given block and start point in paging request
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L361" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api_debug.go#L132" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -606,7 +613,7 @@ func (api *DebugAPI) ChaindbCompact() error {
 	return nil
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2122" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2284" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -687,7 +694,7 @@ func (api *DebugAPI) ChaindbProperty(property string) (string, error) {
 }// ChaindbProperty returns leveldb properties of the key-value database.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2111" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2273" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1395,18 +1402,25 @@ func (api *DebugAPI) DumpBlock(blockNr rpc.BlockNumber) (state.Dump, error) {
 		_, stateDb := api.eth.miner.Pending()
 		return stateDb.RawDump(opts), nil
 	}
-	var block *types.Block
-	if blockNr == rpc.LatestBlockNumber {
-		block = api.eth.blockchain.CurrentBlock()
-	} else if blockNr == rpc.FinalizedBlockNumber {
-		block = api.eth.blockchain.CurrentFinalizedBlock()
-	} else {
-		block = api.eth.blockchain.GetBlockByNumber(uint64(blockNr))
+	var header *types.Header
+	switch blockNr {
+	case rpc.LatestBlockNumber:
+		header = api.eth.blockchain.CurrentBlock()
+	case rpc.FinalizedBlockNumber:
+		header = api.eth.blockchain.CurrentFinalBlock()
+	case rpc.SafeBlockNumber:
+		header = api.eth.blockchain.CurrentSafeBlock()
+	default:
+		block := api.eth.blockchain.GetBlockByNumber(uint64(blockNr))
+		if block == nil {
+			return state.Dump{}, fmt.Errorf("block #%d not found", blockNr)
+		}
+		header = block.Header()
 	}
-	if block == nil {
+	if header == nil {
 		return state.Dump{}, fmt.Errorf("block #%d not found", blockNr)
 	}
-	stateDb, err := api.eth.BlockChain().StateAt(block.Root())
+	stateDb, err := api.eth.BlockChain().StateAt(header.Root)
 	if err != nil {
 		return state.Dump{}, err
 	}
@@ -1414,7 +1428,7 @@ func (api *DebugAPI) DumpBlock(blockNr rpc.BlockNumber) (state.Dump, error) {
 }// DumpBlock retrieves the entire state of the database at a given block.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L282" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api_debug.go#L49" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1867,9 +1881,9 @@ func (api *DebugAPI) GetAccessibleState(from, to rpc.BlockNumber) (uint64, error
 		if num.Int64() < 0 {
 			block := api.eth.blockchain.CurrentBlock()
 			if block == nil {
-				return 0, fmt.Errorf("current block missing")
+				return 0, errors.New("current block missing")
 			}
-			return block.NumberU64(), nil
+			return block.Number.Uint64(), nil
 		}
 		return uint64(num.Int64()), nil
 	}
@@ -1887,7 +1901,7 @@ func (api *DebugAPI) GetAccessibleState(from, to rpc.BlockNumber) (uint64, error
 		return 0, err
 	}
 	if start == end {
-		return 0, fmt.Errorf("from and to needs to be different")
+		return 0, errors.New("from and to needs to be different")
 	}
 	if start > end {
 		delta = -1
@@ -1913,10 +1927,10 @@ func (api *DebugAPI) GetAccessibleState(from, to rpc.BlockNumber) (uint64, error
 			return uint64(i), nil
 		}
 	}
-	return 0, fmt.Errorf("No state found")
+	return 0, errors.New("no state found")
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L556" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api_debug.go#L356" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2073,6 +2087,40 @@ BadBlockArgs <code>[]*BadBlockArgs</code>
 
 							- type: `array`
 
+						- withdrawals: 
+							- items: 
+								- additionalProperties: `false`
+								- properties: 
+									- address: 
+										- pattern: `^0x[a-fA-F\d]{64}$`
+										- title: `keccak`
+										- type: `string`
+
+									- amount: 
+										- pattern: `^0x[a-fA-F0-9]+$`
+										- title: `integer`
+										- type: `string`
+
+									- index: 
+										- pattern: `^0x[a-fA-F0-9]+$`
+										- title: `integer`
+										- type: `string`
+
+									- validatorIndex: 
+										- pattern: `^0x[a-fA-F0-9]+$`
+										- title: `integer`
+										- type: `string`
+
+
+								- type: `object`
+
+							- type: `array`
+
+						- withdrawalsRoot: 
+							- pattern: `^0x[a-fA-F\d]{64}$`
+							- title: `keccak`
+							- type: `string`
+
 
 					- type: `object`
 
@@ -2222,6 +2270,40 @@ BadBlockArgs <code>[]*BadBlockArgs</code>
                                     "type": "string"
                                 },
                                 "type": "array"
+                            },
+                            "withdrawals": {
+                                "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "address": {
+                                            "pattern": "^0x[a-fA-F\\d]{64}$",
+                                            "title": "keccak",
+                                            "type": "string"
+                                        },
+                                        "amount": {
+                                            "pattern": "^0x[a-fA-F0-9]+$",
+                                            "title": "integer",
+                                            "type": "string"
+                                        },
+                                        "index": {
+                                            "pattern": "^0x[a-fA-F0-9]+$",
+                                            "title": "integer",
+                                            "type": "string"
+                                        },
+                                        "validatorIndex": {
+                                            "pattern": "^0x[a-fA-F0-9]+$",
+                                            "title": "integer",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "type": "array"
+                            },
+                            "withdrawalsRoot": {
+                                "pattern": "^0x[a-fA-F\\d]{64}$",
+                                "title": "keccak",
+                                "type": "string"
                             }
                         },
                         "type": "object"
@@ -2283,7 +2365,6 @@ func (api *DebugAPI) GetBadBlocks(ctx context.Context) ([ // GetBadBlocks return
 // and returns them as a JSON list of block hashes.
 ]*BadBlockArgs, error) {
 	var (
-		err	error
 		blocks	= rawdb.ReadAllBadBlocks(api.eth.chainDb)
 		results	= make([]*BadBlockArgs, 0, len(blocks))
 	)
@@ -2295,277 +2376,15 @@ func (api *DebugAPI) GetBadBlocks(ctx context.Context) ([ // GetBadBlocks return
 		if rlpBytes, err := rlp.EncodeToBytes(block); err != nil {
 			blockRlp = err.Error()
 		} else {
-			blockRlp = fmt.Sprintf("0x%x", rlpBytes)
+			blockRlp = fmt.Sprintf("%#x", rlpBytes)
 		}
-		if blockJSON, err = ethapi.RPCMarshalBlock(block, true, true, api.eth.APIBackend.ChainConfig()); err != nil {
-			blockJSON = &ethapi.RPCMarshalBlockT{Error: err.Error()}
-		}
+		blockJSON = ethapi.RPCMarshalBlock(block, true, true, api.eth.APIBackend.ChainConfig())
 		results = append(results, &BadBlockArgs{Hash: block.Hash(), RLP: blockRlp, Block: blockJSON})
 	}
 	return results, nil
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L329" target="_">View on GitHub →</a>
-</p>
-</details>
-
----
-
-
-
-### debug_getBlockRlp
-
-GetBlockRlp retrieves the RLP encoded for of a single block.
-
-
-#### Params (1)
-
-Parameters must be given _by position_.
-
-
-__1:__ 
-number <code>uint64</code> 
-
-  + Required: ✓ Yes
-
-
-=== "Schema"
-
-	``` Schema
-	
-	- description: `Hex representation of the integer`
-	- pattern: `^0x[a-fA-F0-9]+$`
-	- title: `integer`
-	- type: string
-
-
-	```
-
-=== "Raw"
-
-	``` Raw
-	{
-        "description": "Hex representation of the integer",
-        "pattern": "^0x[a-fA-F0-9]+$",
-        "title": "integer",
-        "type": [
-            "string"
-        ]
-    }
-	```
-
-
-
-
-
-#### Result
-
-
-
-
-<code>hexutil.Bytes</code> 
-
-  + Required: ✓ Yes
-
-
-=== "Schema"
-
-	``` Schema
-	
-	- description: `Hex representation of some bytes`
-	- pattern: `^0x([a-fA-F\d])+$`
-	- title: `dataWord`
-	- type: string
-
-
-	```
-
-=== "Raw"
-
-	``` Raw
-	{
-        "description": "Hex representation of some bytes",
-        "pattern": "^0x([a-fA-F\\d])+$",
-        "title": "dataWord",
-        "type": [
-            "string"
-        ]
-    }
-	```
-
-
-
-#### Client Method Invocation Examples
-
-
-=== "Shell HTTP"
-
-	``` shell
-	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_getBlockRlp", "params": [<number>]}'
-	```
-
-
-
-
-
-=== "Shell WebSocket"
-
-	``` shell
-	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "debug_getBlockRlp", "params": [<number>]}'
-	```
-
-
-=== "Javascript Console"
-
-	``` js
-	debug.getBlockRlp(number);
-	```
-
-
-
-<details><summary>Source code</summary>
-<p>
-```go
-func (api *DebugAPI) GetBlockRlp(ctx context.Context, number uint64) (hexutil.Bytes, error) {
-	block, _ := api.b.BlockByNumber(ctx, rpc.BlockNumber(number))
-	if block == nil {
-		return nil, fmt.Errorf("block #%d not found", number)
-	}
-	return rlp.EncodeToBytes(block)
-}// GetBlockRlp retrieves the RLP encoded for of a single block.
-
-```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2054" target="_">View on GitHub →</a>
-</p>
-</details>
-
----
-
-
-
-### debug_getHeaderRlp
-
-GetHeaderRlp retrieves the RLP encoded for of a single header.
-
-
-#### Params (1)
-
-Parameters must be given _by position_.
-
-
-__1:__ 
-number <code>uint64</code> 
-
-  + Required: ✓ Yes
-
-
-=== "Schema"
-
-	``` Schema
-	
-	- description: `Hex representation of the integer`
-	- pattern: `^0x[a-fA-F0-9]+$`
-	- title: `integer`
-	- type: string
-
-
-	```
-
-=== "Raw"
-
-	``` Raw
-	{
-        "description": "Hex representation of the integer",
-        "pattern": "^0x[a-fA-F0-9]+$",
-        "title": "integer",
-        "type": [
-            "string"
-        ]
-    }
-	```
-
-
-
-
-
-#### Result
-
-
-
-
-<code>hexutil.Bytes</code> 
-
-  + Required: ✓ Yes
-
-
-=== "Schema"
-
-	``` Schema
-	
-	- description: `Hex representation of some bytes`
-	- pattern: `^0x([a-fA-F\d])+$`
-	- title: `dataWord`
-	- type: string
-
-
-	```
-
-=== "Raw"
-
-	``` Raw
-	{
-        "description": "Hex representation of some bytes",
-        "pattern": "^0x([a-fA-F\\d])+$",
-        "title": "dataWord",
-        "type": [
-            "string"
-        ]
-    }
-	```
-
-
-
-#### Client Method Invocation Examples
-
-
-=== "Shell HTTP"
-
-	``` shell
-	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_getHeaderRlp", "params": [<number>]}'
-	```
-
-
-
-
-
-=== "Shell WebSocket"
-
-	``` shell
-	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "debug_getHeaderRlp", "params": [<number>]}'
-	```
-
-
-=== "Javascript Console"
-
-	``` js
-	debug.getHeaderRlp(number);
-	```
-
-
-
-<details><summary>Source code</summary>
-<p>
-```go
-func (api *DebugAPI) GetHeaderRlp(ctx context.Context, number uint64) (hexutil.Bytes, error) {
-	header, _ := api.b.HeaderByNumber(ctx, rpc.BlockNumber(number))
-	if header == nil {
-		return nil, fmt.Errorf("header #%d not found", number)
-	}
-	return rlp.EncodeToBytes(header)
-}// GetHeaderRlp retrieves the RLP encoded for of a single header.
-
-```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2045" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api_debug.go#L103" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2761,7 +2580,7 @@ func (api *DebugAPI) GetModifiedAccountsByHash(startHash common.Hash, endHash *c
 	return api.getModifiedAccounts(startBlock, endBlock)
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L501" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api_debug.go#L293" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2957,7 +2776,237 @@ func (api *DebugAPI) GetModifiedAccountsByNumber(startNum uint64, endNum *uint64
 	return api.getModifiedAccounts(startBlock, endBlock)
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L473" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api_debug.go#L265" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### debug_getRawBlock
+
+GetRawBlock retrieves the RLP encoded for a single block.
+
+
+#### Params (1)
+
+Parameters must be given _by position_.
+
+
+__1:__ 
+blockNrOrHash <code>rpc.BlockNumberOrHash</code> 
+
+  + Required: ✓ Yes
+
+
+
+
+
+
+#### Result
+
+
+
+
+<code>hexutil.Bytes</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Hex representation of some bytes`
+	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `dataWord`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Hex representation of some bytes",
+        "pattern": "^0x([a-fA-F\\d])+$",
+        "title": "dataWord",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+=== "Shell HTTP"
+
+	``` shell
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_getRawBlock", "params": [<blockNrOrHash>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "debug_getRawBlock", "params": [<blockNrOrHash>]}'
+	```
+
+
+=== "Javascript Console"
+
+	``` js
+	debug.getRawBlock(blockNrOrHash);
+	```
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *DebugAPI) GetRawBlock(ctx context.Context, blockNrOrHash rpc.BlockNumberOrHash) (hexutil.Bytes, error) {
+	var hash common.Hash
+	if h, ok := blockNrOrHash.Hash(); ok {
+		hash = h
+	} else {
+		block, err := api.b.BlockByNumberOrHash(ctx, blockNrOrHash)
+		if err != nil {
+			return nil, err
+		}
+		hash = block.Hash()
+	}
+	block, _ := api.b.BlockByHash(ctx, hash)
+	if block == nil {
+		return nil, fmt.Errorf("block #%d not found", hash)
+	}
+	return rlp.EncodeToBytes(block)
+}// GetRawBlock retrieves the RLP encoded for a single block.
+
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2190" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### debug_getRawHeader
+
+GetRawHeader retrieves the RLP encoding for a single header.
+
+
+#### Params (1)
+
+Parameters must be given _by position_.
+
+
+__1:__ 
+blockNrOrHash <code>rpc.BlockNumberOrHash</code> 
+
+  + Required: ✓ Yes
+
+
+
+
+
+
+#### Result
+
+
+
+
+<code>hexutil.Bytes</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Hex representation of some bytes`
+	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `dataWord`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Hex representation of some bytes",
+        "pattern": "^0x([a-fA-F\\d])+$",
+        "title": "dataWord",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+=== "Shell HTTP"
+
+	``` shell
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_getRawHeader", "params": [<blockNrOrHash>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "debug_getRawHeader", "params": [<blockNrOrHash>]}'
+	```
+
+
+=== "Javascript Console"
+
+	``` js
+	debug.getRawHeader(blockNrOrHash);
+	```
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *DebugAPI) GetRawHeader(ctx context.Context, blockNrOrHash rpc.BlockNumberOrHash) (hexutil.Bytes, error) {
+	var hash common.Hash
+	if h, ok := blockNrOrHash.Hash(); ok {
+		hash = h
+	} else {
+		block, err := api.b.BlockByNumberOrHash(ctx, blockNrOrHash)
+		if err != nil {
+			return nil, err
+		}
+		hash = block.Hash()
+	}
+	header, _ := api.b.HeaderByHash(ctx, hash)
+	if header == nil {
+		return nil, fmt.Errorf("header #%d not found", hash)
+	}
+	return rlp.EncodeToBytes(header)
+}// GetRawHeader retrieves the RLP encoding for a single header.
+
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2171" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2967,7 +3016,7 @@ func (api *DebugAPI) GetModifiedAccountsByNumber(startNum uint64, endNum *uint64
 
 ### debug_getRawReceipts
 
-GetRawReceipts retrieves the binary-encoded raw receipts of a single block.
+GetRawReceipts retrieves the binary-encoded receipts of a single block.
 
 
 #### Params (1)
@@ -3064,7 +3113,7 @@ hexutilBytes <code>[]hexutil.Bytes</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *DebugAPI) GetRawReceipts(ctx context.Context, blockNrOrHash rpc.BlockNumberOrHash) ([ // GetRawReceipts retrieves the binary-encoded raw receipts of a single block.
+func (api *DebugAPI) GetRawReceipts(ctx context.Context, blockNrOrHash rpc.BlockNumberOrHash) ([ // GetRawReceipts retrieves the binary-encoded receipts of a single block.
 ]hexutil.Bytes, error) {
 	var hash common.Hash
 	if h, ok := blockNrOrHash.Hash(); ok {
@@ -3091,7 +3140,142 @@ func (api *DebugAPI) GetRawReceipts(ctx context.Context, blockNrOrHash rpc.Block
 	return result, nil
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2063" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2209" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### debug_getRawTransaction
+
+GetRawTransaction returns the bytes of the transaction for the given hash.
+
+
+#### Params (1)
+
+Parameters must be given _by position_.
+
+
+__1:__ 
+hash <code>common.Hash</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Hex representation of a Keccak 256 hash`
+	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Hex representation of a Keccak 256 hash",
+        "pattern": "^0x[a-fA-F\\d]{64}$",
+        "title": "keccak",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+
+
+#### Result
+
+
+
+
+<code>hexutil.Bytes</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Hex representation of some bytes`
+	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `dataWord`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Hex representation of some bytes",
+        "pattern": "^0x([a-fA-F\\d])+$",
+        "title": "dataWord",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+=== "Shell HTTP"
+
+	``` shell
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_getRawTransaction", "params": [<hash>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "debug_getRawTransaction", "params": [<hash>]}'
+	```
+
+
+=== "Javascript Console"
+
+	``` js
+	debug.getRawTransaction(hash);
+	```
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (s *DebugAPI) GetRawTransaction(ctx context.Context, hash common.Hash) (hexutil.Bytes, error) {
+	tx, _, _, _, err := s.b.GetTransaction(ctx, hash)
+	if err != nil {
+		return nil, err
+	}
+	if tx == nil {
+		if tx = s.b.GetPoolTransaction(hash); tx == nil {
+			return nil, nil
+		}
+	}
+	return tx.MarshalBinary()
+}// GetRawTransaction returns the bytes of the transaction for the given hash.
+
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2236" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -3299,6 +3483,12 @@ config <code>*TraceConfig</code>
 		- Tracer: 
 			- type: `string`
 
+		- TracerConfig: 
+			- media: 
+				- binaryEncoding: `base64`
+
+			- type: `string`
+
 		- overrides: 
 			- additionalProperties: `true`
 
@@ -3346,6 +3536,12 @@ config <code>*TraceConfig</code>
                 "type": "string"
             },
             "Tracer": {
+                "type": "string"
+            },
+            "TracerConfig": {
+                "media": {
+                    "binaryEncoding": "base64"
+                },
                 "type": "string"
             },
             "overrides": {
@@ -3462,25 +3658,29 @@ func (api *API) IntermediateRoots(ctx context.Context, hash common.Hash, config 
 	if config != nil && config.Reexec != nil {
 		reexec = *config.Reexec
 	}
-	statedb, err := api.backend.StateAtBlock(ctx, parent, reexec, nil, true, false)
+	statedb, release, err := api.backend.StateAtBlock(ctx, parent, reexec, nil, true, false)
 	if err != nil {
 		return nil, err
 	}
+	defer release()
 	var (
 		roots			[]common.Hash
-		signer			= types.MakeSigner(api.backend.ChainConfig(), block.Number())
+		signer			= types.MakeSigner(api.backend.ChainConfig(), block.Number(), block.Time())
 		chainConfig		= api.backend.ChainConfig()
 		vmctx			= core.NewEVMBlockContext(block.Header(), api.chainContext(ctx), nil)
 		deleteEmptyObjects	= api.backend.ChainConfig().IsEnabled(api.backend.ChainConfig().GetEIP161dTransition, block.Number())
 	)
 	for i, tx := range block.Transactions() {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
 		var (
-			msg, _		= tx.AsMessage(signer, block.BaseFee())
+			msg, _		= core.TransactionToMessage(tx, signer, block.BaseFee())
 			txContext	= core.NewEVMTxContext(msg)
 			vmenv		= vm.NewEVM(vmctx, txContext, statedb, chainConfig, vm.Config{})
 		)
-		statedb.Prepare(tx.Hash(), i)
-		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.Gas())); err != nil {
+		statedb.SetTxContext(tx.Hash(), i)
+		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.GasLimit)); err != nil {
 			log.Warn("Tracing intermediate roots did not complete", "txindex", i, "txhash", tx.Hash(), "err", err)
 			return roots, nil
 		}
@@ -4193,7 +4393,7 @@ func (api *DebugAPI) Preimage(ctx context.Context, hash common.Hash) (hexutil.By
 }// Preimage is a debug API function that returns the preimage for a sha3 hash, if known.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L313" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api_debug.go#L87" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -4298,131 +4498,7 @@ func (api *DebugAPI) PrintBlock(ctx context.Context, number uint64) (string, err
 }// PrintBlock retrieves a block and returns its pretty printed form.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2090" target="_">View on GitHub →</a>
-</p>
-</details>
-
----
-
-
-
-### debug_removePendingTransaction
-
-RemovePendingTransaction removes a transaction from the txpool.
-It returns the transaction removed, if any.
-
-
-#### Params (1)
-
-Parameters must be given _by position_.
-
-
-__1:__ 
-hash <code>common.Hash</code> 
-
-  + Required: ✓ Yes
-
-
-=== "Schema"
-
-	``` Schema
-	
-	- description: `Hex representation of a Keccak 256 hash`
-	- pattern: `^0x[a-fA-F\d]{64}$`
-	- title: `keccak`
-	- type: string
-
-
-	```
-
-=== "Raw"
-
-	``` Raw
-	{
-        "description": "Hex representation of a Keccak 256 hash",
-        "pattern": "^0x[a-fA-F\\d]{64}$",
-        "title": "keccak",
-        "type": [
-            "string"
-        ]
-    }
-	```
-
-
-
-
-
-#### Result
-
-
-
-
-<code>*types.Transaction</code> 
-
-  + Required: ✓ Yes
-
-
-=== "Schema"
-
-	``` Schema
-	
-	- additionalProperties: `false`
-	- type: object
-
-
-	```
-
-=== "Raw"
-
-	``` Raw
-	{
-        "additionalProperties": false,
-        "type": [
-            "object"
-        ]
-    }
-	```
-
-
-
-#### Client Method Invocation Examples
-
-
-=== "Shell HTTP"
-
-	``` shell
-	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_removePendingTransaction", "params": [<hash>]}'
-	```
-
-
-
-
-
-=== "Shell WebSocket"
-
-	``` shell
-	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "debug_removePendingTransaction", "params": [<hash>]}'
-	```
-
-
-=== "Javascript Console"
-
-	``` js
-	debug.removePendingTransaction(hash);
-	```
-
-
-
-<details><summary>Source code</summary>
-<p>
-```go
-func (api *DebugAPI) RemovePendingTransaction(hash common.Hash) (*types.Transaction, error) {
-	return api.eth.txPool.RemoveTx(hash), nil
-}// RemovePendingTransaction removes a transaction from the txpool.
-// It returns the transaction removed, if any.
-
-```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L614" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2252" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -4526,11 +4602,11 @@ func (api *DebugAPI) SeedHash(ctx context.Context, number uint64) (string, error
 	ecip1099FBlock := api.b.ChainConfig().GetEthashECIP1099Transition()
 	epochLength := ethash.CalcEpochLength(number, ecip1099FBlock)
 	epoch := ethash.CalcEpoch(number, epochLength)
-	return fmt.Sprintf("0x%x", ethash.SeedHash(epoch, epochLength)), nil
+	return fmt.Sprintf("%#x", ethash.SeedHash(epoch, epochLength)), nil
 }// SeedHash retrieves the seed hash of a block.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2099" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2261" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -4846,7 +4922,7 @@ func (api *DebugAPI) SetHead(number hexutil.Uint64) {
 }// SetHead rewinds the head of the blockchain to a previous block.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2134" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2296" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -5281,7 +5357,7 @@ func (api *API) StandardTraceBadBlockToFile(ctx context.Context, hash common.Has
 	return api.standardTraceBlockToFile(ctx, block, config)
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L572" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L577" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -5765,7 +5841,7 @@ func (h *HandlerT) StopCPUProfile() error {
 
 ### debug_stopGoTrace
 
-StopTrace stops an ongoing trace.
+StopGoTrace stops an ongoing trace.
 
 
 #### Params (0)
@@ -5819,7 +5895,7 @@ func (h *HandlerT) StopGoTrace() error {
 	h.traceW = nil
 	h.traceFile = ""
 	return nil
-}// StopTrace stops an ongoing trace.
+}// StopGoTrace stops an ongoing trace.
 
 ```
 <a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/trace.go#L52" target="_">View on GitHub →</a>
@@ -5841,35 +5917,10 @@ Parameters must be given _by position_.
 
 
 __1:__ 
-blockHash <code>common.Hash</code> 
+blockNrOrHash <code>rpc.BlockNumberOrHash</code> 
 
   + Required: ✓ Yes
 
-
-=== "Schema"
-
-	``` Schema
-	
-	- description: `Hex representation of a Keccak 256 hash`
-	- pattern: `^0x[a-fA-F\d]{64}$`
-	- title: `keccak`
-	- type: string
-
-
-	```
-
-=== "Raw"
-
-	``` Raw
-	{
-        "description": "Hex representation of a Keccak 256 hash",
-        "pattern": "^0x[a-fA-F\\d]{64}$",
-        "title": "keccak",
-        "type": [
-            "string"
-        ]
-    }
-	```
 
 
 
@@ -6106,7 +6157,7 @@ maxResult <code>int</code>
 === "Shell HTTP"
 
 	``` shell
-	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_storageRangeAt", "params": [<blockHash>, <txIndex>, <contractAddress>, <keyStart>, <maxResult>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_storageRangeAt", "params": [<blockNrOrHash>, <txIndex>, <contractAddress>, <keyStart>, <maxResult>]}'
 	```
 
 
@@ -6116,14 +6167,14 @@ maxResult <code>int</code>
 === "Shell WebSocket"
 
 	``` shell
-	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "debug_storageRangeAt", "params": [<blockHash>, <txIndex>, <contractAddress>, <keyStart>, <maxResult>]}'
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "debug_storageRangeAt", "params": [<blockNrOrHash>, <txIndex>, <contractAddress>, <keyStart>, <maxResult>]}'
 	```
 
 
 === "Javascript Console"
 
 	``` js
-	debug.storageRangeAt(blockHash,txIndex,contractAddress,keyStart,maxResult);
+	debug.storageRangeAt(blockNrOrHash,txIndex,contractAddress,keyStart,maxResult);
 	```
 
 
@@ -6131,16 +6182,24 @@ maxResult <code>int</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *DebugAPI) StorageRangeAt(blockHash common.Hash, txIndex int, contractAddress common.Address, keyStart hexutil.Bytes, maxResult int) (StorageRangeResult, error) {
-	block := api.eth.blockchain.GetBlockByHash(blockHash)
-	if block == nil {
-		return StorageRangeResult{}, fmt.Errorf("block %#x not found", blockHash)
-	}
-	_, _, statedb, err := api.eth.stateAtTransaction(block, txIndex, 0)
+func (api *DebugAPI) StorageRangeAt(ctx context.Context, blockNrOrHash rpc.BlockNumberOrHash, txIndex int, contractAddress common.Address, keyStart hexutil.Bytes, maxResult int) (StorageRangeResult, error) {
+	var block *types.Block
+	block, err := api.eth.APIBackend.BlockByNumberOrHash(ctx, blockNrOrHash)
 	if err != nil {
 		return StorageRangeResult{}, err
 	}
-	st := statedb.StorageTrie(contractAddress)
+	if block == nil {
+		return StorageRangeResult{}, fmt.Errorf("block %v not found", blockNrOrHash)
+	}
+	_, _, statedb, release, err := api.eth.stateAtTransaction(ctx, block, txIndex, 0)
+	if err != nil {
+		return StorageRangeResult{}, err
+	}
+	defer release()
+	st, err := statedb.StorageTrie(contractAddress)
+	if err != nil {
+		return StorageRangeResult{}, err
+	}
 	if st == nil {
 		return StorageRangeResult{}, fmt.Errorf("account %x doesn't exist", contractAddress)
 	}
@@ -6148,7 +6207,7 @@ func (api *DebugAPI) StorageRangeAt(blockHash common.Hash, txIndex int, contract
 }// StorageRangeAt returns the storage at the given block height and transaction index.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L428" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api_debug.go#L206" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -6280,7 +6339,7 @@ func (sub *RPCDebugSubscription) Subscribe(subscriptionName RPCDebugSubscription
 // Subscriptions are not available over HTTP; they are only available over WS, IPC, and Process connections.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L251" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L250" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -6380,6 +6439,12 @@ config <code>*TraceConfig</code>
 		- Tracer: 
 			- type: `string`
 
+		- TracerConfig: 
+			- media: 
+				- binaryEncoding: `base64`
+
+			- type: `string`
+
 		- overrides: 
 			- additionalProperties: `true`
 
@@ -6429,6 +6494,12 @@ config <code>*TraceConfig</code>
             "Tracer": {
                 "type": "string"
             },
+            "TracerConfig": {
+                "media": {
+                    "binaryEncoding": "base64"
+                },
+                "type": "string"
+            },
             "overrides": {
                 "additionalProperties": true
             }
@@ -6466,6 +6537,11 @@ txTraceResult <code>[]*txTraceResult</code>
 				- result: 
 					- additionalProperties: `true`
 
+				- txHash: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
 
 			- type: object
 
@@ -6488,6 +6564,11 @@ txTraceResult <code>[]*txTraceResult</code>
                     },
                     "result": {
                         "additionalProperties": true
+                    },
+                    "txHash": {
+                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                        "title": "keccak",
+                        "type": "string"
                     }
                 },
                 "type": [
@@ -6644,6 +6725,12 @@ config <code>*TraceConfig</code>
 		- Tracer: 
 			- type: `string`
 
+		- TracerConfig: 
+			- media: 
+				- binaryEncoding: `base64`
+
+			- type: `string`
+
 		- overrides: 
 			- additionalProperties: `true`
 
@@ -6693,6 +6780,12 @@ config <code>*TraceConfig</code>
             "Tracer": {
                 "type": "string"
             },
+            "TracerConfig": {
+                "media": {
+                    "binaryEncoding": "base64"
+                },
+                "type": "string"
+            },
             "overrides": {
                 "additionalProperties": true
             }
@@ -6730,6 +6823,11 @@ txTraceResult <code>[]*txTraceResult</code>
 				- result: 
 					- additionalProperties: `true`
 
+				- txHash: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
 
 			- type: object
 
@@ -6752,6 +6850,11 @@ txTraceResult <code>[]*txTraceResult</code>
                     },
                     "result": {
                         "additionalProperties": true
+                    },
+                    "txHash": {
+                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                        "title": "keccak",
+                        "type": "string"
                     }
                 },
                 "type": [
@@ -6907,6 +7010,12 @@ config <code>*TraceConfig</code>
 		- Tracer: 
 			- type: `string`
 
+		- TracerConfig: 
+			- media: 
+				- binaryEncoding: `base64`
+
+			- type: `string`
+
 		- overrides: 
 			- additionalProperties: `true`
 
@@ -6956,6 +7065,12 @@ config <code>*TraceConfig</code>
             "Tracer": {
                 "type": "string"
             },
+            "TracerConfig": {
+                "media": {
+                    "binaryEncoding": "base64"
+                },
+                "type": "string"
+            },
             "overrides": {
                 "additionalProperties": true
             }
@@ -6993,6 +7108,11 @@ txTraceResult <code>[]*txTraceResult</code>
 				- result: 
 					- additionalProperties: `true`
 
+				- txHash: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
 
 			- type: object
 
@@ -7015,6 +7135,11 @@ txTraceResult <code>[]*txTraceResult</code>
                     },
                     "result": {
                         "additionalProperties": true
+                    },
+                    "txHash": {
+                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                        "title": "keccak",
+                        "type": "string"
                     }
                 },
                 "type": [
@@ -7198,6 +7323,12 @@ config <code>*TraceConfig</code>
 		- Tracer: 
 			- type: `string`
 
+		- TracerConfig: 
+			- media: 
+				- binaryEncoding: `base64`
+
+			- type: `string`
+
 		- overrides: 
 			- additionalProperties: `true`
 
@@ -7247,6 +7378,12 @@ config <code>*TraceConfig</code>
             "Tracer": {
                 "type": "string"
             },
+            "TracerConfig": {
+                "media": {
+                    "binaryEncoding": "base64"
+                },
+                "type": "string"
+            },
             "overrides": {
                 "additionalProperties": true
             }
@@ -7284,6 +7421,11 @@ txTraceResult <code>[]*txTraceResult</code>
 				- result: 
 					- additionalProperties: `true`
 
+				- txHash: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
 
 			- type: object
 
@@ -7306,6 +7448,11 @@ txTraceResult <code>[]*txTraceResult</code>
                     },
                     "result": {
                         "additionalProperties": true
+                    },
+                    "txHash": {
+                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                        "title": "keccak",
+                        "type": "string"
                     }
                 },
                 "type": [
@@ -7436,6 +7583,12 @@ config <code>*TraceConfig</code>
 		- Tracer: 
 			- type: `string`
 
+		- TracerConfig: 
+			- media: 
+				- binaryEncoding: `base64`
+
+			- type: `string`
+
 		- overrides: 
 			- additionalProperties: `true`
 
@@ -7485,6 +7638,12 @@ config <code>*TraceConfig</code>
             "Tracer": {
                 "type": "string"
             },
+            "TracerConfig": {
+                "media": {
+                    "binaryEncoding": "base64"
+                },
+                "type": "string"
+            },
             "overrides": {
                 "additionalProperties": true
             }
@@ -7522,6 +7681,11 @@ txTraceResult <code>[]*txTraceResult</code>
 				- result: 
 					- additionalProperties: `true`
 
+				- txHash: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
 
 			- type: object
 
@@ -7544,6 +7708,11 @@ txTraceResult <code>[]*txTraceResult</code>
                     },
                     "result": {
                         "additionalProperties": true
+                    },
+                    "txHash": {
+                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                        "title": "keccak",
+                        "type": "string"
                     }
                 },
                 "type": [
@@ -7834,6 +8003,11 @@ config <code>*TraceCallConfig</code>
 		- BlockOverrides: 
 			- additionalProperties: `false`
 			- properties: 
+				- BaseFee: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
 				- Coinbase: 
 					- pattern: `^0x[a-fA-F\d]{64}$`
 					- title: `keccak`
@@ -7860,8 +8034,8 @@ config <code>*TraceCallConfig</code>
 					- type: `string`
 
 				- Time: 
-					- pattern: `^0x[a-fA-F0-9]+$`
-					- title: `integer`
+					- pattern: `^0x([a-fA-F\d])+$`
+					- title: `uint64`
 					- type: `string`
 
 
@@ -7949,6 +8123,12 @@ config <code>*TraceCallConfig</code>
 		- Tracer: 
 			- type: `string`
 
+		- TracerConfig: 
+			- media: 
+				- binaryEncoding: `base64`
+
+			- type: `string`
+
 		- overrides: 
 			- additionalProperties: `true`
 
@@ -7967,6 +8147,11 @@ config <code>*TraceCallConfig</code>
             "BlockOverrides": {
                 "additionalProperties": false,
                 "properties": {
+                    "BaseFee": {
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    },
                     "Coinbase": {
                         "pattern": "^0x[a-fA-F\\d]{64}$",
                         "title": "keccak",
@@ -7993,8 +8178,8 @@ config <code>*TraceCallConfig</code>
                         "type": "string"
                     },
                     "Time": {
-                        "pattern": "^0x[a-fA-F0-9]+$",
-                        "title": "integer",
+                        "pattern": "^0x([a-fA-F\\d])+$",
+                        "title": "uint64",
                         "type": "string"
                     }
                 },
@@ -8082,6 +8267,12 @@ config <code>*TraceCallConfig</code>
             "Tracer": {
                 "type": "string"
             },
+            "TracerConfig": {
+                "media": {
+                    "binaryEncoding": "base64"
+                },
+                "type": "string"
+            },
             "overrides": {
                 "additionalProperties": true
             }
@@ -8160,10 +8351,11 @@ func (api *API) TraceCall(ctx context.Context, args ethapi.TransactionArgs, bloc
 	if config != nil && config.Reexec != nil {
 		reexec = *config.Reexec
 	}
-	statedb, err := api.backend.StateAtBlock(ctx, block, reexec, nil, true, false)
+	statedb, release, err := api.backend.StateAtBlock(ctx, block, reexec, nil, true, false)
 	if err != nil {
 		return nil, err
 	}
+	defer release()
 	vmctx := core.NewEVMBlockContext(block.Header(), api.chainContext(ctx), nil)
 	if config != nil {
 		if err := config.StateOverrides.Apply(statedb); err != nil {
@@ -8183,7 +8375,7 @@ func (api *API) TraceCall(ctx context.Context, args ethapi.TransactionArgs, bloc
 // Try to retrieve the specified block
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L839" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L886" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -8429,6 +8621,11 @@ config <code>*TraceCallConfig</code>
 		- BlockOverrides: 
 			- additionalProperties: `false`
 			- properties: 
+				- BaseFee: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
 				- Coinbase: 
 					- pattern: `^0x[a-fA-F\d]{64}$`
 					- title: `keccak`
@@ -8455,8 +8652,8 @@ config <code>*TraceCallConfig</code>
 					- type: `string`
 
 				- Time: 
-					- pattern: `^0x[a-fA-F0-9]+$`
-					- title: `integer`
+					- pattern: `^0x([a-fA-F\d])+$`
+					- title: `uint64`
 					- type: `string`
 
 
@@ -8544,6 +8741,12 @@ config <code>*TraceCallConfig</code>
 		- Tracer: 
 			- type: `string`
 
+		- TracerConfig: 
+			- media: 
+				- binaryEncoding: `base64`
+
+			- type: `string`
+
 		- overrides: 
 			- additionalProperties: `true`
 
@@ -8562,6 +8765,11 @@ config <code>*TraceCallConfig</code>
             "BlockOverrides": {
                 "additionalProperties": false,
                 "properties": {
+                    "BaseFee": {
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    },
                     "Coinbase": {
                         "pattern": "^0x[a-fA-F\\d]{64}$",
                         "title": "keccak",
@@ -8588,8 +8796,8 @@ config <code>*TraceCallConfig</code>
                         "type": "string"
                     },
                     "Time": {
-                        "pattern": "^0x[a-fA-F0-9]+$",
-                        "title": "integer",
+                        "pattern": "^0x([a-fA-F\\d])+$",
+                        "title": "uint64",
                         "type": "string"
                     }
                 },
@@ -8677,6 +8885,12 @@ config <code>*TraceCallConfig</code>
             "Tracer": {
                 "type": "string"
             },
+            "TracerConfig": {
+                "media": {
+                    "binaryEncoding": "base64"
+                },
+                "type": "string"
+            },
             "overrides": {
                 "additionalProperties": true
             }
@@ -8755,10 +8969,11 @@ func (api *API) TraceCallMany(ctx context.Context, txs [ // TraceCallMany lets y
 	if config != nil && config.Reexec != nil {
 		reexec = *config.Reexec
 	}
-	statedb, err := api.backend.StateAtBlock(ctx, block, reexec, nil, true, false)
+	statedb, release, err := api.backend.StateAtBlock(ctx, block, reexec, nil, true, false)
 	if err != nil {
 		return nil, err
 	}
+	defer release()
 	if config != nil {
 		if err := config.StateOverrides.Apply(statedb); err != nil {
 			return nil, err
@@ -8788,7 +9003,7 @@ func (api *API) TraceCallMany(ctx context.Context, txs [ // TraceCallMany lets y
 	return results, nil
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L893" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L942" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -8977,6 +9192,12 @@ config <code>*TraceConfig</code>
 		- Tracer: 
 			- type: `string`
 
+		- TracerConfig: 
+			- media: 
+				- binaryEncoding: `base64`
+
+			- type: `string`
+
 		- overrides: 
 			- additionalProperties: `true`
 
@@ -9024,6 +9245,12 @@ config <code>*TraceConfig</code>
                 "type": "string"
             },
             "Tracer": {
+                "type": "string"
+            },
+            "TracerConfig": {
+                "media": {
+                    "binaryEncoding": "base64"
+                },
                 "type": "string"
             },
             "overrides": {
@@ -9108,12 +9335,23 @@ func (api *API) TraceChain(ctx context.Context, start, end rpc.BlockNumber, conf
 	if from.Number().Cmp(to.Number()) >= 0 {
 		return nil, fmt.Errorf("end block (#%d) needs to come after start block (#%d)", end, start)
 	}
-	return api.traceChain(ctx, from, to, config)
-}// TraceChain returns the structured logs created during the execution of EVM
-// between two blocks (excluding start) and returns them as a JSON object.
-
+	notifier, supported := rpc.NotifierFromContext(ctx)
+	if !supported {
+		return &rpc.Subscription{}, rpc.ErrNotificationsUnsupported
+	}
+	sub := notifier.CreateSubscription()
+	resCh := api.traceChain(from, to, config, notifier.Closed())
+	go func() {
+		for result := // TraceChain returns the structured logs created during the execution of EVM
+		// between two blocks (excluding start) and returns them as a JSON object.
+		range resCh {
+			notifier.Notify(sub.ID, result)
+		}
+	}()
+	return sub, nil
+}
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L241" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L228" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -9212,6 +9450,12 @@ config <code>*TraceConfig</code>
 		- Tracer: 
 			- type: `string`
 
+		- TracerConfig: 
+			- media: 
+				- binaryEncoding: `base64`
+
+			- type: `string`
+
 		- overrides: 
 			- additionalProperties: `true`
 
@@ -9259,6 +9503,12 @@ config <code>*TraceConfig</code>
                 "type": "string"
             },
             "Tracer": {
+                "type": "string"
+            },
+            "TracerConfig": {
+                "media": {
+                    "binaryEncoding": "base64"
+                },
                 "type": "string"
             },
             "overrides": {
@@ -9318,9 +9568,12 @@ interface <code>interface{}</code>
 <p>
 ```go
 func (api *API) TraceTransaction(ctx context.Context, hash common.Hash, config *TraceConfig) (interface{}, error) {
-	_, blockHash, blockNumber, index, err := api.backend.GetTransaction(ctx, hash)
+	tx, blockHash, blockNumber, index, err := api.backend.GetTransaction(ctx, hash)
 	if err != nil {
 		return nil, err
+	}
+	if tx == nil {
+		return nil, errTxNotFound
 	}
 	if blockNumber == 0 {
 		return nil, errors.New("genesis is not traceable")
@@ -9333,17 +9586,18 @@ func (api *API) TraceTransaction(ctx context.Context, hash common.Hash, config *
 	if err != nil {
 		return nil, err
 	}
-	msg, vmctx, statedb, err := api.backend.StateAtTransaction(ctx, block, int(index), reexec)
+	msg, vmctx, statedb, release, err := api.backend.StateAtTransaction(ctx, block, int(index), reexec)
 	if err != nil {
 		return nil, err
 	}
-	txctx := &Context{BlockHash: blockHash, TxIndex: int(index), TxHash: hash}
+	defer release()
+	txctx := &Context{BlockHash: blockHash, BlockNumber: block.Number(), TxIndex: int(index), TxHash: hash}
 	return api.traceTx(ctx, msg, txctx, vmctx, statedb, config)
 }// TraceTransaction returns the structured logs created during the execution of EVM
 // and returns them as a JSON object.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L807" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L847" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -9434,7 +9688,7 @@ func (sub *RPCDebugSubscription) Unsubscribe(id rpc.ID) error {
 }// Unsubscribe terminates an existing subscription by ID.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L242" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L241" target="_">View on GitHub →</a>
 </p>
 </details>
 

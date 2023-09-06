@@ -64,7 +64,7 @@ type lesCommons struct {
 // NodeInfo represents a short summary of the Ethereum sub-protocol metadata
 // known about the host peer.
 type NodeInfo struct {
-	Network    uint64                   `json:"network"`    // Ethereum network ID (1=Mainnet, Rinkeby=4, Goerli=5)
+	Network    uint64                   `json:"network"`    // Ethereum network ID (1=Mainnet, Goerli=5)
 	Difficulty *big.Int                 `json:"difficulty"` // Total difficulty of the host's blockchain
 	Genesis    common.Hash              `json:"genesis"`    // SHA3 hash of the host's genesis block
 	Config     ctypes.ChainConfigurator `json:"config"`     // Chain configuration for the fork rules
@@ -154,7 +154,7 @@ func (c *lesCommons) setupOracle(node *node.Node, genesis common.Hash, ethconfig
 		return nil
 	}
 	oracle := checkpointoracle.New(config, c.localCheckpoint)
-	rpcClient, _ := node.Attach()
+	rpcClient := node.Attach()
 	client := ethclient.NewClient(rpcClient)
 	oracle.Start(client)
 	log.Info("Configured checkpoint oracle", "address", config.Address, "signers", len(config.Signers), "threshold", config.Threshold)

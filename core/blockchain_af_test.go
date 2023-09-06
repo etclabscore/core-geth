@@ -271,10 +271,7 @@ func TestEcbp1100PolynomialV(t *testing.T) {
 
 func TestPlot_ecbp1100PolynomialV(t *testing.T) {
 	t.Skip("This test plots a graph of the ECBP1100 polynomial curve.")
-	p, err := plot.New()
-	if err != nil {
-		panic(err)
-	}
+	p := plot.New()
 	p.Title.Text = "ECBP1100 Polynomial Curve Function"
 	p.X.Label.Text = "X"
 	p.Y.Label.Text = "Y"
@@ -339,10 +336,7 @@ func TestDifficultyDelta(t *testing.T) {
 		data = append(data, plotter.XY{X: float64(i), Y: rat})
 	}
 
-	p, err := plot.New()
-	if err != nil {
-		log.Panic(err)
-	}
+	p := plot.New()
 	p.Title.Text = "Block Difficulty Delta by Timestamp Offset"
 	p.X.Label.Text = "Timestamp Offset"
 	p.Y.Label.Text = "Relative Difficulty (child/parent)"
@@ -410,10 +404,7 @@ func TestGenerateChainTargetingHashrate(t *testing.T) {
 	}
 	t.Log(chain.CurrentBlock().Number)
 
-	p, err := plot.New()
-	if err != nil {
-		log.Panic(err)
-	}
+	p := plot.New()
 	p.Title.Text = fmt.Sprintf("Block Difficulty Toward Target: %dx", targetDifficultyRatio.Uint64())
 	p.X.Label.Text = "Block Number"
 	p.Y.Label.Text = "Difficulty"
@@ -467,10 +458,7 @@ func TestBlockChain_GenerateMESSPlot(t *testing.T) {
 	maxHardLen := 400
 
 	generatePlot := func(title, fileName string) {
-		p, err := plot.New()
-		if err != nil {
-			log.Panic(err)
-		}
+		p := plot.New()
 		p.Title.Text = title
 		p.X.Label.Text = "Block Depth"
 		p.Y.Label.Text = "Mode Block Time Offset (10 seconds + y)"
@@ -523,7 +511,7 @@ func TestBlockChain_GenerateMESSPlot(t *testing.T) {
 
 		p.Legend.YOffs = -30
 
-		err = p.Save(pixelWidth, 300, fileName)
+		err := p.Save(pixelWidth, 300, fileName)
 		if err != nil {
 			log.Panic(err)
 		}
@@ -1036,10 +1024,7 @@ func TestBlockChain_AF_Difficulty_Develop(t *testing.T) {
 		scatterHards.Shape = draw.CircleGlyph{}
 		scatterHards.Radius = 2
 
-		p, perr := plot.New()
-		if perr != nil {
-			log.Panic(perr)
-		}
+		p := plot.New()
 		p.Add(scatterCommons)
 		p.Legend.Add("Commons", scatterCommons)
 		p.Add(scatterEasys)
@@ -1049,10 +1034,7 @@ func TestBlockChain_AF_Difficulty_Develop(t *testing.T) {
 		p.Title.Text = fmt.Sprintf("TD easy=%d hard=%d", c.easyOffset, c.hardOffset)
 		p.Save(1000, 600, fmt.Sprintf("plot-td-%d-%d-%d-%d-%d.png", c.easyLen, c.commonAncestorN, c.hardLen, c.easyOffset, c.hardOffset))
 
-		p, perr = plot.New()
-		if perr != nil {
-			log.Panic(perr)
-		}
+		p = plot.New()
 
 		scatterTDRs.Color = color.RGBA{R: 236, G: 106, B: 94, A: 255} // red
 		scatterTDRs.Radius = 3
@@ -1075,10 +1057,7 @@ func TestBlockChain_AF_Difficulty_Develop(t *testing.T) {
 		p.Title.Text = fmt.Sprintf("TD Ratio easy=%d hard=%d", c.easyOffset, c.hardOffset)
 		p.Save(1000, 600, fmt.Sprintf("plot-td-ratio-%d-%d-%d-%d-%d.png", c.easyLen, c.commonAncestorN, c.hardLen, c.easyOffset, c.hardOffset))
 
-		p, perr = plot.New()
-		if perr != nil {
-			log.Panic(perr)
-		}
+		p = plot.New()
 		p.Title.Text = fmt.Sprintf("TD Ratio - Antigravity Penalty easy=%d hard=%d", c.easyOffset, c.hardOffset)
 		balanceScatter.Color = color.RGBA{R: 235, G: 92, B: 236, A: 255} // purple
 		balanceScatter.Radius = 3

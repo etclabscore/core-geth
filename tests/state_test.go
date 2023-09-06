@@ -48,7 +48,6 @@ func TestState(t *testing.T) {
 	st.slow(`^stStaticCall/static_Return50000`)
 	st.slow(`^stSystemOperationsTest/CallRecursiveBomb`)
 	st.slow(`^stTransactionTest/Opcodes_TransactionInit`)
-
 	// Very time consuming
 	st.skipLoad(`^stTimeConsuming/`)
 	st.skipLoad(`.*vmPerformance/loop.*`)
@@ -83,20 +82,29 @@ func TestState(t *testing.T) {
 		st.skipFork("London")   // ETH
 		st.skipFork("Mystique") // ETC
 		st.skipFork("Merge")    // ETH
+		st.skipFork("Shanghai") // ETH
+		st.skipFork("Spiral")   // ETC
+		st.skipFork("Cancun")   // ETH
 	}
 
 	// Un-skip this when https://github.com/ethereum/tests/issues/908 is closed
 	st.skipLoad(`^stQuadraticComplexityTest/QuadraticComplexitySolidity_CallDataCopy`)
 
 	// Broken tests:
-	//
-	// The stEOF tests are generated with EOF as part of Shanghai, which
-	// is erroneous. Therefore, these tests are skipped.
-	st.skipLoad(`^EIPTests/stEOF/`)
+	// EOF is not part of cancun
+	st.skipLoad(`^stEOF/`)
+
+	// EIP-4844 tests need to be regenerated due to the data-to-blob rename
+	st.skipLoad(`^stEIP4844-blobtransactions/`)
+
 	// Expected failures:
+	// These EIP-4844 tests need to be regenerated.
+	st.fails(`stEIP4844-blobtransactions/opcodeBlobhashOutOfRange.json`, "test has incorrect state root")
+	st.fails(`stEIP4844-blobtransactions/opcodeBlobhBounds.json`, "test has incorrect state root")
 
 	// For Istanbul, older tests were moved into LegacyTests
 	for _, dir := range []string{
+		filepath.Join(baseDir, "EIPTests", "StateTests"),
 		stateTestDir,
 		legacyStateTestDir,
 		benchmarksDir,
@@ -281,7 +289,8 @@ func runBenchmark(b *testing.B, t *StateTest) {
 
 				// Shanghai
 				// EIP-3651: Warm coinbase
-				eip3651f = config.IsEnabledByTime(config.GetEIP3651TransitionTime, &evm.Context.Time)
+				eip3651f = config.IsEnabledByTime(config.GetEIP3651TransitionTime, &evm.Context.Time) ||
+					config.IsEnabled(config.GetEIP3651Transition, evm.Context.BlockNumber)
 			)
 			b.ResetTimer()
 			for n := 0; n < b.N; n++ {

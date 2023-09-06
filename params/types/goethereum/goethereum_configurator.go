@@ -592,12 +592,87 @@ func (c *ChainConfig) SetEIP6049TransitionTime(n *uint64) error {
 	return nil
 }
 
+// EIP3651: Warm COINBASE
+func (c *ChainConfig) GetEIP3651Transition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetEIP3651Transition(n *uint64) error {
+	return ctypes.ErrUnsupportedConfigNoop
+}
+
+// GetEIP3855Transition EIP3855: PUSH0 instruction
+func (c *ChainConfig) GetEIP3855Transition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetEIP3855Transition(n *uint64) error {
+	return ctypes.ErrUnsupportedConfigNoop
+}
+
+// GetEIP3860Transition EIP3860: Limit and meter initcode
+func (c *ChainConfig) GetEIP3860Transition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetEIP3860Transition(n *uint64) error {
+	return ctypes.ErrUnsupportedConfigNoop
+}
+
+// GetEIP4895Transition EIP4895: Beacon chain push withdrawals as operations
+func (c *ChainConfig) GetEIP4895Transition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetEIP4895Transition(n *uint64) error {
+	return ctypes.ErrUnsupportedConfigNoop
+}
+
+// GetEIP6049Transition EIP6049: Deprecate SELFDESTRUCT
+func (c *ChainConfig) GetEIP6049Transition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetEIP6049Transition(n *uint64) error {
+	return ctypes.ErrUnsupportedConfigNoop
+}
+
 // GetEIP4844TransitionTime EIP4844: Shard Block Transactions
 func (c *ChainConfig) GetEIP4844TransitionTime() *uint64 {
 	return c.CancunTime
 }
 
 func (c *ChainConfig) SetEIP4844TransitionTime(n *uint64) error {
+	c.CancunTime = n
+	return nil
+}
+
+// GetEIP1153TransitionTime EIP1153: Transient Storage opcodes
+func (c *ChainConfig) GetEIP1153TransitionTime() *uint64 {
+	return c.CancunTime
+}
+
+func (c *ChainConfig) SetEIP1153TransitionTime(n *uint64) error {
+	c.CancunTime = n
+	return nil
+}
+
+// GetEIP5656TransitionTime EIP5656: MCOPY - Memory copying instruction
+func (c *ChainConfig) GetEIP5656TransitionTime() *uint64 {
+	return c.CancunTime
+}
+
+func (c *ChainConfig) SetEIP5656TransitionTime(n *uint64) error {
+	c.CancunTime = n
+	return nil
+}
+
+// GetEIP6780TransitionTime EIP6780: SELFDESTRUCT only in same transaction
+func (c *ChainConfig) GetEIP6780TransitionTime() *uint64 {
+	return c.CancunTime
+}
+
+func (c *ChainConfig) SetEIP6780TransitionTime(n *uint64) error {
 	c.CancunTime = n
 	return nil
 }
@@ -679,6 +754,15 @@ func (c *ChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) erro
 	default:
 		return ctypes.ErrUnsupportedConfigFatal
 	}
+}
+
+func (c *ChainConfig) GetIsDevMode() bool {
+	return c.IsDevMode
+}
+
+func (c *ChainConfig) SetDevMode(devMode bool) error {
+	c.IsDevMode = devMode
+	return nil
 }
 
 func (c *ChainConfig) GetEthashTerminalTotalDifficulty() *big.Int {

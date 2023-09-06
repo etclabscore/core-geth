@@ -29,7 +29,6 @@ import (
 var (
 	MainnetGenesisHash = common.HexToHash("0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3")
 	SepoliaGenesisHash = common.HexToHash("0x25a5cc106eea7138acab33231d7160d69cb777ee0c2c553fcddf5138993e6dd9")
-	RinkebyGenesisHash = common.HexToHash("0x6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177")
 	GoerliGenesisHash  = common.HexToHash("0xbf7e331f7f7c1dd2e05159666b3bf8bc7a8a3a9eb1d518969eab529dd9b88c1a")
 )
 
@@ -89,31 +88,6 @@ var (
 		ShanghaiTime:                  newUint64(1677557088),
 		Ethash:                        new(ctypes.EthashConfig),
 	}
-
-	// RinkebyChainConfig contains the chain parameters to run a node on the Rinkeby test network.
-	RinkebyChainConfig = &goethereum.ChainConfig{
-		ChainID:                   big.NewInt(4),
-		SupportedProtocolVersions: vars.DefaultProtocolVersions,
-		HomesteadBlock:            big.NewInt(1),
-		DAOForkBlock:              nil,
-		DAOForkSupport:            true,
-		EIP150Block:               big.NewInt(2),
-		EIP155Block:               big.NewInt(3),
-		EIP158Block:               big.NewInt(3),
-		ByzantiumBlock:            big.NewInt(1_035_301),
-		ConstantinopleBlock:       big.NewInt(3_660_663),
-		PetersburgBlock:           big.NewInt(4_321_234),
-		IstanbulBlock:             big.NewInt(5_435_345),
-		MuirGlacierBlock:          nil,
-		BerlinBlock:               big.NewInt(8_290_928),
-		LondonBlock:               big.NewInt(8_897_988),
-		ArrowGlacierBlock:         nil,
-		Clique: &ctypes.CliqueConfig{
-			Period: 15,
-			Epoch:  30000,
-		},
-	}
-
 	// GoerliChainConfig contains the chain parameters to run a node on the Görli test network.
 	GoerliChainConfig = &goethereum.ChainConfig{
 		ChainID:                       big.NewInt(5),
@@ -164,10 +138,32 @@ var (
 		ShanghaiTime:                  nil,
 		CancunTime:                    nil,
 		PragueTime:                    nil,
+		VerkleTime:                    nil,
 		TerminalTotalDifficulty:       nil,
 		TerminalTotalDifficultyPassed: false,
 		Ethash:                        new(ctypes.EthashConfig),
 		Clique:                        nil,
+	}
+
+	AllDevChainProtocolChanges = &goethereum.ChainConfig{
+		ChainID:                       big.NewInt(1337),
+		HomesteadBlock:                big.NewInt(0),
+		EIP150Block:                   big.NewInt(0),
+		EIP155Block:                   big.NewInt(0),
+		EIP158Block:                   big.NewInt(0),
+		ByzantiumBlock:                big.NewInt(0),
+		ConstantinopleBlock:           big.NewInt(0),
+		PetersburgBlock:               big.NewInt(0),
+		IstanbulBlock:                 big.NewInt(0),
+		MuirGlacierBlock:              big.NewInt(0),
+		BerlinBlock:                   big.NewInt(0),
+		LondonBlock:                   big.NewInt(0),
+		ArrowGlacierBlock:             big.NewInt(0),
+		GrayGlacierBlock:              big.NewInt(0),
+		ShanghaiTime:                  newUint64(0),
+		TerminalTotalDifficulty:       big.NewInt(0),
+		TerminalTotalDifficultyPassed: true,
+		IsDevMode:                     true,
 	}
 
 	// AllCliqueProtocolChanges contains every protocol change (EIPs) introduced
@@ -193,6 +189,7 @@ var (
 		ShanghaiTime:                  nil,
 		CancunTime:                    nil,
 		PragueTime:                    nil,
+		VerkleTime:                    nil,
 		TerminalTotalDifficulty:       nil,
 		TerminalTotalDifficultyPassed: false,
 		Ethash:                        nil,
@@ -225,6 +222,7 @@ var (
 		ShanghaiTime:                  nil,
 		CancunTime:                    nil,
 		PragueTime:                    nil,
+		VerkleTime:                    nil,
 		TerminalTotalDifficulty:       nil,
 		TerminalTotalDifficultyPassed: false,
 		Ethash:                        new(ctypes.EthashConfig),
@@ -254,6 +252,7 @@ var (
 		ShanghaiTime:                  nil,
 		CancunTime:                    nil,
 		PragueTime:                    nil,
+		VerkleTime:                    nil,
 		TerminalTotalDifficulty:       nil,
 		TerminalTotalDifficultyPassed: false,
 		Ethash:                        new(ctypes.EthashConfig),
@@ -264,7 +263,6 @@ var (
 // NetworkNames are user friendly names to use in the chain spec banner.
 var NetworkNames = map[string]string{
 	MainnetChainConfig.ChainID.String(): "mainnet",
-	RinkebyChainConfig.ChainID.String(): "rinkeby",
 	GoerliChainConfig.ChainID.String():  "goerli",
 	SepoliaChainConfig.ChainID.String(): "sepolia",
 }
@@ -327,6 +325,7 @@ var NetworkNames = map[string]string{
 	ShanghaiTime *uint64 `json:"shanghaiTime,omitempty"` // Shanghai switch time (nil = no fork, 0 = already on shanghai)
 	CancunTime   *uint64 `json:"cancunTime,omitempty"`   // Cancun switch time (nil = no fork, 0 = already on cancun)
 	PragueTime   *uint64 `json:"pragueTime,omitempty"`   // Prague switch time (nil = no fork, 0 = already on prague)
+	VerkleTime   *uint64 `json:"verkleTime,omitempty"`   // Verkle switch time (nil = no fork, 0 = already on verkle)
 
 					// TerminalTotalDifficulty is the amount of total difficulty reached by
 					// the network that triggers the consensus upgrade.

@@ -564,6 +564,57 @@ func (c *CoreGethChainConfig) SetEIP6049TransitionTime(n *uint64) error {
 	return nil
 }
 
+// Shanghai by block
+// EIP3651: Warm COINBASE
+func (c *CoreGethChainConfig) GetEIP3651Transition() *uint64 {
+	return bigNewU64(c.EIP3651FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP3651Transition(n *uint64) error {
+	c.EIP3651FBlock = setBig(c.EIP3651FBlock, n)
+	return nil
+}
+
+// GetEIP3855Transition EIP3855: PUSH0 instruction
+func (c *CoreGethChainConfig) GetEIP3855Transition() *uint64 {
+	return bigNewU64(c.EIP3855FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP3855Transition(n *uint64) error {
+	c.EIP3855FBlock = setBig(c.EIP3855FBlock, n)
+	return nil
+}
+
+// GetEIP3860Transition EIP3860: Limit and meter initcode
+func (c *CoreGethChainConfig) GetEIP3860Transition() *uint64 {
+	return bigNewU64(c.EIP3860FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP3860Transition(n *uint64) error {
+	c.EIP3860FBlock = setBig(c.EIP3860FBlock, n)
+	return nil
+}
+
+// GetEIP4895Transition EIP4895: Beacon chain push withdrawals as operations
+func (c *CoreGethChainConfig) GetEIP4895Transition() *uint64 {
+	return bigNewU64(c.EIP4895FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP4895Transition(n *uint64) error {
+	c.EIP4895FBlock = setBig(c.EIP4895FBlock, n)
+	return nil
+}
+
+// GetEIP6049Transition EIP6049: Deprecate SELFDESTRUCT
+func (c *CoreGethChainConfig) GetEIP6049Transition() *uint64 {
+	return bigNewU64(c.EIP6049FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP6049Transition(n *uint64) error {
+	c.EIP6049FBlock = setBig(c.EIP6049FBlock, n)
+	return nil
+}
+
 // GetEIP4844TransitionTime EIP4844: Shard Blob Transactions
 func (c *CoreGethChainConfig) GetEIP4844TransitionTime() *uint64 {
 	return c.EIP4844FTime
@@ -571,6 +622,36 @@ func (c *CoreGethChainConfig) GetEIP4844TransitionTime() *uint64 {
 
 func (c *CoreGethChainConfig) SetEIP4844TransitionTime(n *uint64) error {
 	c.EIP4844FTime = n
+	return nil
+}
+
+// GetEIP1153TransitionTime EIP1153: Transient Storage opcodes
+func (c *CoreGethChainConfig) GetEIP1153TransitionTime() *uint64 {
+	return c.EIP1153FTime
+}
+
+func (c *CoreGethChainConfig) SetEIP1153TransitionTime(n *uint64) error {
+	c.EIP1153FTime = n
+	return nil
+}
+
+// GetEIP5656TransitionTime EIP5656: MCOPY - Memory copying instruction
+func (c *CoreGethChainConfig) GetEIP5656TransitionTime() *uint64 {
+	return c.EIP5656FTime
+}
+
+func (c *CoreGethChainConfig) SetEIP5656TransitionTime(n *uint64) error {
+	c.EIP5656FTime = n
+	return nil
+}
+
+// GetEIP6780TransitionTime EIP6780: SELFDESTRUCT only in same transaction
+func (c *CoreGethChainConfig) GetEIP6780TransitionTime() *uint64 {
+	return c.EIP6780FTime
+}
+
+func (c *CoreGethChainConfig) SetEIP6780TransitionTime(n *uint64) error {
+	c.EIP6780FTime = n
 	return nil
 }
 
@@ -654,6 +735,15 @@ func (c *CoreGethChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngin
 	default:
 		return ctypes.ErrUnsupportedConfigFatal
 	}
+}
+
+func (c *CoreGethChainConfig) GetIsDevMode() bool {
+	return c.IsDevMode
+}
+
+func (c *CoreGethChainConfig) SetDevMode(devMode bool) error {
+	c.IsDevMode = devMode
+	return nil
 }
 
 func (c *CoreGethChainConfig) GetEthashTerminalTotalDifficulty() *big.Int {

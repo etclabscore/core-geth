@@ -341,7 +341,7 @@ func genesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 	if g.Difficulty == nil {
 		head.Difficulty = vars.GenesisDifficulty
 	}
-	statedb.Commit(false)
+	statedb.Commit(head.Number.Uint64(), false)
 	statedb.Database().TrieDB().Commit(root, true)
 
 	return types.NewBlock(head, nil, nil, nil, trie.NewStackTrie(nil))

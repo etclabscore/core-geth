@@ -17,12 +17,14 @@
 package core
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
 	cmath "github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/consensus/misc/eip4844"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/params/vars"
@@ -125,16 +127,18 @@ func toWordSize(size uint64) uint64 {
 // A Message contains the data derived from a single transaction that is relevant to state
 // processing.
 type Message struct {
-	To         *common.Address
-	From       common.Address
-	Nonce      uint64
-	Value      *big.Int
-	GasLimit   uint64
-	GasPrice   *big.Int
-	GasFeeCap  *big.Int
-	GasTipCap  *big.Int
-	Data       []byte
-	AccessList types.AccessList
+	To            *common.Address
+	From          common.Address
+	Nonce         uint64
+	Value         *big.Int
+	GasLimit      uint64
+	GasPrice      *big.Int
+	GasFeeCap     *big.Int
+	GasTipCap     *big.Int
+	Data          []byte
+	AccessList    types.AccessList
+	BlobGasFeeCap *big.Int
+	BlobHashes    []common.Hash
 
 	// When SkipAccountChecks is true, the message nonce is not checked against the
 	// account nonce in state. It also disables checking that the sender is an EOA.
@@ -155,6 +159,8 @@ func TransactionToMessage(tx *types.Transaction, s types.Signer, baseFee *big.In
 		Data:              tx.Data(),
 		AccessList:        tx.AccessList(),
 		SkipAccountChecks: false,
+		BlobHashes:        tx.BlobHashes(),
+		BlobGasFeeCap:     tx.BlobGasFeeCap(),
 	}
 	// If baseFee provided, set gasPrice to effectiveGasPrice.
 	if baseFee != nil {
@@ -228,11 +234,23 @@ func (st *StateTransition) to() common.Address {
 func (st *StateTransition) buyGas() error {
 	mgval := new(big.Int).SetUint64(st.msg.GasLimit)
 	mgval = mgval.Mul(mgval, st.msg.GasPrice)
-	balanceCheck := mgval
+	balanceCheck := new(big.Int).Set(mgval)
 	if st.msg.GasFeeCap != nil {
-		balanceCheck = new(big.Int).SetUint64(st.msg.GasLimit)
+		balanceCheck.SetUint64(st.msg.GasLimit)
 		balanceCheck = balanceCheck.Mul(balanceCheck, st.msg.GasFeeCap)
 		balanceCheck.Add(balanceCheck, st.msg.Value)
+	}
+	if st.evm.ChainConfig().IsEnabledByTime(st.evm.ChainConfig().GetEIP4844TransitionTime, &st.evm.Context.Time) {
+		if blobGas := st.blobGasUsed(); blobGas > 0 {
+			// Check that the user has enough funds to cover blobGasUsed * tx.BlobGasFeeCap
+			blobBalanceCheck := new(big.Int).SetUint64(blobGas)
+			blobBalanceCheck.Mul(blobBalanceCheck, st.msg.BlobGasFeeCap)
+			balanceCheck.Add(balanceCheck, blobBalanceCheck)
+			// Pay for blobGasUsed * actual blob fee
+			blobFee := new(big.Int).SetUint64(blobGas)
+			blobFee.Mul(blobFee, eip4844.CalcBlobFee(*st.evm.Context.ExcessBlobGas))
+			mgval.Add(mgval, blobFee)
+		}
 	}
 	if have, want := st.state.GetBalance(st.msg.From), balanceCheck; have.Cmp(want) < 0 {
 		return fmt.Errorf("%w: address %v have %v want %v", ErrInsufficientFunds, st.msg.From.Hex(), have, want)
@@ -295,6 +313,29 @@ func (st *StateTransition) preCheck() error {
 			}
 		}
 	}
+	// Check the blob version validity
+	if msg.BlobHashes != nil {
+		if len(msg.BlobHashes) == 0 {
+			return errors.New("blob transaction missing blob hashes")
+		}
+		for i, hash := range msg.BlobHashes {
+			if hash[0] != vars.BlobTxHashVersion {
+				return fmt.Errorf("blob %d hash version mismatch (have %d, supported %d)",
+					i, hash[0], vars.BlobTxHashVersion)
+			}
+		}
+	}
+
+	if st.evm.ChainConfig().IsEnabledByTime(st.evm.ChainConfig().GetEIP4844TransitionTime, &st.evm.Context.Time) {
+		if st.blobGasUsed() > 0 {
+			// Check that the user is paying at least the current blob fee
+			blobFee := eip4844.CalcBlobFee(*st.evm.Context.ExcessBlobGas)
+			if st.msg.BlobGasFeeCap.Cmp(blobFee) < 0 {
+				return fmt.Errorf("%w: address %v have %v want %v", ErrBlobFeeCapTooLow, st.msg.From.Hex(), st.msg.BlobGasFeeCap, blobFee)
+			}
+		}
+	}
+
 	return st.buyGas()
 }
 
@@ -358,10 +399,12 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		eip3529f = st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP3529Transition, st.evm.Context.BlockNumber)
 
 		// EIP-3860: Limit and meter initcode
-		eip3860f = st.evm.ChainConfig().IsEnabledByTime(st.evm.ChainConfig().GetEIP3860TransitionTime, &st.evm.Context.Time)
+		eip3860f = st.evm.ChainConfig().IsEnabledByTime(st.evm.ChainConfig().GetEIP3860TransitionTime, &st.evm.Context.Time) ||
+			st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP3860Transition, st.evm.Context.BlockNumber)
 
 		// EIP-3651: Warm coinbase
-		eip3651f = st.evm.ChainConfig().IsEnabledByTime(st.evm.ChainConfig().GetEIP3651TransitionTime, &st.evm.Context.Time)
+		eip3651f = st.evm.ChainConfig().IsEnabledByTime(st.evm.ChainConfig().GetEIP3651TransitionTime, &st.evm.Context.Time) ||
+			st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP3651Transition, st.evm.Context.BlockNumber)
 	)
 
 	// Check clauses 4-5, subtract intrinsic gas if everything is correct
@@ -454,4 +497,9 @@ func (st *StateTransition) refundGas(refundQuotient uint64) {
 // gasUsed returns the amount of gas used up by the state transition.
 func (st *StateTransition) gasUsed() uint64 {
 	return st.initialGas - st.gasRemaining
+}
+
+// blobGasUsed returns the amount of blob gas used by the message.
+func (st *StateTransition) blobGasUsed() uint64 {
+	return uint64(len(st.msg.BlobHashes) * vars.BlobTxBlobGasPerBlob)
 }

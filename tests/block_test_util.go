@@ -103,7 +103,7 @@ type btHeaderMarshaling struct {
 	BaseFeePerGas *math.HexOrDecimal256
 }
 
-func (t *BlockTest) Run(snapshotter bool) error {
+func (t *BlockTest) Run(snapshotter bool, tracer vm.EVMLogger) error {
 	config, ok := Forks[t.json.Network]
 	if !ok {
 		return UnsupportedForkError{t.json.Network}
@@ -136,7 +136,9 @@ func (t *BlockTest) Run(snapshotter bool) error {
 		cache.SnapshotLimit = 1
 		cache.SnapshotWait = true
 	}
-	chain, err := core.NewBlockChain(db, cache, genesis, nil, engine, vm.Config{}, nil, nil)
+	chain, err := core.NewBlockChain(db, cache, genesis, nil, engine, vm.Config{
+		Tracer: tracer,
+	}, nil, nil)
 	if err != nil {
 		return err
 	}

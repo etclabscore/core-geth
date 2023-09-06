@@ -27,7 +27,7 @@ func TestRPCDiscover_BuildStatic(t *testing.T) {
 	}
 
 	backend, _ := newTestBackend(t)
-	client, _ := backend.Attach()
+	client := backend.Attach()
 	defer backend.Close()
 	defer client.Close()
 

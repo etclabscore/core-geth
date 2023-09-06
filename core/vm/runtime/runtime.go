@@ -46,6 +46,7 @@ type Config struct {
 	Debug       bool
 	EVMConfig   vm.Config
 	BaseFee     *big.Int
+	BlobHashes  []common.Hash
 
 	State     *state.StateDB
 	GetHashFn func(n uint64) common.Hash
@@ -123,7 +124,8 @@ func Execute(code, input []byte, cfg *Config) ([]byte, *state.StateDB, error) {
 
 		// Shanghai
 		// EIP-3651: Warm coinbase
-		eip3651f = cfg.ChainConfig.IsEnabledByTime(cfg.ChainConfig.GetEIP3651TransitionTime, &vmenv.Context.Time)
+		eip3651f = cfg.ChainConfig.IsEnabledByTime(cfg.ChainConfig.GetEIP3651TransitionTime, &vmenv.Context.Time) ||
+			cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP3651Transition, vmenv.Context.BlockNumber)
 	)
 	// Execute the preparatory steps for state transition which includes:
 	// - prepare accessList(post-berlin)
@@ -164,7 +166,8 @@ func Create(input []byte, cfg *Config) ([]byte, common.Address, uint64, error) {
 
 		// Shanghai
 		// EIP-3651: Warm coinbase
-		eip3651f = cfg.ChainConfig.IsEnabledByTime(cfg.ChainConfig.GetEIP3651TransitionTime, &vmenv.Context.Time)
+		eip3651f = cfg.ChainConfig.IsEnabledByTime(cfg.ChainConfig.GetEIP3651TransitionTime, &vmenv.Context.Time) ||
+			cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP3651Transition, vmenv.Context.BlockNumber)
 	)
 	// Execute the preparatory steps for state transition which includes:
 	// - prepare accessList(post-berlin)
@@ -199,7 +202,8 @@ func Call(address common.Address, input []byte, cfg *Config) ([]byte, uint64, er
 
 		// Shanghai
 		// EIP-3651: Warm coinbase
-		eip3651f = cfg.ChainConfig.IsEnabledByTime(cfg.ChainConfig.GetEIP3651TransitionTime, &vmenv.Context.Time)
+		eip3651f = cfg.ChainConfig.IsEnabledByTime(cfg.ChainConfig.GetEIP3651TransitionTime, &vmenv.Context.Time) ||
+			cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP3651Transition, vmenv.Context.BlockNumber)
 	)
 	// Execute the preparatory steps for state transition which includes:
 	// - prepare accessList(post-berlin)

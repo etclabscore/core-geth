@@ -193,7 +193,7 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, isPostMerge bool, 
 	if config.IsEnabled(config.GetEIP3198Transition, bn) {
 		enable3198(instructionSet) // BASEFEE opcode https://eips.ethereum.org/EIPS/eip-3198
 	}
-	if isPostMerge {
+	if isPostMerge || config.IsEnabled(config.GetEIP4399Transition, bn) { // EIP4399: Supplant DIFFICULTY opcode with PREVRANDAO (ETH @ PoS)
 		instructionSet[PREVRANDAO] = &operation{
 			execute:     opRandom,
 			constantGas: GasQuickStep,
@@ -201,12 +201,29 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, isPostMerge bool, 
 			maxStack:    maxStack(0, 1),
 		}
 	}
-	if config.IsEnabledByTime(config.GetEIP3855TransitionTime, bt) {
+
+	// Shangai
+	if config.IsEnabledByTime(config.GetEIP3855TransitionTime, bt) || config.IsEnabled(config.GetEIP3855Transition, bn) {
 		enable3855(instructionSet) // PUSH0 instruction
 	}
-	if config.IsEnabledByTime(config.GetEIP3860TransitionTime, bt) {
+	if config.IsEnabledByTime(config.GetEIP3860TransitionTime, bt) || config.IsEnabled(config.GetEIP3860Transition, bn) {
 		enable3860(instructionSet) // Limit and meter initcode
 	}
+
+	// Cancun
+	if config.IsEnabledByTime(config.GetEIP4844TransitionTime, bt) {
+		enable4844(instructionSet) // EIP-4844 (DATAHASH opcode)
+	}
+	if config.IsEnabledByTime(config.GetEIP1153TransitionTime, bt) {
+		enable1153(instructionSet) // EIP-1153 "Transient Storage"
+	}
+	if config.IsEnabledByTime(config.GetEIP5656TransitionTime, bt) {
+		enable5656(instructionSet) // EIP-5656 (MCOPY opcode)
+	}
+	if config.IsEnabledByTime(config.GetEIP6780TransitionTime, bt) {
+		enable6780(instructionSet) // EIP-6780 SELFDESTRUCT only in same transaction
+	}
+
 	return validate(instructionSet)
 }
 

@@ -22,7 +22,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus"
-	"github.com/ethereum/go-ethereum/consensus/misc"
+	"github.com/ethereum/go-ethereum/consensus/misc/eip1559"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -207,7 +207,7 @@ func (b *BlockGen) AddUncle(h *types.Header) {
 	// The gas limit and price should be derived from the parent
 	h.GasLimit = parent.GasLimit
 	if b.config.IsEnabled(b.config.GetEIP1559Transition, h.Number) {
-		h.BaseFee = misc.CalcBaseFee(b.config, parent)
+		h.BaseFee = eip1559.CalcBaseFee(b.config, parent)
 		if !b.config.IsEnabled(b.config.GetEIP1559Transition, parent.Number) {
 			parentGasLimit := parent.GasLimit * b.config.GetElasticityMultiplier()
 			h.GasLimit = CalcGasLimit(parentGasLimit, parentGasLimit)
@@ -326,7 +326,7 @@ func GenerateChain(config ctypes.ChainConfigurator, parent *types.Block, engine 
 			}
 
 			// Write state changes to db
-			root, err := statedb.Commit(config.IsEnabled(config.GetEIP161dTransition, b.header.Number))
+			root, err := statedb.Commit(b.header.Number.Uint64(), config.IsEnabled(config.GetEIP161dTransition, b.header.Number))
 			if err != nil {
 				panic(fmt.Sprintf("state write error: %v", err))
 			}
@@ -385,7 +385,7 @@ func makeHeader(chain consensus.ChainReader, parent *types.Block, state *state.S
 		Time:     time,
 	}
 	if chain.Config().IsEnabled(chain.Config().GetEIP1559Transition, header.Number) {
-		header.BaseFee = misc.CalcBaseFee(chain.Config(), parent.Header())
+		header.BaseFee = eip1559.CalcBaseFee(chain.Config(), parent.Header())
 		if !chain.Config().IsEnabled(chain.Config().GetEIP1559Transition, parent.Number()) {
 			parentGasLimit := parent.GasLimit() * chain.Config().GetElasticityMultiplier()
 			header.GasLimit = CalcGasLimit(parentGasLimit, parentGasLimit)

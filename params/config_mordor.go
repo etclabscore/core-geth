@@ -80,6 +80,14 @@ var (
 		EIP3529FBlock: big.NewInt(5_520_000),
 		EIP3541FBlock: big.NewInt(5_520_000),
 
+		// Spiral, aka Shanghai (partially)
+		// EIP4399FBlock: nil, // Supplant DIFFICULTY with PREVRANDAO. ETC does not spec 4399 because it's still PoW, and 4399 is only applicable for the PoS system.
+		EIP3651FBlock: nil, // Warm COINBASE (gas reprice)
+		EIP3855FBlock: nil, // PUSH0 instruction
+		EIP3860FBlock: nil, // Limit and meter initcode
+		// EIP4895FBlock: nil, // Beacon chain push withdrawals as operations
+		EIP6049FBlock: nil, // Deprecate SELFDESTRUCT (noop)
+
 		DisposalBlock:      big.NewInt(0),
 		ECIP1017FBlock:     big.NewInt(0),
 		ECIP1017EraRounds:  big.NewInt(2000000),

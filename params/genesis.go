@@ -66,6 +66,19 @@ func DefaultGoerliGenesisBlock() *genesisT.Genesis {
 	}
 }
 
+// DefaultHoleskyGenesisBlock returns the Holesky network genesis block.
+func DefaultHoleskyGenesisBlock() *genesisT.Genesis {
+	return &genesisT.Genesis{
+		Config:     HoleskyChainConfig,
+		Nonce:      0x1234,
+		ExtraData:  hexutil.MustDecode("0x686f77206d7563682069732074686520666973683f"),
+		GasLimit:   0x17d7840,
+		Difficulty: big.NewInt(0x01),
+		Timestamp:  1694786100,
+		Alloc:      genesisT.DecodePreAlloc(holeskyAllocData),
+	}
+}
+
 // DeveloperGenesisBlock returns the 'geth --dev' genesis block. Note, this must
 // be seeded with the
 func DeveloperGenesisBlock(gasLimit uint64, faucet common.Address, useEthash bool) *genesisT.Genesis {

@@ -2204,7 +2204,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		if !ctx.IsSet(NetworkIdFlag.Name) {
 			cfg.NetworkId = 17000
 		}
-		cfg.Genesis = core.DefaultHoleskyGenesisBlock()
+		cfg.Genesis = params.DefaultHoleskyGenesisBlock()
 		SetDNSDiscoveryDefaults(cfg, params.HoleskyGenesisHash)
 	case ctx.Bool(SepoliaFlag.Name):
 		cfg.Genesis = params.DefaultSepoliaGenesisBlock()

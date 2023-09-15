@@ -17,7 +17,7 @@ func forks(ctx *cli.Context) error {
 	for _, f := range confp.BlockForks(globalChainspecValue) {
 		fmt.Println(f)
 	}
-	for _, f := range confp.TimeForks(globalChainspecValue) {
+	for _, f := range confp.TimeForks(globalChainspecValue, 0) {
 		fmt.Printf("@%d\n", f)
 	}
 

@@ -235,7 +235,6 @@ func checksumToBytes(hash uint32) [4]byte {
 }
 
 // gatherForks gathers all the known forks and creates a sorted list out of them.
-func gatherForks(config ctypes.ChainConfigurator) ([]uint64, []uint64) {
-	// TODO(meowsbits): skip any forks before genesis (by time)
-	return confp.BlockForks(config), confp.TimeForks(config)
+func gatherForks(config ctypes.ChainConfigurator, genesis uint64) ([]uint64, []uint64) {
+	return confp.BlockForks(config), confp.TimeForks(config, genesis)
 }

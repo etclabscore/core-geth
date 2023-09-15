@@ -37,7 +37,6 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/eth/tracers/logger"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/rlp"
@@ -314,7 +313,7 @@ func signUnsignedTransactions(txs []*txWithKey, signer types.Signer) (types.Tran
 	return signedTxs, nil
 }
 
-func loadTransactions(txStr string, inputData *input, env stEnv, chainConfig *params.ChainConfig) (types.Transactions, error) {
+func loadTransactions(txStr string, inputData *input, env stEnv, chainConfig ctypes.ChainConfigurator) (types.Transactions, error) {
 	var txsWithKeys []*txWithKey
 	var signed types.Transactions
 	if txStr != stdinSelector {
@@ -354,7 +353,7 @@ func loadTransactions(txStr string, inputData *input, env stEnv, chainConfig *pa
 	return signUnsignedTransactions(txsWithKeys, signer)
 }
 
-func applyLondonChecks(env *stEnv, chainConfig *params.ChainConfig) error {
+func applyLondonChecks(env *stEnv, chainConfig ctypes.ChainConfigurator) error {
 	if !chainConfig.IsLondon(big.NewInt(int64(env.Number))) {
 		return nil
 	}
@@ -375,7 +374,7 @@ func applyLondonChecks(env *stEnv, chainConfig *params.ChainConfig) error {
 	return nil
 }
 
-func applyShanghaiChecks(env *stEnv, chainConfig *params.ChainConfig) error {
+func applyShanghaiChecks(env *stEnv, chainConfig ctypes.ChainConfigurator) error {
 	if !chainConfig.IsShanghai(big.NewInt(int64(env.Number)), env.Timestamp) {
 		return nil
 	}
@@ -385,7 +384,7 @@ func applyShanghaiChecks(env *stEnv, chainConfig *params.ChainConfig) error {
 	return nil
 }
 
-func applyMergeChecks(env *stEnv, chainConfig *params.ChainConfig) error {
+func applyMergeChecks(env *stEnv, chainConfig ctypes.ChainConfigurator) error {
 	isMerged := chainConfig.TerminalTotalDifficulty != nil && chainConfig.TerminalTotalDifficulty.BitLen() == 0
 	if !isMerged {
 		// pre-merge: If difficulty was not provided by caller, we need to calculate it.
@@ -419,7 +418,7 @@ func applyMergeChecks(env *stEnv, chainConfig *params.ChainConfig) error {
 	return nil
 }
 
-func applyCancunChecks(env *stEnv, chainConfig *params.ChainConfig) error {
+func applyCancunChecks(env *stEnv, chainConfig ctypes.ChainConfigurator) error {
 	if !chainConfig.IsCancun(big.NewInt(int64(env.Number)), env.Timestamp) {
 		env.ParentBeaconBlockRoot = nil // un-set it if it has been set too early
 		return nil

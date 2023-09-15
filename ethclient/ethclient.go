@@ -102,7 +102,6 @@ func (ec *Client) BlockNumber(ctx context.Context) (uint64, error) {
 }
 
 // PeerCount returns the number of p2p peers as reported by the net_peerCount method.
-// FIXME(meowsbits) duplicate method
 func (ec *Client) PeerCount(ctx context.Context) (uint64, error) {
 	var result hexutil.Uint64
 	err := ec.c.CallContext(ctx, &result, "net_peerCount")
@@ -603,15 +602,6 @@ func (ec *Client) SendTransaction(ctx context.Context, tx *types.Transaction) er
 		return err
 	}
 	return ec.c.CallContext(ctx, nil, "eth_sendRawTransaction", hexutil.Encode(data))
-}
-
-func (ec *Client) PeerCount(ctx context.Context) (uint64, error) {
-	var res hexutil.Uint64
-	err := ec.c.CallContext(ctx, &res, "net_peerCount")
-	if err != nil {
-		return 0, err
-	}
-	return uint64(res), nil
 }
 
 func toBlockNumArg(number *big.Int) string {

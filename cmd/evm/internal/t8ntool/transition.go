@@ -385,7 +385,7 @@ func applyShanghaiChecks(env *stEnv, chainConfig ctypes.ChainConfigurator) error
 }
 
 func applyMergeChecks(env *stEnv, chainConfig ctypes.ChainConfigurator) error {
-	isMerged := chainConfig.TerminalTotalDifficulty != nil && chainConfig.TerminalTotalDifficulty.BitLen() == 0
+	isMerged := chainConfig.GetEthashTerminalTotalDifficulty() != nil && chainConfig.GetEthashTerminalTotalDifficulty().BitLen() == 0
 	if !isMerged {
 		// pre-merge: If difficulty was not provided by caller, we need to calculate it.
 		if env.Difficulty != nil {

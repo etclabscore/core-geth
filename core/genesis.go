@@ -291,7 +291,7 @@ func configOrDefault(g *genesisT.Genesis, ghash common.Hash) ctypes.ChainConfigu
 
 // Flush adds allocated genesis accounts into a fresh new statedb and
 // commit the state changes into the given database handler.
-func gaFlush(ga *genesisT.GenesisAlloc, db ethdb.Database) error {
+func gaFlush(ga *genesisT.GenesisAlloc, triedb *trie.Database, db ethdb.Database) error {
 	statedb, err := state.New(common.Hash{}, state.NewDatabaseWithConfig(db, &trie.Config{Preimages: true}), nil)
 	if err != nil {
 		return err
@@ -310,7 +310,7 @@ func gaFlush(ga *genesisT.GenesisAlloc, db ethdb.Database) error {
 	}
 	// Commit newly generated states into disk if it's not empty.
 	if root != types.EmptyRootHash {
-		err = statedb.Database().TrieDB().Commit(root, true)
+		err = triedb.Commit(root, true)
 		if err != nil {
 			return err
 		}
@@ -358,9 +358,9 @@ func gaWrite(ga *genesisT.GenesisAlloc, db ethdb.KeyValueWriter, hash common.Has
 
 // CommitGenesisState loads the stored genesis state with the given block
 // hash and commits them into the given database handler.
-func CommitGenesisState(db ethdb.Database, hash common.Hash) error {
+func CommitGenesisState(db ethdb.Database, triedb *trie.Database, blockhash common.Hash) error {
 	var alloc genesisT.GenesisAlloc
-	blob := rawdb.ReadGenesisStateSpec(db, hash)
+	blob := rawdb.ReadGenesisStateSpec(db, blockhash)
 	if len(blob) != 0 {
 		if err := alloc.UnmarshalJSON(blob); err != nil {
 			return err
@@ -372,7 +372,7 @@ func CommitGenesisState(db ethdb.Database, hash common.Hash) error {
 		// - supported networks(mainnet, testnets), recover with defined allocations
 		// - private network, can't recover
 		var genesis *genesisT.Genesis
-		switch hash {
+		switch blockhash {
 		case params.MainnetGenesisHash:
 			genesis = params.DefaultGenesisBlock()
 		case params.GoerliGenesisHash:
@@ -390,7 +390,7 @@ func CommitGenesisState(db ethdb.Database, hash common.Hash) error {
 			return errors.New("not found")
 		}
 	}
-	err := gaFlush(&alloc, db)
+	err := gaFlush(&alloc, triedb, db)
 	return err
 }
 

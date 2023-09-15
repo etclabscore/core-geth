@@ -99,6 +99,9 @@ var (
 		utils.GCModeFlag,
 		utils.SnapshotFlag,
 		utils.TxLookupLimitFlag,
+		utils.TransactionHistoryFlag,
+		utils.StateSchemeFlag,
+		utils.StateHistoryFlag,
 		utils.LightServeFlag,
 		utils.LightIngressFlag,
 		utils.LightEgressFlag,
@@ -298,6 +301,9 @@ func checkMainnet(ctx *cli.Context) bool {
 
 	case ctx.IsSet(utils.SepoliaFlag.Name):
 		log.Info("Starting Geth on Sepolia testnet...")
+
+	case ctx.IsSet(utils.HoleskyFlag.Name):
+		log.Info("Starting Geth on Holesky testnet...")
 
 	case ctx.IsSet(utils.DeveloperFlag.Name):
 		log.Info("Starting Geth in ephemeral proof-of-authority network dev mode...")

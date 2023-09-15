@@ -133,10 +133,12 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, gen
 		log.Info("Wrote genesis block OK", "config", genesis.Config)
 		return genesis.Config, block.Hash(), nil
 	}
-	// We have the genesis block in database(perhaps in ancient database)
-	// but the corresponding state is missing.
+	// The genesis block is present(perhaps in ancient database) while the
+	// state database is not initialized yet. It can happen that the node
+	// is initialized with an external ancient store. Commit genesis state
+	// in this case.
 	header := rawdb.ReadHeader(db, stored, 0)
-	if header.Root != types.EmptyRootHash && !rawdb.HasLegacyTrieNode(db, header.Root) {
+	if header.Root != types.EmptyRootHash && !triedb.Initialized(header.Root) {
 		if genesis == nil {
 			genesis = params.DefaultGenesisBlock()
 		}
@@ -446,6 +448,11 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 		}
 		isCancun := conf.IsEnabledByTime(g.Config.GetEIP4844TransitionTime, &g.Timestamp)
 		if isCancun {
+			// EIP-4788: The parentBeaconBlockRoot of the genesis block is always
+			// the zero hash. This is because the genesis block does not have a parent
+			// by definition.
+			head.ParentBeaconRoot = new(common.Hash)
+			// EIP-4844 fields
 			head.ExcessBlobGas = g.ExcessBlobGas
 			head.BlobGasUsed = g.BlobGasUsed
 			if head.ExcessBlobGas == nil {
@@ -499,8 +506,8 @@ func CommitGenesis(g *genesisT.Genesis, db ethdb.Database, triedb *trie.Database
 // The block is committed as the canonical head block.
 // Note the state changes will be committed in hash-based scheme, use Commit
 // if path-scheme is preferred.
-func MustCommitGenesis(db ethdb.Database, g *genesisT.Genesis) *types.Block {
-	block, err := CommitGenesis(g, db, trie.NewDatabase(db))
+func MustCommitGenesis(db ethdb.Database, g *genesisT.Genesis, triedb *trie.Database) *types.Block {
+	block, err := CommitGenesis(g, db, triedb)
 	if err != nil {
 		panic(err)
 	}

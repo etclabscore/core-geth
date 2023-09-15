@@ -31,6 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/clique"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/consensus/lyra2"
+	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/txpool/blobpool"
 	"github.com/ethereum/go-ethereum/core/txpool/legacypool"
 	"github.com/ethereum/go-ethereum/eth/downloader"
@@ -39,6 +40,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/miner"
 	"github.com/ethereum/go-ethereum/node"
+	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
@@ -79,6 +81,9 @@ var Defaults = Config{
 	NetworkId:          vars.DefaultNetworkID,
 	ProtocolVersions:   vars.DefaultProtocolVersions,
 	TxLookupLimit:      2350000,
+	TransactionHistory: 2350000,
+	StateHistory:       params.FullImmutabilityThreshold,
+	StateScheme:        rawdb.HashScheme,
 	LightPeers:         100,
 	UltraLightFraction: 75,
 	DatabaseCache:      512,
@@ -138,7 +143,11 @@ type Config struct {
 	NoPruning  bool // Whether to disable pruning and flush everything to disk
 	NoPrefetch bool // Whether to disable prefetching and only load state on demand
 
-	TxLookupLimit uint64 `toml:",omitempty"` // The maximum number of blocks from head whose tx indices are reserved.
+	// Deprecated, use 'TransactionHistory' instead.
+	TxLookupLimit      uint64 `toml:",omitempty"` // The maximum number of blocks from head whose tx indices are reserved.
+	TransactionHistory uint64 `toml:",omitempty"` // The maximum number of blocks from head whose tx indices are reserved.
+	StateHistory       uint64 `toml:",omitempty"` // The maximum number of blocks from head whose state histories are reserved.
+	StateScheme        string `toml:",omitempty"` // State scheme used to store ethereum state and merkle trie nodes on top
 
 	// RequiredBlocks is a set of block number -> hash mappings which must be in the
 	// canonical chain of all remote peers. Setting the option makes geth verify the

@@ -76,24 +76,18 @@ func (b *EthAPIBackend) HeaderByNumber(ctx context.Context, number rpc.BlockNumb
 		return b.eth.blockchain.CurrentBlock(), nil
 	}
 	if number == rpc.FinalizedBlockNumber {
-		if !b.eth.Merger().TDDReached() {
-			return nil, errors.New("'finalized' tag not supported on pre-merge network")
-		}
 		block := b.eth.blockchain.CurrentFinalBlock()
-		if block != nil {
-			return block, nil
+		if block == nil {
+			return nil, errors.New("finalized block not found")
 		}
-		return nil, errors.New("finalized block not found")
+		return block, nil
 	}
 	if number == rpc.SafeBlockNumber {
-		if !b.eth.Merger().TDDReached() {
-			return nil, errors.New("'safe' tag not supported on pre-merge network")
-		}
 		block := b.eth.blockchain.CurrentSafeBlock()
-		if block != nil {
-			return block, nil
+		if block == nil {
+			return nil, errors.New("safe block not found")
 		}
-		return nil, errors.New("safe block not found")
+		return block, nil
 	}
 	return b.eth.blockchain.GetHeaderByNumber(uint64(number)), nil
 }
@@ -131,9 +125,6 @@ func (b *EthAPIBackend) BlockByNumber(ctx context.Context, number rpc.BlockNumbe
 		return b.eth.blockchain.GetBlock(header.Hash(), header.Number.Uint64()), nil
 	}
 	if number == rpc.FinalizedBlockNumber {
-		if !b.eth.Merger().TDDReached() {
-			return nil, errors.New("'finalized' tag not supported on pre-merge network")
-		}
 		header := b.eth.blockchain.CurrentFinalBlock()
 		if header == nil {
 			return nil, errors.New("finalized block not found")
@@ -141,9 +132,6 @@ func (b *EthAPIBackend) BlockByNumber(ctx context.Context, number rpc.BlockNumbe
 		return b.eth.blockchain.GetBlock(header.Hash(), header.Number.Uint64()), nil
 	}
 	if number == rpc.SafeBlockNumber {
-		if !b.eth.Merger().TDDReached() {
-			return nil, errors.New("'safe' tag not supported on pre-merge network")
-		}
 		header := b.eth.blockchain.CurrentSafeBlock()
 		if header == nil {
 			return nil, errors.New("safe block not found")
@@ -237,7 +225,7 @@ func (b *EthAPIBackend) GetReceipts(ctx context.Context, hash common.Hash) (type
 }
 
 func (b *EthAPIBackend) GetLogs(ctx context.Context, hash common.Hash, number uint64) ([][]*types.Log, error) {
-	return rawdb.ReadLogs(b.eth.chainDb, hash, number, b.ChainConfig()), nil
+	return rawdb.ReadLogs(b.eth.chainDb, hash, number), nil
 }
 
 func (b *EthAPIBackend) GetTd(ctx context.Context, hash common.Hash) *big.Int {
@@ -286,7 +274,7 @@ func (b *EthAPIBackend) SubscribeLogsEvent(ch chan<- []*types.Log) event.Subscri
 }
 
 func (b *EthAPIBackend) SendTx(ctx context.Context, signedTx *types.Transaction) error {
-	return b.eth.txPool.Add([]*txpool.Transaction{{Tx: signedTx}}, true, false)[0]
+	return b.eth.txPool.Add([]*types.Transaction{signedTx}, true, false)[0]
 }
 
 func (b *EthAPIBackend) GetPoolTransactions() (types.Transactions, error) {
@@ -295,7 +283,7 @@ func (b *EthAPIBackend) GetPoolTransactions() (types.Transactions, error) {
 	for _, batch := range pending {
 		for _, lazy := range batch {
 			if tx := lazy.Resolve(); tx != nil {
-				txs = append(txs, tx.Tx)
+				txs = append(txs, tx)
 			}
 		}
 	}
@@ -303,10 +291,7 @@ func (b *EthAPIBackend) GetPoolTransactions() (types.Transactions, error) {
 }
 
 func (b *EthAPIBackend) GetPoolTransaction(hash common.Hash) *types.Transaction {
-	if tx := b.eth.txPool.Get(hash); tx != nil {
-		return tx.Tx
-	}
-	return nil
+	return b.eth.txPool.Get(hash)
 }
 
 func (b *EthAPIBackend) GetTransaction(ctx context.Context, txHash common.Hash) (*types.Transaction, common.Hash, uint64, uint64, error) {
@@ -410,7 +395,7 @@ func (b *EthAPIBackend) StartMining(threads int) error {
 }
 
 func (b *EthAPIBackend) StateAtBlock(ctx context.Context, block *types.Block, reexec uint64, base *state.StateDB, readOnly bool, preferDisk bool) (*state.StateDB, tracers.StateReleaseFunc, error) {
-	return b.eth.StateAtBlock(ctx, block, reexec, base, readOnly, preferDisk)
+	return b.eth.stateAtBlock(ctx, block, reexec, base, readOnly, preferDisk)
 }
 
 func (b *EthAPIBackend) StateAtTransaction(ctx context.Context, block *types.Block, txIndex int, reexec uint64) (*core.Message, vm.BlockContext, *state.StateDB, tracers.StateReleaseFunc, error) {

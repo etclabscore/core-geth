@@ -483,6 +483,9 @@ func GenerateBadBlock(parent *types.Block, engine consensus.Engine, txs types.Tr
 		used := uint64(nBlobs * vars.BlobTxBlobGasPerBlob)
 		header.ExcessBlobGas = &excess
 		header.BlobGasUsed = &used
+
+		beaconRoot := common.HexToHash("0xbeac00")
+		header.ParentBeaconRoot = &beaconRoot
 	}
 	// Assemble and return the final block for sealing
 	if config.IsEnabledByTime(config.GetEIP4895TransitionTime, &header.Time) || config.IsEnabled(config.GetEIP4895Transition, header.Number) {

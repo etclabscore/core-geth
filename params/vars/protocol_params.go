@@ -16,7 +16,11 @@
 
 package vars
 
-import "math/big"
+import (
+	"math/big"
+
+	"github.com/ethereum/go-ethereum/common"
+)
 
 var (
 	FrontierBlockReward = big.NewInt(5e+18) // Block reward in wei for successfully mining a block
@@ -195,12 +199,13 @@ const (
 	BlobTxBytesPerFieldElement         = 32      // Size in bytes of a field element
 	BlobTxFieldElementsPerBlob         = 4096    // Number of field elements stored in a single data blob
 	BlobTxHashVersion                  = 0x01    // Version byte of the commitment hash
-	BlobTxMaxBlobGasPerBlock           = 1 << 19 // Maximum consumable blob gas for data blobs per block
-	BlobTxTargetBlobGasPerBlock        = 1 << 18 // Target consumable blob gas for data blobs per block (for 1559-like pricing)
 	BlobTxBlobGasPerBlob               = 1 << 17 // Gas consumption of a single data blob (== blob byte size)
 	BlobTxMinBlobGasprice              = 1       // Minimum gas price for data blobs
-	BlobTxBlobGaspriceUpdateFraction   = 2225652 // Controls the maximum rate of change for blob gas price
+	BlobTxBlobGaspriceUpdateFraction   = 3338477 // Controls the maximum rate of change for blob gas price
 	BlobTxPointEvaluationPrecompileGas = 50000   // Gas price for the point evaluation precompile.
+
+	BlobTxTargetBlobGasPerBlock = 3 * BlobTxBlobGasPerBlob // Target consumable blob gas for data blobs per block (for 1559-like pricing)
+	MaxBlobGasPerBlock          = 6 * BlobTxBlobGasPerBlob // Maximum consumable blob gas for data blobs per block
 )
 
 // Gas discount table for BLS12-381 G1 and G2 multi exponentiation operations
@@ -213,4 +218,9 @@ var (
 	DurationLimit                     = big.NewInt(13)     // The decision boundary on the blocktime duration used to determine whether difficulty should go up or not.
 	EIP2DifficultyIncrementDivisor    = big.NewInt(10)     // Is related to the equilibrium block intervals for the Homestead era difficulty evolution, redefines the value in (YP:43), originally 10 = 0xa
 	EIP100FDifficultyIncrementDivisor = big.NewInt(9)
+
+	// BeaconRootsStorageAddress is the address where historical beacon roots are stored as per EIP-4788
+	BeaconRootsStorageAddress = common.HexToAddress("0xbEac00dDB15f3B6d645C48263dC93862413A222D")
+	// SystemAddress is where the system-transaction is sent from as per EIP-4788
+	SystemAddress common.Address = common.HexToAddress("0xfffffffffffffffffffffffffffffffffffffffe")
 )

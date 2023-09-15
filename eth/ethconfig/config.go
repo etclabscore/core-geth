@@ -40,7 +40,6 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/miner"
 	"github.com/ethereum/go-ethereum/node"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
@@ -82,7 +81,7 @@ var Defaults = Config{
 	ProtocolVersions:   vars.DefaultProtocolVersions,
 	TxLookupLimit:      2350000,
 	TransactionHistory: 2350000,
-	StateHistory:       params.FullImmutabilityThreshold,
+	StateHistory:       vars.FullImmutabilityThreshold,
 	StateScheme:        rawdb.HashScheme,
 	LightPeers:         100,
 	UltraLightFraction: 75,

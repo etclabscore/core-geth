@@ -263,7 +263,7 @@ func (t *StateTest) Run(subtest StateSubtest, vmconfig vm.Config, snapshotter bo
 }
 
 // RunNoVerify runs a specific subtest and returns the statedb and post-state root
-func (t *StateTest) RunNoVerifyWithPost(subtest StateSubtest, vmconfig vm.Config, snapshotter bool, post stPostState) (*snapshot.Tree, *state.StateDB, common.Hash, error) {
+func (t *StateTest) RunNoVerifyWithPost(subtest StateSubtest, vmconfig vm.Config, snapshotter bool, scheme string, post stPostState) (*trie.Database, *snapshot.Tree, *state.StateDB, common.Hash, error) {
 	var stPostCp stPostState
 	if v, ok := t.json.Post[subtest.Fork]; ok {
 		if len(v) > subtest.Index {
@@ -280,7 +280,7 @@ func (t *StateTest) RunNoVerifyWithPost(subtest StateSubtest, vmconfig vm.Config
 		t.json.Post[subtest.Fork] = append(t.json.Post[subtest.Fork], make([]stPostState, subtest.Index-len(t.json.Post[subtest.Fork])+1)...)
 	}
 	t.json.Post[subtest.Fork][subtest.Index] = post
-	return t.RunNoVerify(subtest, vmconfig, snapshotter)
+	return t.RunNoVerify(subtest, vmconfig, snapshotter, scheme)
 }
 
 // RunNoVerify runs a specific subtest and returns the statedb and post-state root
@@ -292,7 +292,7 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 	vmconfig.ExtraEips = eips
 
 	block := core.GenesisToBlock(t.genesis(config), nil)
-	triedb, snaps, statedb := MakePreState(rawdb.NewMemoryDatabase(), t.json.Pre, snapshotter, scheme)
+	triedb, snaps, statedb := MakePreState(rawdb.NewMemoryDatabase(), t.json.Pre.toGenesisAlloc(), snapshotter, scheme)
 
 	var baseFee *big.Int
 	if config.IsEnabled(config.GetEIP1559Transition, new(big.Int)) {

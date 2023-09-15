@@ -610,7 +610,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		ShanghaiTime:            u64(0),
 		CancunTime:              u64(0),
 	},
-	"ShanghaiToCancunAtTime15k": {
+	"ShanghaiToCancunAtTime15k": &goethereum.ChainConfig{
 		ChainID:                 big.NewInt(1),
 		HomesteadBlock:          big.NewInt(0),
 		EIP150Block:             big.NewInt(0),

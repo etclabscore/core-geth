@@ -23,7 +23,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto/kzg4844"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/holiman/uint256"
@@ -242,6 +241,6 @@ func blobHash(commit *kzg4844.Commitment) common.Hash {
 	hasher.Write(commit[:])
 	var vhash common.Hash
 	hasher.Sum(vhash[:0])
-	vhash[0] = params.BlobTxHashVersion
+	vhash[0] = vars.BlobTxHashVersion
 	return vhash
 }

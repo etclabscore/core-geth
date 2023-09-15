@@ -498,7 +498,12 @@ func (api *ConsensusAPI) NewPayloadV3(params engine.ExecutableData, versionedHas
 		return engine.PayloadStatusV1{Status: engine.INVALID}, engine.InvalidParams.With(errors.New("nil parentBeaconBlockRoot post-cancun"))
 	}
 
-	if !api.eth.BlockChain().Config().IsCancun(new(big.Int).SetUint64(params.Number), params.Timestamp) {
+	// Since both 4844 (blob txes) and 4788 (beacon root) features are checked, we assert BOTH config values.
+	if !api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4844TransitionTime, &params.Timestamp) {
+		return engine.PayloadStatusV1{Status: engine.INVALID}, engine.UnsupportedFork.With(errors.New("newPayloadV3 called pre-cancun"))
+	}
+
+	if !api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4788TransitionTime, &params.Timestamp) {
 		return engine.PayloadStatusV1{Status: engine.INVALID}, engine.UnsupportedFork.With(errors.New("newPayloadV3 called pre-cancun"))
 	}
 

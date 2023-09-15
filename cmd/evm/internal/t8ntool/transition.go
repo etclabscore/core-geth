@@ -375,7 +375,7 @@ func applyLondonChecks(env *stEnv, chainConfig ctypes.ChainConfigurator) error {
 }
 
 func applyShanghaiChecks(env *stEnv, chainConfig ctypes.ChainConfigurator) error {
-	if !chainConfig.IsShanghai(big.NewInt(int64(env.Number)), env.Timestamp) {
+	if !chainConfig.IsEnabledByTime(chainConfig.GetEIP4895Transition, &env.Timestamp) {
 		return nil
 	}
 	if env.Withdrawals == nil {

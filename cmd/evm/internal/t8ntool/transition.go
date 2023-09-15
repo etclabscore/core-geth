@@ -30,7 +30,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/consensus/misc/eip1559"
-	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
@@ -431,7 +430,7 @@ func applyCancunChecks(env *stEnv, chainConfig ctypes.ChainConfigurator) error {
 	return nil
 }
 
-type Alloc map[common.Address]core.GenesisAccount
+type Alloc map[common.Address]genesisT.GenesisAccount
 
 func (g Alloc) OnRoot(common.Hash) {}
 

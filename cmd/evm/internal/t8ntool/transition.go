@@ -419,7 +419,7 @@ func applyMergeChecks(env *stEnv, chainConfig ctypes.ChainConfigurator) error {
 }
 
 func applyCancunChecks(env *stEnv, chainConfig ctypes.ChainConfigurator) error {
-	if !chainConfig.IsCancun(big.NewInt(int64(env.Number)), env.Timestamp) {
+	if !chainConfig.IsEnabledByTime(chainConfig.GetEIP4788TransitionTime, &env.Timestamp) {
 		env.ParentBeaconBlockRoot = nil // un-set it if it has been set too early
 		return nil
 	}

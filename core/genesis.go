@@ -253,7 +253,8 @@ func LoadCliqueConfig(db ethdb.Database, genesis *genesisT.Genesis) (*ctypes.Cli
 		// config is missing(initialize the empty leveldb with an
 		// external ancient chain segment), ensure the provided genesis
 		// is matched.
-		genesisBlock := MustCommitGenesis(rawdb.NewMemoryDatabase(), genesis)
+		db := rawdb.NewMemoryDatabase()
+		genesisBlock := MustCommitGenesis(db, trie.NewDatabase(db, nil), genesis)
 		if stored != (common.Hash{}) && genesisBlock.Hash() != stored {
 			return nil, &genesisT.GenesisMismatchError{Stored: stored, New: genesisBlock.Hash()}
 		}
@@ -404,7 +405,7 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 	if err != nil {
 		panic(err)
 	}
-	err = gaFlush(&g.Alloc, db)
+	err = gaFlush(&g.Alloc, trie.NewDatabase(db, nil), db)
 	if err != nil {
 		panic(err)
 	}
@@ -506,7 +507,7 @@ func CommitGenesis(g *genesisT.Genesis, db ethdb.Database, triedb *trie.Database
 // The block is committed as the canonical head block.
 // Note the state changes will be committed in hash-based scheme, use Commit
 // if path-scheme is preferred.
-func MustCommitGenesis(db ethdb.Database, g *genesisT.Genesis, triedb *trie.Database) *types.Block {
+func MustCommitGenesis(db ethdb.Database, triedb *trie.Database, g *genesisT.Genesis) *types.Block {
 	block, err := CommitGenesis(g, db, triedb)
 	if err != nil {
 		panic(err)
@@ -520,5 +521,5 @@ func GenesisBlockForTesting(db ethdb.Database, addr common.Address, balance *big
 		Alloc:   genesisT.GenesisAlloc{addr: {Balance: balance}},
 		BaseFee: big.NewInt(vars.InitialBaseFee),
 	}
-	return MustCommitGenesis(db, &g)
+	return MustCommitGenesis(db, trie.NewDatabase(db, nil), &g)
 }

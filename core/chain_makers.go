@@ -403,7 +403,7 @@ func makeHeader(chain consensus.ChainReader, parent *types.Block, state *state.S
 			header.GasLimit = CalcGasLimit(parentGasLimit, parentGasLimit)
 		}
 	}
-	if chain.Config().IsCancun(header.Number, header.Time) {
+	if chain.Config().IsEnabledByTime(chain.Config().GetEIP4844TransitionTime, &header.Time) {
 		var (
 			parentExcessBlobGas uint64
 			parentBlobGasUsed   uint64

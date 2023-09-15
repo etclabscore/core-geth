@@ -1076,9 +1076,9 @@ func (w *worker) prepareWork(genParams *generateParams) (*environment, error) {
 		}
 	}
 	// Apply EIP-4844, EIP-4788.
-	if w.chainConfig.IsCancun(header.Number, header.Time) {
+	if w.chainConfig.IsEnabledByTime(w.chainConfig.GetEIP4844TransitionTime, &header.Time) {
 		var excessBlobGas uint64
-		if w.chainConfig.IsCancun(parent.Number, parent.Time) {
+		if w.chainConfig.IsEnabledByTime(w.chainConfig.GetEIP4844TransitionTime, &parent.Time) {
 			excessBlobGas = eip4844.CalcExcessBlobGas(*parent.ExcessBlobGas, *parent.BlobGasUsed)
 		} else {
 			// For the first post-fork block, both parent.data_gas_used and parent.excess_data_gas are evaluated as 0

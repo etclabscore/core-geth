@@ -354,7 +354,7 @@ func loadTransactions(txStr string, inputData *input, env stEnv, chainConfig cty
 }
 
 func applyLondonChecks(env *stEnv, chainConfig ctypes.ChainConfigurator) error {
-	if !chainConfig.IsLondon(big.NewInt(int64(env.Number))) {
+	if !chainConfig.IsEnabled(chainConfig.GetEIP1559Transition, big.NewInt(int64(env.Number))) {
 		return nil
 	}
 	// Sanity check, to not `panic` in state_transition

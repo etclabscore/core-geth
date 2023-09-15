@@ -677,6 +677,16 @@ func (c *ChainConfig) SetEIP6780TransitionTime(n *uint64) error {
 	return nil
 }
 
+// GetEIP6780TransitionTime EIP4788: Beacon block root in the EVM
+func (c *ChainConfig) GetEIP4788TransitionTime() *uint64 {
+	return c.CancunTime
+}
+
+func (c *ChainConfig) SetEIP4788TransitionTime(n *uint64) error {
+	c.CancunTime = n
+	return nil
+}
+
 func (c *ChainConfig) GetMergeVirtualTransition() *uint64 {
 	return bigNewU64(c.MergeNetsplitBlock)
 }

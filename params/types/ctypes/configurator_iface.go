@@ -228,6 +228,10 @@ type ProtocolSpecifier interface {
 	// EIP6780 - SELFDESTRUCT only in same transaction - https://eips.ethereum.org/EIPS/eip-6780
 	GetEIP6780TransitionTime() *uint64
 	SetEIP6780TransitionTime(n *uint64) error
+
+	// EIP4788 - Beacon block root in the EVM
+	GetEIP4788TransitionTime() *uint64
+	SetEIP4788TransitionTime(n *uint64) error
 }
 
 type Forker interface {

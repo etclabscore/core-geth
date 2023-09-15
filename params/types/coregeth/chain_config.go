@@ -237,6 +237,7 @@ type CoreGethChainConfig struct {
 	EIP1153FTime *uint64 `json:"eip1153FTime,omitempty"` // EIP-1153: Transient Storage opcodes https://eips.ethereum.org/EIPS/eip-1153
 	EIP5656FTime *uint64 `json:"eip5656FTime,omitempty"` // EIP-5656: MCOPY - Memory copying instruction https://eips.ethereum.org/EIPS/eip-5656
 	EIP6780FTime *uint64 `json:"eip6780FTime,omitempty"` // EIP-6780: SELFDESTRUCT only in same transaction https://eips.ethereum.org/EIPS/eip-6780
+	EIP4788FTime *uint64 `json:"eip4788FTime,omitempty"` // EIP-4788: Beacon block root in the EVM https://eips.ethereum.org/EIPS/eip-4788
 
 	MergeNetsplitVBlock *big.Int `json:"mergeNetsplitVBlock,omitempty"` // Virtual fork after The Merge to use as a network splitter
 

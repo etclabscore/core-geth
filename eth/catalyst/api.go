@@ -213,14 +213,14 @@ func (api *ConsensusAPI) verifyPayloadAttributes(attr *engine.PayloadAttributes)
 	// FIXME(meowsbits)
 	// Verify withdrawals attribute for Shanghai.
 	withdrawalsCheck := func(b *big.Int, t uint64) bool {
-		return c.IsEnabledByTime(c.GetEIP4895TransitionTime, t)
+		return c.IsEnabledByTime(c.GetEIP4895TransitionTime, &t)
 	}
 	if err := checkAttribute(withdrawalsCheck, attr.Withdrawals != nil, attr.Timestamp); err != nil {
 		return fmt.Errorf("invalid withdrawals: %w", err)
 	}
 	// Verify beacon root attribute for Cancun.
 	beaconRootCheck := func(b *big.Int, t uint64) bool {
-		return c.IsEnabledByTime(c.GetEIP4788TransitionTime, t) // TODO(meowsbits)
+		return c.IsEnabledByTime(c.GetEIP4788TransitionTime, &t) // TODO(meowsbits)
 	}
 	if err := checkAttribute(beaconRootCheck, attr.BeaconRoot != nil, attr.Timestamp); err != nil {
 		return fmt.Errorf("invalid parent beacon block root: %w", err)

@@ -16,6 +16,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/trie"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"
@@ -28,7 +29,7 @@ func runMESSTest2(t *testing.T, enableMess bool, easyL, hardL, caN int, easyT, h
 
 	db := rawdb.NewMemoryDatabase()
 	genesis := params.DefaultMessNetGenesisBlock()
-	genesisB := MustCommitGenesis(db, genesis)
+	genesisB := MustCommitGenesis(db, trie.NewDatabase(db, nil), genesis)
 
 	chain, err := NewBlockChain(db, nil, genesis, nil, engine, vm.Config{}, nil, nil)
 	if err != nil {
@@ -209,7 +210,7 @@ func TestAFKnownBlock(t *testing.T) {
 	db := rawdb.NewMemoryDatabase()
 	genesis := params.DefaultMessNetGenesisBlock()
 	// genesis.Timestamp = 1
-	genesisB := MustCommitGenesis(db, genesis)
+	genesisB := MustCommitGenesis(db, trie.NewDatabase(db, nil), genesis)
 
 	chain, err := NewBlockChain(db, nil, genesis, nil, engine, vm.Config{}, nil, nil)
 	if err != nil {
@@ -356,7 +357,7 @@ func TestGenerateChainTargetingHashrate(t *testing.T) {
 	db := rawdb.NewMemoryDatabase()
 	genesis := params.DefaultMessNetGenesisBlock()
 	// genesis.Timestamp = 1
-	genesisB := MustCommitGenesis(db, genesis)
+	genesisB := MustCommitGenesis(db, trie.NewDatabase(db, nil), genesis)
 
 	chain, err := NewBlockChain(db, nil, genesis, nil, engine, vm.Config{}, nil, nil)
 	if err != nil {
@@ -423,7 +424,7 @@ func runMESSTest(t *testing.T, easyL, hardL, caN int, easyT, hardT int64) (hardH
 
 	db := rawdb.NewMemoryDatabase()
 	genesis := params.DefaultMessNetGenesisBlock()
-	genesisB := MustCommitGenesis(db, genesis)
+	genesisB := MustCommitGenesis(db, trie.NewDatabase(db, nil), genesis)
 
 	chain, err := NewBlockChain(db, nil, genesis, nil, engine, vm.Config{}, nil, nil)
 	if err != nil {
@@ -722,7 +723,7 @@ func TestBlockChain_AF_Difficulty_Develop(t *testing.T) {
 	db := rawdb.NewMemoryDatabase()
 	genesis := params.DefaultMessNetGenesisBlock()
 	// genesis.Timestamp = 1
-	genesisB := MustCommitGenesis(db, genesis)
+	genesisB := MustCommitGenesis(db, trie.NewDatabase(db, nil), genesis)
 
 	chain, err := NewBlockChain(db, nil, genesis, nil, engine, vm.Config{}, nil, nil)
 	if err != nil {

@@ -43,7 +43,7 @@ func TestSetupGenesisBlock(t *testing.T) {
 
 	defaultGenesisBlock := params.DefaultGenesisBlock()
 
-	config, hash, err := SetupGenesisBlock(db, trie.NewDatabase(db), defaultGenesisBlock)
+	config, hash, err := SetupGenesisBlock(db, trie.NewDatabase(db, nil), defaultGenesisBlock)
 	if err != nil {
 		t.Errorf("err: %v", err)
 	}

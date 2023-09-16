@@ -136,7 +136,7 @@ func testSetupGenesis(t *testing.T, scheme string) {
 			fn: func(db ethdb.Database) (ctypes.ChainConfigurator, common.Hash, error) {
 				tdb := trie.NewDatabase(db, newDbConfig(scheme))
 				MustCommitGenesis(db, trie.NewDatabase(db, nil), &customg)
-				return SetupGenesisBlock(db, trie.NewDatabase(db, tdb), nil)
+				return SetupGenesisBlock(db, tdb, nil)
 			},
 			wantHash:   customghash,
 			wantConfig: customg.Config,

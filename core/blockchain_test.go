@@ -2836,7 +2836,8 @@ func TestTransactionIndices(t *testing.T) {
 	for _, l := range limit {
 		frdir := t.TempDir()
 		ancientDb, _ := rawdb.NewDatabaseWithFreezer(rawdb.NewMemoryDatabase(), frdir, "", false)
-		genesisBlock := MustCommitGenesis(rawdb.NewMemoryDatabase(), gspec)
+		mem := rawdb.NewMemoryDatabase()
+		genesisBlock := MustCommitGenesis(mem, trie.NewDatabase(mem, nil), gspec)
 		rawdb.WriteAncientBlocks(ancientDb, append([]*types.Block{genesisBlock}, blocks...), append([]types.Receipts{{}}, receipts...), big.NewInt(0))
 
 		l := l
@@ -2860,7 +2861,8 @@ func TestTransactionIndices(t *testing.T) {
 	ancientDb, _ := rawdb.NewDatabaseWithFreezer(rawdb.NewMemoryDatabase(), t.TempDir(), "", false)
 	defer ancientDb.Close()
 
-	genesisBlock := MustCommitGenesis(rawdb.NewMemoryDatabase(), gspec)
+	mem := rawdb.NewMemoryDatabase()
+	genesisBlock := MustCommitGenesis(mem, trie.NewDatabase(mem, nil), gspec)
 	rawdb.WriteAncientBlocks(ancientDb, append([]*types.Block{genesisBlock}, blocks...), append([]types.Receipts{{}}, receipts...), big.NewInt(0))
 	limit = []uint64{0, 64 /* drop stale */, 32 /* shorten history */, 64 /* extend history */, 0 /* restore all */}
 	for _, l := range limit {

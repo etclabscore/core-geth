@@ -2007,7 +2007,8 @@ func testSetHeadWithScheme(t *testing.T, tt *rewindTest, snapshots bool, scheme 
 
 	// If sidechain blocks are needed, make a light chain and import it
 	var sideblocks types.Blocks
-	genesisBlock := MustCommitGenesis(rawdb.NewMemoryDatabase(), gspec)
+	mem := rawdb.NewMemoryDatabase()
+	genesisBlock := MustCommitGenesis(mem, trie.NewDatabase(mem, nil), gspec)
 	if tt.sidechainBlocks > 0 {
 		sideblocks, _ = GenerateChain(gspec.Config, genesisBlock, engine, rawdb.NewMemoryDatabase(), tt.sidechainBlocks, func(i int, b *BlockGen) {
 			b.SetCoinbase(common.Address{0x01})

@@ -1779,7 +1779,8 @@ func testBlockchainHeaderchainReorgConsistency(t *testing.T, scheme string) {
 	// Generate a bunch of fork blocks, each side forking from the canonical chain
 	forks := make([]*types.Block, len(blocks))
 	for i := 0; i < len(forks); i++ {
-		parent := MustCommitGenesis(rawdb.NewMemoryDatabase(), genesis)
+		mem := rawdb.NewMemoryDatabase()
+		parent := MustCommitGenesis(mem, trie.NewDatabase(mem, nil), genesis)
 		if i > 0 {
 			parent = blocks[i-1]
 		}

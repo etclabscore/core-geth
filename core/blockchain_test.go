@@ -2240,7 +2240,7 @@ func TestForkChoice_CommonAncestor(t *testing.T) {
 
 	db := rawdb.NewMemoryDatabase()
 	genesis := params.DefaultMessNetGenesisBlock()
-	genesisB := MustCommitGenesis(db, genesis)
+	genesisB := MustCommitGenesis(db, trie.NewDatabase(db, nil), genesis)
 
 	chain, err := NewBlockChain(db, nil, genesis, nil, engine, vm.Config{}, nil, nil)
 	if err != nil {

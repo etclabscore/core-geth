@@ -168,7 +168,7 @@ func testSetupGenesis(t *testing.T, scheme string) {
 				// Commit the 'old' genesis block with Homestead transition at #2.
 				// Advance to block #4, past the homestead transition block of customg.
 				tdb := trie.NewDatabase(db, newDbConfig(scheme))
-				genesis := MustCommitGenesis(db, &oldcustomg, tdb)
+				genesis := MustCommitGenesis(db, tdb, &oldcustomg)
 
 				bc, _ := NewBlockChain(db, DefaultCacheConfigWithScheme(scheme), &oldcustomg, nil, ethash.NewFullFaker(), vm.Config{}, nil, nil)
 				defer bc.Stop()

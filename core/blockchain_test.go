@@ -1068,7 +1068,7 @@ func testLightVsFastVsFullChainHeads(t *testing.T, scheme string) {
 	lightDb := makeDb()
 	defer lightDb.Close()
 	light, _ := NewBlockChain(lightDb, DefaultCacheConfigWithScheme(scheme), gspec, nil, ethash.NewFaker(), vm.Config{}, nil, nil)
-	if n, err := light.InsertHeaderChain(headers); err != nil {
+	if n, err := light.InsertHeaderChain(headers, 1); err != nil {
 		t.Fatalf("failed to insert header %d: %v", n, err)
 	}
 	defer light.Stop()

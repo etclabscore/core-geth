@@ -78,7 +78,7 @@ func TestGenerateWithdrawalChain(t *testing.T) {
 		Storage: storage,
 		Code:    common.Hex2Bytes("600154600354"),
 	}
-	genesis := MustCommitGenesis(gendb, trie.NewDatabase(gendb, trie.HashDefaults))
+	genesis := MustCommitGenesis(gendb, trie.NewDatabase(gendb, trie.HashDefaults), gspec)
 
 	chain, _ := GenerateChain(gspec.Config, genesis, beacon.NewFaker(), gendb, 4, func(i int, gen *BlockGen) {
 		tx, _ := types.SignTx(types.NewTransaction(gen.TxNonce(address), address, big.NewInt(1000), vars.TxGas, new(big.Int).Add(gen.BaseFee(), common.Big1), nil), signer, key)

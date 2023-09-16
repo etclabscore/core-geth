@@ -58,7 +58,7 @@ func TestSetupGenesisBlock(t *testing.T) {
 
 	classicGenesisBlock := params.DefaultClassicGenesisBlock()
 
-	clConfig, clHash, clErr := SetupGenesisBlock(db, trie.NewDatabase(db), classicGenesisBlock)
+	clConfig, clHash, clErr := SetupGenesisBlock(db, trie.NewDatabase(db, nil), classicGenesisBlock)
 	if clErr != nil {
 		t.Errorf("err: %v", clErr)
 	}

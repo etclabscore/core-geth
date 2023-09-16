@@ -4513,9 +4513,9 @@ func TestDeleteThenCreate(t *testing.T) {
 	contractABI := common.Hex2Bytes("6080604052348015600f57600080fd5b5060646000819055506081806100266000396000f3fe608060405260043610601f5760003560e01c80632b68b9c614602a576025565b36602557005b600080fd5b60306032565b005b3373ffffffffffffffffffffffffffffffffffffffff16fffea2646970667358221220ab749f5ed1fcb87bda03a74d476af3f074bba24d57cb5a355e8162062ad9a4e664736f6c63430008070033")
 	contractAddr := crypto.CreateAddress2(factoryAddr, [32]byte{}, crypto.Keccak256(contractABI))
 
-	gspec := &Genesis{
+	gspec := &genesisT.Genesis{
 		Config: params.TestChainConfig,
-		Alloc: GenesisAlloc{
+		Alloc: genesisT.GenesisAlloc{
 			address: {Balance: funds},
 		},
 	}

@@ -4353,7 +4353,8 @@ func TestTxIndexer(t *testing.T) {
 	for _, c := range cases {
 		frdir := t.TempDir()
 		db, _ := rawdb.NewDatabaseWithFreezer(rawdb.NewMemoryDatabase(), frdir, "", false)
-		genesisBlock := MustCommitGenesis(rawdb.NewMemoryDatabase(), gspec)
+		mem := rawdb.NewMemoryDatabase()
+		genesisBlock := MustCommitGenesis(mem, trie.NewDatabase(mem, nil), gspec)
 		rawdb.WriteAncientBlocks(db, append([]*types.Block{genesisBlock}, blocks...), append([]types.Receipts{{}}, receipts...), big.NewInt(0))
 
 		// Index the initial blocks from ancient store

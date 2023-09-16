@@ -1804,8 +1804,8 @@ func testRepairWithScheme(t *testing.T, tt *rewindTest, snapshots bool, scheme s
 	// If sidechain blocks are needed, make a light chain and import it
 	var sideblocks types.Blocks
 	if tt.sidechainBlocks > 0 {
-		db := rawdb.NewMemoryDatabase()
-		genesisBlock := MustCommitGenesis(db, trie.NewDatabase(db, nil), gspec)
+		mem := rawdb.NewMemoryDatabase()
+		genesisBlock := MustCommitGenesis(mem, trie.NewDatabase(mem, nil), gspec)
 		sideblocks, _ = GenerateChain(gspec.Config, genesisBlock, engine, rawdb.NewMemoryDatabase(), tt.sidechainBlocks, func(i int, b *BlockGen) {
 			b.SetCoinbase(common.Address{0x01})
 		})
@@ -1813,7 +1813,6 @@ func testRepairWithScheme(t *testing.T, tt *rewindTest, snapshots bool, scheme s
 			t.Fatalf("Failed to import side chain: %v", err)
 		}
 	}
-	db := rawdb.NewMemoryDatabase()
 	genesisBlock := MustCommitGenesis(db, trie.NewDatabase(db, nil), gspec)
 	canonblocks, _ := GenerateChain(gspec.Config, genesisBlock, engine, rawdb.NewMemoryDatabase(), tt.canonicalBlocks, func(i int, b *BlockGen) {
 		b.SetCoinbase(common.Address{0x02})

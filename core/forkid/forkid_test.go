@@ -25,7 +25,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"math/big"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"

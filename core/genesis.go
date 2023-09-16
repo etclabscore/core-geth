@@ -492,6 +492,9 @@ func CommitGenesis(g *genesisT.Genesis, db ethdb.Database, triedb *trie.Database
 	if err := gaWrite(&g.Alloc, db, block.Hash()); err != nil {
 		return nil, err
 	}
+	if err := gaFlush(&g.Alloc, triedb, db); err != nil {
+		return nil, err
+	}
 	rawdb.WriteTd(db, block.Hash(), block.NumberU64(), block.Difficulty())
 	rawdb.WriteBlock(db, block)
 	rawdb.WriteReceipts(db, block.Hash(), block.NumberU64(), nil)

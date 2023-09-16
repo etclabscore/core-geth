@@ -3839,7 +3839,7 @@ func testEIP1559Transition(t *testing.T, scheme string) {
 		config  = *params.AllEthashProtocolChanges
 		gspec   = &genesisT.Genesis{
 			Config: &config,
-			Alloc: GenesisAlloc{
+			Alloc: genesisT.GenesisAlloc{
 				addr1: {Balance: funds},
 				addr2: {Balance: funds},
 				// The address 0xAAAA sloads 0x00 and 0x01

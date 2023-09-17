@@ -56,7 +56,7 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-func testTransactionMarshal(t *testing.T, tests []txData, config *params.ChainConfig) {
+func testTransactionMarshal(t *testing.T, tests []txData, config ctypes.ChainConfigurator) {
 	t.Parallel()
 	var (
 		signer = types.LatestSigner(config)
@@ -360,7 +360,7 @@ func allTransactionTypes(addr common.Address, config ctypes.ChainConfigurator) [
 	}
 }
 
-func allBlobTxs(addr common.Address, config *params.ChainConfig) []txData {
+func allBlobTxs(addr common.Address, config ctypes.ChainConfigurator) []txData {
 	return []txData{
 		{
 			Tx: &types.BlobTx{

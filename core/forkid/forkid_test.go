@@ -121,7 +121,7 @@ func TestCreation(t *testing.T) {
 		{
 			"classic",
 			params.ClassicChainConfig,
-			core.GenesisToBlock(params.DefaultGenesisBlock(), nil),
+			core.GenesisToBlock(params.DefaultClassicGenesisBlock(), nil),
 			[]testcase{
 				{0, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
 				{1, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
@@ -483,28 +483,33 @@ func TestEncoding(t *testing.T) {
 
 func TestGatherForks(t *testing.T) {
 	cases := []struct {
-		name   string
-		config ctypes.ChainConfigurator
-		wantNs []uint64
+		name    string
+		config  ctypes.ChainConfigurator
+		genesis *types.Block
+		wantNs  []uint64
 	}{
 		{
 			"classic",
 			params.ClassicChainConfig,
+			core.GenesisToBlock(params.DefaultClassicGenesisBlock(), nil),
 			[]uint64{1150000, 2500000, 3000000, 5000000, 5900000, 8772000, 9573000, 10500839, 11_700_000, 13_189_133, 14_525_000},
 		},
 		{
 			"mainnet",
 			params.MainnetChainConfig,
+			core.GenesisToBlock(params.DefaultGenesisBlock(), nil),
 			[]uint64{1150000, 1920000, 2463000, 2675000, 4370000, 7280000, 9069000, 9200000, 12_244_000, 12_965_000, 13_773_000, 15050000},
 		},
 		{
 			"mordor",
 			params.MordorChainConfig,
+			core.GenesisToBlock(params.DefaultMordorGenesisBlock(), nil),
 			[]uint64{301_243, 999_983, 2_520_000, 3_985_893, 5_520_000},
 		},
 		{
 			"mintme",
 			params.MintMeChainConfig,
+			core.GenesisToBlock(params.DefaultMintMeGenesisBlock(), nil),
 			[]uint64{252_500},
 		},
 	}
@@ -517,7 +522,7 @@ func TestGatherForks(t *testing.T) {
 		return false
 	}
 	for _, c := range cases {
-		blockForks, _ := gatherForks(c.config)
+		blockForks, _ := gatherForks(c.config, c.genesis.Time())
 		if len(blockForks) != len(c.wantNs) {
 			for _, n := range c.wantNs {
 				if !sliceContains(blockForks, n) {

@@ -31,6 +31,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/state/snapshot"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/internal/build"
@@ -401,22 +403,23 @@ func (tm *testMatcherGen) stateTestRunner(t *testing.T, name string, test *State
 			// vmConfig is constructed using global variables for possible EVM and EWASM interpreters.
 			// These interpreters are configured with environment variables and are assigned in an init() function.
 			vmConfig := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
-			_, _, err := test.Run(st, vmConfig, false)
-			if err != nil && len(test.json.Post[st.Fork][st.Index].ExpectException) > 0 {
-				// Ignore expected errors (TODO MariusVanDerWijden check error string)
-				return
-			}
-			checkedErr := tm.checkFailure(t, err)
-			if checkedErr != nil && *testEWASM != "" {
-				checkedErr = fmt.Errorf("%w ewasm=%s", checkedErr, *testEWASM)
-			}
-			if checkedErr != nil {
-				if tm.errorPanics {
-					panic(checkedErr)
-				} else {
-					t.Fatal(err)
+			test.Run(st, vmConfig, false, rawdb.HashScheme, func(err error, snaps *snapshot.Tree, state *state.StateDB) {
+				if err != nil && len(test.json.Post[st.Fork][st.Index].ExpectException) > 0 {
+					// Ignore expected errors (TODO MariusVanDerWijden check error string)
+					return
 				}
-			}
+				checkedErr := tm.checkFailure(t, err)
+				if checkedErr != nil && *testEWASM != "" {
+					checkedErr = fmt.Errorf("%w ewasm=%s", checkedErr, *testEWASM)
+				}
+				if checkedErr != nil {
+					if tm.errorPanics {
+						panic(checkedErr)
+					} else {
+						t.Fatal(err)
+					}
+				}
+			})
 		})
 	}
 }

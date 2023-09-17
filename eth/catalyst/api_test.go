@@ -1643,10 +1643,10 @@ func TestParentBeaconBlockRoot(t *testing.T) {
 		rootIdx = common.BigToHash(big.NewInt(int64((execData.ExecutionPayload.Timestamp % 98304) + 98304)))
 	)
 
-	if num := db.GetState(params.BeaconRootsStorageAddress, timeIdx); num != timeIdx {
+	if num := db.GetState(vars.BeaconRootsStorageAddress, timeIdx); num != timeIdx {
 		t.Fatalf("incorrect number stored: want %s, got %s", timeIdx, num)
 	}
-	if root := db.GetState(params.BeaconRootsStorageAddress, rootIdx); root != *blockParams.BeaconRoot {
+	if root := db.GetState(vars.BeaconRootsStorageAddress, rootIdx); root != *blockParams.BeaconRoot {
 		t.Fatalf("incorrect root stored: want %s, got %s", *blockParams.BeaconRoot, root)
 	}
 }

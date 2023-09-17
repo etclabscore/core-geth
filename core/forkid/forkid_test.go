@@ -546,7 +546,7 @@ func TestGenerateSpecificationCases(t *testing.T) {
 	}
 	type testCaseJSON struct {
 		ChainConfig *coregeth.CoreGethChainConfig `json:"geth_chain_config"`
-		GenesisHash common.Hash                   `json:"genesis_hash"`
+		Genesis     *types.Block                  `json:"genesis_hash"`
 		Head        uint64                        `json:"head"`
 		ForkHash    common.Hash                   `json:"fork_hash"`
 		ForkNext    uint64                        `json:"fork_next"`
@@ -556,50 +556,35 @@ func TestGenerateSpecificationCases(t *testing.T) {
 	generatedCases := []*testCaseJSON{}
 
 	tests := []struct {
-		name        string
-		config      ctypes.ChainConfigurator
-		genesisHash common.Hash
+		name    string
+		config  ctypes.ChainConfigurator
+		genesis *types.Block
 	}{
 		{"Ethereum Classic Mainnet (ETC)",
 			params.ClassicChainConfig,
-			params.MainnetGenesisHash,
+			core.GenesisToBlock(params.DefaultClassicGenesisBlock(), nil),
 		},
 		{
 			"Mordor",
 			params.MordorChainConfig,
-			params.MordorGenesisHash,
-		},
-		{
-			"Morden",
-			&coregeth.CoreGethChainConfig{
-				Ethash:            &ctypes.EthashConfig{},
-				EIP2FBlock:        big.NewInt(494000),
-				EIP150Block:       big.NewInt(1783000),
-				EIP155Block:       big.NewInt(1915000),
-				ECIP1017FBlock:    big.NewInt(2000000),
-				ECIP1017EraRounds: big.NewInt(2000000),
-				DisposalBlock:     big.NewInt(2300000),
-				EIP198FBlock:      big.NewInt(4729274), // Atlantis
-				EIP1052FBlock:     big.NewInt(5000381), // Agharta
-			},
-			common.HexToHash("0cd786a2425d16f152c658316c423e6ce1181e15c3295826d7c9904cba9ce303"),
+			core.GenesisToBlock(params.DefaultMordorGenesisBlock(), nil),
 		},
 		{
 			"MintMe",
 			params.MintMeChainConfig,
-			params.MintMeGenesisHash,
+			core.GenesisToBlock(params.DefaultMintMeGenesisBlock(), nil),
 		},
 	}
 	for _, tt := range tests {
 		cs := []uint64{0}
-		blockForks, _ := gatherForks(tt.config)
+		blockForks, _ := gatherForks(tt.config, tt.genesis.Time())
 		for _, f := range blockForks {
 			cs = append(cs, f-1, f, f+1)
 		}
 		fmt.Printf("##### %s\n", tt.name)
 		fmt.Println()
-		fmt.Printf("- Genesis Hash: `0x%x`\n", tt.genesisHash)
-		forks, _ := gatherForks(tt.config)
+		fmt.Printf("- Genesis Hash: `0x%x`\n", tt.genesis.Hash())
+		forks, _ := gatherForks(tt.config, 441806400)
 		forksS := []string{}
 		for _, fi := range forks {
 			forksS = append(forksS, strconv.Itoa(int(fi)))
@@ -609,7 +594,7 @@ func TestGenerateSpecificationCases(t *testing.T) {
 		fmt.Println("| Head Block Number | `FORK_HASH` | `FORK_NEXT` | RLP Encoded (Hex) |")
 		fmt.Println("| --- | --- | --- | --- |")
 		for _, c := range cs {
-			id := NewID(tt.config, tt.genesisHash, c, 0)
+			id := NewID(tt.config, tt.genesis, c, 0)
 			isCanonical := false
 			for _, fi := range forks {
 				if c == fi {
@@ -630,7 +615,7 @@ func TestGenerateSpecificationCases(t *testing.T) {
 			}
 			generatedCases = append(generatedCases, &testCaseJSON{
 				ChainConfig: gethConfig,
-				GenesisHash: tt.genesisHash,
+				Genesis:     tt.genesis,
 				Head:        c,
 				ForkHash:    common.BytesToHash(id.Hash[:]),
 				ForkNext:    id.Next,
@@ -650,7 +635,7 @@ func TestTimeBasedForkInGenesis(t *testing.T) {
 		time       = uint64(1690475657)
 		genesis    = types.NewBlockWithHeader(&types.Header{Time: time})
 		forkidHash = checksumToBytes(crc32.ChecksumIEEE(genesis.Hash().Bytes()))
-		config     = func(shanghai, cancun uint64) *params.ChainConfig {
+		config     = func(shanghai, cancun uint64) ctypes.ChainConfigurator {
 			return &params.ChainConfig{
 				ChainID:                       big.NewInt(1337),
 				HomesteadBlock:                big.NewInt(0),

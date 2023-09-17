@@ -49,6 +49,7 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/holiman/uint256"
@@ -1399,8 +1400,8 @@ func setupReceiptBackend(t *testing.T, genBlocks int) (*testBackend, []common.Ha
 	)
 
 	// Set the terminal total difficulty in the config
-	genesis.Config.TerminalTotalDifficulty = big.NewInt(0)
-	genesis.Config.TerminalTotalDifficultyPassed = true
+	genesis.Config.(*goethereum.ChainConfig).TerminalTotalDifficulty = big.NewInt(0)
+	genesis.Config.(*goethereum.ChainConfig).TerminalTotalDifficultyPassed = true
 	backend := newTestBackend(t, genBlocks, genesis, beacon.New(ethash.NewFaker()), func(i int, b *core.BlockGen) {
 		var (
 			tx  *types.Transaction

@@ -255,7 +255,8 @@ func TestStateProcessorErrors(t *testing.T) {
 				want: "could not apply tx 0 [0x6c11015985ce82db691d7b2d017acda296db88b811c3c60dc71449c76256c716]: max fee per gas less than block base fee: address 0x71562b71999873DB5b286dF957af199Ec94617F7, maxFeePerGas: 1 baseFee: 875000000",
 			},
 		} {
-			genesisBlock := MustCommitGenesis(rawdb.NewMemoryDatabase(), gspec)
+			mem := rawdb.NewMemoryDatabase()
+			genesisBlock := MustCommitGenesis(mem, trie.NewDatabase(mem, nil), gspec)
 			block := GenerateBadBlock(genesisBlock, beacon.New(ethash.NewFaker()), tt.txs, gspec.Config)
 			_, err := blockchain.InsertChain(types.Blocks{block})
 			if err == nil {
@@ -291,7 +292,8 @@ func TestStateProcessorErrors(t *testing.T) {
 					},
 				},
 			}
-			genesis       = MustCommitGenesis(rawdb.NewMemoryDatabase(), gspec)
+			mem           = rawdb.NewMemoryDatabase()
+			genesis       = MustCommitGenesis(mem, trie.NewDatabase(mem, nil), gspec)
 			blockchain, _ = NewBlockChain(db, nil, gspec, nil, ethash.NewFaker(), vm.Config{}, nil, nil)
 		)
 		defer blockchain.Stop()
@@ -331,7 +333,8 @@ func TestStateProcessorErrors(t *testing.T) {
 					},
 				},
 			}
-			genesis       = MustCommitGenesis(rawdb.NewMemoryDatabase(), gspec)
+			mem           = rawdb.NewMemoryDatabase()
+			genesis       = MustCommitGenesis(mem, trie.NewDatabase(mem, nil), gspec)
 			blockchain, _ = NewBlockChain(db, nil, gspec, nil, beacon.New(ethash.NewFaker()), vm.Config{}, nil, nil)
 		)
 		defer blockchain.Stop()
@@ -389,7 +392,7 @@ func TestStateProcessorErrors(t *testing.T) {
 					},
 				},
 			}
-			genesis        = MustCommitGenesis(db, gspec)
+			genesis        = MustCommitGenesis(db, trie.NewDatabase(db, nil), gspec)
 			blockchain, _  = NewBlockChain(db, nil, gspec, nil, beacon.New(ethash.NewFaker()), vm.Config{}, nil, nil)
 			tooBigInitCode = make([]byte, vars.MaxInitCodeSize+1)
 			smallInitCode  = [320]byte{}

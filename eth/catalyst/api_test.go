@@ -47,6 +47,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/ethereum/go-ethereum/trie"
@@ -1575,8 +1576,8 @@ func TestParentBeaconBlockRoot(t *testing.T) {
 
 	// Set cancun time to last block + 5 seconds
 	time := blocks[len(blocks)-1].Time() + 5
-	genesis.Config.ShanghaiTime = &time
-	genesis.Config.CancunTime = &time
+	genesis.Config.(*goethereum.ChainConfig).ShanghaiTime = &time
+	genesis.Config.(*goethereum.ChainConfig).CancunTime = &time
 
 	n, ethservice := startEthService(t, genesis, blocks)
 	ethservice.Merger().ReachTTD()

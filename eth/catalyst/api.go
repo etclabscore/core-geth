@@ -215,24 +215,24 @@ func (api *ConsensusAPI) verifyPayloadAttributes(attr *engine.PayloadAttributes)
 	withdrawalsCheck := func(b *big.Int, t uint64) bool {
 		return c.IsEnabledByTime(c.GetEIP4895TransitionTime, &t)
 	}
-	if err := checkAttribute(withdrawalsCheck, attr.Withdrawals != nil, attr.Timestamp); err != nil {
+	if err := checkAttribute(withdrawalsCheck, attr.Withdrawals != nil, c.GetEIP1559Transition(), attr.Timestamp); err != nil {
 		return fmt.Errorf("invalid withdrawals: %w", err)
 	}
 	// Verify beacon root attribute for Cancun.
 	beaconRootCheck := func(b *big.Int, t uint64) bool {
 		return c.IsEnabledByTime(c.GetEIP4788TransitionTime, &t) // TODO(meowsbits)
 	}
-	if err := checkAttribute(beaconRootCheck, attr.BeaconRoot != nil, attr.Timestamp); err != nil {
+	if err := checkAttribute(beaconRootCheck, attr.BeaconRoot != nil, c.GetEIP1559Transition(), attr.Timestamp); err != nil {
 		return fmt.Errorf("invalid parent beacon block root: %w", err)
 	}
 	return nil
 }
 
-func checkAttribute(active func(*big.Int, uint64) bool, exists bool, time uint64) error {
-	if active(common.Big0, time) && !exists {
+func checkAttribute(active func(*big.Int, uint64) bool, exists bool, block *big.Int, time uint64) error {
+	if active(block, time) && !exists {
 		return errors.New("fork active, missing expected attribute")
 	}
-	if !active(common.Big0, time) && exists {
+	if !active(block, time) && exists {
 		return errors.New("fork inactive, unexpected attribute set")
 	}
 	return nil

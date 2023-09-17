@@ -356,6 +356,9 @@ func (api *DebugAPI) getModifiedAccounts(startBlock, endBlock *types.Block) ([]c
 // The (from, to) parameters are the sequence of blocks to search, which can go
 // either forwards or backwards
 func (api *DebugAPI) GetAccessibleState(from, to rpc.BlockNumber) (uint64, error) {
+	if api.eth.blockchain.TrieDB().Scheme() == rawdb.PathScheme {
+		return 0, errors.New("state history is not yet available in path-based scheme")
+	}
 	db := api.eth.ChainDb()
 	var pivot uint64
 	if p := rawdb.ReadLastPivotNumber(db); p != nil {
@@ -409,4 +412,28 @@ func (api *DebugAPI) GetAccessibleState(from, to rpc.BlockNumber) (uint64, error
 		}
 	}
 	return 0, errors.New("no state found")
+}
+
+// SetTrieFlushInterval configures how often in-memory tries are persisted
+// to disk. The value is in terms of block processing time, not wall clock.
+// If the value is shorter than the block generation time, or even 0 or negative,
+// the node will flush trie after processing each block (effectively archive mode).
+func (api *DebugAPI) SetTrieFlushInterval(interval string) error {
+	if api.eth.blockchain.TrieDB().Scheme() == rawdb.PathScheme {
+		return errors.New("trie flush interval is undefined for path-based scheme")
+	}
+	t, err := time.ParseDuration(interval)
+	if err != nil {
+		return err
+	}
+	api.eth.blockchain.SetTrieFlushInterval(t)
+	return nil
+}
+
+// GetTrieFlushInterval gets the current value of in-memory trie flush interval
+func (api *DebugAPI) GetTrieFlushInterval() (string, error) {
+	if api.eth.blockchain.TrieDB().Scheme() == rawdb.PathScheme {
+		return "", errors.New("trie flush interval is undefined for path-based scheme")
+	}
+	return api.eth.blockchain.GetTrieFlushInterval().String(), nil
 }

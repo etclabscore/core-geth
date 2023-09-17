@@ -109,7 +109,7 @@ func init() {
 		GasPrice: big.NewInt(vars.InitialBaseFee),
 	})
 
-	newTxs = append(newTxs, &txpool.Transaction{Tx: tx2})
+	newTxs = append(newTxs, tx2)
 }
 
 // testWorkerBackend implements worker.Backend interfaces and wraps all information needed during the testing.

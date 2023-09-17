@@ -55,7 +55,7 @@ func TestCreation(t *testing.T) {
 		{
 			"mainnet",
 			params.MainnetChainConfig,
-			core.DefaultGenesisBlock().ToBlock(),
+			core.GenesisToBlock(params.DefaultGenesisBlock(), nil),
 			[]testcase{
 				{0, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},                    // Unsynced
 				{1149999, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},              // Last Frontier block
@@ -91,7 +91,7 @@ func TestCreation(t *testing.T) {
 		{
 			"goerli",
 			params.GoerliChainConfig,
-			core.DefaultGoerliGenesisBlock().ToBlock(),
+			core.GenesisToBlock(params.DefaultGoerliGenesisBlock(), nil),
 			[]testcase{
 				{0, 0, ID{Hash: checksumToBytes(0xa3f5ab08), Next: 1561651}},                   // Unsynced, last Frontier, Homestead, Tangerine, Spurious, Byzantium, Constantinople and first Petersburg block
 				{1561650, 0, ID{Hash: checksumToBytes(0xa3f5ab08), Next: 1561651}},             // Last Petersburg block
@@ -109,7 +109,7 @@ func TestCreation(t *testing.T) {
 		{
 			"sepolia",
 			params.SepoliaChainConfig,
-			core.DefaultSepoliaGenesisBlock().ToBlock(),
+			core.GenesisToBlock(params.DefaultSepoliaGenesisBlock(), nil),
 			[]testcase{
 				{0, 0, ID{Hash: checksumToBytes(0xfe3366e7), Next: 1735371}},                   // Unsynced, last Frontier, Homestead, Tangerine, Spurious, Byzantium, Constantinople, Petersburg, Istanbul, Berlin and first London block
 				{1735370, 0, ID{Hash: checksumToBytes(0xfe3366e7), Next: 1735371}},             // Last London block
@@ -121,7 +121,7 @@ func TestCreation(t *testing.T) {
 		{
 			"classic",
 			params.ClassicChainConfig,
-			params.MainnetGenesisHash,
+			core.GenesisToBlock(params.DefaultGenesisBlock(), nil),
 			[]testcase{
 				{0, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
 				{1, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
@@ -167,7 +167,7 @@ func TestCreation(t *testing.T) {
 		{
 			"mordor",
 			params.MordorChainConfig,
-			params.MordorGenesisHash,
+			core.GenesisToBlock(params.DefaultMordorGenesisBlock(), nil),
 			[]testcase{
 				{0, 0, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
 				{1, 0, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
@@ -195,7 +195,7 @@ func TestCreation(t *testing.T) {
 		{
 			"mintme",
 			params.MintMeChainConfig,
-			params.MintMeGenesisHash,
+			core.GenesisToBlock(params.DefaultMintMeGenesisBlock(), nil),
 			[]testcase{
 				{0, 0, ID{Hash: checksumToBytes(0x02bf4180), Next: 252500}},
 				{252500, 0, ID{Hash: checksumToBytes(0x50aed09f), Next: 0}},
@@ -451,7 +451,7 @@ func TestValidation(t *testing.T) {
 		// {params.MainnetChainConfig, 20999999, 1677999999, ID{Hash: checksumToBytes(0x71147644), Next: 1678000000}, ErrLocalIncompatibleOrStale},
 	}
 	for i, tt := range tests {
-		filter := newFilter(tt.config, core.DefaultGenesisBlock().ToBlock(), func() (uint64, uint64) { return tt.head, tt.time })
+		filter := newFilter(tt.config, core.GenesisToBlock(params.DefaultGenesisBlock(), nil), func() (uint64, uint64) { return tt.head, tt.time })
 		if err := filter(tt.id); err != tt.err {
 			t.Errorf("test %d, head: %d: validation error mismatch: have %v, want %v\nConfig=%s", i, tt.head, err, tt.err, tt.config)
 		}

@@ -1441,7 +1441,7 @@ func setupReceiptBackend(t *testing.T, genBlocks int) (*testBackend, []common.Ha
 				Nonce:      uint64(i),
 				GasTipCap:  uint256.NewInt(1),
 				GasFeeCap:  uint256.MustFromBig(fee),
-				Gas:        params.TxGas,
+				Gas:        vars.TxGas,
 				To:         acc2Addr,
 				BlobFeeCap: uint256.NewInt(1),
 				BlobHashes: []common.Hash{{1}},
@@ -1456,7 +1456,7 @@ func setupReceiptBackend(t *testing.T, genBlocks int) (*testBackend, []common.Ha
 			txHashes[i] = tx.Hash()
 		}
 		if i == 5 {
-			b.SetBlobGas(params.BlobTxBlobGasPerBlob)
+			b.SetBlobGas(vars.BlobTxBlobGasPerBlob)
 		}
 		b.SetPoS()
 	})

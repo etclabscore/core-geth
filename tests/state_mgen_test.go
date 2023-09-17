@@ -30,6 +30,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/internal/build"
@@ -314,7 +315,7 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 				Index: s.Index,
 			}
 
-			_, statedb, root, err := test.RunNoVerifyWithPost(targetSubtest, vmConfig, false, stPost)
+			_, _, statedb, root, err := test.RunNoVerifyWithPost(targetSubtest, vmConfig, false, rawdb.HashScheme, stPost)
 			if err != nil {
 				// Our runner has returned an error.
 				// This can either be an intentional error (testing for the error), or an "unexpected" error,

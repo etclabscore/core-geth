@@ -34,6 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -636,7 +637,7 @@ func TestTimeBasedForkInGenesis(t *testing.T) {
 		genesis    = types.NewBlockWithHeader(&types.Header{Time: time})
 		forkidHash = checksumToBytes(crc32.ChecksumIEEE(genesis.Hash().Bytes()))
 		config     = func(shanghai, cancun uint64) ctypes.ChainConfigurator {
-			return &params.ChainConfig{
+			return &goethereum.ChainConfig{
 				ChainID:                       big.NewInt(1337),
 				HomesteadBlock:                big.NewInt(0),
 				DAOForkBlock:                  nil,
@@ -656,12 +657,12 @@ func TestTimeBasedForkInGenesis(t *testing.T) {
 				MergeNetsplitBlock:            big.NewInt(0),
 				ShanghaiTime:                  &shanghai,
 				CancunTime:                    &cancun,
-				Ethash:                        new(params.EthashConfig),
+				Ethash:                        new(ctypes.EthashConfig),
 			}
 		}
 	)
 	tests := []struct {
-		config *params.ChainConfig
+		config ctypes.ChainConfigurator
 		want   ID
 	}{
 		// Shanghai active before genesis, skip

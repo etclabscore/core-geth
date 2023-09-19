@@ -311,7 +311,7 @@ func gaFlush(ga *genesisT.GenesisAlloc, triedb *trie.Database, db ethdb.Database
 	}
 	// Commit newly generated states into disk if it's not empty.
 	if root != types.EmptyRootHash {
-		err = triedb.Commit(root, true)
+		err = statedb.Database().TrieDB().Commit(root, true)
 		if err != nil {
 			return err
 		}

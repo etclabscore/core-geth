@@ -135,7 +135,7 @@ func testSetupGenesis(t *testing.T, scheme string) {
 			name: "custom block in DB, genesis == nil",
 			fn: func(db ethdb.Database) (ctypes.ChainConfigurator, common.Hash, error) {
 				tdb := trie.NewDatabase(db, newDbConfig(scheme))
-				MustCommitGenesis(db, trie.NewDatabase(db, nil), &customg)
+				MustCommitGenesis(db, tdb, &customg)
 				return SetupGenesisBlock(db, tdb, nil)
 			},
 			wantHash:   customghash,
@@ -145,7 +145,7 @@ func testSetupGenesis(t *testing.T, scheme string) {
 			name: "custom block in DB, genesis == goerli",
 			fn: func(db ethdb.Database) (ctypes.ChainConfigurator, common.Hash, error) {
 				tdb := trie.NewDatabase(db, newDbConfig(scheme))
-				MustCommitGenesis(db, trie.NewDatabase(db, nil), &customg)
+				MustCommitGenesis(db, tdb, &customg)
 				return SetupGenesisBlock(db, tdb, params.DefaultGoerliGenesisBlock())
 			},
 			wantErr:    &genesisT.GenesisMismatchError{Stored: customghash, New: params.GoerliGenesisHash},

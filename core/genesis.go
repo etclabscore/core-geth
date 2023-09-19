@@ -293,12 +293,14 @@ func configOrDefault(g *genesisT.Genesis, ghash common.Hash) ctypes.ChainConfigu
 // Flush adds allocated genesis accounts into a fresh new statedb and
 // commit the state changes into the given database handler.
 func gaFlush(ga *genesisT.GenesisAlloc, triedb *trie.Database, db ethdb.Database) error {
-	statedb, err := state.New(common.Hash{}, state.NewDatabaseWithConfig(db, &trie.Config{Preimages: true}), nil)
+	statedb, err := state.New(types.EmptyRootHash, state.NewDatabaseWithNodeDB(db, triedb), nil)
 	if err != nil {
 		return err
 	}
 	for addr, account := range *ga {
-		statedb.AddBalance(addr, account.Balance)
+		if account.Balance != nil {
+			statedb.AddBalance(addr, account.Balance)
+		}
 		statedb.SetCode(addr, account.Code)
 		statedb.SetNonce(addr, account.Nonce)
 		for key, value := range account.Storage {
@@ -311,8 +313,7 @@ func gaFlush(ga *genesisT.GenesisAlloc, triedb *trie.Database, db ethdb.Database
 	}
 	// Commit newly generated states into disk if it's not empty.
 	if root != types.EmptyRootHash {
-		err = statedb.Database().TrieDB().Commit(root, true)
-		if err != nil {
+		if err := triedb.Commit(root, true); err != nil {
 			return err
 		}
 	}

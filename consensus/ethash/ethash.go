@@ -615,7 +615,7 @@ func New(config Config, notify []string, noverify bool) *Ethash {
 		caches:   newlru(config.CachesInMem, newCache),
 		datasets: newlru(config.DatasetsInMem, newDataset),
 		update:   make(chan struct{}),
-		hashrate: metrics.NewMeterForced(),
+		hashrate: metrics.NewMeter(),
 	}
 	if config.PowMode == ModeShared {
 		ethash.shared = sharedEthash

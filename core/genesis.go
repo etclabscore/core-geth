@@ -384,6 +384,8 @@ func CommitGenesisState(db ethdb.Database, triedb *trie.Database, blockhash comm
 			genesis = params.DefaultMordorGenesisBlock()
 		case params.MintMeGenesisHash:
 			genesis = params.DefaultMintMeGenesisBlock()
+		case params.HoleskyGenesisHash:
+			genesis = params.DefaultHoleskyGenesisBlock()
 		}
 		if genesis != nil {
 			alloc = genesis.Alloc

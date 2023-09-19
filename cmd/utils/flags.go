@@ -1722,6 +1722,8 @@ func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) stri
 		return filepath.Join(baseDataDirPath, "sepolia")
 	case ctx.Bool(MintMeFlag.Name):
 		return filepath.Join(baseDataDirPath, "mintme")
+	case ctx.Bool(HoleskyFlag.Name):
+		return filepath.Join(baseDataDirPath, "holesky")
 	}
 	return baseDataDirPath
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 )
 
-func ExampleMainnetAllocData() {
+func ExamplemainnetAllocData() {
 	// Test that the mainnet alloc is parsable.
 	alloc := mainnetAllocData
 	ga := genesisT.DecodePreAlloc(alloc)

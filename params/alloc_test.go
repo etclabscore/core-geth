@@ -9,7 +9,7 @@ import (
 
 func ExampleMainnetAllocData() {
 	// Test that the mainnet alloc is parsable.
-	alloc := MainnetAllocData
+	alloc := mainnetAllocData
 	ga := genesisT.DecodePreAlloc(alloc)
 
 	fmt.Println(ga[common.Address{0x3}])

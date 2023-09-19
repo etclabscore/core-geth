@@ -125,7 +125,7 @@ func (lyra2 *Lyra2) APIs(chain consensus.ChainHeaderReader) []rpc.API {
 }
 
 func (lyra2 *Lyra2) Hashrate() float64 {
-	return lyra2.hashrate.Rate1()
+	return lyra2.hashrate.Snapshot().Rate1()
 }
 
 // Threads returns the number of mining threads currently enabled. This doesn't

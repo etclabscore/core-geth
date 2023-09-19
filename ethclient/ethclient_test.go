@@ -820,7 +820,7 @@ func TestRPCDiscover(t *testing.T) {
 
 			responseDocument, _ := json.MarshalIndent(r, "", "    ")
 			t.Logf(`Response Document:
-
+			
 %s`, string(responseDocument))
 			t.Fatalf(`OVER (methods which do not appear in the current API, but exist in the hardcoded response document):):
 %v
@@ -1130,6 +1130,7 @@ var allRPCMethods = []string{
 	"debug_getBadBlocks",
 	"debug_getModifiedAccountsByHash",
 	"debug_getModifiedAccountsByNumber",
+	"debug_getTrieFlushInterval",
 	"debug_getRawBlock",
 	"debug_getRawHeader",
 	"debug_getRawReceipts",
@@ -1145,6 +1146,7 @@ var allRPCMethods = []string{
 	"debug_setGCPercent",
 	"debug_setHead",
 	"debug_setMutexProfileFraction",
+	"debug_setTrieFlushInterval",
 	"debug_stacks",
 	"debug_standardTraceBadBlockToFile",
 	"debug_standardTraceBlockToFile",
@@ -1183,6 +1185,7 @@ var allRPCMethods = []string{
 	"eth_getBalance",
 	"eth_getBlockByHash",
 	"eth_getBlockByNumber",
+	"eth_getBlockReceipts",
 	"eth_getBlockTransactionCountByHash",
 	"eth_getBlockTransactionCountByNumber",
 	"eth_getCode",

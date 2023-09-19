@@ -210,19 +210,24 @@ func (api *ConsensusAPI) ForkchoiceUpdatedV3(update engine.ForkchoiceStateV1, pa
 func (api *ConsensusAPI) verifyPayloadAttributes(attr *engine.PayloadAttributes) error {
 	c := api.eth.BlockChain().Config()
 
-	// FIXME(meowsbits)
+	var eip1559BlockBig *big.Int
+	eip1559Block := c.GetEIP1559Transition()
+	if eip1559Block != nil {
+		eip1559BlockBig = new(big.Int).SetUint64(*eip1559Block)
+	}
+
 	// Verify withdrawals attribute for Shanghai.
 	withdrawalsCheck := func(b *big.Int, t uint64) bool {
 		return c.IsEnabledByTime(c.GetEIP4895TransitionTime, &t)
 	}
-	if err := checkAttribute(withdrawalsCheck, attr.Withdrawals != nil, c.GetEIP1559Transition(), attr.Timestamp); err != nil {
+	if err := checkAttribute(withdrawalsCheck, attr.Withdrawals != nil, eip1559BlockBig, attr.Timestamp); err != nil {
 		return fmt.Errorf("invalid withdrawals: %w", err)
 	}
 	// Verify beacon root attribute for Cancun.
 	beaconRootCheck := func(b *big.Int, t uint64) bool {
 		return c.IsEnabledByTime(c.GetEIP4788TransitionTime, &t) // TODO(meowsbits)
 	}
-	if err := checkAttribute(beaconRootCheck, attr.BeaconRoot != nil, c.GetEIP1559Transition(), attr.Timestamp); err != nil {
+	if err := checkAttribute(beaconRootCheck, attr.BeaconRoot != nil, eip1559BlockBig, attr.Timestamp); err != nil {
 		return fmt.Errorf("invalid parent beacon block root: %w", err)
 	}
 	return nil

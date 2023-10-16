@@ -1031,6 +1031,11 @@ func (d *Downloader) findAncestorBinarySearch(p *peerConnection, mode SyncMode, 
 	return start, nil
 }
 
+// fetchTotalDifficulty retrieves the self-reported total difficulty of the peer.
+// This function was designed to mitigate issues detailed in a paper Snapping Snap Sync,
+// where this logic is used to compare the TDs of the networks and the syncing peer to
+// enforce dropping that peer should they lag sufficiently behind, indicating a potentially
+// starving/starved chain.
 func (d *Downloader) fetchTotalDifficulty(p *peerConnection, latest *types.Header) error {
 	var head *types.Header
 	head = latest

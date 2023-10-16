@@ -164,6 +164,14 @@ func (g *Genesis) SetEIP4844TransitionTime(n *uint64) error {
 	return g.Config.SetEIP4844TransitionTime(n)
 }
 
+func (g *Genesis) GetEIP7516TransitionTime() *uint64 {
+	return g.Config.GetEIP7516TransitionTime()
+}
+
+func (g *Genesis) SetEIP7516TransitionTime(n *uint64) error {
+	return g.Config.SetEIP7516TransitionTime(n)
+}
+
 func (g *Genesis) GetEIP1153TransitionTime() *uint64 {
 	return g.Config.GetEIP1153TransitionTime()
 }

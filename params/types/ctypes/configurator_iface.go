@@ -217,6 +217,10 @@ type ProtocolSpecifier interface {
 	GetEIP4844TransitionTime() *uint64
 	SetEIP4844TransitionTime(n *uint64) error
 
+	// EIP7516 - Blob Base Fee Opcode - https://eips.ethereum.org/EIPS/eip-7516
+	GetEIP7516TransitionTime() *uint64
+	SetEIP7516TransitionTime(n *uint64) error
+
 	// EIP1153 - Transient Storage opcodes - https://eips.ethereum.org/EIPS/eip-1153
 	GetEIP1153TransitionTime() *uint64
 	SetEIP1153TransitionTime(n *uint64) error

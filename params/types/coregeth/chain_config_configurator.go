@@ -625,6 +625,16 @@ func (c *CoreGethChainConfig) SetEIP4844TransitionTime(n *uint64) error {
 	return nil
 }
 
+// GetEIP7516TransitionTime EIP7516: Blob Base Fee Opcode
+func (c *CoreGethChainConfig) GetEIP7516TransitionTime() *uint64 {
+	return c.EIP7516FTime
+}
+
+func (c *CoreGethChainConfig) SetEIP7516TransitionTime(n *uint64) error {
+	c.EIP7516FTime = n
+	return nil
+}
+
 // GetEIP1153TransitionTime EIP1153: Transient Storage opcodes
 func (c *CoreGethChainConfig) GetEIP1153TransitionTime() *uint64 {
 	return c.EIP1153FTime

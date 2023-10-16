@@ -647,6 +647,16 @@ func (c *ChainConfig) SetEIP4844TransitionTime(n *uint64) error {
 	return nil
 }
 
+// GetEIP7516TransitionTime EIP7516: Shard Block Transactions
+func (c *ChainConfig) GetEIP7516TransitionTime() *uint64 {
+	return c.CancunTime
+}
+
+func (c *ChainConfig) SetEIP7516TransitionTime(n *uint64) error {
+	c.CancunTime = n
+	return nil
+}
+
 // GetEIP1153TransitionTime EIP1153: Transient Storage opcodes
 func (c *ChainConfig) GetEIP1153TransitionTime() *uint64 {
 	return c.CancunTime

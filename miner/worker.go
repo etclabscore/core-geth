@@ -979,7 +979,7 @@ func (w *worker) commitTransactions(env *environment, txs *transactionsByPriceAn
 		// Check whether the tx is replay protected. If we're not in the EIP155 hf
 		// phase, start ignoring the sender until we do.
 		if tx.Protected() && !w.chainConfig.IsEnabled(w.chainConfig.GetEIP155Transition, env.header.Number) {
-			log.Trace("Ignoring replay protected transaction", "hash", ltx.Hash(), "eip155", w.chainConfig.GetEIP155Transition())
+			log.Trace("Ignoring replay protected transaction", "hash", ltx.Hash, "eip155", w.chainConfig.GetEIP155Transition())
 			txs.Pop()
 			continue
 		}

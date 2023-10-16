@@ -82,13 +82,15 @@ require (
 	golang.org/x/text v0.13.0
 	golang.org/x/time v0.3.0
 	golang.org/x/tools v0.13.0
+	gonum.org/v1/gonum v0.14.0
+	gonum.org/v1/plot v0.14.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gopkg.in/urfave/cli.v1 v1.20.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
-	git.sr.ht/~sbinet/gg v0.4.1 // indirect
+	git.sr.ht/~sbinet/gg v0.5.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v0.21.1 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v0.8.3 // indirect
 	github.com/DataDog/zstd v1.4.5 // indirect
@@ -103,6 +105,7 @@ require (
 	github.com/aws/smithy-go v1.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bits-and-blooms/bitset v1.5.0 // indirect
+	github.com/campoy/embedmd v1.0.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20190617123548-eb05cc24525f // indirect
 	github.com/cockroachdb/redact v1.0.8 // indirect
@@ -161,6 +164,7 @@ require (
 	github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
+	golang.org/x/image v0.11.0 // indirect
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/net v0.15.0 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect

@@ -121,7 +121,7 @@ func runCmd(ctx *cli.Context) error {
 		tracer      vm.EVMLogger
 		debugLogger *logger.StructLogger
 		statedb     *state.StateDB
-		chainConfig   ctypes.ChainConfigurator
+		chainConfig ctypes.ChainConfigurator
 		sender      = common.BytesToAddress([]byte("sender"))
 		receiver    = common.BytesToAddress([]byte("receiver"))
 		preimages   = ctx.Bool(DumpFlag.Name)

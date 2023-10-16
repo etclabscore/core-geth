@@ -224,7 +224,7 @@ var traceFlags = []cli.Flag{
 	DisableStackFlag,
 	DisableStorageFlag,
 	DisableReturnDataFlag,
-		utils.EVMInterpreterFlag,
+	utils.EVMInterpreterFlag,
 }
 
 var app = flags.NewApp("the evm command line interface")

@@ -201,7 +201,7 @@ func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig ctypes.ChainConfigura
 			continue
 		}
 		if tx.Type() == types.BlobTxType {
-			blobGasUsed += uint64(params.BlobTxBlobGasPerBlob * len(tx.BlobHashes()))
+			blobGasUsed += uint64(vars.BlobTxBlobGasPerBlob * len(tx.BlobHashes()))
 		}
 		msg, err := core.TransactionToMessage(tx, signer, pre.Env.BaseFee)
 		if err != nil {

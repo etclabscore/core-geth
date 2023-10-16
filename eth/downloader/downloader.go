@@ -746,7 +746,7 @@ func (d *Downloader) fetchHead(p *peerConnection) (head *types.Header, pivot *ty
 	mode := d.getMode()
 
 	// Request the advertised remote head block and wait for the response
-	latest, peerTd, _ := p.peer.Head()
+	latest, peerTd := p.peer.Head()
 	d.td = peerTd
 	fetch := 1
 	if mode == SnapSync {
@@ -1045,7 +1045,7 @@ func (d *Downloader) fetchTotalDifficulty(p *peerConnection, latest *types.Heade
 
 			// Check if the peer is lagging behind
 			for _, peer := range d.peers.AllPeers() {
-				_, peerTd, peerDifficulty := peer.peer.Head()
+				_, peerTd := peer.peer.Head()
 				distance := new(big.Int).Sub(peerTd, d.td)
 				if distance.Sign() <= 0 || peerDifficulty.Sign() == 0 {
 					continue

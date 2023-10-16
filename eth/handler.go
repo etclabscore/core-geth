@@ -438,7 +438,7 @@ func (h *handler) runEthPeer(peer *eth.Peer, handler eth.Handler) error {
 
 			select {
 			case res := <-resCh:
-				headers := ([]*types.Header)(*res.Res.(*eth.BlockHeadersPacket))
+				headers := ([]*types.Header)(*res.Res.(*eth.BlockHeadersRequest))
 				if len(headers) == 0 {
 					// If we're doing a snap sync, we must enforce the checkpoint
 					// block to avoid eclipse attacks. Unsynced nodes are welcome

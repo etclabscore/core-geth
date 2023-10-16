@@ -46,6 +46,7 @@ type Config struct {
 	Debug       bool
 	EVMConfig   vm.Config
 	BaseFee     *big.Int
+	BlobBaseFee *big.Int
 	BlobHashes  []common.Hash
 	Random      *common.Hash
 
@@ -96,6 +97,9 @@ func setDefaults(cfg *Config) {
 	}
 	if cfg.BaseFee == nil {
 		cfg.BaseFee = big.NewInt(vars.InitialBaseFee)
+	}
+	if cfg.BlobBaseFee == nil {
+		cfg.BlobBaseFee = new(big.Int)
 	}
 }
 

@@ -39,6 +39,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/trie"
+	"github.com/ethereum/go-ethereum/trie/trienode"
 )
 
 var (
@@ -97,7 +98,7 @@ func (odr *testOdr) Retrieve(ctx context.Context, req OdrRequest) error {
 		if err != nil {
 			panic(err)
 		}
-		nodes := NewNodeSet()
+		nodes := trienode.NewProofSet()
 		t.Prove(req.Key, nodes)
 		req.Proof = nodes
 	case *CodeRequest:

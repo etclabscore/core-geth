@@ -100,7 +100,6 @@ var (
 		utils.SnapshotFlag,
 		utils.TxLookupLimitFlag,
 		utils.TransactionHistoryFlag,
-		utils.StateSchemeFlag,
 		utils.StateHistoryFlag,
 		utils.LightServeFlag,
 		utils.LightIngressFlag,
@@ -171,7 +170,7 @@ var (
 		utils.ECBP1100Flag,
 		utils.ECBP1100NoDisableFlag,
 		configFileFlag,
-	}, utils.NetworkFlags, utils.DatabasePathFlags)
+	}, utils.NetworkFlags, utils.DatabaseFlags)
 
 	rpcFlags = []cli.Flag{
 		utils.HTTPEnabledFlag,

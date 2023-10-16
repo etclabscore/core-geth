@@ -190,7 +190,7 @@ func newHandler(config *handlerConfig) (*handler, error) {
 		h.checkpointHash = config.Checkpoint.SectionHead
 	}
 	// Construct the downloader (long sync)
-	h.downloader = downloader.New(config.Database, h.eventMux, h.chain, nil, h.removePeer, h.enableSyncedFeatures)
+	h.downloader = downloader.New(h.checkpointNumber, config.Database, h.eventMux, h.chain, nil, h.removePeer, h.enableSyncedFeatures)
 	if ttd := h.chain.Config().GetEthashTerminalTotalDifficulty(); ttd != nil {
 		if h.chain.Config().GetEthashTerminalTotalDifficultyPassed() {
 			log.Info("Chain post-merge, sync via beacon client")

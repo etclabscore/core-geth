@@ -30,7 +30,6 @@ import (
 	"github.com/ethereum/go-ethereum/cmd/evm/internal/compiler"
 	"github.com/ethereum/go-ethereum/cmd/utils"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/vm"
@@ -138,7 +137,7 @@ func runCmd(ctx *cli.Context) error {
 	}
 
 	initialGas := ctx.Uint64(GasFlag.Name)
-	genesisConfig := new(core.Genesis)
+	genesisConfig := new(genesisT.Genesis)
 	genesisConfig.GasLimit = initialGas
 	if ctx.String(GenesisFlag.Name) != "" {
 		genesisConfig = readGenesis(ctx.String(GenesisFlag.Name))

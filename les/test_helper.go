@@ -34,7 +34,6 @@ import (
 	"github.com/ethereum/go-ethereum/common/mclock"
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
-	"github.com/ethereum/go-ethereum/contracts/checkpointoracle"
 	"github.com/ethereum/go-ethereum/contracts/checkpointoracle/contract"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/forkid"
@@ -204,7 +203,6 @@ func newTestClientHandler(backend *backends.SimulatedBackend, odr *LesOdr, index
 			GasLimit: 100000000,
 			BaseFee:  big.NewInt(vars.InitialBaseFee),
 		}
-		oracle *checkpointoracle.CheckpointOracle
 	)
 	genesis := core.MustCommitGenesis(db, trie.NewDatabase(db, trie.HashDefaults), &gspec)
 	chain, _ := light.NewLightChain(odr, gspec.Config, engine, nil)
@@ -215,7 +213,6 @@ func newTestClientHandler(backend *backends.SimulatedBackend, odr *LesOdr, index
 			chainConfig: params.AllEthashProtocolChanges,
 			iConfig:     light.TestClientIndexerConfig,
 			chainDb:     db,
-			oracle:      oracle,
 			chainReader: chain,
 			closeCh:     make(chan struct{}),
 		},
@@ -243,7 +240,6 @@ func newTestServerHandler(blocks int, indexers []*core.ChainIndexer, db ethdb.Da
 			GasLimit: 100000000,
 			BaseFee:  big.NewInt(vars.InitialBaseFee),
 		}
-		oracle *checkpointoracle.CheckpointOracle
 	)
 	genesis := core.MustCommitGenesis(db, trie.NewDatabase(db, trie.HashDefaults), &gspec)
 
@@ -265,7 +261,6 @@ func newTestServerHandler(blocks int, indexers []*core.ChainIndexer, db ethdb.Da
 			iConfig:     light.TestServerIndexerConfig,
 			chainDb:     db,
 			chainReader: simulation.Blockchain(),
-			oracle:      oracle,
 			closeCh:     make(chan struct{}),
 		},
 		peers:        newClientPeerSet(),

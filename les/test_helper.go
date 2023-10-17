@@ -28,7 +28,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/mclock"
@@ -118,9 +117,6 @@ func prepare(n int, backend *backends.SimulatedBackend) {
 			// Builtin-block
 			//    number: 1
 			//    txs:    2
-
-			// deploy checkpoint contract
-			auth, _ := bind.NewKeyedTransactorWithChainID(bankKey, big.NewInt(1337))
 
 			// bankUser transfers some ether to user1
 			nonce, _ := backend.PendingNonceAt(ctx, bankAddr)

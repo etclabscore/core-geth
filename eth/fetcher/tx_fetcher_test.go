@@ -27,7 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/mclock"
 	"github.com/ethereum/go-ethereum/core/txpool"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 var (
@@ -1060,7 +1060,7 @@ func TestTransactionFetcherBandwidthLimiting(t *testing.T) {
 			doTxNotify{peer: "C",
 				hashes: []common.Hash{{0x07}, {0x08}},
 				types:  []byte{types.BlobTxType, types.BlobTxType},
-				sizes:  []uint32{params.MaxBlobGasPerBlock, params.MaxBlobGasPerBlock},
+				sizes:  []uint32{vars.MaxBlobGasPerBlock, vars.MaxBlobGasPerBlock},
 			},
 			doWait{time: txArriveTimeout, step: true},
 			isWaiting(nil),
@@ -1077,8 +1077,8 @@ func TestTransactionFetcherBandwidthLimiting(t *testing.T) {
 						{common.Hash{0x06}, typeptr(types.LegacyTxType), sizeptr(maxTxRetrievalSize)},
 					},
 					"C": {
-						{common.Hash{0x07}, typeptr(types.BlobTxType), sizeptr(params.MaxBlobGasPerBlock)},
-						{common.Hash{0x08}, typeptr(types.BlobTxType), sizeptr(params.MaxBlobGasPerBlock)},
+						{common.Hash{0x07}, typeptr(types.BlobTxType), sizeptr(vars.MaxBlobGasPerBlock)},
+						{common.Hash{0x08}, typeptr(types.BlobTxType), sizeptr(vars.MaxBlobGasPerBlock)},
 					},
 				},
 				fetching: map[string][]common.Hash{

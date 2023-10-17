@@ -45,7 +45,7 @@ var (
 		Alloc:   genesisT.GenesisAlloc{testAddress: {Balance: big.NewInt(1000000000000000)}},
 		BaseFee: big.NewInt(vars.InitialBaseFee),
 	}
-	genesis      = gspec.MustCommit(testdb)
+	genesis      = core.MustCommitGenesis(testdb, trie.NewDatabase(testdb, nil), &gspec)
 	unknownBlock = types.NewBlock(&types.Header{Root: types.EmptyRootHash, GasLimit: vars.GenesisGasLimit, BaseFee: big.NewInt(vars.InitialBaseFee)}, nil, nil, nil, trie.NewStackTrie(nil))
 )
 

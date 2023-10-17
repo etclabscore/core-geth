@@ -268,7 +268,7 @@ func (b *LesApiBackend) SyncProgress() ethereum.SyncProgress {
 }
 
 func (b *LesApiBackend) ProtocolVersion() int {
-	return b.eth.LesVersion() + 10000les/
+	return b.eth.LesVersion() + 10000
 }
 
 func (b *LesApiBackend) SuggestGasTipCap(ctx context.Context) (*big.Int, error) {

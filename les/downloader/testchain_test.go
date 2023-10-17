@@ -28,6 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -37,8 +38,8 @@ var (
 	testAddress = crypto.PubkeyToAddress(testKey.PublicKey)
 	testDB      = rawdb.NewMemoryDatabase()
 
-	gspec = core.Genesis{
-		Alloc:   core.GenesisAlloc{testAddress: {Balance: big.NewInt(1000000000000000)}},
+	gspec = genesisT.Genesis{
+		Alloc:   genesisT.GenesisAlloc{testAddress: {Balance: big.NewInt(1000000000000000)}},
 		BaseFee: big.NewInt(vars.InitialBaseFee),
 	}
 	testGenesis = gspec.MustCommit(testDB)

@@ -31,6 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/les"
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/trie"
 )
@@ -45,11 +46,11 @@ var (
 	testBalance = big.NewInt(2e18)
 )
 
-func generatePreMergeChain(pre, post int) (*core.Genesis, []*types.Header, []*types.Block, []*types.Header, []*types.Block) {
+func generatePreMergeChain(pre, post int) (*genesisT.Genesis, []*types.Header, []*types.Block, []*types.Header, []*types.Block) {
 	config := *params.AllEthashProtocolChanges
-	genesis := &core.Genesis{
+	genesis := &genesisT.Genesis{
 		Config:    &config,
-		Alloc:     core.GenesisAlloc{testAddr: {Balance: testBalance}},
+		Alloc:     genesisT.GenesisAlloc{testAddr: {Balance: testBalance}},
 		ExtraData: []byte("test genesis"),
 		Timestamp: 9000,
 		BaseFee:   big.NewInt(vars.InitialBaseFee),
@@ -215,7 +216,7 @@ func TestEth2DeepReorg(t *testing.T) {
 }
 
 // startEthService creates a full node instance for testing.
-func startLesService(t *testing.T, genesis *core.Genesis, headers []*types.Header) (*node.Node, *les.LightEthereum) {
+func startLesService(t *testing.T, genesis *genesisT.Genesis, headers []*types.Header) (*node.Node, *les.LightEthereum) {
 	t.Helper()
 
 	n, err := node.New(&node.Config{})

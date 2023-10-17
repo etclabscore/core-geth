@@ -123,7 +123,7 @@ func TestCreation(t *testing.T) {
 		{
 			"holesky",
 			params.HoleskyChainConfig,
-			core.DefaultHoleskyGenesisBlock().ToBlock(),
+			core.GenesisToBlock(params.DefaultHoleskyGenesisBlock(), nil),
 			[]testcase{
 				{0, 0, ID{Hash: checksumToBytes(0xc61a6098), Next: 1696000704}},   // Unsynced, last Frontier, Homestead, Tangerine, Spurious, Byzantium, Constantinople, Petersburg, Istanbul, Berlin, London, Paris block
 				{123, 0, ID{Hash: checksumToBytes(0xc61a6098), Next: 1696000704}}, // First MergeNetsplit block

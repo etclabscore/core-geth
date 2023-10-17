@@ -1048,15 +1048,6 @@ func (p *clientPeer) Handshake(td *big.Int, head common.Hash, headNum uint64, ge
 		p.fcCosts = costList.decode(ProtocolLengths[uint(p.version)])
 		p.fcParams = server.defParams
 
-		// Add advertised checkpoint and register block height which
-		// client can verify the checkpoint validity.
-		if server.oracle != nil && server.oracle.IsRunning() {
-			cp, height := server.oracle.StableCheckpoint()
-			if cp != nil {
-				*lists = (*lists).add("checkpoint/value", cp)
-				*lists = (*lists).add("checkpoint/registerHeight", height)
-			}
-		}
 	}, func(recv keyValueMap) error {
 		p.server = recv.get("flowControl/MRR", nil) == nil
 		if p.server {

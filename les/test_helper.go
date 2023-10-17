@@ -218,8 +218,9 @@ func newTestClientHandler(backend *backends.SimulatedBackend, odr *LesOdr, index
 		eventMux:   evmux,
 		merger:     consensus.NewMerger(rawdb.NewMemoryDatabase()),
 	}
-	client.handler = newClientHandler(client)
+	client.handler = newClientHandler(ulcServers, ulcFraction, client)
 
+	client.handler.start()
 	return client.handler, func() {
 		client.handler.stop()
 	}
@@ -576,6 +577,7 @@ func newClientServerEnv(t *testing.T, config testnetConfig) (*testServer, *testC
 	)
 	if config.connect {
 		done := make(chan struct{})
+		client.syncEnd = func(_ *types.Header) { close(done) }
 		cpeer, speer, err = newTestPeerPair("peer", config.protocol, server, client, false)
 		if err != nil {
 			t.Fatalf("Failed to connect testing peers %v", err)

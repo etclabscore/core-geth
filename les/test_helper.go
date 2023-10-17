@@ -77,12 +77,6 @@ var (
 )
 
 var (
-	// The block frequency for creating checkpoint(only used in test)
-	sectionSize = big.NewInt(128)
-
-	// The number of confirmations needed to generate a checkpoint(only used in test).
-	processConfirms = big.NewInt(1)
-
 	// The token bucket buffer limit for testing purpose.
 	testBufLimit = uint64(1000000)
 

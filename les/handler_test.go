@@ -31,13 +31,13 @@ import (
 	"github.com/ethereum/go-ethereum/core/txpool"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/les/downloader"
+	"github.com/ethereum/go-ethereum/eth/downloader"
 	"github.com/ethereum/go-ethereum/light"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/ethereum/go-ethereum/trie"
+	"github.com/ethereum/go-ethereum/trie"les/down
 	"github.com/ethereum/go-ethereum/trie/trienode"
 )
 
@@ -127,10 +127,10 @@ func testGetBlockHeaders(t *testing.T, protocol int) {
 			[]common.Hash{bc.CurrentBlock().Hash()},
 		},
 		// Ensure protocol limits are honored
-		//{
+		// {
 		//	&GetBlockHeadersData{Origin: hashOrNumber{Number: bc.CurrentBlock().Number.Uint64()() - 1}, Amount: limit + 10, Reverse: true},
 		//	[]common.Hash{},
-		//},
+		// },
 		// Check that requesting more than available is handled gracefully
 		{
 			&GetBlockHeadersData{Origin: hashOrNumber{Number: bc.CurrentBlock().Number.Uint64() - 4}, Skip: 3, Amount: 3},
@@ -216,7 +216,7 @@ func testGetBlockBodies(t *testing.T, protocol int) {
 		{1, nil, nil, 1},         // A single random block should be retrievable
 		{10, nil, nil, 10},       // Multiple random blocks should be retrievable
 		{limit, nil, nil, limit}, // The maximum possible blocks should be retrievable
-		//{limit + 1, nil, nil, limit},                                  // No more than the possible block count should be returned
+		// {limit + 1, nil, nil, limit},                                  // No more than the possible block count should be returned
 		{0, []common.Hash{bc.Genesis().Hash()}, []bool{true}, 1},      // The genesis block should be retrievable
 		{0, []common.Hash{bc.CurrentBlock().Hash()}, []bool{true}, 1}, // The chains head block should be retrievable
 		{0, []common.Hash{{}}, []bool{false}, 0},                      // A non existent block should not be returned

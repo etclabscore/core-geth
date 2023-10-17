@@ -68,7 +68,7 @@ func (m *mockBackend) StateAtBlock(block *types.Block, reexec uint64, base *stat
 
 type testBlockChain struct {
 	root          common.Hash
-	config        *params.ChainConfig
+	config        ctypes.ChainConfigurator
 	statedb       *state.StateDB
 	gasLimit      uint64
 	chainHeadFeed *event.Feed

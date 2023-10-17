@@ -68,7 +68,6 @@ type LightEthereum struct {
 	blockchain         *light.LightChain
 	serverPool         *vfc.ServerPool
 	serverPoolIterator enode.Iterator
-	pruner             *pruner
 	merger             *consensus.Merger
 
 	bloomRequests chan chan *bloombits.Retrieval // Channel receiving bloom data retrieval requests

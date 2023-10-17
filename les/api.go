@@ -27,8 +27,6 @@ import (
 )
 
 var (
-	errNoCheckpoint         = errors.New("no local checkpoint provided")
-	errNotActivated         = errors.New("checkpoint registrar is not activated")
 	errUnknownBenchmarkType = errors.New("unknown benchmark type")
 )
 

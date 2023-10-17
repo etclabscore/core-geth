@@ -34,6 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/mclock"
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
+	"github.com/ethereum/go-ethereum/contracts/checkpointoracle"
 	"github.com/ethereum/go-ethereum/contracts/checkpointoracle/contract"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/forkid"
@@ -45,14 +46,12 @@ import (
 	"github.com/ethereum/go-ethereum/eth/ethconfig"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/event"
-	"github.com/ethereum/go-ethereum/les/checkpointoracle"
 	"github.com/ethereum/go-ethereum/les/flowcontrol"
 	vfs "github.com/ethereum/go-ethereum/les/vflux/server"
 	"github.com/ethereum/go-ethereum/light"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/trie"
@@ -209,24 +208,6 @@ func newTestClientHandler(backend *backends.SimulatedBackend, odr *LesOdr, index
 	)
 	genesis := core.MustCommitGenesis(db, trie.NewDatabase(db, trie.HashDefaults), &gspec)
 	chain, _ := light.NewLightChain(odr, gspec.Config, engine, nil)
-	if indexers != nil {
-		checkpointConfig := &ctypes.CheckpointOracleConfig{
-			Address:   crypto.CreateAddress(bankAddr, 0),
-			Signers:   []common.Address{signerAddr},
-			Threshold: 1,
-		}
-		getLocal := func(index uint64) ctypes.TrustedCheckpoint {
-			chtIndexer := indexers[0]
-			sectionHead := chtIndexer.SectionHead(index)
-			return ctypes.TrustedCheckpoint{
-				SectionIndex: index,
-				SectionHead:  sectionHead,
-				CHTRoot:      light.GetChtRoot(db, index, sectionHead),
-				BloomRoot:    light.GetBloomTrieRoot(db, index, sectionHead),
-			}
-		}
-		oracle = checkpointoracle.New(checkpointConfig, getLocal)
-	}
 	client := &LightEthereum{
 		lesCommons: lesCommons{
 			genesis:     genesis.Hash(),
@@ -247,12 +228,8 @@ func newTestClientHandler(backend *backends.SimulatedBackend, odr *LesOdr, index
 		eventMux:   evmux,
 		merger:     consensus.NewMerger(rawdb.NewMemoryDatabase()),
 	}
-	client.handler = newClientHandler(ulcServers, ulcFraction, nil, client)
+	client.handler = newClientHandler(client)
 
-	if client.oracle != nil {
-		client.oracle.Start(backend)
-	}
-	client.handler.start()
 	return client.handler, func() {
 		client.handler.stop()
 	}
@@ -280,24 +257,6 @@ func newTestServerHandler(blocks int, indexers []*core.ChainIndexer, db ethdb.Da
 	pool := legacypool.New(txpoolConfig, simulation.Blockchain())
 	txpool, _ := txpool.New(new(big.Int).SetUint64(txpoolConfig.PriceLimit), simulation.Blockchain(), []txpool.SubPool{pool})
 
-	if indexers != nil {
-		checkpointConfig := &ctypes.CheckpointOracleConfig{
-			Address:   crypto.CreateAddress(bankAddr, 0),
-			Signers:   []common.Address{signerAddr},
-			Threshold: 1,
-		}
-		getLocal := func(index uint64) ctypes.TrustedCheckpoint {
-			chtIndexer := indexers[0]
-			sectionHead := chtIndexer.SectionHead(index)
-			return ctypes.TrustedCheckpoint{
-				SectionIndex: index,
-				SectionHead:  sectionHead,
-				CHTRoot:      light.GetChtRoot(db, index, sectionHead),
-				BloomRoot:    light.GetBloomTrieRoot(db, index, sectionHead),
-			}
-		}
-		oracle = checkpointoracle.New(checkpointConfig, getLocal)
-	}
 	server := &LesServer{
 		lesCommons: lesCommons{
 			genesis:     genesis.Hash(),
@@ -323,9 +282,6 @@ func newTestServerHandler(blocks int, indexers []*core.ChainIndexer, db ethdb.Da
 	server.clientPool.Start()
 	server.clientPool.SetLimits(10000, 10000) // Assign enough capacity for clientpool
 	server.handler = newServerHandler(server, simulation.Blockchain(), db, txpool, func() bool { return true })
-	if server.oracle != nil {
-		server.oracle.Start(simulation)
-	}
 	server.servingQueue.setThreads(4)
 	server.handler.start()
 	closer := func() { server.Stop() }
@@ -632,7 +588,6 @@ func newClientServerEnv(t *testing.T, config testnetConfig) (*testServer, *testC
 	)
 	if config.connect {
 		done := make(chan struct{})
-		client.syncEnd = func(_ *types.Header) { close(done) }
 		cpeer, speer, err = newTestPeerPair("peer", config.protocol, server, client, false)
 		if err != nil {
 			t.Fatalf("Failed to connect testing peers %v", err)

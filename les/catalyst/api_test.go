@@ -31,6 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/les"
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/trie"
 )
 
@@ -51,11 +52,11 @@ func generatePreMergeChain(pre, post int) (*core.Genesis, []*types.Header, []*ty
 		Alloc:     core.GenesisAlloc{testAddr: {Balance: testBalance}},
 		ExtraData: []byte("test genesis"),
 		Timestamp: 9000,
-		BaseFee:   big.NewInt(params.InitialBaseFee),
+		BaseFee:   big.NewInt(vars.InitialBaseFee),
 	}
 	// Pre-merge blocks
 	db, preBLocks, _ := core.GenerateChainWithGenesis(genesis, ethash.NewFaker(), pre, nil)
-	totalDifficulty := new(big.Int).Set(params.GenesisDifficulty)
+	totalDifficulty := new(big.Int).Set(vars.GenesisDifficulty)
 
 	var preHeaders []*types.Header
 	for _, b := range preBLocks {

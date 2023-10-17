@@ -30,6 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/cmd/evm/internal/compiler"
 	"github.com/ethereum/go-ethereum/cmd/utils"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/vm"
@@ -154,7 +155,7 @@ func runCmd(ctx *cli.Context) error {
 		HashDB:    hashdb.Defaults,
 	})
 	defer triedb.Close()
-	genesis := genesisConfig.MustCommit(db, triedb)
+	genesis := core.MustCommitGenesis(db, triedb, genesisConfig)
 	sdb := state.NewDatabaseWithNodeDB(db, triedb)
 	statedb, _ = state.New(genesis.Root(), sdb, nil)
 	chainConfig = genesisConfig.Config

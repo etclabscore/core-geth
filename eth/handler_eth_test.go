@@ -454,9 +454,10 @@ func testTransactionPropagation(t *testing.T, protocol uint) {
 	}
 }
 
-// Tests that post eth protocol handshake, clients perform a mutual checkpoint
+// TestCheckpointChallenge tests that post eth protocol handshake, clients perform a mutual checkpoint
 // challenge to validate each other's chains. Hash mismatches, or missing ones
 // during a fast sync should lead to the peer getting dropped.
+// Only at core-geth; removed upstream post merge (v1.13.3), along with ETH66.
 func TestCheckpointChallenge(t *testing.T) {
 	tests := []struct {
 		syncmode   downloader.SyncMode
@@ -523,8 +524,8 @@ func testCheckpointChallenge(t *testing.T, syncmode downloader.SyncMode, checkpo
 	defer p2pLocal.Close()
 	defer p2pRemote.Close()
 
-	local := eth.NewPeer(eth.ETH66, p2p.NewPeerPipe(enode.ID{1}, "", nil, p2pLocal), p2pLocal, handler.txpool)
-	remote := eth.NewPeer(eth.ETH66, p2p.NewPeerPipe(enode.ID{2}, "", nil, p2pRemote), p2pRemote, handler.txpool)
+	local := eth.NewPeer(eth.ETH67, p2p.NewPeerPipe(enode.ID{1}, "", nil, p2pLocal), p2pLocal, handler.txpool)
+	remote := eth.NewPeer(eth.ETH67, p2p.NewPeerPipe(enode.ID{2}, "", nil, p2pRemote), p2pRemote, handler.txpool)
 	defer local.Close()
 	defer remote.Close()
 
@@ -551,11 +552,11 @@ func testCheckpointChallenge(t *testing.T, syncmode downloader.SyncMode, checkpo
 		if err != nil {
 			t.Fatalf("failed to read checkpoint challenge: %v", err)
 		}
-		request := new(eth.GetBlockHeadersPacket66)
+		request := new(eth.GetBlockHeadersPacket)
 		if err := msg.Decode(request); err != nil {
 			t.Fatalf("failed to decode checkpoint challenge: %v", err)
 		}
-		query := request.GetBlockHeadersPacket
+		query := request.GetBlockHeadersRequest
 		if query.Origin.Number != response.Number.Uint64() || query.Amount != 1 || query.Skip != 0 || query.Reverse {
 			t.Fatalf("challenge mismatch: have [%d, %d, %d, %v] want [%d, %d, %d, %v]",
 				query.Origin.Number, query.Amount, query.Skip, query.Reverse,

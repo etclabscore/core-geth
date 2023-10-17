@@ -893,9 +893,8 @@ func testShiftedHeaderAttack(t *testing.T, protocol uint, mode SyncMode) {
 }
 
 // Tests that upon detecting an invalid header, the recent ones are rolled back
-// for various failure scenarios. Afterwards a full sync is attempted to make
+// for various failure scenarios. Afterward a full sync is attempted to make
 // sure no state was corrupted.
-func TestInvalidHeaderRollback66Snap(t *testing.T) { testInvalidHeaderRollback(t, eth.ETH66, SnapSync) }
 func TestInvalidHeaderRollback67Snap(t *testing.T) { testInvalidHeaderRollback(t, eth.ETH67, SnapSync) }
 
 func testInvalidHeaderRollback(t *testing.T, protocol uint, mode SyncMode) {
@@ -1426,15 +1425,16 @@ func TestRemoteHeaderRequestSpan(t *testing.T) {
 
 // Tests that peers below a pre-configured checkpoint block are prevented from
 // being fast-synced from, avoiding potential cheap eclipse attacks.
-func TestCheckpointEnforcement66Full(t *testing.T) { testCheckpointEnforcement(t, eth.ETH66, FullSync) }
-func TestCheckpointEnforcement66Snap(t *testing.T) { testCheckpointEnforcement(t, eth.ETH66, SnapSync) }
-func TestCheckpointEnforcement66Light(t *testing.T) {
-	testCheckpointEnforcement(t, eth.ETH66, LightSync)
-}
 func TestCheckpointEnforcement67Full(t *testing.T) { testCheckpointEnforcement(t, eth.ETH67, FullSync) }
 func TestCheckpointEnforcement67Snap(t *testing.T) { testCheckpointEnforcement(t, eth.ETH67, SnapSync) }
 func TestCheckpointEnforcement67Light(t *testing.T) {
 	testCheckpointEnforcement(t, eth.ETH67, LightSync)
+}
+
+func TestCheckpointEnforcement68Full(t *testing.T) { testCheckpointEnforcement(t, eth.ETH68, FullSync) }
+func TestCheckpointEnforcement68Snap(t *testing.T) { testCheckpointEnforcement(t, eth.ETH68, SnapSync) }
+func TestCheckpointEnforcement68Light(t *testing.T) {
+	testCheckpointEnforcement(t, eth.ETH68, LightSync)
 }
 
 func testCheckpointEnforcement(t *testing.T, protocol uint, mode SyncMode) {

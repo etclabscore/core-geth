@@ -374,7 +374,7 @@ func (s *StateDB) HasSelfDestructed(addr common.Address) bool {
 // AddBalance adds amount to the account associated with addr.
 func (s *StateDB) AddBalance(addr common.Address, amount *big.Int) {
 	stateObject := s.GetOrNewStateObject(addr)
-	if stateObject != nil {
+	if stateObject != nil && amount != nil {
 		stateObject.AddBalance(amount)
 	}
 }

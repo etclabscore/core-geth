@@ -1621,7 +1621,7 @@ func (d *Downloader) processHeaders(origin uint64, td *big.Int) error {
 						rollbackErr = err
 
 						// If some headers were inserted, track them as uncertain
-						if mode == FastSync && n > 0 && rollback == 0 {
+						if (mode == FastSync || frequency > 1) && n > 0 && rollback == 0 {
 							rollback = chunk[0].Number.Uint64()
 						}
 						log.Warn("Invalid header encountered", "number", chunk[n].Number, "hash", chunk[n].Hash(), "parent", chunk[n].ParentHash, "err", err)

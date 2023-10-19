@@ -335,6 +335,9 @@ func (s *LightEthereum) APIs() []rpc.API {
 			Namespace: "net",
 			Service:   s.netRPCService,
 		}, {
+			Namespace: "les",
+			Service:   NewLightAPI(&s.lesCommons),
+		}, {
 			Namespace: "vflux",
 			Service:   s.serverPool.API(),
 		},

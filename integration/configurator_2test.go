@@ -29,6 +29,50 @@ import (
 	"github.com/ethereum/go-ethereum/tests"
 )
 
+func validateChainConfigurator(c ctypes.ChainConfigurator, t *testing.T) {
+	zero, max := uint64(0), uint64(math.MaxUint64)
+	for _, head := range []*uint64{nil, &zero, &max} {
+		if err := confp.IsValid(c, head); err != nil {
+			t.Fatalf("invalid config, err: %v", err)
+		}
+	}
+}
+
+func logChainConfiguratorInfo(c ctypes.ChainConfigurator, name string, t *testing.T) {
+	t.Log(name)
+	t.Log("Consensus Engine Type:", c.GetConsensusEngineType())
+	t.Log("Ethash EIP649 Transition:", nicelog(c.GetEthashEIP649Transition()))
+	t.Log("Ethash EIP1234 Transition:", nicelog(c.GetEthashEIP1234Transition()))
+	t.Log("Ethash Block Reward Schedule:", c.GetEthashBlockRewardSchedule())
+	if v := c.GetEthashEIP649Transition(); v != nil {
+		t.Log(name, "649T", *v)
+	} else {
+		t.Log(name, "649T", v)
+	}
+}
+
+func testEquivalent(t *testing.T, name string, oconf ctypes.ChainConfigurator, mg *coregeth.CoreGethChainConfig) {
+	logChainConfiguratorInfo(oconf, name, t)
+
+	// Integration tests: conversion
+	err := confp.Crush(mg, oconf, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	logChainConfiguratorInfo(mg, name, t)
+	validateChainConfigurator(mg, t)
+
+	if mg.GetConsensusEngineType().IsUnknown() {
+		t.Fatal("Unknown consensus mg")
+	}
+
+	err = confp.Equivalent(oconf, mg)
+	if err != nil {
+		t.Errorf("Equivalence: %s oconf/mg err: %v", name, err) // With error.
+	}
+}
+
 func TestConstantinopleEquivalence(t *testing.T) {
 	conf := tests.Forks["Constantinople"]
 	pspec := &coregeth.CoreGethChainConfig{}
@@ -36,25 +80,13 @@ func TestConstantinopleEquivalence(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// This test's config will set Byz delay (3m) at 0, and Const delay (5m) at 0.
-	// This check ensures that 5m delay being greater than 3m takes precedence at simultaneous blocks.
+
 	if pspec.GetEthashDifficultyBombDelaySchedule()[*conf.GetEthashEIP1234Transition()].Cmp(vars.EIP1234DifficultyBombDelay) != 0 {
-		t.Error("bad")
+		t.Error("Bad")
 	}
 }
 
 func TestEquivalent_Features(t *testing.T) {
-	mustValidate := func(c ctypes.ChainConfigurator) {
-		zero, max := uint64(0), uint64(math.MaxUint64)
-		for _, head := range []*uint64{
-			nil, &zero, &max,
-		} {
-			if err := confp.IsValid(c, head); err != nil {
-				t.Fatalf("invalid config, err: %v", err)
-			}
-		}
-	}
-
 	for name, oconf := range tests.Forks {
 		log.Println(name)
 		oconf := oconf
@@ -63,57 +95,9 @@ func TestEquivalent_Features(t *testing.T) {
 			oconf.MustSetConsensusEngineType(ctypes.ConsensusEngineT_Ethash)
 		}
 
-		mustValidate(oconf)
-
-		// Integration tests: conversion
+		validateChainConfigurator(oconf, t)
 
 		mg := &coregeth.CoreGethChainConfig{}
-		err := confp.Crush(mg, oconf, true)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		mustValidate(mg)
-
-		if mg.GetConsensusEngineType().IsUnknown() {
-			t.Fatal("unknown consensus mg")
-		}
-
-		nicelog := func(n *uint64) interface{} {
-			if n == nil {
-				return "nil"
-			}
-			return *n
-		}
-		debuglog := func(a, b ctypes.ChainConfigurator) {
-			// Debugging log lines.
-			t.Log("o", oconf.GetConsensusEngineType())
-			t.Log("m", mg.GetConsensusEngineType())
-
-			t.Log("o 649", nicelog(oconf.GetEthashEIP649Transition()))
-			t.Log("m 649", nicelog(mg.GetEthashEIP649Transition()))
-			t.Log("o 1234", nicelog(oconf.GetEthashEIP1234Transition()))
-			t.Log("m 1234", nicelog(mg.GetEthashEIP1234Transition()))
-
-			t.Log(mg.GetEthashBlockRewardSchedule())
-
-			if v := oconf.GetEthashEIP649Transition(); v != nil {
-				t.Log(name, "649T", *v)
-			} else {
-				t.Log(name, "649T", v)
-			}
-
-			t.Log("--------------------")
-			j, _ := json.MarshalIndent(oconf, "", "    ")
-			t.Log(string(j))
-			j, _ = json.MarshalIndent(mg, "", "    ")
-			t.Log(string(j))
-		}
-
-		err = confp.Equivalent(oconf, mg)
-		if err != nil {
-			t.Errorf("Equivalence: %s oconf/mg err: %v", name, err) // With error.
-			debuglog(oconf, mg)
-		}
+		testEquivalent(t, name, oconf, mg)
 	}
 }

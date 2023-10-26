@@ -292,8 +292,16 @@ func (ethash *Ethash) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 			return err
 		}
 	}
-	// Note: EIP4788 (Beacon Block Root) is not verified here;
-	// it is incompatible with ethash because of the hard assumption on the Beacon chain.
+	eip4788Enabled := chain.Config().IsEnabledByTime(chain.Config().GetEIP4788TransitionTime, &header.Time)
+	if !eip4788Enabled {
+		if header.ParentBeaconRoot != nil {
+			return fmt.Errorf("invalid parentBeaconRoot, have %#x, expected nil", header.ParentBeaconRoot)
+		}
+	} else {
+		if header.ParentBeaconRoot == nil {
+			return errors.New("header is missing beaconRoot")
+		}
+	}
 
 	// Verify the engine specific seal securing the block
 	if seal {

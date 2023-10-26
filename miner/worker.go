@@ -1086,7 +1086,7 @@ func (w *worker) prepareWork(genParams *generateParams) (*environment, error) {
 			header.GasLimit = core.CalcGasLimit(parentGasLimit, w.config.GasCeil)
 		}
 	}
-	// Apply EIP-4844, EIP-4788.
+	// Apply EIP-4844.
 	if w.chainConfig.IsEnabledByTime(w.chainConfig.GetEIP4844TransitionTime, &header.Time) {
 		var excessBlobGas uint64
 		if w.chainConfig.IsEnabledByTime(w.chainConfig.GetEIP4844TransitionTime, &parent.Time) {
@@ -1097,6 +1097,9 @@ func (w *worker) prepareWork(genParams *generateParams) (*environment, error) {
 		}
 		header.BlobGasUsed = new(uint64)
 		header.ExcessBlobGas = &excessBlobGas
+	}
+	// Apply EIP-4788.
+	if w.chainConfig.IsEnabledByTime(w.chainConfig.GetEIP4788TransitionTime, &header.Time) {
 		header.ParentBeaconRoot = genParams.beaconRoot
 	}
 	// Run the consensus preparation with the default or customized consensus engine.

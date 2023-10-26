@@ -450,12 +450,9 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 			head.WithdrawalsHash = &types.EmptyWithdrawalsHash
 			withdrawals = make([]*types.Withdrawal, 0)
 		}
-		isCancun := conf.IsEnabledByTime(g.Config.GetEIP4844TransitionTime, &g.Timestamp)
-		if isCancun {
-			// EIP-4788: The parentBeaconBlockRoot of the genesis block is always
-			// the zero hash. This is because the genesis block does not have a parent
-			// by definition.
-			head.ParentBeaconRoot = new(common.Hash)
+		// EIP4844 and EIP4788 are Cancun features.
+		isEIP4844 := conf.IsEnabledByTime(g.Config.GetEIP4844TransitionTime, &g.Timestamp)
+		if isEIP4844 {
 			// EIP-4844 fields
 			head.ExcessBlobGas = g.ExcessBlobGas
 			head.BlobGasUsed = g.BlobGasUsed
@@ -465,6 +462,13 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 			if head.BlobGasUsed == nil {
 				head.BlobGasUsed = new(uint64)
 			}
+		}
+		isEIP4788 := conf.IsEnabledByTime(g.Config.GetEIP4788TransitionTime, &g.Timestamp)
+		if isEIP4788 {
+			// EIP-4788: The parentBeaconBlockRoot of the genesis block is always
+			// the zero hash. This is because the genesis block does not have a parent
+			// by definition.
+			head.ParentBeaconRoot = new(common.Hash)
 		}
 	}
 	return types.NewBlock(head, nil, nil, nil, trie.NewStackTrie(nil)).WithWithdrawals(withdrawals)

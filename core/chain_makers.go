@@ -413,6 +413,8 @@ func makeHeader(chain consensus.ChainReader, parent *types.Block, state *state.S
 		excessBlobGas := eip4844.CalcExcessBlobGas(parentExcessBlobGas, parentBlobGasUsed)
 		header.ExcessBlobGas = &excessBlobGas
 		header.BlobGasUsed = new(uint64)
+	}
+	if chain.Config().IsEnabledByTime(chain.Config().GetEIP4788TransitionTime, &header.Time) {
 		header.ParentBeaconRoot = new(common.Hash)
 	}
 	return header

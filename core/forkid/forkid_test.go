@@ -188,8 +188,11 @@ func TestCreation(t *testing.T) {
 				{3_985_893, 0, ID{Hash: checksumToBytes(0x92b323e0), Next: 5_520_000}},
 				{3_985_894, 0, ID{Hash: checksumToBytes(0x92b323e0), Next: 5_520_000}},
 				{5_519_999, 0, ID{Hash: checksumToBytes(0x92b323e0), Next: 5_520_000}},
-				{5_520_000, 0, ID{Hash: checksumToBytes(0x8c9b1797), Next: 0}},
-				{5_520_001, 0, ID{Hash: checksumToBytes(0x8c9b1797), Next: 0}},
+				{5_520_000, 0, ID{Hash: checksumToBytes(0x8c9b1797), Next: 9_957_000}},
+				{5_520_001, 0, ID{Hash: checksumToBytes(0x8c9b1797), Next: 9_957_000}},
+				{9_956_999, 0, ID{Hash: checksumToBytes(0x8c9b1797), Next: 9_957_000}},
+				{9_957_000, 0, ID{Hash: checksumToBytes(0x3a6b00d7), Next: 0}},
+				{9_957_001, 0, ID{Hash: checksumToBytes(0x3a6b00d7), Next: 0}},
 			},
 		},
 		// MintMe test cases
@@ -504,8 +507,7 @@ func TestGatherForks(t *testing.T) {
 		{
 			"mordor",
 			params.MordorChainConfig,
-			core.GenesisToBlock(params.DefaultMordorGenesisBlock(), nil),
-			[]uint64{301_243, 999_983, 2_520_000, 3_985_893, 5_520_000},
+			[]uint64{301_243, 999_983, 2_520_000, 3_985_893, 5_520_000, 9_957_000},
 		},
 		{
 			"mintme",

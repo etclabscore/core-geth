@@ -518,6 +518,7 @@ func TestGatherForks(t *testing.T) {
 		{
 			"mordor",
 			params.MordorChainConfig,
+			core.GenesisToBlock(params.DefaultMordorGenesisBlock(), nil),
 			[]uint64{301_243, 999_983, 2_520_000, 3_985_893, 5_520_000, 9_957_000},
 		},
 		{

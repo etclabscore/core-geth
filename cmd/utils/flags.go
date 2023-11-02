@@ -2251,14 +2251,16 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 
 // SetDNSDiscoveryDefaults2 configures DNS discovery with the given URL if no URLs are set.
 func SetDNSDiscoveryDefaults2(cfg *ethconfig.Config, url string) {
+	var ethURL = url
 	if cfg.EthDiscoveryURLs != nil {
+		log.Warn("Short circuiting DNS discovery defaults (should be manually configured)")
 		return
 	}
 	if cfg.SyncMode == downloader.LightSync {
-		url = strings.Replace(url, "@all.", "@les.", 1)
+		ethURL = strings.Replace(url, "@all.", "@les.", 1)
 	}
-	cfg.EthDiscoveryURLs = []string{url}
-	cfg.SnapDiscoveryURLs = cfg.EthDiscoveryURLs
+	cfg.EthDiscoveryURLs = []string{ethURL}
+	cfg.SnapDiscoveryURLs = []string{strings.Replace(url, "@all.", "@snap.", 1)}
 }
 
 // SetDNSDiscoveryDefaults configures DNS discovery with the given URL if

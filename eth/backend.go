@@ -301,6 +301,7 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 
 	// Setup DNS discovery iterators.
 	dnsclient := dnsdisc.NewClient(dnsdisc.Config{})
+	log.Info("DNS client configuring discovery", "eth.urls", config.EthDiscoveryURLs, "snap.urls", eth.config.SnapDiscoveryURLs)
 	eth.ethDialCandidates, err = dnsclient.NewIterator(eth.config.EthDiscoveryURLs...)
 	if err != nil {
 		return nil, err

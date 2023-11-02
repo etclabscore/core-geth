@@ -501,6 +501,18 @@ func TestGatherForks(t *testing.T) {
 			[]uint64{1681338455 /* ShanghaiTime */},
 		},
 		{
+			"goerli",
+			params.GoerliChainConfig,
+			[]uint64{1_561_651, 4_460_644, 5_062_605},
+			[]uint64{1678832736 /* ShanghaiTime */},
+		},
+		{
+			"sepolia",
+			params.SepoliaChainConfig,
+			[]uint64{1735371 /* Merge NetSplit */},
+			[]uint64{1677557088 /* ShanghaiTime */},
+		},
+		{
 			"mordor",
 			params.MordorChainConfig,
 			[]uint64{301_243, 999_983, 2_520_000, 3_985_893, 5_520_000, 9_957_000},

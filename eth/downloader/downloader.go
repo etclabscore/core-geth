@@ -768,6 +768,9 @@ func (d *Downloader) fetchHead(p *peerConnection) (head *types.Header, pivot *ty
 	if (mode == SnapSync || mode == LightSync) && head.Number.Uint64() < d.checkpoint {
 		return nil, nil, fmt.Errorf("%w: remote head %d below checkpoint %d", errUnsyncedPeer, head.Number, d.checkpoint)
 	}
+	if (mode == SnapSync || mode == LightSync) && head.Number.Uint64() <= uint64(fsMinFullBlocks) {
+		return nil, nil, fmt.Errorf("%w: remote head %d below min-full-blocks height %d", errUnsyncedPeer, head.Number, fsMinFullBlocks)
+	}
 	if len(headers) == 1 {
 		if mode == SnapSync && head.Number.Uint64() > uint64(fsMinFullBlocks) {
 			return nil, nil, fmt.Errorf("%w: no pivot included along head header", errBadPeer)

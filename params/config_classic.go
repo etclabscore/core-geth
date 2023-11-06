@@ -107,6 +107,58 @@ var (
 			1920000: common.HexToHash("0x94365e3a8c0b35089c1d1195081fe7489b528a84b22199c916180db8b28ade7f"),
 			2500000: common.HexToHash("0xca12c63534f565899681965528d536c52cb05b7c48e269c2a6cb77ad864d878a"),
 		},
+
+		TrustedCheckpoint: &ctypes.TrustedCheckpoint{
+			/*
+					eth/handler.go:
+
+					// If we have trusted checkpoints, enforce them on the chain
+					if config.Checkpoint != nil {
+						h.checkpointNumber = (config.Checkpoint.SectionIndex+1)*vars.CHTFrequency - 1
+						h.checkpointHash = config.Checkpoint.SectionHead
+					}
+
+				---
+
+					vars.CHTFrequency = 32768
+					SectionIndex = 554
+					SectionHead = ?
+
+					h.checkpointNumber = (config.Checkpoint.SectionIndex+1)*vars.CHTFrequency - 1
+					(554 + 1)*32768 - 1 = 18186239
+
+					tohex 18186239
+					0x1157fff
+
+					ethrpc --http-addr 'https://c5939282f04343249b36574c0eb41851.etc.rpc.rivet.cloud' eth_getBlockByNumber 0x1157fff false
+					{
+						"difficulty": "0x6a6bbe665e6ae",
+						"extraData": "0xe4b883e5bda9e7a59ee4bb99e9b1bc020621",
+						"gasLimit": "0x790003",
+						"gasUsed": "0x0",
+						"hash": "0xdc8f5a9e2193473e0f3a8591e12992163e61e1bda1ff62165d0596f774c6d968",
+						"logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+						"miner": "0x0239da7f7d5af4cff574c507bb6ce18ddc73b875",
+						"mixHash": "0xd3fbca722640d62c4c351ef4d594c0a0925859428bde707396e55c73052f3b08",
+						"nonce": "0x0e061fa013f2ca55",
+						"number": "0x1157fff",
+						"parentHash": "0x2b1ab0d1f439ba7a66d8d59cc14675689365d9ce8de8a9603a8fd3adbe2b1f9c",
+						"receiptsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+						"sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+						"size": "0x219",
+						"stateRoot": "0xa45491c784422a2109c6e54224888c1b708c5c1d5a64b08bab16bdee8b1b857d",
+						"timestamp": "0x64e77466",
+						"totalDifficulty": "0x14e449af4fc8b238926",
+						"transactions": [],
+						"transactionsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+						"uncles": []
+				 	}
+			*/
+			SectionIndex: 554,                                                                                    // (18186239 of current 18_666_111)
+			SectionHead:  common.HexToHash("0xdc8f5a9e2193473e0f3a8591e12992163e61e1bda1ff62165d0596f774c6d968"), // hash
+			CHTRoot:      common.HexToHash("0xa45491c784422a2109c6e54224888c1b708c5c1d5a64b08bab16bdee8b1b857d"), // stateRoot
+			BloomRoot:    common.Hash{},                                                                          // unnecessary and tough to derive (without les client or server)
+		},
 	}
 
 	DisinflationRateQuotient = big.NewInt(4)      // Disinflation rate quotient for ECIP1017

@@ -1805,18 +1805,9 @@ func (d *Downloader) processSnapSyncContent() error {
 				continue
 			}
 		}
-		if len(afterP) > 0 {
-			// Fast sync done, pivot commit done, full import
-			vals := []interface{}{
-				"mode", d.getMode(),
-				"pivot", pivot.Number.Uint64(),
-				"first", afterP[0].Header.Number.Uint64(),
-				"last", afterP[len(afterP)-1].Header.Number.Uint64()}
-			log.Debug("Snap full import", vals...)
-			// Snap full import                         mode=snap pivot=0          first=1 last=2
-			if err := d.importBlockResults(afterP); err != nil {
-				return err
-			}
+		// Fast sync done, pivot commit done, full import
+		if err := d.importBlockResults(afterP); err != nil {
+			return err
 		}
 	}
 }
@@ -1824,26 +1815,6 @@ func (d *Downloader) processSnapSyncContent() error {
 func splitAroundPivot(pivot uint64, results []*fetchResult) (p *fetchResult, before, after []*fetchResult) {
 	if len(results) == 0 {
 		return nil, nil, nil
-	}
-	// If the pivot is < fsMinFullBlocks (64), then we should not consider later
-	// blocks to be AFTER it because that will send those blocks
-	// to full import, which should only happen when we're actually
-	// approaching the end of a long chain.
-	// But a pivot of <64 suggests that the peer is not in sync
-	// and that if we consider blocks after it as heading toward FULL processing (rather than SNAP), then
-	// we're defeating the purpose of snap sync
-	// because we're basically then snap syncing with a peer with a fantastically low chain,
-	// achieving "full sync" (at, say, block 2), then full importing following blocks.
-	// So in order to delegate snap vs. full processing well, we have to set a lower
-	// bound on what can be handled as full (here: 'after' pivot results).
-	if pivot < uint64(fsMinFullBlocks) {
-		for _, result := range results {
-			num := result.Header.Number.Uint64()
-			if num == pivot {
-				p = result
-			}
-		}
-		return p, results, nil
 	}
 	if lastNum := results[len(results)-1].Header.Number.Uint64(); lastNum < pivot {
 		// the pivot is somewhere in the future

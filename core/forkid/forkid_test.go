@@ -500,32 +500,44 @@ func TestGatherForks(t *testing.T) {
 	cases := []struct {
 		name    string
 		config  ctypes.ChainConfigurator
-		genesis *types.Block
-		wantNs  []uint64
+		blockForks []uint64
+		timeForks  []uint64
 	}{
 		{
 			"classic",
 			params.ClassicChainConfig,
-			core.GenesisToBlock(params.DefaultClassicGenesisBlock(), nil),
 			[]uint64{1150000, 2500000, 3000000, 5000000, 5900000, 8772000, 9573000, 10500839, 11_700_000, 13_189_133, 14_525_000},
+			[]uint64{},
 		},
 		{
 			"mainnet",
 			params.MainnetChainConfig,
-			core.GenesisToBlock(params.DefaultGenesisBlock(), nil),
 			[]uint64{1150000, 1920000, 2463000, 2675000, 4370000, 7280000, 9069000, 9200000, 12_244_000, 12_965_000, 13_773_000, 15050000},
+			[]uint64{1681338455 /* ShanghaiTime */},
+		},
+		{
+			"goerli",
+			params.GoerliChainConfig,
+			[]uint64{1_561_651, 4_460_644, 5_062_605},
+			[]uint64{1678832736 /* ShanghaiTime */},
+		},
+		{
+			"sepolia",
+			params.SepoliaChainConfig,
+			[]uint64{1735371 /* Merge NetSplit */},
+			[]uint64{1677557088 /* ShanghaiTime */},
 		},
 		{
 			"mordor",
 			params.MordorChainConfig,
-			core.GenesisToBlock(params.DefaultMordorGenesisBlock(), nil),
 			[]uint64{301_243, 999_983, 2_520_000, 3_985_893, 5_520_000, 9_957_000},
+			[]uint64{},
 		},
 		{
 			"mintme",
 			params.MintMeChainConfig,
-			core.GenesisToBlock(params.DefaultMintMeGenesisBlock(), nil),
 			[]uint64{252_500},
+			[]uint64{},
 		},
 	}
 	sliceContains := func(sl []uint64, u uint64) bool {
@@ -536,19 +548,24 @@ func TestGatherForks(t *testing.T) {
 		}
 		return false
 	}
+	slicesEquivalent := func(sl1, sl2 []uint64) bool {
+		if len(sl1) != len(sl2) {
+			return false
+		}
+		for _, s := range sl1 {
+			if !sliceContains(sl2, s) {
+				return false
+			}
+		}
+		return true
+	}
 	for _, c := range cases {
-		blockForks, _ := gatherForks(c.config, c.genesis.Time())
-		if len(blockForks) != len(c.wantNs) {
-			for _, n := range c.wantNs {
-				if !sliceContains(blockForks, n) {
-					t.Errorf("config=%s missing wanted fork at block number: %d", c.name, n)
-				}
-			}
-			for _, n := range blockForks {
-				if !sliceContains(c.wantNs, n) {
-					t.Errorf("config=%s gathered unwanted fork at block number: %d", c.name, n)
-				}
-			}
+		blockForks, timeForks := gatherForks(c.config)
+		if !slicesEquivalent(blockForks, c.blockForks) {
+			t.Errorf("config=%s block forks mismatch: have %v, want %v", c.name, blockForks, c.blockForks)
+		}
+		if !slicesEquivalent(timeForks, c.timeForks) {
+			t.Errorf("config=%s time forks mismatch: have %v, want %v", c.name, timeForks, c.timeForks)
 		}
 	}
 }

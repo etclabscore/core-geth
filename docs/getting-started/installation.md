@@ -3,13 +3,30 @@ title: Installation
 ---
 
 !!! tip "Build from Source"
-    Instructions to build from source can be found [here](core-geth/developers/build-from-source/).
+    Instructions to build from source can be found [here](https://etclabscore.github.io/core-geth/developers/build-from-source/)
 
 ## Pre-built executable
 
-If you just want to download and run `geth` or any of the other tools here, this is the quickest and simplest way.
+If you just want to download and run `geth --classic` or any of the other tools here, this is the quickest and simplest way.
 
 Binary archives are published at https://github.com/etclabscore/core-geth/releases. Find the latest one for your OS, download it, (check the SHA sum), unarchive it, and run!
+
+Tip: When running Core-geth use `--classic` flag for Ethereum Classic mainnet.
+
+```shell
+$ wget https://github.com/etclabscore/core-geth/releases/download/v1.12.16/core-geth-linux-v1.12.16.zip # Update to the most current release version
+$ sudo unzip core-geth-linux-v1.12.16.zip -d /bin/ # Update to the most current release version
+$ geth --help # Lists available options
+$ geth --classic # Runs Ethereum Classic mainnet
+```
+
+Tip: Here is how you make an address and keystore file with core-geth. You'll be able to mine to this address and import the keystore file into wallets like MetaMask.
+
+```shell
+$ geth --classic account new # Creates a new account with a public address and keystore file
+$ geth --classic account list
+$ geth --classic # Runs Ethereum Classic mainnet
+```
 
 ## With Docker
 

@@ -20,7 +20,7 @@ Recommended:
 
 ## Dependencies
 
-- Make sure your system has __Go 1.19+__ installed. https://golang.org/doc/install
+Make sure your system has __Go 1.19+__ installed. https://golang.org/doc/install
 
 Step-by-step Instructions to install Go on Ubuntu. https://www.linuxtechi.com/install-go-golang-on-ubuntu-linux/
 

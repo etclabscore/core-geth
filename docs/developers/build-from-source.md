@@ -26,10 +26,10 @@ Step-by-step Instructions to install Go on Ubuntu. https://www.linuxtechi.com/in
 
 ```shell
 $ sudo apt update
-$ wget https://go.dev/dl/go1.21.4.linux-amd64.tar.gz
-$ sudo tar -C /usr/local -xzf go1.21.4.linux-amd64.tar.gz
+$ wget https://go.dev/dl/go1.21.4.linux-amd64.tar.gz # Update to the most current release version
+$ sudo tar -C /usr/local -xzf go1.21.4.linux-amd64.tar.gz # Update to the most current release version
 $ ls /usr/local/go
-$ nano ~/.bash_profile # PASTE then SAVE: export PATH=$PATH:/usr/local/go/bin
+$ nano ~/.bash_profile # PASTE the following, then SAVE: export PATH=$PATH:/usr/local/go/bin
 $ source ~/.bash_profile
 $ go version
 ```

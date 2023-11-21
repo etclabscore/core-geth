@@ -5,7 +5,6 @@ title: Mordor Testnet Guide
 !!! tip "Mordor Testnet"
     Mordor is a PoW Ethereum Classic testnet. A testnet allows developers to perform specific tests. Developers may want to test protocol changes, test a smart contract, or interact with the network in anyway that does not require real EthClassic (ETC)—just don’t test on mainnet, mainnet is for production.
 
-
 ## Summary:
 
 + Install Core-geth https://etclabscore.github.io/core-geth/getting-started/installation/
@@ -13,11 +12,9 @@ title: Mordor Testnet Guide
 + Run --mordor with --mine enabled
 + Create a Script to mine Mordor METC
 
-
 ## Install Core-geth
 
 https://etclabscore.github.io/core-geth/getting-started/installation/
-
 
 ## Mordor Testnet Mining Guide
 
@@ -36,7 +33,6 @@ $ geth --help # Lists available options
 $ geth --mordor # Runs Ethereum Classic's testnet Mordor
 ```
 
-
 ## Account Creation
 
 You'll need an account with an address (0x...) to receive your mETC mining rewards. Here is how you make an address and keystore file with core-geth. You'll be able to import the keystore file into wallets like MetaMask. Backup this file. You'll mine your mordor rewards to it.
@@ -49,7 +45,6 @@ $ geth --mordor # Runs Ethereum Classic's testnet Mordor
 
 You’ll notice listing the account will print the keystore file location.For example:keystore:///home/USER/.ethereum/mordor/keystore/UTC...
 
-
 ## Run Mordor with Mining Enable
 
 ```shell
@@ -60,15 +55,13 @@ Check Mordor Balance on Blockscout
 
 So, you’re running a Mordor node and mining testnet mETC. Woohoo! An easy way to double check you’re actually growing a Mordor testnet balance is on [Blockscout](https://etc-mordor.blockscout.com). Just search the account address you created earlier.
 
-
 ## Add your Mordor Account to a Wallet?
 
 You can use your keystore file to import your wallet into a wallet application such as MetaMask. In MetaMask
 
-    Add the Ethereum Classic mainnet to your MetaMask by visiting https://chainlist.org/chain/61 and clicking the "Add to MetaMask" button.
-    Add the Mordor testnet to your MetaMask by visiting https://chainlist.org/chain/63 and clicking the "Add to MetaMask" button.
-    Under your account profile select import account > select type (JSON) > upload your keystore file. You may need to enter the account password.
-
+* Add the Ethereum Classic mainnet to your MetaMask by visiting https://chainlist.org/chain/61 and clicking the "Add to MetaMask" button.
+* Add the Mordor testnet to your MetaMask by visiting https://chainlist.org/chain/63 and clicking the "Add to MetaMask" button.
+* Under your account profile select import account > select type (JSON) > upload your keystore file. You may need to enter the account password.
 
 ## Mordor Mining Script
 
@@ -93,7 +86,6 @@ Enter the following in a new terminal window (ctrl + alt + t):
 ```
 
 Great job! You are mining on Ethereum Classic's testnet.
-
 
 ## Donate unused mETC to a community faucet.
 

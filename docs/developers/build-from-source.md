@@ -20,7 +20,20 @@ Recommended:
 
 ## Dependencies
 
-- Make sure your system has __Go 1.16+__ installed. https://golang.org/doc/install
+- Make sure your system has __Go 1.19+__ installed. https://golang.org/doc/install
+
+Step-by-step Instructions to install Go on Ubuntu. https://www.linuxtechi.com/install-go-golang-on-ubuntu-linux/
+
+```shell
+$ sudo apt update
+$ wget https://go.dev/dl/go1.21.4.linux-amd64.tar.gz
+$ sudo tar -C /usr/local -xzf go1.21.4.linux-amd64.tar.gz
+$ ls /usr/local/go
+$ nano ~/.bash_profile # PASTE then SAVE: export PATH=$PATH:/usr/local/go/bin
+$ source ~/.bash_profile
+$ go version
+```
+
 - Make sure your system has a C compiler installed. For example, with Linux Ubuntu:
 
 ```shell

@@ -143,15 +143,7 @@ func (miner *Miner) update() {
 					miner.worker.start()
 				}
 				miner.worker.syncing.Store(false)
-			case downloader.DoneEvent:
-				canStart = true
-				if shouldStart {
-					miner.worker.start()
-				}
-				miner.worker.syncing.Store(false)
-				// Stop reacting to downloader events
-				events.Unsubscribe()
-			case fetcher.InsertBlockEvent:
+			case downloader.DoneEvent, fetcher.InsertBlockEvent:
 				// InsertBlockEvents are posted by the block fetcher, which handles the fetching and importing
 				// of network head blocks.
 				// This event should be treated by the miner equivalently to the downloader.DoneEvent;

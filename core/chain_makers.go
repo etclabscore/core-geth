@@ -36,7 +36,6 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/trie"
-	"github.com/ledgerwatch/erigon-lib/chain"
 )
 
 // BlockGen creates blocks for testing.
@@ -425,7 +424,7 @@ func GenerateChainWithGenesis(genesis *genesisT.Genesis, engine consensus.Engine
 func (cm *chainMaker) makeHeader(parent *types.Block, state *state.StateDB, engine consensus.Engine) *types.Header {
 	time := parent.Time() + 10 // block time is fixed at 10 seconds
 	header := &types.Header{
-		Root:       state.IntermediateRoot(chain.Config().IsEnabled(chain.Config().GetEIP161dTransition, parent.Number())),
+		Root:       state.IntermediateRoot(cm.Config().IsEnabled(cm.Config().GetEIP161dTransition, parent.Number())),
 		ParentHash: parent.Hash(),
 		Coinbase:   parent.Coinbase(),
 		Difficulty: engine.CalcDifficulty(cm, time, parent.Header()),
@@ -433,14 +432,14 @@ func (cm *chainMaker) makeHeader(parent *types.Block, state *state.StateDB, engi
 		Number:     new(big.Int).Add(parent.Number(), common.Big1),
 		Time:       time,
 	}
-	if chain.Config().IsEnabled(chain.Config().GetEIP1559Transition, header.Number) {
-		header.BaseFee = eip1559.CalcBaseFee(chain.Config(), parent.Header())
-		if !chain.Config().IsEnabled(chain.Config().GetEIP1559Transition, parent.Number()) {
-			parentGasLimit := parent.GasLimit() * chain.Config().GetElasticityMultiplier()
+	if cm.Config().IsEnabled(cm.Config().GetEIP1559Transition, header.Number) {
+		header.BaseFee = eip1559.CalcBaseFee(cm.Config(), parent.Header())
+		if !cm.Config().IsEnabled(cm.Config().GetEIP1559Transition, parent.Number()) {
+			parentGasLimit := parent.GasLimit() * cm.Config().GetElasticityMultiplier()
 			header.GasLimit = CalcGasLimit(parentGasLimit, parentGasLimit)
 		}
 	}
-	if chain.Config().IsEnabledByTime(chain.Config().GetEIP4844TransitionTime, &header.Time) {
+	if cm.Config().IsEnabledByTime(cm.Config().GetEIP4844TransitionTime, &header.Time) {
 		var (
 			parentExcessBlobGas uint64
 			parentBlobGasUsed   uint64
@@ -453,7 +452,7 @@ func (cm *chainMaker) makeHeader(parent *types.Block, state *state.StateDB, engi
 		header.ExcessBlobGas = &excessBlobGas
 		header.BlobGasUsed = new(uint64)
 	}
-	if chain.Config().IsEnabledByTime(chain.Config().GetEIP4788TransitionTime, &header.Time) {
+	if cm.Config().IsEnabledByTime(cm.Config().GetEIP4788TransitionTime, &header.Time) {
 		header.ParentBeaconRoot = new(common.Hash)
 	}
 	return header

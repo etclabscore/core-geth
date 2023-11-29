@@ -29,7 +29,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -112,7 +112,7 @@ func signUnsignedTransactions(txs []*txWithKey, signer types.Signer) (types.Tran
 	return signedTxs, nil
 }
 
-func loadTransactions(txStr string, inputData *input, env stEnv, chainConfig *params.ChainConfig) (txIterator, error) {
+func loadTransactions(txStr string, inputData *input, env stEnv, chainConfig ctypes.ChainConfigurator) (txIterator, error) {
 	var txsWithKeys []*txWithKey
 	if txStr != stdinSelector {
 		data, err := os.ReadFile(txStr)
@@ -138,7 +138,7 @@ func loadTransactions(txStr string, inputData *input, env stEnv, chainConfig *pa
 		txsWithKeys = inputData.Txs
 	}
 	// We may have to sign the transactions.
-	signer := types.LatestSignerForChainID(chainConfig.ChainID)
+	signer := types.LatestSignerForChainID(chainConfig.GetChainID())
 	txs, err := signUnsignedTransactions(txsWithKeys, signer)
 	return newSliceTxIterator(txs), err
 }

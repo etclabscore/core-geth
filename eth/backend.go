@@ -171,9 +171,13 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 
 	engine := ethconfig.CreateConsensusEngine(stack, &ethashConfig, cliqueConfig, lyra2Config, config.Miner.Notify, config.Miner.Noverify, chainDb)
 
+	chainConfig, err := core.LoadChainConfig(chainDb, config.Genesis)
+	if err != nil {
+		return nil, err
+	}
 	networkID := config.NetworkId
 	if networkID == 0 {
-		networkID = chainConfig.ChainID.Uint64()
+		networkID = chainConfig.GetChainID().Uint64()
 	}
 	eth := &Ethereum{
 		config:            config,

@@ -36,6 +36,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/trie"
+	"github.com/ledgerwatch/erigon-lib/chain"
 )
 
 // BlockGen creates blocks for testing.
@@ -355,7 +356,7 @@ func GenerateChain(config ctypes.ChainConfigurator, parent *types.Block, engine 
 		}
 
 		// Write state changes to db
-			root, err := statedb.Commit(b.header.Number.Uint64(), config.IsEnabled(config.GetEIP161dTransition, b.header.Number))
+		root, err := statedb.Commit(b.header.Number.Uint64(), config.IsEnabled(config.GetEIP161dTransition, b.header.Number))
 		if err != nil {
 			panic(fmt.Sprintf("state write error: %v", err))
 		}

@@ -72,7 +72,7 @@ func makechain() (bc *core.BlockChain, addresses []common.Address, txHashes []co
 			)
 			nonce := uint64(i)
 			if i%4 == 0 {
-				tx, _ = types.SignTx(types.NewContractCreation(nonce, big.NewInt(0), 200000, big.NewInt(params.GWei), testContractCode), signer, bankKey)
+				tx, _ = types.SignTx(types.NewContractCreation(nonce, big.NewInt(0), 200000, big.NewInt(vars.GWei), testContractCode), signer, bankKey)
 				addr = crypto.CreateAddress(bankAddr, nonce)
 			} else {
 				addr = common.BigToAddress(big.NewInt(int64(i)))

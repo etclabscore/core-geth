@@ -296,7 +296,7 @@ func LoadChainConfig(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.Chain
 		// is matched.
 		genesisBlock := GenesisToBlock(genesis, nil)
 		if stored != (common.Hash{}) && genesisBlock.Hash() != stored {
-			return nil, &genesisT.GenesisMismatchError{stored, genesisBlock.Hash()}
+			return nil, &genesisT.GenesisMismatchError{Stored: stored, New: genesisBlock.Hash()}
 		}
 		return genesis.Config, nil
 	}

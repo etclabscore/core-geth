@@ -18,6 +18,9 @@ package goethereum
 
 import (
 	"math/big"
+	"reflect"
+	"runtime"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
@@ -699,6 +702,13 @@ func (c *ChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {
 		return false
+	}
+	fnName := runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()
+	if strings.Contains(fnName, "ECBP1100Transition") {
+		disabledTransition := c.GetECBP1100DisableTransition()
+		if disabledTransition != nil {
+			return big.NewInt(int64(*disabledTransition)).Cmp(n) > 0 && big.NewInt(int64(*f)).Cmp(n) <= 0
+		}
 	}
 	return big.NewInt(int64(*f)).Cmp(n) <= 0
 }

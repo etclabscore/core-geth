@@ -49,3 +49,43 @@ func TestCoreGethChainConfig_String(t *testing.T) {
 	t.Skip("(noop) development use only")
 	t.Log(testConfig.String())
 }
+
+func TestCoreGethChainConfig_ECBP1100Disable(t *testing.T) {
+	var _testConfig = &CoreGethChainConfig{}
+	*_testConfig = *testConfig
+
+	enable := uint64(100)
+	disable := uint64(200)
+	_testConfig.SetECBP1100Transition(&enable)
+	_testConfig.SetECBP1100DisableTransition(&disable)
+
+	n := uint64(10)
+	bigN := new(big.Int).SetUint64(n)
+	if _testConfig.IsEnabled(_testConfig.GetECBP1100Transition, bigN) {
+		t.Errorf("ECBP1100 should be not yet be enabled at block %d", n)
+	}
+
+	n = uint64(100)
+	bigN = new(big.Int).SetUint64(n)
+	if !_testConfig.IsEnabled(_testConfig.GetECBP1100Transition, bigN) {
+		t.Errorf("ECBP1100 should be enabled at block %d", n)
+	}
+
+	n = uint64(110)
+	bigN = new(big.Int).SetUint64(n)
+	if !_testConfig.IsEnabled(_testConfig.GetECBP1100Transition, bigN) {
+		t.Errorf("ECBP1100 should be enabled at block %d", n)
+	}
+
+	n = uint64(200)
+	bigN = new(big.Int).SetUint64(n)
+	if _testConfig.IsEnabled(_testConfig.GetECBP1100Transition, bigN) {
+		t.Errorf("ECBP1100 should be disabled at block %d", n)
+	}
+
+	n = uint64(210)
+	bigN = new(big.Int).SetUint64(n)
+	if _testConfig.IsEnabled(_testConfig.GetECBP1100Transition, bigN) {
+		t.Errorf("ECBP1100 should be disabled at block %d", n)
+	}
+}

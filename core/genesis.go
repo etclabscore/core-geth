@@ -124,12 +124,11 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, gen
 		} else {
 			log.Info("Writing custom genesis block")
 		}
-
+		applyOverrides(genesis.Config)
 		block, err := CommitGenesis(genesis, db, triedb)
 		if err != nil {
 			return genesis.Config, common.Hash{}, err
 		}
-		applyOverrides(genesis.Config)
 		log.Info("Wrote genesis block OK", "config", genesis.Config)
 		return genesis.Config, block.Hash(), nil
 	}
@@ -142,6 +141,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, gen
 		if genesis == nil {
 			genesis = params.DefaultGenesisBlock()
 		}
+		applyOverrides(genesis.Config)
 		// Ensure the stored genesis matches with the given one.
 		hash := GenesisToBlock(genesis, nil).Hash()
 		if hash != stored {
@@ -151,11 +151,11 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, gen
 		if err != nil {
 			return genesis.Config, hash, err
 		}
-		applyOverrides(genesis.Config)
 		return genesis.Config, block.Hash(), nil
 	}
 	// Check whether the genesis block is already written.
 	if genesis != nil {
+		applyOverrides(genesis.Config)
 		hash := GenesisToBlock(genesis, nil).Hash()
 		if hash != stored {
 			return genesis.Config, hash, &genesisT.GenesisMismatchError{Stored: stored, New: hash}

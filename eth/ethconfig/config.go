@@ -76,7 +76,7 @@ var Defaults = Config{
 		DatasetsOnDisk:   2,
 		DatasetsLockMmap: false,
 	},
-	NetworkId:          vars.DefaultNetworkID,
+	NetworkId:          0, // enable auto configuration of networkID == chainID
 	ProtocolVersions:   vars.DefaultProtocolVersions,
 	TxLookupLimit:      2350000,
 	TransactionHistory: 2350000,
@@ -128,7 +128,7 @@ type Config struct {
 	Genesis *genesisT.Genesis `toml:",omitempty"`
 
 	// Protocol options
-	NetworkId        uint64 // Network ID to use for selecting peers to connect to
+	NetworkId        uint64 // Network ID to use for selecting peers to connect to. When 0, chainID is used.
 	ProtocolVersions []uint // Protocol versions are the supported versions of the eth protocol (first is primary).
 	SyncMode         downloader.SyncMode
 

@@ -33,7 +33,6 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/eth/tracers/logger"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/tests"
@@ -206,7 +205,7 @@ func Transition(ctx *cli.Context) error {
 	if txIt, err = loadTransactions(txStr, inputData, prestate.Env, chainConfig); err != nil {
 		return err
 	}
-	if err := applyLondonChecks(&prestate.Env, chainConfig); err != nil {
+	if err := applyEIP1559Checks(&prestate.Env, chainConfig); err != nil {
 		return err
 	}
 	if err := applyShanghaiChecks(&prestate.Env, chainConfig); err != nil {
@@ -229,8 +228,8 @@ func Transition(ctx *cli.Context) error {
 	return dispatchOutput(ctx, baseDir, result, collector, body)
 }
 
-func applyLondonChecks(env *stEnv, chainConfig *params.ChainConfig) error {
-	if !chainConfig.IsLondon(big.NewInt(int64(env.Number))) {
+func applyEIP1559Checks(env *stEnv, chainConfig ctypes.ChainConfigurator) error {
+	if !chainConfig.IsEnabled(chainConfig.GetEIP1559Transition, big.NewInt(int64(env.Number))) {
 		return nil
 	}
 	// Sanity check, to not `panic` in state_transition

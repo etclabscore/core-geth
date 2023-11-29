@@ -293,7 +293,8 @@ func newHandler(config *handlerConfig) (*handler, error) {
 		}
 		n, err := h.chain.InsertChain(blocks)
 		if err == nil {
-			h.acceptTxs.Store(true) // Mark initial sync done on any fetcher import
+			// Mark initial sync done on any fetcher import
+			h.acceptTxs.Store(true)
 			h.eventMux.Post(fetcher.InsertBlockEvent{Block: blocks[0]})
 		}
 		return n, err

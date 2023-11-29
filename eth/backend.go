@@ -238,6 +238,14 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 			}
 		}
 	}
+	if config.ECBP1100Disable != nil {
+		if n := config.ECBP1100Disable.Uint64(); n != math.MaxUint64 {
+			if err := eth.blockchain.Config().SetECBP1100DisableTransition(&n); err != nil {
+				return nil, err
+			}
+		}
+	}
+
 	if config.ECBP1100NoDisable != nil {
 		if *config.ECBP1100NoDisable {
 			eth.blockchain.ArtificialFinalityNoDisable(1)

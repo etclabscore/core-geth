@@ -424,6 +424,15 @@ func (c *CoreGethChainConfig) SetECBP1100Transition(n *uint64) error {
 	return nil
 }
 
+func (c *CoreGethChainConfig) GetECBP1100DisableTransition() *uint64 {
+	return bigNewU64(c.ECBP1100DisableFBlock)
+}
+
+func (c *CoreGethChainConfig) SetECBP1100DisableTransition(n *uint64) error {
+	c.ECBP1100DisableFBlock = setBig(c.ECBP1100DisableFBlock, n)
+	return nil
+}
+
 func (c *CoreGethChainConfig) GetEIP2315Transition() *uint64 {
 	return bigNewU64(c.EIP2315FBlock)
 }

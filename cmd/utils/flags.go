@@ -1068,6 +1068,11 @@ Please note that --` + MetricsHTTPFlag.Name + ` must be set to start the server.
 		Usage: "Configure ECBP-1100 (MESS) block activation number",
 		Value: math.MaxUint64,
 	}
+	ECBP1100DisableFlag = &cli.Uint64Flag{
+		Name:  "ecbp1100.disable",
+		Usage: "Disable ECBP-1100 (MESS) block activation number",
+		Value: math.MaxUint64,
+	}
 	ECBP1100NoDisableFlag = &cli.BoolFlag{
 		Name:  "ecbp1100.nodisable",
 		Usage: "Short-circuit ECBP-1100 (MESS) disable mechanisms; (yields a permanent-once-activated state, deactivating auto-shutoff mechanisms)",

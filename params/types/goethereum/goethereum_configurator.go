@@ -449,6 +449,15 @@ func (c *ChainConfig) SetECBP1100Transition(n *uint64) error {
 	return nil
 }
 
+func (c *ChainConfig) GetECBP1100DisableTransition() *uint64 {
+	return bigNewU64(c.ecbp1100DisableTransition)
+}
+
+func (c *ChainConfig) SetECBP1100DisableTransition(n *uint64) error {
+	c.ecbp1100DisableTransition = setBig(c.ecbp1100DisableTransition, n)
+	return nil
+}
+
 // GetEIP2315Transition implements EIP2537.
 // This logic is written but not configured for any Ethereum-supported networks, yet.
 func (c *ChainConfig) GetEIP2315Transition() *uint64 {

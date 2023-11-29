@@ -50,8 +50,8 @@ func TestGeneratePOSChain(t *testing.T) {
 		gspec   = &genesisT.Genesis{
 			Config: &config,
 			Alloc: genesisT.GenesisAlloc{
-				address:                          {Balance: funds},
-				params.BeaconRootsStorageAddress: {Balance: common.Big0, Code: asm4788},
+				address:                        {Balance: funds},
+				vars.BeaconRootsStorageAddress: {Balance: common.Big0, Code: asm4788},
 			},
 			BaseFee:    big.NewInt(vars.InitialBaseFee),
 			Difficulty: common.Big1,
@@ -183,7 +183,7 @@ func TestGeneratePOSChain(t *testing.T) {
 		}
 		state, _ := blockchain.State()
 		idx := block.Time()%8191 + 8191
-		got := state.GetState(params.BeaconRootsStorageAddress, common.BigToHash(new(big.Int).SetUint64(idx)))
+		got := state.GetState(vars.BeaconRootsStorageAddress, common.BigToHash(new(big.Int).SetUint64(idx)))
 		if got != want {
 			t.Fatalf("block %d, wrong parent beacon root in state: got %s, want %s", i, got, want)
 		}

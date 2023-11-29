@@ -100,7 +100,7 @@ func setDefaults(cfg *Config) {
 		cfg.BaseFee = big.NewInt(vars.InitialBaseFee)
 	}
 	if cfg.BlobBaseFee == nil {
-		cfg.BlobBaseFee = big.NewInt(params.BlobTxMinBlobGasprice)
+		cfg.BlobBaseFee = big.NewInt(vars.BlobTxMinBlobGasprice)
 	}
 }
 

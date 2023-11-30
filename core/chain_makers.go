@@ -53,7 +53,6 @@ type BlockGen struct {
 	uncles      []*types.Header
 	withdrawals []*types.Withdrawal
 
-	config ctypes.ChainConfigurator
 	engine consensus.Engine
 }
 

@@ -32,11 +32,11 @@ import (
 	"github.com/ethereum/go-ethereum/trie"
 )
 
-// InsertBlockEvent is posted by the handler when a propagated block is successfully imported.
+// InsertChainEvent is posted by the handler when a propagated block is successfully imported.
 // The block may have been propagated via announcement (hashes) or broadcast (full block, via its miner).
 // The event should not be posted if the insert function returns any error.
-type InsertBlockEvent struct {
-	Block *types.Block
+type InsertChainEvent struct {
+	Blocks types.Blocks
 }
 
 const (

@@ -197,7 +197,7 @@ func TestMinerStartAfterFetcherInsertEvent(t *testing.T) {
 
 	// During the sync, import a block via the fetcher.
 	// Miner should resume mining, inferring that we're at or near-enough (<32 block) the head of the network canonical chain.
-	mux.Post(fetcher.InsertBlockEvent{})
+	mux.Post(fetcher.InsertChainEvent{})
 	waitForMiningState(t, miner, true)
 
 	mux.Post(downloader.FailedEvent{})
@@ -224,7 +224,7 @@ func TestMinerStartAfterFetcherInsertEvent2(t *testing.T) {
 	// Before we've started the downloader, import a block via the fetcher.
 	// This should disable subsequent autopausing for downloader events thereafter, since
 	// we consider the local chain sufficiently synced.
-	mux.Post(fetcher.InsertBlockEvent{})
+	mux.Post(fetcher.InsertChainEvent{})
 	waitForMiningState(t, miner, true)
 
 	// Start the downloader

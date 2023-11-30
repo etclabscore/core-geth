@@ -108,7 +108,7 @@ func New(eth Backend, config *Config, chainConfig ctypes.ChainConfigurator, mux 
 func (miner *Miner) update() {
 	defer miner.wg.Done()
 
-	events := miner.mux.Subscribe(downloader.StartEvent{}, downloader.DoneEvent{}, downloader.FailedEvent{}, fetcher.InsertBlockEvent{})
+	events := miner.mux.Subscribe(downloader.StartEvent{}, downloader.DoneEvent{}, downloader.FailedEvent{}, fetcher.InsertChainEvent{})
 	defer func() {
 		if !events.Closed() {
 			events.Unsubscribe()
@@ -143,7 +143,7 @@ func (miner *Miner) update() {
 					miner.worker.start()
 				}
 				miner.worker.syncing.Store(false)
-			case downloader.DoneEvent, fetcher.InsertBlockEvent:
+			case downloader.DoneEvent, fetcher.InsertChainEvent:
 				// InsertBlockEvents are posted by the block fetcher, which handles the fetching and importing
 				// of network head blocks.
 				// This event should be treated by the miner equivalently to the downloader.DoneEvent;

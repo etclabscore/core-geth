@@ -233,10 +233,10 @@ func (b *BlockGen) AddUncle(h *types.Header) {
 
 	// The gas limit and price should be derived from the parent
 	h.GasLimit = parent.GasLimit
-	if b.config.IsEnabled(b.config.GetEIP1559Transition, h.Number) {
-		h.BaseFee = eip1559.CalcBaseFee(b.config, parent)
-		if !b.config.IsEnabled(b.config.GetEIP1559Transition, parent.Number) {
-			parentGasLimit := parent.GasLimit * b.config.GetElasticityMultiplier()
+	if b.cm.config.IsEnabled(b.cm.config.GetEIP1559Transition, h.Number) {
+		h.BaseFee = eip1559.CalcBaseFee(b.cm.config, parent)
+		if !b.cm.config.IsEnabled(b.cm.config.GetEIP1559Transition, parent.Number) {
+			parentGasLimit := parent.GasLimit * b.cm.config.GetElasticityMultiplier()
 			h.GasLimit = CalcGasLimit(parentGasLimit, parentGasLimit)
 		}
 	}

@@ -2086,6 +2086,8 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 			cfg.EthDiscoveryURLs = SplitAndTrim(urls)
 		}
 	}
+	CheckExclusive(ctx, ECBP1100DisableFlag, ECBP1100NoDisableFlag)
+
 	// Override any default configs for hard coded networks.
 
 	// Override genesis configuration if a --<chain> flag.

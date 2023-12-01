@@ -23,6 +23,13 @@ func (bc *BlockChain) ArtificialFinalityNoDisable(n int32) {
 	log.Warn("Deactivating ECBP1100 (MESS) disablers", "always on", true)
 	bc.artificialFinalityNoDisable = new(int32)
 	atomic.StoreInt32(bc.artificialFinalityNoDisable, n)
+
+	if n == 1 {
+		disabledTransition := bc.chainConfig.GetECBP1100DisableTransition()
+		if disabledTransition != nil && big.NewInt(int64(*disabledTransition)).Cmp(big.NewInt(0)) > 0 {
+			log.Warn("Disable ECBP1100 (MESS) block activation number is set together with '--ecbp1100.nodisable'. ECBP1100 will not be disabled.", "disable transition block", *disabledTransition)
+		}
+	}
 }
 
 // EnableArtificialFinality enables and disable artificial finality features for the blockchain.

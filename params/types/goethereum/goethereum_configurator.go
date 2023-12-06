@@ -452,12 +452,12 @@ func (c *ChainConfig) SetECBP1100Transition(n *uint64) error {
 	return nil
 }
 
-func (c *ChainConfig) GetECBP1100DisableTransition() *uint64 {
-	return bigNewU64(c.ecbp1100DisableTransition)
+func (c *ChainConfig) GetECBP1100DeactivateTransition() *uint64 {
+	return bigNewU64(c.ecbp1100DeactivateTransition)
 }
 
-func (c *ChainConfig) SetECBP1100DisableTransition(n *uint64) error {
-	c.ecbp1100DisableTransition = setBig(c.ecbp1100DisableTransition, n)
+func (c *ChainConfig) SetECBP1100DeactivateTransition(n *uint64) error {
+	c.ecbp1100DeactivateTransition = setBig(c.ecbp1100DeactivateTransition, n)
 	return nil
 }
 
@@ -705,9 +705,9 @@ func (c *ChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	}
 	fnName := runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()
 	if strings.Contains(fnName, "ECBP1100Transition") {
-		disabledTransition := c.GetECBP1100DisableTransition()
-		if disabledTransition != nil {
-			return big.NewInt(int64(*disabledTransition)).Cmp(n) > 0 && big.NewInt(int64(*f)).Cmp(n) <= 0
+		deactivateTransition := c.GetECBP1100DeactivateTransition()
+		if deactivateTransition != nil {
+			return big.NewInt(int64(*deactivateTransition)).Cmp(n) > 0 && big.NewInt(int64(*f)).Cmp(n) <= 0
 		}
 	}
 	return big.NewInt(int64(*f)).Cmp(n) <= 0

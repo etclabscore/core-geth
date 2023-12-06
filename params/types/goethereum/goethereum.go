@@ -99,8 +99,8 @@ type ChainConfig struct {
 	ECIP1080Transition *big.Int `json:"-"`
 
 	// Cache types for use with testing, but will not show up in config API.
-	ecbp1100Transition        *big.Int
-	ecbp1100DisableTransition *big.Int
+	ecbp1100Transition           *big.Int
+	ecbp1100DeactivateTransition *big.Int
 
 	Lyra2NonceTransitionBlock *big.Int `json:"lyra2NonceTransitionBlock,omitempty"`
 }

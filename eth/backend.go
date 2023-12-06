@@ -238,9 +238,9 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 			}
 		}
 	}
-	if config.ECBP1100Disable != nil {
-		if n := config.ECBP1100Disable.Uint64(); n != math.MaxUint64 {
-			if err := eth.blockchain.Config().SetECBP1100DisableTransition(&n); err != nil {
+	if config.ECBP1100Deactivate != nil {
+		if n := config.ECBP1100Deactivate.Uint64(); n != math.MaxUint64 {
+			if err := eth.blockchain.Config().SetECBP1100DeactivateTransition(&n); err != nil {
 				return nil, err
 			}
 		}

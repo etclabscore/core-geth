@@ -81,9 +81,9 @@ var (
 		EIP2028FBlock: big.NewInt(10_500_839),
 		EIP2200FBlock: big.NewInt(10_500_839), // RePetersburg (=~ re-1283)
 
-		ECBP1100FBlock:        big.NewInt(11_380_000), // ETA 09 Oct 2020
-		ECBP1100DisableFBlock: big.NewInt(69_420_123),
-		ECIP1099FBlock:        big.NewInt(11_700_000), // Etchash (DAG size limit)
+		ECBP1100FBlock:           big.NewInt(11_380_000), // ETA 09 Oct 2020
+		ECBP1100DeactivateFBlock: big.NewInt(69_420_123),
+		ECIP1099FBlock:           big.NewInt(11_700_000), // Etchash (DAG size limit)
 
 		// Berlin eq, aka Magneto
 		EIP2565FBlock: big.NewInt(13_189_133),

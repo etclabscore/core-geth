@@ -82,7 +82,7 @@ var (
 		EIP2200FBlock: big.NewInt(10_500_839), // RePetersburg (=~ re-1283)
 
 		ECBP1100FBlock:           big.NewInt(11_380_000), // ETA 09 Oct 2020
-		ECBP1100DeactivateFBlock: big.NewInt(69_420_123),
+		ECBP1100DeactivateFBlock: big.NewInt(19_250_000), // ETA 31 Jan 2023 (== Spiral hard fork)
 		ECIP1099FBlock:           big.NewInt(11_700_000), // Etchash (DAG size limit)
 
 		// Berlin eq, aka Magneto

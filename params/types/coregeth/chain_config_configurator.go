@@ -28,6 +28,9 @@ package coregeth
 
 import (
 	"math/big"
+	"reflect"
+	"runtime"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
@@ -424,6 +427,15 @@ func (c *CoreGethChainConfig) SetECBP1100Transition(n *uint64) error {
 	return nil
 }
 
+func (c *CoreGethChainConfig) GetECBP1100DeactivateTransition() *uint64 {
+	return bigNewU64(c.ECBP1100DeactivateFBlock)
+}
+
+func (c *CoreGethChainConfig) SetECBP1100DeactivateTransition(n *uint64) error {
+	c.ECBP1100DeactivateFBlock = setBig(c.ECBP1100DeactivateFBlock, n)
+	return nil
+}
+
 func (c *CoreGethChainConfig) GetEIP2315Transition() *uint64 {
 	return bigNewU64(c.EIP2315FBlock)
 }
@@ -668,6 +680,13 @@ func (c *CoreGethChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {
 		return false
+	}
+	fnName := runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()
+	if strings.Contains(fnName, "ECBP1100Transition") {
+		deactivateTransition := c.GetECBP1100DeactivateTransition()
+		if deactivateTransition != nil {
+			return big.NewInt(int64(*deactivateTransition)).Cmp(n) > 0 && big.NewInt(int64(*f)).Cmp(n) <= 0
+		}
 	}
 	return big.NewInt(int64(*f)).Cmp(n) <= 0
 }

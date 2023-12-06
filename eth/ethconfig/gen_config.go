@@ -66,6 +66,7 @@ func (c Config) MarshalTOML() (interface{}, error) {
 		Checkpoint              *ctypes.TrustedCheckpoint      `toml:",omitempty"`
 		CheckpointOracle        *ctypes.CheckpointOracleConfig `toml:",omitempty"`
 		ECBP1100                *big.Int
+		ECBP1100Disable         *big.Int
 		ECBP1100NoDisable       *bool   `toml:",omitempty"`
 		OverrideShanghai        *uint64 `toml:",omitempty"`
 		OverrideCancun          *uint64 `toml:",omitempty"`
@@ -118,7 +119,9 @@ func (c Config) MarshalTOML() (interface{}, error) {
 	enc.Checkpoint = c.Checkpoint
 	enc.CheckpointOracle = c.CheckpointOracle
 	enc.ECBP1100 = c.ECBP1100
+	enc.ECBP1100Disable = c.OverrideECBP1100Deactivate
 	enc.ECBP1100NoDisable = c.ECBP1100NoDisable
+
 	enc.OverrideShanghai = c.OverrideShanghai
 	enc.OverrideCancun = c.OverrideCancun
 	enc.OverrideVerkle = c.OverrideVerkle
@@ -174,6 +177,7 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 		Checkpoint              *ctypes.TrustedCheckpoint      `toml:",omitempty"`
 		CheckpointOracle        *ctypes.CheckpointOracleConfig `toml:",omitempty"`
 		ECBP1100                *big.Int
+		ECBP1100Disable         *big.Int
 		ECBP1100NoDisable       *bool   `toml:",omitempty"`
 		OverrideShanghai        *uint64 `toml:",omitempty"`
 		OverrideCancun          *uint64 `toml:",omitempty"`
@@ -320,6 +324,9 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 	}
 	if dec.ECBP1100 != nil {
 		c.ECBP1100 = dec.ECBP1100
+	}
+	if dec.ECBP1100Disable != nil {
+		c.OverrideECBP1100Deactivate = dec.ECBP1100Disable
 	}
 	if dec.ECBP1100NoDisable != nil {
 		c.ECBP1100NoDisable = dec.ECBP1100NoDisable

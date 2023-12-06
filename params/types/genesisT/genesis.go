@@ -789,6 +789,14 @@ func (g *Genesis) SetECBP1100Transition(n *uint64) error {
 	return g.Config.SetECBP1100Transition(n)
 }
 
+func (g *Genesis) GetECBP1100DeactivateTransition() *uint64 {
+	return g.Config.GetECBP1100DeactivateTransition()
+}
+
+func (g *Genesis) SetECBP1100DeactivateTransition(n *uint64) error {
+	return g.Config.SetECBP1100DeactivateTransition(n)
+}
+
 func (g *Genesis) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	return g.Config.IsEnabled(fn, n)
 }

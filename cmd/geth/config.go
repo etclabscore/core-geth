@@ -179,6 +179,11 @@ func makeFullNode(ctx *cli.Context) (*node.Node, ethapi.Backend) {
 			cfg.Eth.ECBP1100NoDisable = &enable
 		}
 	}
+	if ctx.IsSet(utils.OverrideECBP1100DeactivateFlag.Name) {
+		if n := ctx.Uint64(utils.OverrideECBP1100DeactivateFlag.Name); n != math.MaxUint64 {
+			cfg.Eth.OverrideECBP1100Deactivate = new(big.Int).SetUint64(n)
+		}
+	}
 	if ctx.IsSet(utils.OverrideShanghai.Name) {
 		v := ctx.Uint64(utils.OverrideShanghai.Name)
 		cfg.Eth.OverrideShanghai = &v

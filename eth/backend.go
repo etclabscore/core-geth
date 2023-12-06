@@ -20,7 +20,6 @@ package eth
 import (
 	"errors"
 	"fmt"
-	"math"
 	"math/big"
 	"runtime"
 	"sync"
@@ -231,13 +230,19 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 	}
 	eth.bloomIndexer.Start(eth.blockchain)
 	// Handle artificial finality config override cases.
-	if config.ECBP1100 != nil {
-		if n := config.ECBP1100.Uint64(); n != math.MaxUint64 {
-			if err := eth.blockchain.Config().SetECBP1100Transition(&n); err != nil {
-				return nil, err
-			}
+	if n := config.ECBP1100; n != nil {
+		v := n.Uint64()
+		if err := eth.blockchain.Config().SetECBP1100Transition(&v); err != nil {
+			return nil, err
 		}
 	}
+	if n := config.OverrideECBP1100Deactivate; n != nil {
+		v := n.Uint64()
+		if err := eth.blockchain.Config().SetECBP1100DeactivateTransition(&v); err != nil {
+			return nil, err
+		}
+	}
+
 	if config.ECBP1100NoDisable != nil {
 		if *config.ECBP1100NoDisable {
 			eth.blockchain.ArtificialFinalityNoDisable(1)

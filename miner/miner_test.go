@@ -34,6 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/eth/downloader"
+	"github.com/ethereum/go-ethereum/eth/fetcher"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
@@ -180,6 +181,60 @@ func TestMinerStartStopAfterDownloaderEvents(t *testing.T) {
 
 	miner.Stop()
 	waitForMiningState(t, miner, false)
+}
+
+// TestMinerStartAfterFetcherInsertEvent tests that the miner resumes mining during a downloader sync attempt
+// if a propagated block (announce, broadcast) is inserted successfully to the local chain.
+func TestMinerStartAfterFetcherInsertEvent(t *testing.T) {
+	miner, mux, cleanup := createMiner(t)
+	defer cleanup(false)
+
+	miner.Start()
+	waitForMiningState(t, miner, true)
+	// Start the downloader
+	mux.Post(downloader.StartEvent{})
+	waitForMiningState(t, miner, false)
+
+	// During the sync, import a block via the fetcher.
+	// Miner should resume mining, inferring that we're at or near-enough (<32 block) the head of the network canonical chain.
+	mux.Post(fetcher.InsertChainEvent{})
+	waitForMiningState(t, miner, true)
+
+	mux.Post(downloader.FailedEvent{})
+	waitForMiningState(t, miner, true)
+
+	mux.Post(downloader.StartEvent{})
+	waitForMiningState(t, miner, true) // Has not autopaused mining.
+
+	// Downloader finally succeeds.
+	mux.Post(downloader.DoneEvent{})
+	waitForMiningState(t, miner, true) // Still mining.
+}
+
+// TestMinerStartAfterFetcherInsertEvent2 tests that the miner does not autopause if outside any downloader sync attempt
+// a propagated block (announce, broadcast) is inserted successfully to the local chain; that is,
+// a fetcher->import event disables the downloader event listener and autopause mechanism.
+func TestMinerStartAfterFetcherInsertEvent2(t *testing.T) {
+	miner, mux, cleanup := createMiner(t)
+	defer cleanup(false)
+
+	miner.Start()
+	waitForMiningState(t, miner, true)
+
+	// Before we've started the downloader, import a block via the fetcher.
+	// This should disable subsequent autopausing for downloader events thereafter, since
+	// we consider the local chain sufficiently synced.
+	mux.Post(fetcher.InsertChainEvent{})
+	waitForMiningState(t, miner, true)
+
+	// Start the downloader
+	mux.Post(downloader.StartEvent{})
+	// Still mining; we've inferred by a successful import of a propagated block
+	// that we're already synced, and we're no longer treating downloader events as autopause-able.
+	waitForMiningState(t, miner, true)
+
+	mux.Post(downloader.FailedEvent{})
+	waitForMiningState(t, miner, true)
 }
 
 func TestStartWhileDownload(t *testing.T) {

@@ -27,7 +27,7 @@ func (bc *BlockChain) ArtificialFinalityNoDisable(n int32) {
 	if n == 1 {
 		disabledTransition := bc.chainConfig.GetECBP1100DisableTransition()
 		if disabledTransition != nil && big.NewInt(int64(*disabledTransition)).Cmp(big.NewInt(0)) > 0 {
-			log.Warn("Disable ECBP1100 (MESS) block activation number is set together with '--ecbp1100.nodisable'. ECBP1100 will not be disabled.", "disable transition block", *disabledTransition)
+			log.Warn("Disable ECBP1100 (MESS) block activation number is set together with '--ecbp1100.nodisable'.", "disable transition block", *disabledTransition)
 		}
 	}
 }

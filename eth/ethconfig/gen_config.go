@@ -119,7 +119,7 @@ func (c Config) MarshalTOML() (interface{}, error) {
 	enc.Checkpoint = c.Checkpoint
 	enc.CheckpointOracle = c.CheckpointOracle
 	enc.ECBP1100 = c.ECBP1100
-	enc.ECBP1100Disable = c.ECBP1100Deactivate
+	enc.ECBP1100Disable = c.OverrideECBP1100Deactivate
 	enc.ECBP1100NoDisable = c.ECBP1100NoDisable
 
 	enc.OverrideShanghai = c.OverrideShanghai
@@ -326,7 +326,7 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 		c.ECBP1100 = dec.ECBP1100
 	}
 	if dec.ECBP1100Disable != nil {
-		c.ECBP1100Deactivate = dec.ECBP1100Disable
+		c.OverrideECBP1100Deactivate = dec.ECBP1100Disable
 	}
 	if dec.ECBP1100NoDisable != nil {
 		c.ECBP1100NoDisable = dec.ECBP1100NoDisable

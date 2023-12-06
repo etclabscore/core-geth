@@ -174,14 +174,14 @@ func makeFullNode(ctx *cli.Context) (*node.Node, ethapi.Backend) {
 			cfg.Eth.ECBP1100 = new(big.Int).SetUint64(n)
 		}
 	}
-	if ctx.IsSet(utils.ECBP1100DeactivateFlag.Name) {
-		if n := ctx.Uint64(utils.ECBP1100DeactivateFlag.Name); n != math.MaxUint64 {
-			cfg.Eth.ECBP1100Deactivate = new(big.Int).SetUint64(n)
-		}
-	}
 	if ctx.IsSet(utils.ECBP1100NoDisableFlag.Name) {
 		if enable := ctx.Bool(utils.ECBP1100NoDisableFlag.Name); enable {
 			cfg.Eth.ECBP1100NoDisable = &enable
+		}
+	}
+	if ctx.IsSet(utils.OverrideECBP1100DeactivateFlag.Name) {
+		if n := ctx.Uint64(utils.OverrideECBP1100DeactivateFlag.Name); n != math.MaxUint64 {
+			cfg.Eth.OverrideECBP1100Deactivate = new(big.Int).SetUint64(n)
 		}
 	}
 	if ctx.IsSet(utils.OverrideShanghai.Name) {

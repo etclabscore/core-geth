@@ -167,7 +167,7 @@ var (
 		utils.MinerNotifyFullFlag,
 		utils.ECBP1100Flag,
 		utils.ECBP1100NoDisableFlag,
-		utils.ECBP1100DeactivateFlag,
+		utils.OverrideECBP1100DeactivateFlag,
 		configFileFlag,
 	}, utils.NetworkFlags, utils.DatabasePathFlags)
 

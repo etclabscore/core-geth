@@ -27,8 +27,8 @@ Binary archives are published at https://github.com/etclabscore/core-geth/releas
 When running Core-geth use `--mordor` flag for Ethereum Classic testnet.
 
 ```shell
-$ wget https://github.com/etclabscore/core-geth/releases/download/v1.12.16/core-geth-linux-v1.12.16.zip # Update to the most current release version
-$ sudo unzip core-geth-linux-v1.12.16.zip -d /bin/ # Update to the most current release version
+$ wget https://github.com/etclabscore/core-geth/releases/download/v1.12.17/core-geth-linux-v1.12.17.zip # Update to the most current release version
+$ sudo unzip core-geth-linux-v1.12.17.zip -d /bin/ # Update to the most current release version
 $ geth --help # Lists available options
 $ geth --mordor # Runs Ethereum Classic's testnet Mordor
 ```

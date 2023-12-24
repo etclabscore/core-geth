@@ -157,7 +157,21 @@ func testSnapSyncDisabling(t *testing.T, ethVer uint, snapVer uint) {
 	}
 }
 
-func TestArtificialFinalityFeatureEnablingDisabling(t *testing.T) {
+func TestArtificialFinalityFeatureEnablingDisabling_AbleDisable(t *testing.T) {
+	// Tweak the hardcoded minArtificialFinalityPeers value
+	// before anything else (and establish its reassignment to original value).
+	// Lowering the value from the default is only done to save the boilerplate of
+	// setting up 5 peers instead of 1.
+	// Its important to do this before starting the syncer because
+	// of a potential data race with the minArtificialFinalityPeers value.
+	// This value does not (should not) change during geth runtime.
+	oMinAFPeers := atomic.LoadUint32(&minArtificialFinalityPeers)
+	defer func() {
+		// Clean up after, resetting global default to original value.
+		atomic.StoreUint32(&minArtificialFinalityPeers, oMinAFPeers)
+	}()
+	atomic.StoreUint32(&minArtificialFinalityPeers, 1)
+
 	maxBlocksCreated := 1024
 	genFunc := blockGenContemporaryTime(int64(maxBlocksCreated))
 
@@ -170,13 +184,6 @@ func TestArtificialFinalityFeatureEnablingDisabling(t *testing.T) {
 
 	one := uint64(1)
 	a.chain.Config().SetECBP1100Transition(&one)
-
-	oMinAFPeers := minArtificialFinalityPeers
-	defer func() {
-		// Clean up after, resetting global default to original value.
-		minArtificialFinalityPeers = oMinAFPeers
-	}()
-	minArtificialFinalityPeers = 1
 
 	// Create a full protocol manager, check that fast sync gets disabled
 	b := newTestHandlerWithBlocksWithOpts(0, downloader.FullSync, genFunc)
@@ -211,7 +218,8 @@ func TestArtificialFinalityFeatureEnablingDisabling(t *testing.T) {
 		t.Fatalf("sync failed: %v", err)
 	}
 
-	b.handler.chainSync.forced = true
+	atomic.StoreUint32(&b.handler.chainSync.forced, 1)
+
 	next := b.handler.chainSync.nextSyncOp()
 	if next != nil {
 		t.Fatal("non-nil next sync op")
@@ -224,10 +232,10 @@ func TestArtificialFinalityFeatureEnablingDisabling(t *testing.T) {
 	}
 
 	// Set the value back to default (more than 1).
-	minArtificialFinalityPeers = oMinAFPeers
+	atomic.StoreUint32(&minArtificialFinalityPeers, oMinAFPeers)
 
 	// Next sync op will unset AF because manager only has 1 peer.
-	b.handler.chainSync.forced = true
+	atomic.StoreUint32(&b.handler.chainSync.forced, 1)
 	next = b.handler.chainSync.nextSyncOp()
 	if next != nil {
 		t.Fatal("non-nil next sync op")
@@ -240,6 +248,20 @@ func TestArtificialFinalityFeatureEnablingDisabling(t *testing.T) {
 // TestArtificialFinalityFeatureEnablingDisabling_NoDisable tests that when the nodisable override
 // is in place (see NOTE1 below), AF is not disabled at the min peer floor.
 func TestArtificialFinalityFeatureEnablingDisabling_NoDisable(t *testing.T) {
+	// Tweak the hardcoded minArtificialFinalityPeers value
+	// before anything else (and establish its reassignment to original value).
+	// Lowering the value from the default is only done to save the boilerplate of
+	// setting up 5 peers instead of 1.
+	// Its important to do this before starting the syncer because
+	// of a potential data race with the minArtificialFinalityPeers value.
+	// This value does not (should not) change during geth runtime.
+	oMinAFPeers := atomic.LoadUint32(&minArtificialFinalityPeers)
+	defer func() {
+		// Clean up after, resetting global default to original value.
+		atomic.StoreUint32(&minArtificialFinalityPeers, oMinAFPeers)
+	}()
+	atomic.StoreUint32(&minArtificialFinalityPeers, 1)
+
 	maxBlocksCreated := 1024
 	genFunc := blockGenContemporaryTime(int64(maxBlocksCreated))
 
@@ -249,13 +271,6 @@ func TestArtificialFinalityFeatureEnablingDisabling_NoDisable(t *testing.T) {
 
 	one := uint64(1)
 	a.chain.Config().SetECBP1100Transition(&one)
-
-	oMinAFPeers := minArtificialFinalityPeers
-	defer func() {
-		// Clean up after, resetting global default to original value.
-		minArtificialFinalityPeers = oMinAFPeers
-	}()
-	minArtificialFinalityPeers = 1
 
 	// Create a full protocol manager, check that fast sync gets disabled
 	b := newTestHandlerWithBlocksWithOpts(0, downloader.FullSync, genFunc)
@@ -291,12 +306,12 @@ func TestArtificialFinalityFeatureEnablingDisabling_NoDisable(t *testing.T) {
 		t.Fatalf("sync failed: %v", err)
 	}
 
-	b.handler.chainSync.forced = true
+	atomic.StoreUint32(&b.handler.chainSync.forced, 1)
 	next := b.handler.chainSync.nextSyncOp()
 
 	// Revert safety condition overrides to default values.
 	// Set the value back to default (more than 1).
-	minArtificialFinalityPeers = oMinAFPeers
+	atomic.StoreUint32(&minArtificialFinalityPeers, oMinAFPeers)
 
 	if next != nil {
 		t.Fatal("non-nil next sync op")
@@ -309,7 +324,7 @@ func TestArtificialFinalityFeatureEnablingDisabling_NoDisable(t *testing.T) {
 	}
 
 	// Next sync op will unset AF because manager only has 1 peer.
-	b.handler.chainSync.forced = true
+	atomic.StoreUint32(&b.handler.chainSync.forced, 1)
 	next = b.handler.chainSync.nextSyncOp()
 	if next != nil {
 		t.Fatal("non-nil next sync op")
@@ -327,6 +342,20 @@ and the number of peers 'a' is connected with being only 1.)`)
 // be very old (far exceeding the auto-disable stale limit).
 // In this case, AF features should NOT be enabled.
 func TestArtificialFinalityFeatureEnablingDisabling_StaleHead(t *testing.T) {
+	// Tweak the hardcoded minArtificialFinalityPeers value
+	// before anything else (and establish its reassignment to original value).
+	// Lowering the value from the default is only done to save the boilerplate of
+	// setting up 5 peers instead of 1.
+	// Its important to do this before starting the syncer because
+	// of a potential data race with the minArtificialFinalityPeers value.
+	// This value does not (should not) change during geth runtime.
+	oMinAFPeers := atomic.LoadUint32(&minArtificialFinalityPeers)
+	defer func() {
+		// Clean up after, resetting global default to original value.
+		atomic.StoreUint32(&minArtificialFinalityPeers, oMinAFPeers)
+	}()
+	atomic.StoreUint32(&minArtificialFinalityPeers, 1)
+
 	maxBlocksCreated := 1024
 
 	// Create a full protocol manager, check that fast sync gets disabled
@@ -334,13 +363,6 @@ func TestArtificialFinalityFeatureEnablingDisabling_StaleHead(t *testing.T) {
 	defer a.close()
 	one := uint64(1)
 	a.chain.Config().SetECBP1100Transition(&one)
-
-	oMinAFPeers := minArtificialFinalityPeers
-	defer func() {
-		// Clean up after, resetting global default to original value.
-		minArtificialFinalityPeers = oMinAFPeers
-	}()
-	minArtificialFinalityPeers = 1
 
 	// Create a full protocol manager, check that fast sync gets disabled
 	b := newTestHandlerWithBlocksWithOpts(0, downloader.FullSync, nil)
@@ -371,12 +393,12 @@ func TestArtificialFinalityFeatureEnablingDisabling_StaleHead(t *testing.T) {
 		t.Fatalf("sync failed: %v", err)
 	}
 
-	b.handler.chainSync.forced = true
+	atomic.StoreUint32(&b.handler.chainSync.forced, 1)
 	next := b.handler.chainSync.nextSyncOp()
 
 	// Revert safety condition overrides to default values.
 	// Set the value back to default (more than 1).
-	minArtificialFinalityPeers = oMinAFPeers
+	atomic.StoreUint32(&minArtificialFinalityPeers, oMinAFPeers)
 
 	if next != nil {
 		t.Fatal("non-nil next sync op")

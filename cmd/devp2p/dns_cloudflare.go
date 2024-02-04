@@ -155,7 +155,7 @@ func (c *cloudflareClient) uploadRecords(name string, records map[string]string)
 			if path, entry := firstCloudflareRecord(stales); path != "" {
 				log.Debug(fmt.Sprintf("Deleting %s = %q", path, entry.Content))
 				deleted++
-				if err := c.DeleteDNSRecord(context.Background(), c.zoneID, entry.ID); err != nil {
+				if err := c.DeleteDNSRecord(context.Background(), cloudflare.ZoneIdentifier(c.zoneID), entry.ID); err != nil {
 					return fmt.Errorf("failed to delete %s: %v", path, err)
 				}
 				delete(stales, path)

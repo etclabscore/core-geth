@@ -284,7 +284,14 @@ func newHandler(config *handlerConfig) (*handler, error) {
 			}
 			return 0, nil
 		}
-		return h.chain.InsertChain(blocks)
+		n, err := h.chain.InsertChain(blocks)
+		// PTAL(meowsbits) This chunk was removed upstream. (No acceptTxs.Store...)
+		if err == nil {
+			// Mark initial sync done on any fetcher import
+			h.acceptTxs.Store(true)
+			h.eventMux.Post(fetcher.InsertChainEvent{Blocks: blocks})
+		}
+		return n, err
 	}
 	h.blockFetcher = fetcher.NewBlockFetcher(false, nil, h.chain.GetBlockByHash, validator, h.BroadcastBlock, heighter, nil, inserter, h.removePeer)
 

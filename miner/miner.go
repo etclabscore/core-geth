@@ -31,6 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/txpool"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/eth/downloader"
+	"github.com/ethereum/go-ethereum/eth/fetcher"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
@@ -107,7 +108,7 @@ func New(eth Backend, config *Config, chainConfig ctypes.ChainConfigurator, mux 
 func (miner *Miner) update() {
 	defer miner.wg.Done()
 
-	events := miner.mux.Subscribe(downloader.StartEvent{}, downloader.DoneEvent{}, downloader.FailedEvent{})
+	events := miner.mux.Subscribe(downloader.StartEvent{}, downloader.DoneEvent{}, downloader.FailedEvent{}, fetcher.InsertChainEvent{})
 	defer func() {
 		if !events.Closed() {
 			events.Unsubscribe()
@@ -116,13 +117,13 @@ func (miner *Miner) update() {
 
 	shouldStart := false
 	canStart := true
-	dlEventCh := events.Chan()
+	eventCh := events.Chan()
 	for {
 		select {
-		case ev := <-dlEventCh:
+		case ev := <-eventCh:
 			if ev == nil {
 				// Unsubscription done, stop listening
-				dlEventCh = nil
+				eventCh = nil
 				continue
 			}
 			switch ev.Data.(type) {
@@ -142,7 +143,12 @@ func (miner *Miner) update() {
 					miner.worker.start()
 				}
 				miner.worker.syncing.Store(false)
-			case downloader.DoneEvent:
+			case downloader.DoneEvent, fetcher.InsertChainEvent:
+				// InsertBlockEvents are posted by the block fetcher, which handles the fetching and importing
+				// of network head blocks.
+				// This event should be treated by the miner equivalently to the downloader.DoneEvent;
+				// both events indicate that the local node should be treated as fully synced
+				// and thus ready to mine.
 				canStart = true
 				if shouldStart {
 					miner.worker.start()

@@ -172,8 +172,11 @@ func TestCreation(t *testing.T) {
 				{13_189_133, 0, ID{Hash: checksumToBytes(0x0f6bf187), Next: 14_525_000}},
 				{13_189_134, 0, ID{Hash: checksumToBytes(0x0f6bf187), Next: 14_525_000}},
 				{14_524_999, 0, ID{Hash: checksumToBytes(0x0f6bf187), Next: 14_525_000}},
-				{14_525_000, 0, ID{Hash: checksumToBytes(0x7fd1bb25), Next: 0}},
-				{14_525_001, 0, ID{Hash: checksumToBytes(0x7fd1bb25), Next: 0}},
+				{14_525_000, 0, ID{Hash: checksumToBytes(0x7fd1bb25), Next: 19_250_000}},
+				{14_525_001, 0, ID{Hash: checksumToBytes(0x7fd1bb25), Next: 19_250_000}},
+				{19_249_999, 0, ID{Hash: checksumToBytes(0x7fd1bb25), Next: 19_250_000}},
+				{19_250_000, 0, ID{Hash: checksumToBytes(0xbe46d57c), Next: 0}},
+				{19_250_001, 0, ID{Hash: checksumToBytes(0xbe46d57c), Next: 0}},
 			},
 		},
 		{
@@ -506,7 +509,7 @@ func TestGatherForks(t *testing.T) {
 		{
 			"classic",
 			params.ClassicChainConfig,
-			[]uint64{1150000, 2500000, 3000000, 5000000, 5900000, 8772000, 9573000, 10500839, 11_700_000, 13_189_133, 14_525_000},
+			[]uint64{1150000, 2500000, 3000000, 5000000, 5900000, 8772000, 9573000, 10500839, 11_700_000, 13_189_133, 14_525_000, 19_250_000},
 			[]uint64{},
 		},
 		{

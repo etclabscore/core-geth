@@ -1083,13 +1083,19 @@ Please note that --` + MetricsHTTPFlag.Name + ` must be set to start the server.
 		Value: "",
 	}
 	ECBP1100Flag = &cli.Uint64Flag{
-		Name:  "ecbp1100",
-		Usage: "Configure ECBP-1100 (MESS) block activation number",
-		Value: math.MaxUint64,
+		Name:     "ecbp1100", // should have been override.ecbp1100, but maintained now for backwards compatibility
+		Usage:    "Manually specify the ECBP-1100 (MESS) block activation number, overriding the bundled setting",
+		Category: flags.EthCategory,
+	}
+	OverrideECBP1100DeactivateFlag = &cli.Uint64Flag{
+		Name:     "override.ecbp1100.deactivate",
+		Usage:    "Manually specify the ECBP-1100 (MESS) deactivation block number, overriding the bundled setting",
+		Category: flags.EthCategory,
 	}
 	ECBP1100NoDisableFlag = &cli.BoolFlag{
-		Name:  "ecbp1100.nodisable",
-		Usage: "Short-circuit ECBP-1100 (MESS) disable mechanisms; (yields a permanent-once-activated state, deactivating auto-shutoff mechanisms)",
+		Name:     "ecbp1100.nodisable",
+		Usage:    "Short-circuit ECBP-1100 (MESS) disable mechanisms; (yields a permanent-once-activated state, deactivating auto-shutoff mechanisms)",
+		Category: flags.DeprecatedCategory,
 	}
 
 	MetricsEnableInfluxDBV2Flag = &cli.BoolFlag{
@@ -2128,6 +2134,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 			cfg.EthDiscoveryURLs = SplitAndTrim(urls)
 		}
 	}
+
 	// Override any default configs for hard coded networks.
 
 	// Override genesis configuration if a --<chain> flag.

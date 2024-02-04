@@ -20,9 +20,31 @@ var errReorgFinality = errors.New("finality-enforced invalid new chain")
 // n  = 1 : ON
 // n != 1 : OFF
 func (bc *BlockChain) ArtificialFinalityNoDisable(n int32) {
-	log.Warn("Deactivating ECBP1100 (MESS) disablers", "always on", true)
+	log.Warn("Deactivating ECBP1100 (MESS) safety mechanisms", "always on", true)
 	bc.artificialFinalityNoDisable = new(int32)
 	atomic.StoreInt32(bc.artificialFinalityNoDisable, n)
+
+	if n == 1 {
+		deactivateTransition := bc.chainConfig.GetECBP1100DeactivateTransition()
+		if deactivateTransition != nil && big.NewInt(int64(*deactivateTransition)).Cmp(big.NewInt(0)) > 0 {
+			// Log the activation block as well as the deactivation block.
+			// Context is nice to have for the user.
+			var logActivationBlock uint64
+			logActivationBlockRaw := bc.chainConfig.GetECBP1100Transition()
+			if logActivationBlockRaw == nil {
+				// panic("impossible")
+				logActivationBlock = *deactivateTransition
+			} else {
+				logActivationBlock = *logActivationBlockRaw
+			}
+
+			log.Warn(`Deactivate-ECBP1100 (MESS) block activation number is set together with '--ecbp1100.nodisable'.
+The --ecbp1100.nodisable feature prevents the toggling of ECBP1100 (MESS) artificial finality with its safety mechanisms of low peer count and stale head.
+ECBP1100 (MESS) is scheduled for network-wide deactivation, rendering the --ecbp1100.nodisable feature anachronistic.
+`, "ECBP1100 activation block", logActivationBlock,
+				"ECBP1100 deactivation block", *deactivateTransition)
+		}
+	}
 }
 
 // EnableArtificialFinality enables and disable artificial finality features for the blockchain.

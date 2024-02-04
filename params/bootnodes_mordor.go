@@ -20,10 +20,7 @@ package params
 // the Ethereum Classic Mordor network.
 // https://github.com/etclabscore/mordor/blob/master/static-nodes.json
 var MordorBootnodes = []string{
-	"enode://534d18fd46c5cd5ba48a68250c47cea27a1376869755ed631c94b91386328039eb607cf10dd8d0aa173f5ec21e3fb45c5d7a7aa904f97bc2557e9cb4ccc703f1@51.158.190.99:30303", // @q9f lyrae
-	"enode://15b6ae4e9e18772f297c90d83645b0fbdb56667ce2d747d6d575b21d7b60c2d3cd52b11dec24e418438caf80ddc433232b3685320ed5d0e768e3972596385bfc@51.158.191.43:41235", // @q9f mizar
-	"enode://8fa15f5012ac3c47619147220b7772fcc5db0cb7fd132b5d196e7ccacb166ac1fcf83be1dace6cd288e288a85e032423b6e7e9e57f479fe7373edea045caa56b@176.9.51.216:31355",  // @q9f ceibo
-	"enode://34c14141b79652afc334dcd2ba4d8047946246b2310dc8e45737ebe3e6f15f9279ca4702b90bc5be12929f6194e2c3ce19a837b7fec7ebffcee9e9fe4693b504@176.9.51.216:31365",  // @q9f ceibo
+	"enode://5e85df7bc6d529647cf9a417162784a89b7ccf2b8e1570fadb6fdf9fa025c8ec2257825d1ec5d7357a6f49898fdfbd9c4c56d22645dbe8b8a6aa67dacbcf3ecc@157.230.152.87:30303", // meowsbits@sfetclabs
+	"enode://4539a067ae1f6a7ffac509603ba37baf772fc832880ddc67c53f292b6199fb048267f0311c820bc90bfd39ec663bc6b5256bdf787ec38425c82bde6bc2bcfe3c@24.199.107.164:30303", // @etccoop-sfo
 }
-
 var MordorDNSNetwork1 = dnsPrefixETC + "all.mordor.blockd.info"

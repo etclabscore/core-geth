@@ -288,7 +288,7 @@ func newHandler(config *handlerConfig) (*handler, error) {
 		// PTAL(meowsbits) This chunk was removed upstream. (No acceptTxs.Store...)
 		if err == nil {
 			// Mark initial sync done on any fetcher import
-			h.acceptTxs.Store(true)
+			h.synced.Store(true)
 			h.eventMux.Post(fetcher.InsertChainEvent{Blocks: blocks})
 		}
 		return n, err

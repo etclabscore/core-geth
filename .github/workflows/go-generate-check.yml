@@ -1,5 +1,7 @@
 name: Developer helper
-on: pull_request
+on:
+  pull_request:
+  workflow_dispatch:
 env:
   # GENERATE_EXCEPTIONS are exceptions made to the 'go generate' command.
   # These patterns are matched (negatively) against 'go list' output.

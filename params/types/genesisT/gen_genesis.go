@@ -10,10 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/params/confp/generic"
-	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 var _ = (*genesisSpecMarshaling)(nil)
@@ -76,27 +73,11 @@ func (g *Genesis) UnmarshalJSON(input []byte) error {
 		Number        *math.HexOrDecimal64                        `json:"number"`
 		GasUsed       *math.HexOrDecimal64                        `json:"gasUsed"`
 		ParentHash    *common.Hash                                `json:"parentHash"`
-		BaseFee       *math.HexOrDecimal256                       `json:"baseFeePerGas"`
-		ExcessBlobGas *math.HexOrDecimal64                        `json:"excessBlobGas"`
-		BlobGasUsed   *math.HexOrDecimal64                        `json:"blobGasUsed"`
+		BaseFee       *math.HexOrDecimal256                       `json:"baseFeePerGas,omitempty"`
+		ExcessBlobGas *math.HexOrDecimal64                        `json:"excessBlobGas,omitempty"`
+		BlobGasUsed   *math.HexOrDecimal64                        `json:"blobGasUsed,omitempty"`
 	}
 	var dec Genesis
-	// We have to look at the raw input, decide what kind of configurator schema it's using,
-	// then assign the decoder struct to use that schema type.
-	conf, err := generic.UnmarshalChainConfigurator(input)
-	if err != nil {
-		return err
-	}
-
-	switch conf.(type) {
-	case *coregeth.CoreGethChainConfig:
-		dec.Config = &coregeth.CoreGethChainConfig{}
-	case *goethereum.ChainConfig:
-		dec.Config = &goethereum.ChainConfig{}
-	default:
-		panic("unmarshal genesis chain config returned a type not supported by unmarshaling")
-	}
-
 	if err := json.Unmarshal(input, &dec); err != nil {
 		return err
 	}

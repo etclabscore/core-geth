@@ -216,7 +216,7 @@ type Config struct {
 	CheckpointOracle *ctypes.CheckpointOracleConfig `toml:",omitempty"`
 
 	// Manual configuration field for ECBP1100 activation number. Used for modifying genesis config via CLI flag.
-	ECBP1100 *uint64 `toml:",omitempty"`
+	OverrideECBP1100 *uint64 `toml:",omitempty"`
 	// Manual configuration field for ECBP1100's disablement block number. Used for modifying genesis config via CLI flag.
 	OverrideECBP1100Deactivate *uint64 `toml:",omitempty"`
 

@@ -64,7 +64,7 @@ func (c Config) MarshalTOML() (interface{}, error) {
 		RPCTxFeeCap                float64
 		Checkpoint                 *ctypes.TrustedCheckpoint      `toml:",omitempty"`
 		CheckpointOracle           *ctypes.CheckpointOracleConfig `toml:",omitempty"`
-		ECBP1100                   *uint64                        `toml:",omitempty"`
+		OverrideECBP1100           *uint64                        `toml:",omitempty"`
 		OverrideECBP1100Deactivate *uint64                        `toml:",omitempty"`
 		ECBP1100NoDisable          *bool                          `toml:",omitempty"`
 		OverrideShanghai           *uint64                        `toml:",omitempty"`
@@ -117,7 +117,7 @@ func (c Config) MarshalTOML() (interface{}, error) {
 	enc.RPCTxFeeCap = c.RPCTxFeeCap
 	enc.Checkpoint = c.Checkpoint
 	enc.CheckpointOracle = c.CheckpointOracle
-	enc.ECBP1100 = c.ECBP1100
+	enc.OverrideECBP1100 = c.OverrideECBP1100
 	enc.OverrideECBP1100Deactivate = c.OverrideECBP1100Deactivate
 	enc.ECBP1100NoDisable = c.ECBP1100NoDisable
 	enc.OverrideShanghai = c.OverrideShanghai
@@ -174,7 +174,7 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 		RPCTxFeeCap                *float64
 		Checkpoint                 *ctypes.TrustedCheckpoint      `toml:",omitempty"`
 		CheckpointOracle           *ctypes.CheckpointOracleConfig `toml:",omitempty"`
-		ECBP1100                   *uint64                        `toml:",omitempty"`
+		OverrideECBP1100           *uint64                        `toml:",omitempty"`
 		OverrideECBP1100Deactivate *uint64                        `toml:",omitempty"`
 		ECBP1100NoDisable          *bool                          `toml:",omitempty"`
 		OverrideShanghai           *uint64                        `toml:",omitempty"`
@@ -320,8 +320,8 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 	if dec.CheckpointOracle != nil {
 		c.CheckpointOracle = dec.CheckpointOracle
 	}
-	if dec.ECBP1100 != nil {
-		c.ECBP1100 = dec.ECBP1100
+	if dec.OverrideECBP1100 != nil {
+		c.OverrideECBP1100 = dec.OverrideECBP1100
 	}
 	if dec.OverrideECBP1100Deactivate != nil {
 		c.OverrideECBP1100Deactivate = dec.OverrideECBP1100Deactivate

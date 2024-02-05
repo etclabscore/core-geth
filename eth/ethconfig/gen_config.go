@@ -64,12 +64,12 @@ func (c Config) MarshalTOML() (interface{}, error) {
 		RPCTxFeeCap                float64
 		Checkpoint                 *ctypes.TrustedCheckpoint      `toml:",omitempty"`
 		CheckpointOracle           *ctypes.CheckpointOracleConfig `toml:",omitempty"`
-		ECBP1100                   *uint64
-		OverrideECBP1100Deactivate *uint64
-		ECBP1100NoDisable          *bool   `toml:",omitempty"`
-		OverrideShanghai           *uint64 `toml:",omitempty"`
-		OverrideCancun             *uint64 `toml:",omitempty"`
-		OverrideVerkle             *uint64 `toml:",omitempty"`
+		ECBP1100                   *uint64                        `toml:",omitempty"`
+		OverrideECBP1100Deactivate *uint64                        `toml:",omitempty"`
+		ECBP1100NoDisable          *bool                          `toml:",omitempty"`
+		OverrideShanghai           *uint64                        `toml:",omitempty"`
+		OverrideCancun             *uint64                        `toml:",omitempty"`
+		OverrideVerkle             *uint64                        `toml:",omitempty"`
 	}
 	var enc Config
 	enc.Genesis = c.Genesis
@@ -174,12 +174,12 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 		RPCTxFeeCap                *float64
 		Checkpoint                 *ctypes.TrustedCheckpoint      `toml:",omitempty"`
 		CheckpointOracle           *ctypes.CheckpointOracleConfig `toml:",omitempty"`
-		ECBP1100                   *uint64
-		OverrideECBP1100Deactivate *uint64
-		ECBP1100NoDisable          *bool   `toml:",omitempty"`
-		OverrideShanghai           *uint64 `toml:",omitempty"`
-		OverrideCancun             *uint64 `toml:",omitempty"`
-		OverrideVerkle             *uint64 `toml:",omitempty"`
+		ECBP1100                   *uint64                        `toml:",omitempty"`
+		OverrideECBP1100Deactivate *uint64                        `toml:",omitempty"`
+		ECBP1100NoDisable          *bool                          `toml:",omitempty"`
+		OverrideShanghai           *uint64                        `toml:",omitempty"`
+		OverrideCancun             *uint64                        `toml:",omitempty"`
+		OverrideVerkle             *uint64                        `toml:",omitempty"`
 	}
 	var dec Config
 	if err := unmarshal(&dec); err != nil {

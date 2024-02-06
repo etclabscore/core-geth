@@ -20,7 +20,6 @@ package params
 // the Ethereum Classic Mordor network.
 // https://github.com/etclabscore/mordor/blob/master/static-nodes.json
 var MordorBootnodes = []string{
-	"enode://5e85df7bc6d529647cf9a417162784a89b7ccf2b8e1570fadb6fdf9fa025c8ec2257825d1ec5d7357a6f49898fdfbd9c4c56d22645dbe8b8a6aa67dacbcf3ecc@157.230.152.87:30303", // meowsbits@sfetclabs
 	"enode://4539a067ae1f6a7ffac509603ba37baf772fc832880ddc67c53f292b6199fb048267f0311c820bc90bfd39ec663bc6b5256bdf787ec38425c82bde6bc2bcfe3c@24.199.107.164:30303", // @etccoop-sfo
 }
 var MordorDNSNetwork1 = dnsPrefixETC + "all.mordor.blockd.info"

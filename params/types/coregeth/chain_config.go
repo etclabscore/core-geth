@@ -244,10 +244,11 @@ type CoreGethChainConfig struct {
 	DisposalBlock *big.Int `json:"disposalBlock,omitempty"` // Bomb disposal HF block
 
 	// Various consensus engines
-	Ethash    *ctypes.EthashConfig `json:"ethash,omitempty"`
-	Clique    *ctypes.CliqueConfig `json:"clique,omitempty"`
-	Lyra2     *ctypes.Lyra2Config  `json:"lyra2,omitempty"`
-	IsDevMode bool                 `json:"isDev,omitempty"`
+	Ethash    *ctypes.EthashConfig   `json:"ethash,omitempty"`
+	EthashB3  *ctypes.EthashB3Config `json:"ethashb3,omitempty"`
+	Clique    *ctypes.CliqueConfig   `json:"clique,omitempty"`
+	Lyra2     *ctypes.Lyra2Config    `json:"lyra2,omitempty"`
+	IsDevMode bool                   `json:"isDev,omitempty"`
 
 	// TerminalTotalDifficulty is the amount of total difficulty reached by
 	// the network that triggers the consensus upgrade.
@@ -275,6 +276,8 @@ func (c *CoreGethChainConfig) String() string {
 	switch {
 	case c.Ethash != nil:
 		engine = c.Ethash
+	case c.EthashB3 != nil:
+		engine = c.EthashB3
 	case c.Clique != nil:
 		engine = c.Clique
 	case c.Lyra2 != nil:

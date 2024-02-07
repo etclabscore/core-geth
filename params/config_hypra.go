@@ -101,8 +101,9 @@ var (
 		},
 
 		RequireBlockHashes: map[uint64]common.Hash{
-			156000: common.HexToHash("0x2a27bec023108c5f650cb0c9b7aaae7e7fdeefbeb3cd14a8390bb0957043aca2"),
-			512000: common.HexToHash("0xd547c896967174295c61ea18534d3c69337a6fa6e957909dc29e4bcba873592a"),
+			156_000:   common.HexToHash("0x2a27bec023108c5f650cb0c9b7aaae7e7fdeefbeb3cd14a8390bb0957043aca2"),
+			512_000:   common.HexToHash("0xd547c896967174295c61ea18534d3c69337a6fa6e957909dc29e4bcba873592a"),
+			1_878_299: common.HexToHash("0x1834091726bd0890539db04a22b673a6d9262d8b350dffaefdb10abc72e2113d"),
 		},
 	}
 )

@@ -34,7 +34,7 @@ func DefaultHypraGenesisBlock() *genesisT.Genesis {
 		ExtraData:  hexutil.MustDecode("0x5465736c6120656e746572732074686520656c65637472696320747275636b20626174746c65206166746572206669727374204379626572747275636b20726f6c6c73206f6666207468652070726f64756374696f6e206c696e65"),
 		GasLimit:   50000,
 		Difficulty: big.NewInt(9_035_329),
-		Alloc:      genesisT.DecodePreAlloc(HypraAllocData),
+		Alloc:      genesisT.DecodePreAlloc(hypraAllocData),
 		Timestamp:  1689703500,
 	}
 }

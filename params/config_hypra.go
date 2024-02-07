@@ -37,16 +37,11 @@ var (
 		// This is 0 on Hypra but Fork support is nil. Should this be enabled or not?
 		// DAOForkSupport isnt in this struct
 		// DAOForkBlock:       big.NewInt(0),
-		EIP150Block:        big.NewInt(0),
-		EIP155Block:        big.NewInt(0),
-		EIP160FBlock:       big.NewInt(0),
-		ECIP1010PauseBlock: big.NewInt(0),
-		ECIP1010Length:     big.NewInt(0),
-		ECIP1017FBlock:     big.NewInt(0),
-		ECIP1017EraRounds:  big.NewInt(0),
-		DisposalBlock:      big.NewInt(0),
-		EIP161FBlock:       big.NewInt(0),
-		EIP170FBlock:       big.NewInt(0),
+		EIP150Block:  big.NewInt(0),
+		EIP155Block:  big.NewInt(0),
+		EIP160FBlock: big.NewInt(0),
+		EIP161FBlock: big.NewInt(0),
+		EIP170FBlock: big.NewInt(0),
 
 		// Byzantium eq
 		EIP100FBlock: big.NewInt(1001),
@@ -96,6 +91,14 @@ var (
 		// EIP4399FBlock: nil, // Supplant DIFFICULTY with PREVRANDAO. Hypra  does not spec 4399 because it's still PoW, and 4399 is only applicable for the PoS system.
 		// EIP4895FBlock: nil, // Beacon chain push withdrawals as operations
 		// EIP6049FBlock: big.NewInt(19_250_000), // Deprecate SELFDESTRUCT (noop)
+
+		// Define the planned 3 year decreasing rewards.
+		BlockRewardSchedule: map[uint64]*big.Int{
+			0:          big.NewInt(4 * vars.Ether),
+			13_524_557: big.NewInt(3 * vars.Ether),
+			27_200_177: big.NewInt(2 * vars.Ether),
+			40_725_107: big.NewInt(1 * vars.Ether),
+		},
 
 		RequireBlockHashes: map[uint64]common.Hash{
 			156000: common.HexToHash("0x2a27bec023108c5f650cb0c9b7aaae7e7fdeefbeb3cd14a8390bb0957043aca2"),

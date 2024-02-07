@@ -25,7 +25,7 @@ import (
 )
 
 var (
-	// HypraChainConfig is the chain parameters to run a node on the Classic main network.
+	// HypraChainConfig is the chain parameters to run a node on the Hypra main network.
 	HypraChainConfig = &coregeth.CoreGethChainConfig{
 		NetworkID:                 622277,
 		EthashB3:                  new(ctypes.EthashB3Config),
@@ -34,24 +34,19 @@ var (
 
 		EIP2FBlock: big.NewInt(0),
 		EIP7FBlock: big.NewInt(0),
-
-		// DAOForkBlock:        big.NewInt(1920000),
-
-		EIP150Block: big.NewInt(0),
-
+		// This is 0 on Hypra but Fork support is nil. Should this be enabled or not?
+		// DAOForkSupport isnt in this struct
+		// DAOForkBlock:       big.NewInt(0),
+		EIP150Block:        big.NewInt(0),
 		EIP155Block:        big.NewInt(0),
 		EIP160FBlock:       big.NewInt(0),
 		ECIP1010PauseBlock: big.NewInt(0),
 		ECIP1010Length:     big.NewInt(0),
-
-		ECIP1017FBlock:    big.NewInt(0),
-		ECIP1017EraRounds: big.NewInt(0),
-
-		DisposalBlock: big.NewInt(0),
-
-		// EIP158~
-		EIP161FBlock: big.NewInt(0),
-		EIP170FBlock: big.NewInt(0),
+		ECIP1017FBlock:     big.NewInt(0),
+		ECIP1017EraRounds:  big.NewInt(0),
+		DisposalBlock:      big.NewInt(0),
+		EIP161FBlock:       big.NewInt(0),
+		EIP170FBlock:       big.NewInt(0),
 
 		// Byzantium eq
 		EIP100FBlock: big.NewInt(1001),
@@ -63,7 +58,7 @@ var (
 		EIP214FBlock: big.NewInt(1001),
 		EIP658FBlock: big.NewInt(1001),
 
-		// Constantinople eq, aka Agharta
+		// Constantinople eq
 		EIP145FBlock:    big.NewInt(5503),
 		EIP1014FBlock:   big.NewInt(5503),
 		EIP1052FBlock:   big.NewInt(5503),
@@ -71,40 +66,36 @@ var (
 		PetersburgBlock: big.NewInt(5507),
 
 		// Istanbul eq, aka Phoenix
-		// ECIP-1088
 		EIP152FBlock:  big.NewInt(5519),
 		EIP1108FBlock: big.NewInt(5519),
 		EIP1344FBlock: big.NewInt(5519),
 		EIP1884FBlock: big.NewInt(5519),
 		EIP2028FBlock: big.NewInt(5519),
-		EIP2200FBlock: big.NewInt(5519), // RePetersburg (=~ re-1283)
+		EIP2200FBlock: big.NewInt(5519),
 
-		// Hypra does not use ETC Improvements
-		// ECBP1100FBlock:           big.NewInt(11_380_000), // ETA 09 Oct 2020
-		// ECBP1100DeactivateFBlock: big.NewInt(19_250_000), // ETA 31 Jan 2023 (== Spiral hard fork)
-		// ECIP1099FBlock:           big.NewInt(11_700_000), // Etchash (DAG size limit)
+		// Berlin
+		EIP2565FBlock: big.NewInt(5527), // ModExp Gas Cost
+		EIP2718FBlock: big.NewInt(5527), // Typed Transaction Envelope
+		EIP2929FBlock: big.NewInt(5527), // Gas cost increases for state access opcodes
+		EIP2930FBlock: big.NewInt(5527), // Optional access lists
 
-		// Berlin eq, aka Magneto
-		EIP2565FBlock: big.NewInt(5527),
-		EIP2718FBlock: big.NewInt(5527),
-		EIP2929FBlock: big.NewInt(5527),
-		EIP2930FBlock: big.NewInt(5527),
+		// London + shanghai EVM upgrade, aka Gaspar
+		EIP3529FBlock: big.NewInt(1_600_957), // Reduction in refunds
+		EIP3541FBlock: big.NewInt(1_600_957), // Reject new contract code starting with the 0xEF byte
+		EIP3855FBlock: big.NewInt(1_600_957), // PUSH0 instruction
+		EIP3860FBlock: big.NewInt(1_600_957), // Limit and meter initcode
 
-		// London (partially), aka Mystique
-		EIP3529FBlock: big.NewInt(14_525_000),
-		EIP3541FBlock: big.NewInt(14_525_000),
+		// EIP3651FBlock: big.NewInt(1_600_957), // Warm COINBASE (gas reprice) -- I don't think this was enabled on hypra as part of Gaspar
+		// EIP1559FBlock: big.NewInt(0), // EIP-1559 transactions are not enabled on Hypra yet -- TODO
 
 		// Spiral, aka Shanghai (partially)
-		// EIP4399FBlock: nil, // Supplant DIFFICULTY with PREVRANDAO. ETC does not spec 4399 because it's still PoW, and 4399 is only applicable for the PoS system.
-		EIP3651FBlock: big.NewInt(19_250_000), // Warm COINBASE (gas reprice)
-		EIP3855FBlock: big.NewInt(19_250_000), // PUSH0 instruction
-		EIP3860FBlock: big.NewInt(19_250_000), // Limit and meter initcode
+		// EIP4399FBlock: nil, // Supplant DIFFICULTY with PREVRANDAO. Hypra  does not spec 4399 because it's still PoW, and 4399 is only applicable for the PoS system.
 		// EIP4895FBlock: nil, // Beacon chain push withdrawals as operations
-		EIP6049FBlock: big.NewInt(19_250_000), // Deprecate SELFDESTRUCT (noop)
+		// EIP6049FBlock: big.NewInt(19_250_000), // Deprecate SELFDESTRUCT (noop)
 
 		RequireBlockHashes: map[uint64]common.Hash{
-			1920000: common.HexToHash("0x94365e3a8c0b35089c1d1195081fe7489b528a84b22199c916180db8b28ade7f"),
-			2500000: common.HexToHash("0xca12c63534f565899681965528d536c52cb05b7c48e269c2a6cb77ad864d878a"),
+			156000: common.HexToHash("0x2a27bec023108c5f650cb0c9b7aaae7e7fdeefbeb3cd14a8390bb0957043aca2"),
+			512000: common.HexToHash("0xd547c896967174295c61ea18534d3c69337a6fa6e957909dc29e4bcba873592a"),
 		},
 	}
 )

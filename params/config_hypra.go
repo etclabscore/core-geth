@@ -79,6 +79,10 @@ var (
 		EIP2929FBlock: big.NewInt(5527), // Gas cost increases for state access opcodes
 		EIP2930FBlock: big.NewInt(5527), // Optional access lists
 
+		// Veldin fork was used to enable rewards to miners for including uncle blocks.
+		// Previously overlooked and unrewarded. TODO: use in AccumulateRewards
+		HIPVeldin: big.NewInt(500_009),
+
 		// London + shanghai EVM upgrade, aka Gaspar
 		EIP3529FBlock: big.NewInt(1_600_957), // Reduction in refunds
 		EIP3541FBlock: big.NewInt(1_600_957), // Reject new contract code starting with the 0xEF byte

@@ -268,6 +268,10 @@ type CoreGethChainConfig struct {
 	RequireBlockHashes map[uint64]common.Hash `json:"requireBlockHashes"`
 
 	Lyra2NonceTransitionBlock *big.Int `json:"lyra2NonceTransitionBlock,omitempty"`
+
+	// Veldin fork was used to enable rewards to miners for including uncle blocks.
+	// Previously overlooked and unrewarded.
+	HIPVeldin *big.Int `json:"hipveldin,omitempty"`
 }
 
 // String implements the fmt.Stringer interface.

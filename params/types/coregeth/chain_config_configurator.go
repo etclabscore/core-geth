@@ -1313,3 +1313,12 @@ func (c *CoreGethChainConfig) SetLyra2NonceTransition(n *uint64) error {
 
 	return nil
 }
+
+func (c *CoreGethChainConfig) GetHIPVeldinTransition() *uint64 {
+	return bigNewU64(c.HIPVeldinFBlock)
+}
+
+func (c *CoreGethChainConfig) SetHIPVeldinTransition(n *uint64) error {
+	c.HIPVeldinFBlock = setBig(c.HIPVeldinFBlock, n)
+	return nil
+}

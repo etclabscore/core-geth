@@ -269,9 +269,9 @@ type CoreGethChainConfig struct {
 
 	Lyra2NonceTransitionBlock *big.Int `json:"lyra2NonceTransitionBlock,omitempty"`
 
-	// Veldin fork was used to enable rewards to miners for including uncle blocks.
+	// Veldin fork was used to enable rewards to miners for including uncle blocks on Hypra network.
 	// Previously overlooked and unrewarded.
-	HIPVeldin *big.Int `json:"hipveldin,omitempty"`
+	HIPVeldinFBlock *big.Int `json:"hipveldinfblock,omitempty"`
 }
 
 // String implements the fmt.Stringer interface.

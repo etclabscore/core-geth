@@ -231,6 +231,10 @@ type ProtocolSpecifier interface {
 	// EIP6780 - SELFDESTRUCT only in same transaction - https://eips.ethereum.org/EIPS/eip-6780
 	GetEIP6780TransitionTime() *uint64
 	SetEIP6780TransitionTime(n *uint64) error
+
+	// Hypra Network Specific Veldin Fork for uncle rewards fix
+	GetHIPVeldinTransition() *uint64
+	SetHIPVeldinTransition(n *uint64) error
 }
 
 type Forker interface {

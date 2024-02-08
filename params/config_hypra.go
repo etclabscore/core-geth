@@ -24,12 +24,14 @@ import (
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
+const HypraChainId = 622277
+
 var (
 	// HypraChainConfig is the chain parameters to run a node on the Hypra main network.
 	HypraChainConfig = &coregeth.CoreGethChainConfig{
-		NetworkID:                 622277,
+		NetworkID:                 HypraChainId,
 		EthashB3:                  new(ctypes.EthashB3Config),
-		ChainID:                   big.NewInt(622277),
+		ChainID:                   big.NewInt(HypraChainId),
 		SupportedProtocolVersions: vars.DefaultProtocolVersions,
 
 		EIP2FBlock: big.NewInt(0),
@@ -74,9 +76,9 @@ var (
 		EIP2929FBlock: big.NewInt(5527), // Gas cost increases for state access opcodes
 		EIP2930FBlock: big.NewInt(5527), // Optional access lists
 
-		// Veldin fork was used to enable rewards to miners for including uncle blocks.
+		// Veldin fork was used to enable rewards to miners for including uncle blocks on Hypra network.
 		// Previously overlooked and unrewarded. TODO: use in AccumulateRewards
-		HIPVeldin: big.NewInt(500_009),
+		HIPVeldinFBlock: big.NewInt(500_009),
 
 		// London + shanghai EVM upgrade, aka Gaspar
 		EIP3529FBlock: big.NewInt(1_600_957), // Reduction in refunds

@@ -498,8 +498,8 @@ func TestEncoding(t *testing.T) {
 
 func TestGatherForks(t *testing.T) {
 	cases := []struct {
-		name    string
-		config  ctypes.ChainConfigurator
+		name       string
+		config     ctypes.ChainConfigurator
 		blockForks []uint64
 		timeForks  []uint64
 	}{
@@ -560,7 +560,7 @@ func TestGatherForks(t *testing.T) {
 		return true
 	}
 	for _, c := range cases {
-		blockForks, timeForks := gatherForks(c.config)
+		blockForks, timeForks := gatherForks(c.config, 0)
 		if !slicesEquivalent(blockForks, c.blockForks) {
 			t.Errorf("config=%s block forks mismatch: have %v, want %v", c.name, blockForks, c.blockForks)
 		}

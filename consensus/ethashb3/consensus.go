@@ -63,15 +63,15 @@ var (
 
 // Author implements consensus.Engine, returning the header's coinbase as the
 // proof-of-work verified author of the block.
-func (ethash *EthashB3) Author(header *types.Header) (common.Address, error) {
+func (ethashb3 *EthashB3) Author(header *types.Header) (common.Address, error) {
 	return header.Coinbase, nil
 }
 
 // VerifyHeader checks whether a header conforms to the consensus rules of the
-// stock Ethereum ethash engine.
-func (ethash *EthashB3) VerifyHeader(chain consensus.ChainHeaderReader, header *types.Header, seal bool) error {
+// stock Ethereum ethashb3 engine.
+func (ethashb3 *EthashB3) VerifyHeader(chain consensus.ChainHeaderReader, header *types.Header, seal bool) error {
 	// If we're running a full engine faking, accept any input as valid
-	if ethash.config.PowMode == ModeFullFake {
+	if ethashb3.config.PowMode == ModeFullFake {
 		return nil
 	}
 	// Short circuit if the header is known, or its parent not
@@ -84,15 +84,15 @@ func (ethash *EthashB3) VerifyHeader(chain consensus.ChainHeaderReader, header *
 		return consensus.ErrUnknownAncestor
 	}
 	// Sanity checks passed, do a proper verification
-	return ethash.verifyHeader(chain, header, parent, false, seal, time.Now().Unix())
+	return ethashb3.verifyHeader(chain, header, parent, false, seal, time.Now().Unix())
 }
 
 // VerifyHeaders is similar to VerifyHeader, but verifies a batch of headers
 // concurrently. The method returns a quit channel to abort the operations and
 // a results channel to retrieve the async verifications.
-func (ethash *EthashB3) VerifyHeaders(chain consensus.ChainHeaderReader, headers []*types.Header, seals []bool) (chan<- struct{}, <-chan error) {
+func (ethashb3 *EthashB3) VerifyHeaders(chain consensus.ChainHeaderReader, headers []*types.Header, seals []bool) (chan<- struct{}, <-chan error) {
 	// If we're running a full engine faking, accept any input as valid
-	if ethash.config.PowMode == ModeFullFake || len(headers) == 0 {
+	if ethashb3.config.PowMode == ModeFullFake || len(headers) == 0 {
 		abort, results := make(chan struct{}), make(chan error, len(headers))
 		for i := 0; i < len(headers); i++ {
 			results <- nil
@@ -117,7 +117,7 @@ func (ethash *EthashB3) VerifyHeaders(chain consensus.ChainHeaderReader, headers
 	for i := 0; i < workers; i++ {
 		go func() {
 			for index := range inputs {
-				errors[index] = ethash.verifyHeaderWorker(chain, headers, seals, index, unixNow)
+				errors[index] = ethashb3.verifyHeaderWorker(chain, headers, seals, index, unixNow)
 				done <- index
 			}
 		}()
@@ -153,7 +153,7 @@ func (ethash *EthashB3) VerifyHeaders(chain consensus.ChainHeaderReader, headers
 	return abort, errorsOut
 }
 
-func (ethash *EthashB3) verifyHeaderWorker(chain consensus.ChainHeaderReader, headers []*types.Header, seals []bool, index int, unixNow int64) error {
+func (ethashb3 *EthashB3) verifyHeaderWorker(chain consensus.ChainHeaderReader, headers []*types.Header, seals []bool, index int, unixNow int64) error {
 	var parent *types.Header
 	if index == 0 {
 		parent = chain.GetHeader(headers[0].ParentHash, headers[0].Number.Uint64()-1)
@@ -163,14 +163,14 @@ func (ethash *EthashB3) verifyHeaderWorker(chain consensus.ChainHeaderReader, he
 	if parent == nil {
 		return consensus.ErrUnknownAncestor
 	}
-	return ethash.verifyHeader(chain, headers[index], parent, false, seals[index], unixNow)
+	return ethashb3.verifyHeader(chain, headers[index], parent, false, seals[index], unixNow)
 }
 
 // VerifyUncles verifies that the given block's uncles conform to the consensus
-// rules of the stock Ethereum ethash engine.
-func (ethash *EthashB3) VerifyUncles(chain consensus.ChainReader, block *types.Block) error {
+// rules of the stock Ethereum ethashb3 engine.
+func (ethashb3 *EthashB3) VerifyUncles(chain consensus.ChainReader, block *types.Block) error {
 	// If we're running a full engine faking, accept any input as valid
-	if ethash.config.PowMode == ModeFullFake {
+	if ethashb3.config.PowMode == ModeFullFake {
 		return nil
 	}
 	// Verify that there are at most 2 uncles included in this block
@@ -222,7 +222,7 @@ func (ethash *EthashB3) VerifyUncles(chain consensus.ChainReader, block *types.B
 		if ancestors[uncle.ParentHash] == nil || uncle.ParentHash == block.ParentHash() {
 			return errDanglingUncle
 		}
-		if err := ethash.verifyHeader(chain, uncle, ancestors[uncle.ParentHash], true, true, time.Now().Unix()); err != nil {
+		if err := ethashb3.verifyHeader(chain, uncle, ancestors[uncle.ParentHash], true, true, time.Now().Unix()); err != nil {
 			return err
 		}
 	}
@@ -230,9 +230,9 @@ func (ethash *EthashB3) VerifyUncles(chain consensus.ChainReader, block *types.B
 }
 
 // verifyHeader checks whether a header conforms to the consensus rules of the
-// stock Ethereum ethash engine.
+// stock Ethereum ethashb3 engine.
 // See YP section 4.3.4. "Block Header Validity"
-func (ethash *EthashB3) verifyHeader(chain consensus.ChainHeaderReader, header, parent *types.Header, uncle bool, seal bool, unixNow int64) error {
+func (ethashb3 *EthashB3) verifyHeader(chain consensus.ChainHeaderReader, header, parent *types.Header, uncle bool, seal bool, unixNow int64) error {
 	// Ensure that the header's extra-data section is of a reasonable size
 	if uint64(len(header.Extra)) > vars.MaximumExtraDataSize {
 		return fmt.Errorf("extra-data too long: %d > %d", len(header.Extra), vars.MaximumExtraDataSize)
@@ -247,7 +247,7 @@ func (ethash *EthashB3) verifyHeader(chain consensus.ChainHeaderReader, header, 
 		return errOlderBlockTime
 	}
 	// Verify the block's difficulty based on its timestamp and parent's difficulty
-	expected := ethash.CalcDifficulty(chain, header.Time, parent)
+	expected := ethashb3.CalcDifficulty(chain, header.Time, parent)
 
 	if expected.Cmp(header.Difficulty) != 0 {
 		return fmt.Errorf("invalid difficulty: have %v, want %v", header.Difficulty, expected)
@@ -280,7 +280,7 @@ func (ethash *EthashB3) verifyHeader(chain consensus.ChainHeaderReader, header, 
 
 	// Verify the engine specific seal securing the block
 	if seal {
-		if err := ethash.verifySeal(chain, header, false); err != nil {
+		if err := ethashb3.verifySeal(chain, header, false); err != nil {
 			return err
 		}
 	}
@@ -294,7 +294,7 @@ func (ethash *EthashB3) verifyHeader(chain consensus.ChainHeaderReader, header, 
 // CalcDifficulty is the difficulty adjustment algorithm. It returns
 // the difficulty that a new block should have when created at time
 // given the parent block's time and difficulty.
-func (ethash *EthashB3) CalcDifficulty(chain consensus.ChainHeaderReader, time uint64, parent *types.Header) *big.Int {
+func (ethashb3 *EthashB3) CalcDifficulty(chain consensus.ChainHeaderReader, time uint64, parent *types.Header) *big.Int {
 	return CalcDifficulty(chain.Config(), time, parent)
 }
 
@@ -383,20 +383,20 @@ var HomesteadDifficultyCalculator = CalcDifficultyHomesteadU256
 var DynamicDifficultyCalculator = MakeDifficultyCalculatorU256
 
 // verifySeal checks whether a block satisfies the PoW difficulty requirements,
-// either using the usual ethash cache for it, or alternatively using a full DAG
+// either using the usual ethashb3 cache for it, or alternatively using a full DAG
 // to make remote mining fast.
-func (ethash *EthashB3) verifySeal(chain consensus.ChainHeaderReader, header *types.Header, fulldag bool) error {
+func (ethashb3 *EthashB3) verifySeal(chain consensus.ChainHeaderReader, header *types.Header, fulldag bool) error {
 	// If we're running a fake PoW, accept any seal as valid
-	if ethash.config.PowMode == ModeFake || ethash.config.PowMode == ModePoissonFake || ethash.config.PowMode == ModeFullFake {
-		time.Sleep(ethash.fakeDelay)
-		if ethash.fakeFail == header.Number.Uint64() {
+	if ethashb3.config.PowMode == ModeFake || ethashb3.config.PowMode == ModePoissonFake || ethashb3.config.PowMode == ModeFullFake {
+		time.Sleep(ethashb3.fakeDelay)
+		if ethashb3.fakeFail == header.Number.Uint64() {
 			return errInvalidPoW
 		}
 		return nil
 	}
 	// If we're running a shared PoW, delegate verification to it
-	if ethash.shared != nil {
-		return ethash.shared.verifySeal(chain, header, fulldag)
+	if ethashb3.shared != nil {
+		return ethashb3.shared.verifySeal(chain, header, fulldag)
 	}
 	// Ensure that we have a valid difficulty for the block
 	if header.Difficulty.Sign() <= 0 {
@@ -409,11 +409,11 @@ func (ethash *EthashB3) verifySeal(chain consensus.ChainHeaderReader, header *ty
 		digest []byte
 		result []byte
 	)
-	// If fast-but-heavy PoW verification was requested, use an ethash dataset
+	// If fast-but-heavy PoW verification was requested, use an ethashb3 dataset
 	if fulldag {
-		dataset := ethash.dataset(number, true)
+		dataset := ethashb3.dataset(number, true)
 		if dataset.generated() {
-			digest, result = hashimotoFull(dataset.dataset, ethash.SealHash(header).Bytes(), header.Nonce.Uint64())
+			digest, result = hashimotoFull(dataset.dataset, ethashb3.SealHash(header).Bytes(), header.Nonce.Uint64())
 
 			// Datasets are unmapped in a finalizer. Ensure that the dataset stays alive
 			// until after the call to hashimotoFull so it's not unmapped while being used.
@@ -423,16 +423,16 @@ func (ethash *EthashB3) verifySeal(chain consensus.ChainHeaderReader, header *ty
 			fulldag = false
 		}
 	}
-	// If slow-but-light PoW verification was requested (or DAG not yet ready), use an ethash cache
+	// If slow-but-light PoW verification was requested (or DAG not yet ready), use an ethashb3 cache
 	if !fulldag {
-		cache := ethash.cache(number)
-		epochLength := calcEpochLength(number, ethash.config.ECIP1099Block)
+		cache := ethashb3.cache(number)
+		epochLength := calcEpochLength(number)
 		epoch := calcEpoch(number, epochLength)
 		size := datasetSize(epoch)
-		if ethash.config.PowMode == ModeTest {
+		if ethashb3.config.PowMode == ModeTest {
 			size = 32 * 1024
 		}
-		digest, result = hashimotoLight(size, cache.cache, ethash.SealHash(header).Bytes(), header.Nonce.Uint64())
+		digest, result = hashimotoLight(size, cache.cache, ethashb3.SealHash(header).Bytes(), header.Nonce.Uint64())
 
 		// Caches are unmapped in a finalizer. Ensure that the cache stays alive
 		// until after the call to hashimotoLight so it's not unmapped while being used.
@@ -450,30 +450,30 @@ func (ethash *EthashB3) verifySeal(chain consensus.ChainHeaderReader, header *ty
 }
 
 // Prepare implements consensus.Engine, initializing the difficulty field of a
-// header to conform to the ethash protocol. The changes are done inline.
-func (ethash *EthashB3) Prepare(chain consensus.ChainHeaderReader, header *types.Header) error {
+// header to conform to the ethashb3 protocol. The changes are done inline.
+func (ethashb3 *EthashB3) Prepare(chain consensus.ChainHeaderReader, header *types.Header) error {
 	parent := chain.GetHeader(header.ParentHash, header.Number.Uint64()-1)
 	if parent == nil {
 		return consensus.ErrUnknownAncestor
 	}
-	header.Difficulty = ethash.CalcDifficulty(chain, header.Time, parent)
+	header.Difficulty = ethashb3.CalcDifficulty(chain, header.Time, parent)
 	return nil
 }
 
 // Finalize implements consensus.Engine, accumulating the block and uncle rewards.
-func (ethash *EthashB3) Finalize(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB, txs []*types.Transaction, uncles []*types.Header, withdrawals []*types.Withdrawal) {
+func (ethashb3 *EthashB3) Finalize(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB, txs []*types.Transaction, uncles []*types.Header, withdrawals []*types.Withdrawal) {
 	// Accumulate any block and uncle rewards and commit the final state root
 	mutations.AccumulateRewards(chain.Config(), state, header, uncles)
 }
 
 // FinalizeAndAssemble implements consensus.Engine, accumulating the block and
 // uncle rewards, setting the final state and assembling the block.
-func (ethash *EthashB3) FinalizeAndAssemble(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB, txs []*types.Transaction, uncles []*types.Header, receipts []*types.Receipt, withdrawals []*types.Withdrawal) (*types.Block, error) {
+func (ethashb3 *EthashB3) FinalizeAndAssemble(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB, txs []*types.Transaction, uncles []*types.Header, receipts []*types.Receipt, withdrawals []*types.Withdrawal) (*types.Block, error) {
 	if len(withdrawals) > 0 {
 		return nil, errors.New("ethashb3 does not support withdrawals")
 	}
 	// Finalize block
-	ethash.Finalize(chain, header, state, txs, uncles, nil)
+	ethashb3.Finalize(chain, header, state, txs, uncles, nil)
 
 	// Assign the final state root to header.
 	header.Root = state.IntermediateRoot(chain.Config().IsEnabled(chain.Config().GetEIP161dTransition, header.Number))
@@ -483,7 +483,7 @@ func (ethash *EthashB3) FinalizeAndAssemble(chain consensus.ChainHeaderReader, h
 }
 
 // SealHash returns the hash of a block prior to it being sealed.
-func (ethash *EthashB3) SealHash(header *types.Header) (hash common.Hash) {
+func (ethashb3 *EthashB3) SealHash(header *types.Header) (hash common.Hash) {
 	hasher := sha3.NewLegacyKeccak256()
 
 	enc := []interface{}{

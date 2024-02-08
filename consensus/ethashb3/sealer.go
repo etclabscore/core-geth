@@ -39,7 +39,7 @@ import (
 )
 
 const (
-	// staleThreshold is the maximum depth of the acceptable stale but valid ethash solution.
+	// staleThreshold is the maximum depth of the acceptable stale but valid ethashb3 solution.
 	staleThreshold = 7
 )
 
@@ -48,16 +48,16 @@ var (
 	errInvalidSealResult = errors.New("invalid or stale proof-of-work solution")
 )
 
-// makePoissonFakeDelay uses the ethash.threads value as a mean time (lambda)
+// makePoissonFakeDelay uses the ethashb3.threads value as a mean time (lambda)
 // for a Poisson distribution, returning a random value from
 // that discrete function. I think a Poisson distribution probably
 // fairly accurately models real world block times.
-// Note that this is a hacky way to use ethash.threads since
+// Note that this is a hacky way to use ethashb3.threads since
 // lower values will yield faster blocks, but it saves having
 // to add or modify any more code than necessary.
-func (ethash *EthashB3) makePoissonFakeDelay() float64 {
+func (ethashb3 *EthashB3) makePoissonFakeDelay() float64 {
 	p := distuv.Poisson{
-		Lambda: float64(ethash.Threads()),
+		Lambda: float64(ethashb3.Threads()),
 		Src:    exprand.NewSource(uint64(time.Now().UnixNano())),
 	}
 	return p.Rand()
@@ -65,18 +65,18 @@ func (ethash *EthashB3) makePoissonFakeDelay() float64 {
 
 // Seal implements consensus.Engine, attempting to find a nonce that satisfies
 // the block's difficulty requirements.
-func (ethash *EthashB3) Seal(chain consensus.ChainHeaderReader, block *types.Block, results chan<- *types.Block, stop <-chan struct{}) error {
+func (ethashb3 *EthashB3) Seal(chain consensus.ChainHeaderReader, block *types.Block, results chan<- *types.Block, stop <-chan struct{}) error {
 	// If we're running a fake PoW, simply return a 0 nonce immediately
-	if ethash.config.PowMode == ModeFake || ethash.config.PowMode == ModeFullFake {
+	if ethashb3.config.PowMode == ModeFake || ethashb3.config.PowMode == ModeFullFake {
 		header := block.Header()
 		header.Nonce, header.MixDigest = types.BlockNonce{}, common.Hash{}
 		select {
 		case results <- block.WithSeal(header):
 		default:
-			ethash.config.Log.Warn("Sealing result is not read by miner", "mode", "fake", "sealhash", ethash.SealHash(block.Header()))
+			ethashb3.config.Log.Warn("Sealing result is not read by miner", "mode", "fake", "sealhash", ethashb3.SealHash(block.Header()))
 		}
 		return nil
-	} else if ethash.config.PowMode == ModePoissonFake {
+	} else if ethashb3.config.PowMode == ModePoissonFake {
 		go func(header *types.Header) {
 			// Assign random (but non-zero) values to header nonce and mix.
 			header.Nonce = types.EncodeNonce(uint64(rand.Int63n(math.MaxInt64)))
@@ -84,46 +84,46 @@ func (ethash *EthashB3) Seal(chain consensus.ChainHeaderReader, block *types.Blo
 			header.MixDigest = common.BytesToHash(b)
 
 			// Wait some amount of time.
-			timeout := time.NewTimer(time.Duration(ethash.makePoissonFakeDelay()) * time.Second)
+			timeout := time.NewTimer(time.Duration(ethashb3.makePoissonFakeDelay()) * time.Second)
 			defer timeout.Stop()
 
 			select {
 			case <-stop:
 				return
-			case <-ethash.update:
+			case <-ethashb3.update:
 				timeout.Stop()
-				if err := ethash.Seal(chain, block, results, stop); err != nil {
-					ethash.config.Log.Error("Failed to restart sealing after update", "err", err)
+				if err := ethashb3.Seal(chain, block, results, stop); err != nil {
+					ethashb3.config.Log.Error("Failed to restart sealing after update", "err", err)
 				}
 			case <-timeout.C:
 				// Send the results when the timeout expires.
 				select {
 				case results <- block.WithSeal(header):
 				default:
-					ethash.config.Log.Warn("Sealing result is not read by miner", "mode", "fake", "sealhash", ethash.SealHash(block.Header()))
+					ethashb3.config.Log.Warn("Sealing result is not read by miner", "mode", "fake", "sealhash", ethashb3.SealHash(block.Header()))
 				}
 			}
 		}(block.Header())
 		return nil
 	}
 	// If we're running a shared PoW, delegate sealing to it
-	if ethash.shared != nil {
-		return ethash.shared.Seal(chain, block, results, stop)
+	if ethashb3.shared != nil {
+		return ethashb3.shared.Seal(chain, block, results, stop)
 	}
 	// Create a runner and the multiple search threads it directs
 	abort := make(chan struct{})
 
-	ethash.lock.Lock()
-	threads := ethash.threads
-	if ethash.rand == nil {
+	ethashb3.lock.Lock()
+	threads := ethashb3.threads
+	if ethashb3.rand == nil {
 		seed, err := crand.Int(crand.Reader, big.NewInt(math.MaxInt64))
 		if err != nil {
-			ethash.lock.Unlock()
+			ethashb3.lock.Unlock()
 			return err
 		}
-		ethash.rand = rand.New(rand.NewSource(seed.Int64()))
+		ethashb3.rand = rand.New(rand.NewSource(seed.Int64()))
 	}
-	ethash.lock.Unlock()
+	ethashb3.lock.Unlock()
 	if threads == 0 {
 		threads = runtime.NumCPU()
 	}
@@ -131,8 +131,8 @@ func (ethash *EthashB3) Seal(chain consensus.ChainHeaderReader, block *types.Blo
 		threads = 0 // Allows disabling local mining without extra logic around local/remote
 	}
 	// Push new work to remote sealer
-	if ethash.remote != nil {
-		ethash.remote.workCh <- &sealTask{block: block, results: results}
+	if ethashb3.remote != nil {
+		ethashb3.remote.workCh <- &sealTask{block: block, results: results}
 	}
 	var (
 		pend   sync.WaitGroup
@@ -142,8 +142,8 @@ func (ethash *EthashB3) Seal(chain consensus.ChainHeaderReader, block *types.Blo
 		pend.Add(1)
 		go func(id int, nonce uint64) {
 			defer pend.Done()
-			ethash.mine(block, id, nonce, abort, locals)
-		}(i, uint64(ethash.rand.Int63()))
+			ethashb3.mine(block, id, nonce, abort, locals)
+		}(i, uint64(ethashb3.rand.Int63()))
 	}
 	// Wait until sealing is terminated or a nonce is found
 	go func() {
@@ -157,14 +157,14 @@ func (ethash *EthashB3) Seal(chain consensus.ChainHeaderReader, block *types.Blo
 			select {
 			case results <- result:
 			default:
-				ethash.config.Log.Warn("Sealing result is not read by miner", "mode", "local", "sealhash", ethash.SealHash(block.Header()))
+				ethashb3.config.Log.Warn("Sealing result is not read by miner", "mode", "local", "sealhash", ethashb3.SealHash(block.Header()))
 			}
 			close(abort)
-		case <-ethash.update:
+		case <-ethashb3.update:
 			// Thread count was changed on user request, restart
 			close(abort)
-			if err := ethash.Seal(chain, block, results, stop); err != nil {
-				ethash.config.Log.Error("Failed to restart sealing after update", "err", err)
+			if err := ethashb3.Seal(chain, block, results, stop); err != nil {
+				ethashb3.config.Log.Error("Failed to restart sealing after update", "err", err)
 			}
 		}
 		// Wait for all miners to terminate and return the block
@@ -175,14 +175,14 @@ func (ethash *EthashB3) Seal(chain consensus.ChainHeaderReader, block *types.Blo
 
 // mine is the actual proof-of-work miner that searches for a nonce starting from
 // seed that results in correct final block difficulty.
-func (ethash *EthashB3) mine(block *types.Block, id int, seed uint64, abort chan struct{}, found chan *types.Block) {
+func (ethashb3 *EthashB3) mine(block *types.Block, id int, seed uint64, abort chan struct{}, found chan *types.Block) {
 	// Extract some data from the header
 	var (
 		header  = block.Header()
-		hash    = ethash.SealHash(header).Bytes()
+		hash    = ethashb3.SealHash(header).Bytes()
 		target  = new(big.Int).Div(two256, header.Difficulty)
 		number  = header.Number.Uint64()
-		dataset = ethash.dataset(number, false)
+		dataset = ethashb3.dataset(number, false)
 	)
 	// Start generating random nonces until we abort or find a good one
 	var (
@@ -190,22 +190,22 @@ func (ethash *EthashB3) mine(block *types.Block, id int, seed uint64, abort chan
 		nonce     = seed
 		powBuffer = new(big.Int)
 	)
-	logger := ethash.config.Log.New("miner", id)
-	logger.Trace("Started ethash search for new nonces", "seed", seed)
+	logger := ethashb3.config.Log.New("miner", id)
+	logger.Trace("Started ethashb3 search for new nonces", "seed", seed)
 search:
 	for {
 		select {
 		case <-abort:
 			// Mining terminated, update stats and abort
 			logger.Trace("EthashB3 nonce search aborted", "attempts", nonce-seed)
-			ethash.hashrate.Mark(attempts)
+			ethashb3.hashrate.Mark(attempts)
 			break search
 
 		default:
 			// We don't have to update hash rate on every nonce, so update after after 2^X nonces
 			attempts++
 			if (attempts % (1 << 15)) == 0 {
-				ethash.hashrate.Mark(attempts)
+				ethashb3.hashrate.Mark(attempts)
 				attempts = 0
 			}
 			// Compute the PoW value of this nonce
@@ -392,7 +392,7 @@ func (s *remoteSealer) loop() {
 //	result[3], hex encoded block number
 func (s *remoteSealer) makeWork(block *types.Block) {
 	hash := s.ethash.SealHash(block.Header())
-	epochLength := calcEpochLength(block.NumberU64(), s.ethash.config.ECIP1099Block)
+	epochLength := calcEpochLength(block.NumberU64())
 	epoch := calcEpoch(block.NumberU64(), epochLength)
 	s.currentWork[0] = hash.Hex()
 	s.currentWork[1] = common.BytesToHash(SeedHash(epoch, epochLength)).Hex()

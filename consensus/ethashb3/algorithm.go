@@ -35,28 +35,22 @@ import (
 )
 
 const (
-	datasetInitBytes    = 1 << 30 // Bytes in dataset at genesis
-	datasetGrowthBytes  = 1 << 23 // Dataset growth per epoch
-	cacheInitBytes      = 1 << 24 // Bytes in cache at genesis
-	cacheGrowthBytes    = 1 << 17 // Cache growth per epoch
-	epochLengthDefault  = 32000   // Default epoch length (blocks per epoch)
-	epochLengthECIP1099 = 60000   // Blocks per epoch if ECIP-1099 is activated
-	mixBytes            = 128     // Width of mix
-	hashBytes           = 64      // Hash length in bytes
-	hashWords           = 16      // Number of 32 bit ints in a hash
-	datasetParents      = 256     // Number of parents of each dataset element
-	cacheRounds         = 3       // Number of rounds in cache production
-	loopAccesses        = 64      // Number of accesses in hashimoto loop
-	maxEpoch            = 2048    // Max Epoch for included tables
+	datasetInitBytes   = 1 << 30 // Bytes in dataset at genesis
+	datasetGrowthBytes = 1 << 23 // Dataset growth per epoch
+	cacheInitBytes     = 1 << 24 // Bytes in cache at genesis
+	cacheGrowthBytes   = 1 << 17 // Cache growth per epoch
+	epochLengthDefault = 32000   // Default epoch length (blocks per epoch)
+	mixBytes           = 128     // Width of mix
+	hashBytes          = 64      // Hash length in bytes
+	hashWords          = 16      // Number of 32 bit ints in a hash
+	datasetParents     = 256     // Number of parents of each dataset element
+	cacheRounds        = 3       // Number of rounds in cache production
+	loopAccesses       = 64      // Number of accesses in hashimoto loop
+	maxEpoch           = 2048    // Max Epoch for included tables
 )
 
-// calcEpochLength returns the epoch length for a given block number (ECIP-1099)
-func calcEpochLength(block uint64, ecip1099FBlock *uint64) uint64 {
-	if ecip1099FBlock != nil {
-		if block >= *ecip1099FBlock {
-			return epochLengthECIP1099
-		}
-	}
+// calcEpochLength returns the epoch length, block number isnt used on Hypra
+func calcEpochLength(_ uint64) uint64 {
 	return epochLengthDefault
 }
 
@@ -71,7 +65,7 @@ func calcEpochBlock(epoch uint64, epochLength uint64) uint64 {
 	return epoch*epochLength + 1
 }
 
-// cacheSize returns the size of the ethash verification cache that belongs to a certain
+// cacheSize returns the size of the ethashb3 verification cache that belongs to a certain
 // block number.
 func cacheSize(epoch uint64) uint64 {
 	if epoch < maxEpoch {
@@ -91,7 +85,7 @@ func calcCacheSize(epoch uint64) uint64 {
 	return size
 }
 
-// datasetSize returns the size of the ethash mining dataset that belongs to a certain
+// datasetSize returns the size of the ethashb3 mining dataset that belongs to a certain
 // block number.
 func datasetSize(epoch uint64) uint64 {
 	if epoch < maxEpoch {
@@ -249,7 +243,7 @@ func fnv(a, b uint32) uint32 {
 	return a*0x01000193 ^ b
 }
 
-// fnvHash mixes in data into mix using the ethash fnv method.
+// fnvHash mixes in data into mix using the ethashb3 fnv method.
 func fnvHash(mix []uint32, data []uint32) {
 	for i := 0; i < len(mix); i++ {
 		mix[i] = mix[i]*0x01000193 ^ data[i]
@@ -289,7 +283,7 @@ func generateDatasetItem(cache []uint32, index uint32, keccak512 hasher) []byte 
 	return mix
 }
 
-// generateDataset generates the entire ethash dataset for mining.
+// generateDataset generates the entire ethashb3 dataset for mining.
 // This method places the result into dest in machine byte order.
 func generateDataset(dest []uint32, epoch uint64, epochLength uint64, cache []uint32) {
 	// Print some debug logs to allow analysis on low end devices
@@ -431,7 +425,7 @@ func hashimotoFull(dataset []uint32, hash []byte, nonce uint64) ([]byte, []byte)
 	return hashimoto(hash, nonce, uint64(len(dataset))*4, lookup)
 }
 
-// datasetSizes is a lookup table for the ethash dataset size for the first 2048
+// datasetSizes is a lookup table for the ethashb3 dataset size for the first 2048
 // epochs (i.e. 61440000 blocks).
 var datasetSizes = [maxEpoch]uint64{
 	1073739904, 1082130304, 1090514816, 1098906752, 1107293056,
@@ -845,7 +839,7 @@ var datasetSizes = [maxEpoch]uint64{
 	18186498944, 18194886784, 18203275648, 18211666048, 18220048768,
 	18228444544, 18236833408, 18245220736}
 
-// cacheSizes is a lookup table for the ethash verification cache size for the
+// cacheSizes is a lookup table for the ethashb3 verification cache size for the
 // first 2048 epochs (i.e. 61440000 blocks).
 var cacheSizes = [maxEpoch]uint64{
 	16776896, 16907456, 17039296, 17170112, 17301056, 17432512, 17563072,

@@ -234,7 +234,7 @@ func newlru[T cacheOrDataset](maxItems int, new func(epoch uint64, epochLength u
 // get retrieves or creates an item for the given epoch. The first return value is always
 // non-nil. The second return value is non-nil if lru thinks that an item will be useful in
 // the near future.
-func (lru *lru[T]) get(epoch uint64, epochLength uint64, ecip1099FBlock *uint64) (item, future T) {
+func (lru *lru[T]) get(epoch uint64, epochLength uint64) (item, future T) {
 	lru.mu.Lock()
 	defer lru.mu.Unlock()
 
@@ -257,16 +257,6 @@ func (lru *lru[T]) get(epoch uint64, epochLength uint64, ecip1099FBlock *uint64)
 	// Ensure pre-generation handles ecip-1099 changeover correctly
 	var nextEpoch = epoch + 1
 	var nextEpochLength = epochLength
-	if ecip1099FBlock != nil {
-		nextEpochBlock := nextEpoch * epochLength
-		// Note that == demands that the ECIP1099 activation block is situated
-		// at the beginning of an epoch.
-		// https://github.com/ethereumclassic/ECIPs/blob/master/_specs/ecip-1099.md#implementation
-		if nextEpochBlock == *ecip1099FBlock && epochLength == epochLengthDefault {
-			nextEpoch = nextEpoch / 2
-			nextEpochLength = epochLengthECIP1099
-		}
-	}
 
 	// Update the 'future item' if epoch is larger than previously seen.
 	// Last conditional clause ('lru.future > nextEpoch') handles the ECIP1099 case where
@@ -280,7 +270,7 @@ func (lru *lru[T]) get(epoch uint64, epochLength uint64, ecip1099FBlock *uint64)
 	return item, future
 }
 
-// cache wraps an ethash cache with some metadata to allow easier concurrent use.
+// cache wraps an ethashb3 cache with some metadata to allow easier concurrent use.
 type cache struct {
 	epoch       uint64    // Epoch for which this cache is relevant
 	epochLength uint64    // Epoch length (ECIP-1099)
@@ -290,7 +280,7 @@ type cache struct {
 	once        sync.Once // Ensures the cache is generated only once
 }
 
-// newCache creates a new ethash verification cache.
+// newCache creates a new ethashb3 verification cache.
 func newCache(epoch uint64, epochLength uint64) *cache {
 	return &cache{epoch: epoch, epochLength: epochLength}
 }
@@ -384,7 +374,7 @@ func (c *cache) finalizer() {
 	}
 }
 
-// dataset wraps an ethash dataset with some metadata to allow easier concurrent use.
+// dataset wraps an ethashb3 dataset with some metadata to allow easier concurrent use.
 type dataset struct {
 	epoch       uint64      // Epoch for which this cache is relevant
 	epochLength uint64      // Epoch length (ECIP-1099)
@@ -395,7 +385,7 @@ type dataset struct {
 	done        atomic.Bool // Atomic flag to determine generation status
 }
 
-// newDataset creates a new ethash mining dataset and returns it as a plain Go
+// newDataset creates a new ethashb3 mining dataset and returns it as a plain Go
 // interface to be usable in an LRU cache.
 func newDataset(epoch uint64, epochLength uint64) *dataset {
 	return &dataset{epoch: epoch, epochLength: epochLength}
@@ -469,7 +459,7 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 				if _, err := fmt.Sscanf(filepath.Base(file), "full-R%d-%s"+endian, &ar, &s); err == nil {
 					// This file matches the previous generation naming pattern (sans epoch).
 					if err := os.Remove(file); err != nil {
-						logger.Error("Failed to remove legacy ethash full file", "file", file, "err", err)
+						logger.Error("Failed to remove legacy ethashb3 full file", "file", file, "err", err)
 					} else {
 						logger.Warn("Deleted legacy ethashb3 full file", "path", file)
 					}
@@ -481,7 +471,7 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 				if err := os.Remove(file); err == nil {
 					logger.Debug("Deleted ethashb3 full file", "target.epoch", e, "file", file)
 				} else {
-					logger.Error("Failed to delete ethash full file", "target.epoch", e, "file", file, "err", err)
+					logger.Error("Failed to delete ethashb3 full file", "target.epoch", e, "file", file, "err", err)
 				}
 			}
 		}
@@ -504,21 +494,21 @@ func (d *dataset) finalizer() {
 	}
 }
 
-// MakeCache generates a new ethash cache and optionally stores it to disk.
+// MakeCache generates a new ethashb3 cache and optionally stores it to disk.
 func MakeCache(block uint64, epochLength uint64, dir string) {
 	epoch := calcEpoch(block, epochLength)
 	c := cache{epoch: epoch, epochLength: epochLength}
 	c.generate(dir, math.MaxInt32, false, false)
 }
 
-// MakeDataset generates a new ethash dataset and optionally stores it to disk.
+// MakeDataset generates a new ethashb3 dataset and optionally stores it to disk.
 func MakeDataset(block uint64, epochLength uint64, dir string) {
 	epoch := calcEpoch(block, epochLength)
 	d := dataset{epoch: epoch, epochLength: epochLength}
 	d.generate(dir, math.MaxInt32, false, false)
 }
 
-// Mode defines the type and amount of PoW verification an ethash engine makes.
+// Mode defines the type and amount of PoW verification an ethashb3 engine makes.
 type Mode uint
 
 const (
@@ -548,7 +538,7 @@ func (m Mode) String() string {
 	return "unknown"
 }
 
-// Config are the configuration parameters of the ethash.
+// Config are the configuration parameters of the ethashb3.
 type Config struct {
 	CacheDir         string
 	CachesInMem      int
@@ -569,7 +559,7 @@ type Config struct {
 	ECIP1099Block *uint64 `toml:"-"`
 }
 
-// EthashB3 is a consensus engine based on proof-of-work implementing the ethash
+// EthashB3 is a consensus engine based on proof-of-work implementing the ethashb3
 // algorithm.
 type EthashB3 struct {
 	config Config
@@ -593,7 +583,7 @@ type EthashB3 struct {
 	closeOnce sync.Once  // Ensures exit channel will not be closed twice.
 }
 
-// New creates a full sized ethash PoW scheme and starts a background thread for
+// New creates a full sized ethashb3 PoW scheme and starts a background thread for
 // remote mining, also optionally notifying a batch of remote services of new work
 // packages.
 func New(config Config, notify []string, noverify bool) *EthashB3 {
@@ -605,10 +595,10 @@ func New(config Config, notify []string, noverify bool) *EthashB3 {
 		config.CachesInMem = 1
 	}
 	if config.CacheDir != "" && config.CachesOnDisk > 0 {
-		config.Log.Info("Disk storage enabled for ethash caches", "dir", config.CacheDir, "count", config.CachesOnDisk)
+		config.Log.Info("Disk storage enabled for ethashb3 caches", "dir", config.CacheDir, "count", config.CachesOnDisk)
 	}
 	if config.DatasetDir != "" && config.DatasetsOnDisk > 0 {
-		config.Log.Info("Disk storage enabled for ethash DAGs", "dir", config.DatasetDir, "count", config.DatasetsOnDisk)
+		config.Log.Info("Disk storage enabled for ethashb3 DAGs", "dir", config.DatasetDir, "count", config.DatasetsOnDisk)
 	}
 	ethash := &EthashB3{
 		config:   config,
@@ -624,13 +614,13 @@ func New(config Config, notify []string, noverify bool) *EthashB3 {
 	return ethash
 }
 
-// NewTester creates a small sized ethash PoW scheme useful only for testing
+// NewTester creates a small sized ethashb3 PoW scheme useful only for testing
 // purposes.
 func NewTester(notify []string, noverify bool) *EthashB3 {
 	return New(Config{PowMode: ModeTest}, notify, noverify)
 }
 
-// NewFaker creates a ethash consensus engine with a fake PoW scheme that accepts
+// NewFaker creates a ethashb3 consensus engine with a fake PoW scheme that accepts
 // all blocks' seal as valid, though they still have to conform to the Ethereum
 // consensus rules.
 func NewFaker() *EthashB3 {
@@ -642,7 +632,7 @@ func NewFaker() *EthashB3 {
 	}
 }
 
-// NewFakeFailer creates a ethash consensus engine with a fake PoW scheme that
+// NewFakeFailer creates a ethashb3 consensus engine with a fake PoW scheme that
 // accepts all blocks as valid apart from the single one specified, though they
 // still have to conform to the Ethereum consensus rules.
 func NewFakeFailer(fail uint64) *EthashB3 {
@@ -655,7 +645,7 @@ func NewFakeFailer(fail uint64) *EthashB3 {
 	}
 }
 
-// NewFakeDelayer creates a ethash consensus engine with a fake PoW scheme that
+// NewFakeDelayer creates a ethashb3 consensus engine with a fake PoW scheme that
 // accepts all blocks as valid, but delays verifications by some time, though
 // they still have to conform to the Ethereum consensus rules.
 func NewFakeDelayer(delay time.Duration) *EthashB3 {
@@ -668,7 +658,7 @@ func NewFakeDelayer(delay time.Duration) *EthashB3 {
 	}
 }
 
-// NewPoissonFaker creates a ethash consensus engine with a fake PoW scheme that
+// NewPoissonFaker creates a ethashb3 consensus engine with a fake PoW scheme that
 // accepts all blocks as valid, but delays mining by some time based on miner.threads, though
 // they still have to conform to the Ethereum consensus rules.
 func NewPoissonFaker() *EthashB3 {
@@ -680,7 +670,7 @@ func NewPoissonFaker() *EthashB3 {
 	}
 }
 
-// NewFullFaker creates an ethash consensus engine with a full fake scheme that
+// NewFullFaker creates an ethashb3 consensus engine with a full fake scheme that
 // accepts all blocks as valid, without checking any consensus rules whatsoever.
 func NewFullFaker() *EthashB3 {
 	return &EthashB3{
@@ -691,26 +681,26 @@ func NewFullFaker() *EthashB3 {
 	}
 }
 
-// NewShared creates a full sized ethash PoW shared between all requesters running
+// NewShared creates a full sized ethashb3 PoW shared between all requesters running
 // in the same process.
 func NewShared() *EthashB3 {
 	return &EthashB3{shared: sharedEthash}
 }
 
 // Close closes the exit channel to notify all backend threads exiting.
-func (ethash *EthashB3) Close() error {
-	return ethash.StopRemoteSealer()
+func (ethashb3 *EthashB3) Close() error {
+	return ethashb3.StopRemoteSealer()
 }
 
 // StopRemoteSealer stops the remote sealer
-func (ethash *EthashB3) StopRemoteSealer() error {
-	ethash.closeOnce.Do(func() {
+func (ethashb3 *EthashB3) StopRemoteSealer() error {
+	ethashb3.closeOnce.Do(func() {
 		// Short circuit if the exit channel is not allocated.
-		if ethash.remote == nil {
+		if ethashb3.remote == nil {
 			return
 		}
-		close(ethash.remote.requestExit)
-		<-ethash.remote.exitCh
+		close(ethashb3.remote.requestExit)
+		<-ethashb3.remote.exitCh
 	})
 	return nil
 }
@@ -718,17 +708,17 @@ func (ethash *EthashB3) StopRemoteSealer() error {
 // cache tries to retrieve a verification cache for the specified block number
 // by first checking against a list of in-memory caches, then against caches
 // stored on disk, and finally generating one if none can be found.
-func (ethash *EthashB3) cache(block uint64) *cache {
-	epochLength := calcEpochLength(block, ethash.config.ECIP1099Block)
+func (ethashb3 *EthashB3) cache(block uint64) *cache {
+	epochLength := calcEpochLength(block)
 	epoch := calcEpoch(block, epochLength)
-	current, future := ethash.caches.get(epoch, epochLength, ethash.config.ECIP1099Block)
+	current, future := ethashb3.caches.get(epoch, epochLength)
 
 	// Wait for generation finish.
-	current.generate(ethash.config.CacheDir, ethash.config.CachesOnDisk, ethash.config.CachesLockMmap, ethash.config.PowMode == ModeTest)
+	current.generate(ethashb3.config.CacheDir, ethashb3.config.CachesOnDisk, ethashb3.config.CachesLockMmap, ethashb3.config.PowMode == ModeTest)
 
 	// If we need a new future cache, now's a good time to regenerate it.
 	if future != nil {
-		go future.generate(ethash.config.CacheDir, ethash.config.CachesOnDisk, ethash.config.CachesLockMmap, ethash.config.PowMode == ModeTest)
+		go future.generate(ethashb3.config.CacheDir, ethashb3.config.CachesOnDisk, ethashb3.config.CachesLockMmap, ethashb3.config.PowMode == ModeTest)
 	}
 	return current
 }
@@ -739,30 +729,25 @@ func (ethash *EthashB3) cache(block uint64) *cache {
 //
 // If async is specified, not only the future but the current DAG is also
 // generates on a background thread.
-func (ethash *EthashB3) dataset(block uint64, async bool) *dataset {
-	// Retrieve the requested ethash dataset
-	epochLength := calcEpochLength(block, ethash.config.ECIP1099Block)
+func (ethashb3 *EthashB3) dataset(block uint64, async bool) *dataset {
+	// Retrieve the requested ethashb3 dataset
+	epochLength := calcEpochLength(block)
 	epoch := calcEpoch(block, epochLength)
-	current, future := ethash.datasets.get(epoch, epochLength, ethash.config.ECIP1099Block)
-
-	// set async false if ecip-1099 transition in case of regeneratiion bad DAG on disk
-	if epochLength == epochLengthECIP1099 && (epoch == 42 || epoch == 195) {
-		async = false
-	}
+	current, future := ethashb3.datasets.get(epoch, epochLength)
 
 	// If async is specified, generate everything in a background thread
 	if async && !current.generated() {
 		go func() {
-			current.generate(ethash.config.DatasetDir, ethash.config.DatasetsOnDisk, ethash.config.DatasetsLockMmap, ethash.config.PowMode == ModeTest)
+			current.generate(ethashb3.config.DatasetDir, ethashb3.config.DatasetsOnDisk, ethashb3.config.DatasetsLockMmap, ethashb3.config.PowMode == ModeTest)
 			if future != nil {
-				future.generate(ethash.config.DatasetDir, ethash.config.DatasetsOnDisk, ethash.config.DatasetsLockMmap, ethash.config.PowMode == ModeTest)
+				future.generate(ethashb3.config.DatasetDir, ethashb3.config.DatasetsOnDisk, ethashb3.config.DatasetsLockMmap, ethashb3.config.PowMode == ModeTest)
 			}
 		}()
 	} else {
 		// Either blocking generation was requested, or already done
-		current.generate(ethash.config.DatasetDir, ethash.config.DatasetsOnDisk, ethash.config.DatasetsLockMmap, ethash.config.PowMode == ModeTest)
+		current.generate(ethashb3.config.DatasetDir, ethashb3.config.DatasetsOnDisk, ethashb3.config.DatasetsLockMmap, ethashb3.config.PowMode == ModeTest)
 		if future != nil {
-			go future.generate(ethash.config.DatasetDir, ethash.config.DatasetsOnDisk, ethash.config.DatasetsLockMmap, ethash.config.PowMode == ModeTest)
+			go future.generate(ethashb3.config.DatasetDir, ethashb3.config.DatasetsOnDisk, ethashb3.config.DatasetsLockMmap, ethashb3.config.PowMode == ModeTest)
 		}
 	}
 	return current
@@ -770,11 +755,11 @@ func (ethash *EthashB3) dataset(block uint64, async bool) *dataset {
 
 // Threads returns the number of mining threads currently enabled. This doesn't
 // necessarily mean that mining is running!
-func (ethash *EthashB3) Threads() int {
-	ethash.lock.Lock()
-	defer ethash.lock.Unlock()
+func (ethashb3 *EthashB3) Threads() int {
+	ethashb3.lock.Lock()
+	defer ethashb3.lock.Unlock()
 
-	return ethash.threads
+	return ethashb3.threads
 }
 
 // SetThreads updates the number of mining threads currently enabled. Calling
@@ -782,19 +767,19 @@ func (ethash *EthashB3) Threads() int {
 // specified, the miner will use all cores of the machine. Setting a thread
 // count below zero is allowed and will cause the miner to idle, without any
 // work being done.
-func (ethash *EthashB3) SetThreads(threads int) {
-	ethash.lock.Lock()
-	defer ethash.lock.Unlock()
+func (ethashb3 *EthashB3) SetThreads(threads int) {
+	ethashb3.lock.Lock()
+	defer ethashb3.lock.Unlock()
 
 	// If we're running a shared PoW, set the thread count on that instead
-	if ethash.shared != nil {
-		ethash.shared.SetThreads(threads)
+	if ethashb3.shared != nil {
+		ethashb3.shared.SetThreads(threads)
 		return
 	}
 	// Update the threads and ping any running seal to pull in any changes
-	ethash.threads = threads
+	ethashb3.threads = threads
 	select {
-	case ethash.update <- struct{}{}:
+	case ethashb3.update <- struct{}{}:
 	default:
 	}
 }
@@ -803,36 +788,36 @@ func (ethash *EthashB3) SetThreads(threads int) {
 // per second over the last minute.
 // Note the returned hashrate includes local hashrate, but also includes the total
 // hashrate of all remote miner.
-func (ethash *EthashB3) Hashrate() float64 {
-	// Short circuit if we are run the ethash in normal/test mode.
-	if ethash.config.PowMode != ModeNormal && ethash.config.PowMode != ModeTest {
-		return ethash.hashrate.Rate1()
+func (ethashb3 *EthashB3) Hashrate() float64 {
+	// Short circuit if we are run the ethashb3 in normal/test mode.
+	if ethashb3.config.PowMode != ModeNormal && ethashb3.config.PowMode != ModeTest {
+		return ethashb3.hashrate.Rate1()
 	}
 	var res = make(chan uint64, 1)
 
 	select {
-	case ethash.remote.fetchRateCh <- res:
-	case <-ethash.remote.exitCh:
-		// Return local hashrate only if ethash is stopped.
-		return ethash.hashrate.Rate1()
+	case ethashb3.remote.fetchRateCh <- res:
+	case <-ethashb3.remote.exitCh:
+		// Return local hashrate only if ethashb3 is stopped.
+		return ethashb3.hashrate.Rate1()
 	}
 
 	// Gather total submitted hash rate of remote sealers.
-	return ethash.hashrate.Rate1() + float64(<-res)
+	return ethashb3.hashrate.Rate1() + float64(<-res)
 }
 
 // APIs implements consensus.Engine, returning the user facing RPC APIs.
-func (ethash *EthashB3) APIs(chain consensus.ChainHeaderReader) []rpc.API {
-	// In order to ensure backward compatibility, we exposes ethash RPC APIs
-	// to both eth and ethash namespaces.
+func (ethashb3 *EthashB3) APIs(chain consensus.ChainHeaderReader) []rpc.API {
+	// In order to ensure backward compatibility, we exposes ethashb3 RPC APIs
+	// to both eth and ethashb3 namespaces.
 	return []rpc.API{
 		{
 			Namespace: "eth",
-			Service:   &API{ethash},
+			Service:   &API{ethashb3},
 		},
 		{
 			Namespace: "ethashb3",
-			Service:   &API{ethash},
+			Service:   &API{ethashb3},
 		},
 	}
 }
@@ -844,8 +829,8 @@ func SeedHash(epoch uint64, epochLength uint64) []byte {
 }
 
 // CalcEpochLength returns the epoch length for a given block number (ECIP-1099)
-func CalcEpochLength(block uint64, ecip1099FBlock *uint64) uint64 {
-	return calcEpochLength(block, ecip1099FBlock)
+func CalcEpochLength(block uint64) uint64 {
+	return calcEpochLength(block)
 }
 
 // CalcEpoch returns the epoch for a given block number (ECIP-1099)

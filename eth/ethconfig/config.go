@@ -76,6 +76,15 @@ var Defaults = Config{
 		DatasetsOnDisk:   2,
 		DatasetsLockMmap: false,
 	},
+	EthashB3: ethashb3.Config{
+		CacheDir:         "ethashb3",
+		CachesInMem:      2,
+		CachesOnDisk:     3,
+		CachesLockMmap:   false,
+		DatasetsInMem:    1,
+		DatasetsOnDisk:   2,
+		DatasetsLockMmap: false,
+	},
 	NetworkId:          vars.DefaultNetworkID,
 	ProtocolVersions:   vars.DefaultProtocolVersions,
 	TxLookupLimit:      2350000,
@@ -105,15 +114,19 @@ func init() {
 	}
 	if runtime.GOOS == "darwin" {
 		Defaults.Ethash.DatasetDir = filepath.Join(home, "Library", "Ethash")
+		Defaults.Ethash.DatasetDir = filepath.Join(home, "Library", "EthashB3")
 	} else if runtime.GOOS == "windows" {
 		localappdata := os.Getenv("LOCALAPPDATA")
 		if localappdata != "" {
 			Defaults.Ethash.DatasetDir = filepath.Join(localappdata, "Ethash")
+			Defaults.Ethash.DatasetDir = filepath.Join(localappdata, "EthashB3")
 		} else {
 			Defaults.Ethash.DatasetDir = filepath.Join(home, "AppData", "Local", "Ethash")
+			Defaults.Ethash.DatasetDir = filepath.Join(home, "AppData", "Local", "EthashB3")
 		}
 	} else {
 		Defaults.Ethash.DatasetDir = filepath.Join(home, ".ethash")
+		Defaults.Ethash.DatasetDir = filepath.Join(home, ".ethashb3")
 	}
 }
 

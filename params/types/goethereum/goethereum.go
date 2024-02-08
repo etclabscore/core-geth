@@ -87,6 +87,7 @@ type ChainConfig struct {
 
 	// Various consensus engines
 	Ethash    *ctypes.EthashConfig `json:"ethash,omitempty"`
+	EthashB3  *ctypes.EthashConfig `json:"ethashb3,omitempty"`
 	Clique    *ctypes.CliqueConfig `json:"clique,omitempty"`
 	Lyra2     *ctypes.Lyra2Config  `json:"lyra2,omitempty"`
 	IsDevMode bool                 `json:"isDev,omitempty"`

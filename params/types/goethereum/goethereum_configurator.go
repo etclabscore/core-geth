@@ -1156,3 +1156,11 @@ func (c *ChainConfig) SetLyra2NonceTransition(n *uint64) error {
 
 	return nil
 }
+
+func (c *ChainConfig) GetHIPVeldinTransition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetHIPVeldinTransition(n *uint64) error {
+	return ctypes.ErrUnsupportedConfigNoop
+}

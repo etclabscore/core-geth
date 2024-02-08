@@ -24,6 +24,9 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"github.com/ethereum/go-ethereum/consensus"
+	"github.com/ethereum/go-ethereum/consensus/ethashb3"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"math"
 	"math/big"
 	"net"
@@ -2544,30 +2547,9 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readonly bool) (*core.BlockCh
 		gspec   = MakeGenesis(ctx)
 		chainDb = MakeChainDatabase(ctx, stack, readonly)
 	)
-	cliqueConfig, err := core.LoadCliqueConfig(chainDb, gspec)
-	if err != nil {
-		Fatalf("%v", err)
-	}
-	ethashConfig := ethconfig.Defaults.Ethash
 
-	// ETC-specific configuration: ECIP1099 modifies the original Ethash algo, doubling the epoch size.
-	if gspec != nil && gspec.Config != nil {
-		ethashConfig.ECIP1099Block = gspec.GetEthashECIP1099Transition() // This will panic if the genesis config field is not nil.
-	}
+	engine := CreateConsensusEngine(ctx, stack, gspec, chainDb)
 
-	var lyra2Config *lyra2.Config
-	if ctx.Bool(MintMeFlag.Name) {
-		lyra2Config = &lyra2.Config{}
-	}
-
-	// Toggle PoW modes at user request.
-	if ctx.Bool(FakePoWFlag.Name) {
-		ethashConfig.PowMode = ethash.ModeFake
-	} else if ctx.Bool(FakePoWPoissonFlag.Name) {
-		ethashConfig.PowMode = ethash.ModePoissonFake
-	}
-
-	engine := ethconfig.CreateConsensusEngine(stack, &ethashConfig, cliqueConfig, lyra2Config, nil, false, chainDb)
 	if gcmode := ctx.String(GCModeFlag.Name); gcmode != "full" && gcmode != "archive" {
 		Fatalf("--%s must be either 'full' or 'archive'", GCModeFlag.Name)
 	}
@@ -2606,6 +2588,52 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readonly bool) (*core.BlockCh
 		Fatalf("Can't create BlockChain: %v", err)
 	}
 	return chain, chainDb
+}
+
+// Create a Consensus Engine for a specific chains config
+func CreateConsensusEngine(ctx *cli.Context, stack *node.Node, gspec *genesisT.Genesis, chainDb ethdb.Database) (engine consensus.Engine) {
+	switch gspec.GetConsensusEngineType() {
+	case ctypes.ConsensusEngineT_Ethash:
+		ethashConfig := ethconfig.Defaults.Ethash
+		if gspec != nil && gspec.Config != nil {
+			ethashConfig.ECIP1099Block = gspec.GetEthashECIP1099Transition() // This will panic if the genesis config field is not nil.
+		}
+		if ctx.Bool(FakePoWFlag.Name) {
+			ethashConfig.PowMode = ethash.ModeFake
+		} else if ctx.Bool(FakePoWPoissonFlag.Name) {
+			ethashConfig.PowMode = ethash.ModePoissonFake
+		}
+		engine = ethconfig.CreateConsensusEngineEthash(stack, &ethashConfig, nil, false)
+		break
+
+	case ctypes.ConsensusEngineT_EthashB3:
+		ethashb3Config := ethconfig.Defaults.EthashB3
+		if ctx.Bool(FakePoWFlag.Name) {
+			ethashb3Config.PowMode = ethashb3.ModeFake
+		} else if ctx.Bool(FakePoWPoissonFlag.Name) {
+			ethashb3Config.PowMode = ethashb3.ModePoissonFake
+		}
+		engine = ethconfig.CreateConsensusEngineEthashB3(stack, &ethashb3Config, nil, false)
+		break
+
+	case ctypes.ConsensusEngineT_Clique:
+		cliqueConfig, err := core.LoadCliqueConfig(chainDb, gspec)
+		if err != nil {
+			Fatalf("%v", err)
+		}
+		engine = ethconfig.CreateConsensusEngineClique(cliqueConfig, chainDb)
+		break
+
+	case ctypes.ConsensusEngineT_Lyra2:
+		var lyra2Config *lyra2.Config
+		if ctx.Bool(MintMeFlag.Name) {
+			lyra2Config = &lyra2.Config{}
+		}
+		engine = ethconfig.CreateConsensusEngineLyra2(lyra2Config, nil, false)
+		break
+	}
+
+	return engine
 }
 
 // MakeConsolePreloads retrieves the absolute paths for the console JavaScript

@@ -1050,7 +1050,7 @@ func (g *Genesis) GetHIPVeldinTransition() *uint64 {
 	return g.Config.GetHIPVeldinTransition()
 }
 
-func (g *Genesis) SetHIPVeldinTransition(n uint64) error {
+func (g *Genesis) SetHIPVeldinTransition(n *uint64) error {
 	return g.Config.SetHIPVeldinTransition(n)
 }
 

@@ -752,6 +752,9 @@ func (c *ChainConfig) GetConsensusEngineType() ctypes.ConsensusEngineT {
 	if c.Lyra2 != nil {
 		return ctypes.ConsensusEngineT_Lyra2
 	}
+	if c.EthashB3 != nil {
+		return ctypes.ConsensusEngineT_EthashB3
+	}
 	return ctypes.ConsensusEngineT_Ethash
 }
 
@@ -759,15 +762,24 @@ func (c *ChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) erro
 	switch t {
 	case ctypes.ConsensusEngineT_Ethash:
 		c.Ethash = new(ctypes.EthashConfig)
+		c.EthashB3 = nil
+		c.Clique = nil
+		return nil
+	case ctypes.ConsensusEngineT_EthashB3:
+		c.EthashB3 = new(ctypes.EthashB3Config)
+		c.Lyra2 = nil
+		c.Ethash = nil
 		c.Clique = nil
 		return nil
 	case ctypes.ConsensusEngineT_Clique:
 		c.Clique = new(ctypes.CliqueConfig)
 		c.Ethash = nil
+		c.EthashB3 = nil
 		return nil
 	case ctypes.ConsensusEngineT_Lyra2:
 		c.Lyra2 = new(ctypes.Lyra2Config)
 		c.Ethash = nil
+		c.EthashB3 = nil
 		c.Clique = nil
 		return nil
 	default:
@@ -1161,6 +1173,6 @@ func (c *ChainConfig) GetHIPVeldinTransition() *uint64 {
 	return nil
 }
 
-func (c *ChainConfig) SetHIPVeldinTransition(n *uint64) error {
+func (c *ChainConfig) SetHIPVeldinTransition(_ *uint64) error {
 	return ctypes.ErrUnsupportedConfigNoop
 }

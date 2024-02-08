@@ -240,6 +240,14 @@ type CoreGethChainConfig struct {
 	EIP6780FTime *uint64 `json:"eip6780FTime,omitempty"` // EIP-6780: SELFDESTRUCT only in same transaction https://eips.ethereum.org/EIPS/eip-6780
 	EIP4788FTime *uint64 `json:"eip4788FTime,omitempty"` // EIP-4788: Beacon block root in the EVM https://eips.ethereum.org/EIPS/eip-4788
 
+	// Cancun with block activations
+	EIP4844FBlock *big.Int `json:"eip4844FBlock,omitempty"` // EIP-4844: Shard Blob Transactions https://eips.ethereum.org/EIPS/eip-4844
+	EIP7516FBlock *big.Int `json:"eip7516FBlock,omitempty"` // EIP-7516: Blob Base Fee Opcode https://eips.ethereum.org/EIPS/eip-7516
+	EIP1153FBlock *big.Int `json:"eip1153FBlock,omitempty"` // EIP-1153: Transient Storage opcodes https://eips.ethereum.org/EIPS/eip-1153
+	EIP5656FBlock *big.Int `json:"eip5656FBlock,omitempty"` // EIP-5656: MCOPY - Memory copying instruction https://eips.ethereum.org/EIPS/eip-5656
+	EIP6780FBlock *big.Int `json:"eip6780FBlock,omitempty"` // EIP-6780: SELFDESTRUCT only in same transaction https://eips.ethereum.org/EIPS/eip-6780
+	EIP4788FBlock *big.Int `json:"eip4788FBlock,omitempty"` // EIP-4788: Beacon block root in the EVM https://eips.ethereum.org/EIPS/eip-4788
+
 	MergeNetsplitVBlock *big.Int `json:"mergeNetsplitVBlock,omitempty"` // Virtual fork after The Merge to use as a network splitter
 
 	DisposalBlock *big.Int `json:"disposalBlock,omitempty"` // Bomb disposal HF block

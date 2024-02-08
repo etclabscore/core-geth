@@ -239,7 +239,7 @@ func (st *StateTransition) buyGas() error {
 		balanceCheck = balanceCheck.Mul(balanceCheck, st.msg.GasFeeCap)
 		balanceCheck.Add(balanceCheck, st.msg.Value)
 	}
-	if st.evm.ChainConfig().IsEnabledByTime(st.evm.ChainConfig().GetEIP4844TransitionTime, &st.evm.Context.Time) {
+	if st.evm.ChainConfig().IsEnabledByTime(st.evm.ChainConfig().GetEIP4844TransitionTime, &st.evm.Context.Time) || st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP4844Transition, st.evm.Context.BlockNumber) {
 		if blobGas := st.blobGasUsed(); blobGas > 0 {
 			// Check that the user has enough funds to cover blobGasUsed * tx.BlobGasFeeCap
 			blobBalanceCheck := new(big.Int).SetUint64(blobGas)
@@ -325,7 +325,7 @@ func (st *StateTransition) preCheck() error {
 		}
 	}
 
-	if st.evm.ChainConfig().IsEnabledByTime(st.evm.ChainConfig().GetEIP4844TransitionTime, &st.evm.Context.Time) {
+	if st.evm.ChainConfig().IsEnabledByTime(st.evm.ChainConfig().GetEIP4844TransitionTime, &st.evm.Context.Time) || st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP4844Transition, st.evm.Context.BlockNumber) {
 		if st.blobGasUsed() > 0 {
 			// Check that the user is paying at least the current blob fee
 			blobFee := st.evm.Context.BlobBaseFee

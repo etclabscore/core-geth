@@ -40,7 +40,7 @@ type sigCache struct {
 func MakeSigner(config ctypes.ChainConfigurator, blockNumber *big.Int, blockTime uint64) Signer {
 	var signer Signer
 	switch {
-	case config.IsEnabledByTime(config.GetEIP4844TransitionTime, &blockTime):
+	case config.IsEnabledByTime(config.GetEIP4844TransitionTime, &blockTime), config.IsEnabled(config.GetEIP4844Transition, blockNumber):
 		signer = NewCancunSigner(config.GetChainID())
 	case config.IsEnabled(config.GetEIP1559Transition, blockNumber):
 		signer = NewEIP1559Signer(config.GetChainID())
@@ -65,7 +65,7 @@ func MakeSigner(config ctypes.ChainConfigurator, blockNumber *big.Int, blockTime
 // have the current block number available, use MakeSigner instead.
 func LatestSigner(config ctypes.ChainConfigurator) Signer {
 	if chainID := config.GetChainID(); chainID != nil {
-		if config.GetEIP4844TransitionTime() != nil {
+		if config.GetEIP4844TransitionTime() != nil || config.GetEIP4844Transition() != nil {
 			return NewCancunSigner(chainID)
 		}
 		if config.GetEIP1559Transition() != nil {

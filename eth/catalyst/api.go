@@ -218,14 +218,14 @@ func (api *ConsensusAPI) verifyPayloadAttributes(attr *engine.PayloadAttributes)
 
 	// Verify withdrawals attribute for Shanghai.
 	withdrawalsCheck := func(b *big.Int, t uint64) bool {
-		return c.IsEnabledByTime(c.GetEIP4895TransitionTime, &t)
+		return c.IsEnabledByTime(c.GetEIP4895TransitionTime, &t) || c.IsEnabled(c.GetEIP4895Transition, b)
 	}
 	if err := checkAttribute(withdrawalsCheck, attr.Withdrawals != nil, eip1559BlockBig, attr.Timestamp); err != nil {
 		return fmt.Errorf("invalid withdrawals: %w", err)
 	}
 	// Verify beacon root attribute for Cancun.
 	beaconRootCheck := func(b *big.Int, t uint64) bool {
-		return c.IsEnabledByTime(c.GetEIP4788TransitionTime, &t) // TODO(meowsbits)
+		return c.IsEnabledByTime(c.GetEIP4788TransitionTime, &t) || c.IsEnabled(c.GetEIP4788Transition, b)
 	}
 	if err := checkAttribute(beaconRootCheck, attr.BeaconRoot != nil, eip1559BlockBig, attr.Timestamp); err != nil {
 		return fmt.Errorf("invalid parent beacon block root: %w", err)
@@ -481,7 +481,7 @@ func (api *ConsensusAPI) NewPayloadV2(params engine.ExecutableData) (engine.Payl
 	} else if params.Withdrawals != nil {
 		return engine.PayloadStatusV1{Status: engine.INVALID}, engine.InvalidParams.With(errors.New("non-nil withdrawals pre-shanghai"))
 	}
-	is4844 := api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4844TransitionTime, &params.Timestamp)
+	is4844 := api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4844TransitionTime, &params.Timestamp) || api.eth.BlockChain().Config().IsEnabled(api.eth.BlockChain().Config().GetEIP4844Transition, new(big.Int).SetUint64(params.Number))
 	if is4844 {
 		return engine.PayloadStatusV1{Status: engine.INVALID}, engine.InvalidParams.With(errors.New("newPayloadV2 called post-cancun"))
 	}
@@ -504,11 +504,13 @@ func (api *ConsensusAPI) NewPayloadV3(params engine.ExecutableData, versionedHas
 	}
 
 	// Since both 4844 (blob txes) and 4788 (beacon root) features are checked, we assert BOTH config values.
-	if !api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4844TransitionTime, &params.Timestamp) {
+	eip4844Enabled := api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4844TransitionTime, &params.Timestamp) || api.eth.BlockChain().Config().IsEnabled(api.eth.BlockChain().Config().GetEIP4844Transition, new(big.Int).SetUint64(params.Number))
+	if !eip4844Enabled {
 		return engine.PayloadStatusV1{Status: engine.INVALID}, engine.UnsupportedFork.With(errors.New("newPayloadV3 called pre-cancun"))
 	}
 
-	if !api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4788TransitionTime, &params.Timestamp) {
+	eip4788Enabled := api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4788TransitionTime, &params.Timestamp) || api.eth.BlockChain().Config().IsEnabled(api.eth.BlockChain().Config().GetEIP4788Transition, new(big.Int).SetUint64(params.Number))
+	if !eip4788Enabled {
 		return engine.PayloadStatusV1{Status: engine.INVALID}, engine.UnsupportedFork.With(errors.New("newPayloadV3 called pre-cancun"))
 	}
 

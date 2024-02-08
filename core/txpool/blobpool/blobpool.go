@@ -777,7 +777,7 @@ func (p *BlobPool) Reset(oldHead, newHead *types.Header) {
 		}
 	}
 	// Flush out any blobs from limbo that are older than the latest finality
-	isEIP4844 := p.chain.Config().IsEnabledByTime(p.chain.Config().GetEIP4844TransitionTime, &p.head.Time)
+	isEIP4844 := p.chain.Config().IsEnabledByTime(p.chain.Config().GetEIP4844TransitionTime, &p.head.Time) || p.chain.Config().IsEnabled(p.chain.Config().GetEIP4844Transition, p.head.Number)
 	if isEIP4844 {
 		p.limbo.finalize(p.chain.CurrentFinalBlock())
 	}

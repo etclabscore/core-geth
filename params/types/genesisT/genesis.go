@@ -204,6 +204,55 @@ func (g *Genesis) SetEIP4788TransitionTime(n *uint64) error {
 	return g.Config.SetEIP4788TransitionTime(n)
 }
 
+// Cancun by block number
+func (g *Genesis) GetEIP4844Transition() *uint64 {
+	return g.Config.GetEIP4844Transition()
+}
+
+func (g *Genesis) SetEIP4844Transition(n *uint64) error {
+	return g.Config.SetEIP4844Transition(n)
+}
+
+func (g *Genesis) GetEIP7516Transition() *uint64 {
+	return g.Config.GetEIP7516Transition()
+}
+
+func (g *Genesis) SetEIP7516Transition(n *uint64) error {
+	return g.Config.SetEIP7516Transition(n)
+}
+
+func (g *Genesis) GetEIP1153Transition() *uint64 {
+	return g.Config.GetEIP1153Transition()
+}
+
+func (g *Genesis) SetEIP1153Transition(n *uint64) error {
+	return g.Config.SetEIP1153Transition(n)
+}
+
+func (g *Genesis) GetEIP5656Transition() *uint64 {
+	return g.Config.GetEIP5656Transition()
+}
+
+func (g *Genesis) SetEIP5656Transition(n *uint64) error {
+	return g.Config.SetEIP5656Transition(n)
+}
+
+func (g *Genesis) GetEIP6780Transition() *uint64 {
+	return g.Config.GetEIP6780Transition()
+}
+
+func (g *Genesis) SetEIP6780Transition(n *uint64) error {
+	return g.Config.SetEIP6780Transition(n)
+}
+
+func (g *Genesis) GetEIP4788Transition() *uint64 {
+	return g.Config.GetEIP4788Transition()
+}
+
+func (g *Genesis) SetEIP4788Transition(n *uint64) error {
+	return g.Config.SetEIP4788Transition(n)
+}
+
 func (g *Genesis) IsEnabledByTime(fn func() *uint64, n *uint64) bool {
 	return g.Config.IsEnabledByTime(fn, n)
 }

@@ -1087,9 +1087,9 @@ func (w *worker) prepareWork(genParams *generateParams) (*environment, error) {
 		}
 	}
 	// Apply EIP-4844.
-	if w.chainConfig.IsEnabledByTime(w.chainConfig.GetEIP4844TransitionTime, &header.Time) {
+	if w.chainConfig.IsEnabledByTime(w.chainConfig.GetEIP4844TransitionTime, &header.Time) || w.chainConfig.IsEnabled(w.chainConfig.GetEIP4844Transition, header.Number) {
 		var excessBlobGas uint64
-		if w.chainConfig.IsEnabledByTime(w.chainConfig.GetEIP4844TransitionTime, &parent.Time) {
+		if w.chainConfig.IsEnabledByTime(w.chainConfig.GetEIP4844TransitionTime, &parent.Time) || w.chainConfig.IsEnabled(w.chainConfig.GetEIP4844Transition, parent.Number) {
 			excessBlobGas = eip4844.CalcExcessBlobGas(*parent.ExcessBlobGas, *parent.BlobGasUsed)
 		} else {
 			// For the first post-fork block, both parent.data_gas_used and parent.excess_data_gas are evaluated as 0
@@ -1099,7 +1099,7 @@ func (w *worker) prepareWork(genParams *generateParams) (*environment, error) {
 		header.ExcessBlobGas = &excessBlobGas
 	}
 	// Apply EIP-4788.
-	if w.chainConfig.IsEnabledByTime(w.chainConfig.GetEIP4788TransitionTime, &header.Time) {
+	if w.chainConfig.IsEnabledByTime(w.chainConfig.GetEIP4788TransitionTime, &header.Time) || w.chainConfig.IsEnabled(w.chainConfig.GetEIP4788Transition, header.Number) {
 		header.ParentBeaconRoot = genParams.beaconRoot
 	}
 	// Run the consensus preparation with the default or customized consensus engine.

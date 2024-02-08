@@ -401,7 +401,7 @@ func makeHeader(chain consensus.ChainReader, parent *types.Block, state *state.S
 			header.GasLimit = CalcGasLimit(parentGasLimit, parentGasLimit)
 		}
 	}
-	if chain.Config().IsEnabledByTime(chain.Config().GetEIP4844TransitionTime, &header.Time) {
+	if chain.Config().IsEnabledByTime(chain.Config().GetEIP4844TransitionTime, &header.Time) || chain.Config().IsEnabled(chain.Config().GetEIP4844Transition, header.Number) {
 		var (
 			parentExcessBlobGas uint64
 			parentBlobGasUsed   uint64
@@ -414,7 +414,7 @@ func makeHeader(chain consensus.ChainReader, parent *types.Block, state *state.S
 		header.ExcessBlobGas = &excessBlobGas
 		header.BlobGasUsed = new(uint64)
 	}
-	if chain.Config().IsEnabledByTime(chain.Config().GetEIP4788TransitionTime, &header.Time) {
+	if chain.Config().IsEnabledByTime(chain.Config().GetEIP4788TransitionTime, &header.Time) || chain.Config().IsEnabled(chain.Config().GetEIP4788Transition, header.Number) {
 		header.ParentBeaconRoot = new(common.Hash)
 	}
 	return header

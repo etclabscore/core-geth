@@ -341,7 +341,6 @@ func CreateConsensusEngineEthashB3(stack *node.Node, ethashb3Config *ethashb3.Co
 			DatasetsOnDisk:   ethashb3Config.DatasetsOnDisk,
 			DatasetsLockMmap: ethashb3Config.DatasetsLockMmap,
 			NotifyFull:       ethashb3Config.NotifyFull,
-			ECIP1099Block:    ethashb3Config.ECIP1099Block,
 		}, notify, noverify)
 		engine.(*ethashb3.EthashB3).SetThreads(-1) // Disable CPU mining
 	}

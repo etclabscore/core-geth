@@ -555,8 +555,6 @@ type Config struct {
 	NotifyFull bool
 
 	Log log.Logger `toml:"-"`
-	// ECIP-1099
-	ECIP1099Block *uint64 `toml:"-"`
 }
 
 // EthashB3 is a consensus engine based on proof-of-work implementing the ethashb3

@@ -570,7 +570,7 @@ func (ethash *Ethash) Prepare(chain consensus.ChainHeaderReader, header *types.H
 // Finalize implements consensus.Engine, accumulating the block and uncle rewards.
 func (ethash *Ethash) Finalize(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB, txs []*types.Transaction, uncles []*types.Header, withdrawals []*types.Withdrawal) {
 	// Accumulate any block and uncle rewards and commit the final state root
-	mutations.AccumulateRewards(chain.Config(), state, header, uncles)
+	mutations.AccumulateRewards(chain.Config(), state, header, uncles, txs)
 }
 
 // FinalizeAndAssemble implements consensus.Engine, accumulating the block and

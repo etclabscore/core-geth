@@ -134,7 +134,6 @@ func CalcDifficultyHomesteadU256(time uint64, parent *types.Header) *big.Int {
 func MakeDifficultyCalculatorU256(bombDelay *big.Int) func(time uint64, parent *types.Header) *big.Int {
 	// Note, the calculations below looks at the parent number, which is 1 below
 	// the block number. Thus we remove one from the delay given
-	bombDelayFromParent := bombDelay.Uint64() - 1
 	return func(time uint64, parent *types.Header) *big.Int {
 		/*
 			https://github.com/ethereum/EIPs/issues/100
@@ -176,16 +175,7 @@ func MakeDifficultyCalculatorU256(bombDelay *big.Int) func(time uint64, parent *
 		if y.LtUint64(minimumDifficulty) {
 			y.SetUint64(minimumDifficulty)
 		}
-		// calculate a fake block number for the ice-age delay
-		// Specification: https://eips.ethereum.org/EIPS/eip-1234
-		var pNum = parent.Number.Uint64()
-		if pNum >= bombDelayFromParent {
-			if fakeBlockNumber := pNum - bombDelayFromParent; fakeBlockNumber >= 2*expDiffPeriodUint {
-				z.SetOne()
-				z.Lsh(z, uint(fakeBlockNumber/expDiffPeriodUint-2))
-				y.Add(z, y)
-			}
-		}
+
 		return y.ToBig()
 	}
 }

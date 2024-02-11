@@ -102,6 +102,13 @@ var (
 			40_725_107: big.NewInt(1 * vars.Ether),
 		},
 
+		TrustedCheckpoint: &ctypes.TrustedCheckpoint{
+			BloomRoot:    common.HexToHash("0xb09a3dc1215903dc757dd83c960c6dd77ec508e03c185b16df62af069d197fc3"),
+			CHTRoot:      common.HexToHash("0x21f6a69cbd097bd2c1d250ed7144888e483d46105b66a99a68e4847c99a863cd"),
+			SectionHead:  common.HexToHash("0x2461cbf15f92264332e09ba8a9d6b9106c12b3cf0e7d7bfff78483c1b271e902"),
+			SectionIndex: 43,
+		},
+
 		RequireBlockHashes: map[uint64]common.Hash{
 			156_000:   common.HexToHash("0x2a27bec023108c5f650cb0c9b7aaae7e7fdeefbeb3cd14a8390bb0957043aca2"),
 			512_000:   common.HexToHash("0xd547c896967174295c61ea18534d3c69337a6fa6e957909dc29e4bcba873592a"),

@@ -44,6 +44,7 @@ import (
 var (
 	maxUncles              = 2               // Maximum number of uncles allowed in a single block
 	allowedFutureBlockTime = 7 * time.Second // Max time from current time allowed for blocks, before they're considered future blocks
+	MinimumDifficulty      = big.NewInt(1_002_317)
 )
 
 // Various error messages to mark blocks invalid. These should be private to
@@ -315,11 +316,6 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 	next := new(big.Int).Add(parent.Number, big1)
 	out := new(big.Int)
 
-	// TODO (meowbits): do we need this?
-	// if config.IsEnabled(config.GetEthashTerminalTotalDifficulty, next) {
-	// 	return big.NewInt(1)
-	// }
-
 	// ADJUSTMENT algorithms
 	if config.IsEnabled(config.GetEthashEIP100BTransition, next) {
 		// https://github.com/ethereum/EIPs/issues/100
@@ -327,16 +323,38 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		// diff = (parent_diff +
 		//         (parent_diff / 2048 * max((2 if len(parent.uncles) else 1) - ((timestamp - parent.timestamp) // 9), -99))
 		//        ) + 2^(periodCount - 2)
-		out.Div(parent_time_delta(time, parent), big.NewInt(6))
+		bigTime := new(big.Int).SetUint64(time)
+		bigParentTime := new(big.Int).SetUint64(parent.Time)
 
+		// holds intermediate values to make the algo easier to read & audit
+		x := new(big.Int)
+		y := new(big.Int)
+
+		// (2 if len(parent_uncles) else 1) - (block_timestamp - parent_timestamp) // 9
+		x.Sub(bigTime, bigParentTime)
+		x.Div(x, big.NewInt(6))
 		if parent.UncleHash == types.EmptyUncleHash {
-			out.Sub(big1, out)
+			x.Sub(big1, x)
 		} else {
-			out.Sub(big2, out)
+			x.Sub(big2, x)
 		}
-		out.Set(math.BigMax(out, bigMinus99))
-		out.Mul(parent_diff_over_dbd(parent), out)
-		out.Add(out, parent.Difficulty)
+
+		// max((2 if len(parent_uncles) else 1) - (block_timestamp - parent_timestamp) // 9, -99)
+		if x.Cmp(bigMinus99) < 0 {
+			x.Set(bigMinus99)
+		}
+
+		// parent_diff + (parent_diff / 2048 * max((2 if len(parent.uncles) else 1) - ((timestamp - parent.timestamp) // 9), -99))
+		y.Div(parent.Difficulty, vars.DifficultyBoundDivisor)
+		x.Mul(y, x)
+		x.Add(parent.Difficulty, x)
+
+		// minimum difficulty can ever be (before exponential factor)
+		if x.Cmp(MinimumDifficulty) < 0 {
+			x.Set(MinimumDifficulty)
+		}
+
+		return x
 	} else if config.IsEnabled(config.GetEIP2Transition, next) {
 		// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2.md
 		// algorithm:
@@ -463,7 +481,7 @@ func (ethashb3 *EthashB3) Prepare(chain consensus.ChainHeaderReader, header *typ
 // Finalize implements consensus.Engine, accumulating the block and uncle rewards.
 func (ethashb3 *EthashB3) Finalize(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB, txs []*types.Transaction, uncles []*types.Header, withdrawals []*types.Withdrawal) {
 	// Accumulate any block and uncle rewards and commit the final state root
-	mutations.AccumulateRewards(chain.Config(), state, header, uncles)
+	mutations.AccumulateRewards(chain.Config(), state, header, uncles, txs)
 }
 
 // FinalizeAndAssemble implements consensus.Engine, accumulating the block and

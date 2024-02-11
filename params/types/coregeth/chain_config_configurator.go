@@ -727,6 +727,9 @@ func (c *CoreGethChainConfig) GetConsensusEngineType() ctypes.ConsensusEngineT {
 	if c.Ethash != nil {
 		return ctypes.ConsensusEngineT_Ethash
 	}
+	if c.EthashB3 != nil {
+		return ctypes.ConsensusEngineT_EthashB3
+	}
 	if c.Clique != nil {
 		return ctypes.ConsensusEngineT_Clique
 	}
@@ -1156,7 +1159,8 @@ func (c *CoreGethChainConfig) SetEthashECIP1017EraRounds(n *uint64) error {
 }
 
 func (c *CoreGethChainConfig) GetEthashEIP100BTransition() *uint64 {
-	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
+	engineType := c.GetConsensusEngineType()
+	if !(engineType == ctypes.ConsensusEngineT_Ethash || engineType == ctypes.ConsensusEngineT_EthashB3) {
 		return nil
 	}
 	return bigNewU64(c.EIP100FBlock)

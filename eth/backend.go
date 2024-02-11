@@ -143,6 +143,7 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 	}
 	// Transfer mining-related config to the ethash config.
 	ethashConfig := config.Ethash
+	ethashb3Config := config.EthashB3
 	ethashConfig.NotifyFull = config.Miner.NotifyFull
 
 	if config.Genesis != nil && config.Genesis.Config != nil {
@@ -161,7 +162,7 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 		}
 	}
 
-	engine := ethconfig.CreateConsensusEngine(stack, &ethashConfig, cliqueConfig, lyra2Config, config.Miner.Notify, config.Miner.Noverify, chainDb)
+	engine := ethconfig.CreateConsensusEngine(stack, &ethashConfig, &ethashb3Config, cliqueConfig, lyra2Config, config.Miner.Notify, config.Miner.Noverify, chainDb)
 
 	eth := &Ethereum{
 		config:            config,

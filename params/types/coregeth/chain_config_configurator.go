@@ -743,15 +743,26 @@ func (c *CoreGethChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngin
 	switch t {
 	case ctypes.ConsensusEngineT_Ethash:
 		c.Ethash = new(ctypes.EthashConfig)
+		c.EthashB3 = nil
 		c.Clique = nil
+		c.Lyra2 = nil
+		return nil
+	case ctypes.ConsensusEngineT_EthashB3:
+		c.EthashB3 = new(ctypes.EthashB3Config)
+		c.Ethash = nil
+		c.Clique = nil
+		c.Lyra2 = nil
 		return nil
 	case ctypes.ConsensusEngineT_Clique:
 		c.Clique = new(ctypes.CliqueConfig)
 		c.Ethash = nil
+		c.EthashB3 = nil
+		c.Lyra2 = nil
 		return nil
 	case ctypes.ConsensusEngineT_Lyra2:
 		c.Lyra2 = new(ctypes.Lyra2Config)
 		c.Ethash = nil
+		c.EthashB3 = nil
 		c.Clique = nil
 		return nil
 	default:
@@ -1320,6 +1331,9 @@ func (c *CoreGethChainConfig) SetLyra2NonceTransition(n *uint64) error {
 }
 
 func (c *CoreGethChainConfig) GetHIPVeldinTransition() *uint64 {
+	if c.GetChainID() == big.NewInt(622277) {
+		return nil
+	}
 	return bigNewU64(c.HIPVeldinFBlock)
 }
 

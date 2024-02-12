@@ -102,10 +102,10 @@ func (bc *testBlockChain) CurrentBlock() *types.Header {
 	// mainnet ether existence, use that as a cap for the tests.
 	var (
 		blockNumber = new(big.Int).Add(new(big.Int).SetUint64(*bc.config.GetEIP1559Transition()), big.NewInt(1))
-		// TODO @ziogaschr: consider what to put here using the block number. We can leave it as is, as it's been using in tests only
-		blockTime = *bc.config.GetEIP4844TransitionTime() + 1
-		gasLimit  = uint64(30_000_000)
+		blockTime   = *bc.config.GetEIP4844TransitionTime() + 1
+		gasLimit    = uint64(30_000_000)
 	)
+
 	lo := new(big.Int)
 	hi := new(big.Int).Mul(big.NewInt(5714), new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil))
 

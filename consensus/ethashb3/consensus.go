@@ -309,6 +309,12 @@ func parent_diff_over_dbd(p *types.Header) *big.Int {
 	return new(big.Int).Div(p.Difficulty, vars.DifficultyBoundDivisor)
 }
 
+var (
+	big5 = big.NewInt(5)
+	big6 = big.NewInt(6)
+	big7 = big.NewInt(7)
+)
+
 // CalcDifficulty is the difficulty adjustment algorithm. It returns
 // the difficulty that a new block should have when created at time
 // given the parent block's time and difficulty.
@@ -332,7 +338,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 
 		// (2 if len(parent_uncles) else 1) - (block_timestamp - parent_timestamp) // 9
 		x.Sub(bigTime, bigParentTime)
-		x.Div(x, big.NewInt(6))
+		x.Div(x, big6)
 		if parent.UncleHash == types.EmptyUncleHash {
 			x.Sub(big1, x)
 		} else {
@@ -361,7 +367,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		// diff = (parent_diff +
 		//         (parent_diff / 2048 * max(1 - (block_timestamp - parent_timestamp) // 10, -99))
 		//        )
-		out.Div(parent_time_delta(time, parent), big.NewInt(5))
+		out.Div(parent_time_delta(time, parent), big5)
 		out.Sub(big1, out)
 		out.Set(math.BigMax(out, bigMinus99))
 		out.Mul(parent_diff_over_dbd(parent), out)
@@ -375,7 +381,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		//   else
 		//      parent_diff - (parent_diff // 2048)
 		out.Set(parent.Difficulty)
-		if parent_time_delta(time, parent).Cmp(vars.DurationLimit) < 0 {
+		if parent_time_delta(time, parent).Cmp(big7) < 0 {
 			out.Add(out, parent_diff_over_dbd(parent))
 		} else {
 			out.Sub(out, parent_diff_over_dbd(parent))

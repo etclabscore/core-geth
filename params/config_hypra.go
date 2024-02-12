@@ -38,7 +38,7 @@ var (
 		EIP7FBlock: big.NewInt(0),
 		// This is 0 on Hypra but Fork support is nil. Should this be enabled or not?
 		// DAOForkSupport isnt in this struct
-		DAOForkBlock: big.NewInt(0),
+		// DAOForkBlock: big.NewInt(0),
 		EIP150Block:  big.NewInt(0),
 		EIP155Block:  big.NewInt(0),
 		EIP160FBlock: big.NewInt(0),

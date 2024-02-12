@@ -839,7 +839,8 @@ func (c *CoreGethChainConfig) SetEthashDurationLimit(i *big.Int) error {
 }
 
 func (c *CoreGethChainConfig) GetEthashHomesteadTransition() *uint64 {
-	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
+	engine := c.GetConsensusEngineType()
+	if engine != ctypes.ConsensusEngineT_Ethash && engine != ctypes.ConsensusEngineT_EthashB3 {
 		return nil
 	}
 	if c.EIP2FBlock == nil || c.EIP7FBlock == nil {
@@ -1178,7 +1179,7 @@ func (c *CoreGethChainConfig) GetEthashEIP100BTransition() *uint64 {
 }
 
 func (c *CoreGethChainConfig) SetEthashEIP100BTransition(n *uint64) error {
-	if c.Ethash == nil {
+	if c.Ethash == nil || c.EthashB3 == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
 	c.EIP100FBlock = setBig(c.EIP100FBlock, n)
@@ -1276,7 +1277,7 @@ func (c *CoreGethChainConfig) GetEthashBlockRewardSchedule() ctypes.Uint64BigMap
 }
 
 func (c *CoreGethChainConfig) SetEthashBlockRewardSchedule(m ctypes.Uint64BigMapEncodesHex) error {
-	if c.Ethash == nil {
+	if c.Ethash == nil || c.EthashB3 == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
 	c.BlockRewardSchedule = m
@@ -1331,7 +1332,7 @@ func (c *CoreGethChainConfig) SetLyra2NonceTransition(n *uint64) error {
 }
 
 func (c *CoreGethChainConfig) GetHIPVeldinTransition() *uint64 {
-	if c.GetChainID() == big.NewInt(622277) {
+	if c.GetChainID() != big.NewInt(622277) {
 		return nil
 	}
 	return bigNewU64(c.HIPVeldinFBlock)

@@ -62,7 +62,7 @@ var (
 		EIP1283FBlock:   big.NewInt(5503),
 		PetersburgBlock: big.NewInt(5507),
 
-		// Istanbul eq, aka Phoenix
+		// Istanbul eq
 		EIP152FBlock:  big.NewInt(5519),
 		EIP1108FBlock: big.NewInt(5519),
 		EIP1344FBlock: big.NewInt(5519),
@@ -86,17 +86,19 @@ var (
 		EIP3860FBlock: big.NewInt(1_600_957), // Limit and meter initcode
 		EIP3198FBlock: big.NewInt(1_600_957), // BASEFEE Opcode
 
-		// London chain upgrades, aka Eudora
-		EIP1559FBlock: big.NewInt(13_524_557), // EIP-1559 transactions are not enabled on Hypra yet
-		EIP3651FBlock: big.NewInt(13_524_557), // Warm COINBASE (gas reprice)
-		EIP6049FBlock: big.NewInt(13_524_557), // Deprecate SELFDESTRUCT
+		// London chain upgrades, aka Planned Eudora
+		// TODO: move block numbers closer once testing has concluded
+		EIP1559FBlock: big.NewInt(13_524_557), // EIP-1559 transactions`
 		EIP3529FBlock: big.NewInt(13_524_557), // Reduction in refunds
-		EIP3541FBlock: big.NewInt(13_524_557), // Reject new contract code starting with the 0xEF byte
+
+		// Unplanned Upgrade, aka Olantis
+		// EIP3651FBlock: big.NewInt(13_524_557), // Warm COINBASE (gas reprice)
+		// EIP6049FBlock: big.NewInt(13_524_557), // Deprecate SELFDESTRUCT
+		// EIP3541FBlock: big.NewInt(13_524_557), // Reject new contract code starting with the 0xEF byte
 
 		// Spiral, aka Shanghai (partially)
 		// EIP4399FBlock: nil, // Supplant DIFFICULTY with PREVRANDAO. Hypra  does not spec 4399 because it's still PoW, and 4399 is only applicable for the PoS system.
 		// EIP4895FBlock: nil, // Beacon chain push withdrawals as operations
-		// EIP6049FBlock: big.NewInt(19_250_000), // Deprecate SELFDESTRUCT (noop)
 
 		// Define the planned 3 year decreasing rewards.
 		BlockRewardSchedule: map[uint64]*big.Int{

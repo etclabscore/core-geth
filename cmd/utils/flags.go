@@ -2548,7 +2548,7 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readonly bool) (*core.BlockCh
 		chainDb = MakeChainDatabase(ctx, stack, readonly)
 	)
 
-	engine := CreateConsensusEngine(ctx, stack, gspec, chainDb)
+	engine := makeConsensusEngine(ctx, stack, gspec, chainDb)
 
 	if gcmode := ctx.String(GCModeFlag.Name); gcmode != "full" && gcmode != "archive" {
 		Fatalf("--%s must be either 'full' or 'archive'", GCModeFlag.Name)
@@ -2591,7 +2591,7 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readonly bool) (*core.BlockCh
 }
 
 // Create a Consensus Engine for a specific chains config
-func CreateConsensusEngine(ctx *cli.Context, stack *node.Node, gspec *genesisT.Genesis, chainDb ethdb.Database) (engine consensus.Engine) {
+func makeConsensusEngine(ctx *cli.Context, stack *node.Node, gspec *genesisT.Genesis, chainDb ethdb.Database) (engine consensus.Engine) {
 	switch gspec.GetConsensusEngineType() {
 	case ctypes.ConsensusEngineT_Ethash:
 		ethashConfig := ethconfig.Defaults.Ethash

@@ -38,7 +38,7 @@ var (
 		EIP7FBlock: big.NewInt(0),
 		// This is 0 on Hypra but Fork support is nil. Should this be enabled or not?
 		// DAOForkSupport isnt in this struct
-		// DAOForkBlock:       big.NewInt(0),
+		DAOForkBlock: big.NewInt(0),
 		EIP150Block:  big.NewInt(0),
 		EIP155Block:  big.NewInt(0),
 		EIP160FBlock: big.NewInt(0),
@@ -69,6 +69,7 @@ var (
 		EIP1884FBlock: big.NewInt(5519),
 		EIP2028FBlock: big.NewInt(5519),
 		EIP2200FBlock: big.NewInt(5519),
+		EIP2384FBlock: big.NewInt(5521),
 
 		// Berlin
 		EIP2565FBlock: big.NewInt(5527), // ModExp Gas Cost
@@ -77,17 +78,20 @@ var (
 		EIP2930FBlock: big.NewInt(5527), // Optional access lists
 
 		// Veldin fork was used to enable rewards to miners for including uncle blocks on Hypra network.
-		// Previously overlooked and unrewarded. TODO: use in AccumulateRewards
+		// Previously overlooked and unrewarded.
 		HIPVeldinFBlock: big.NewInt(500_009),
 
 		// London + shanghai EVM upgrade, aka Gaspar
-		EIP3529FBlock: big.NewInt(1_600_957), // Reduction in refunds
-		EIP3541FBlock: big.NewInt(1_600_957), // Reject new contract code starting with the 0xEF byte
 		EIP3855FBlock: big.NewInt(1_600_957), // PUSH0 instruction
 		EIP3860FBlock: big.NewInt(1_600_957), // Limit and meter initcode
+		EIP3198FBlock: big.NewInt(1_600_957), // BASEFEE Opcode
 
-		// EIP3651FBlock: big.NewInt(1_600_957), // Warm COINBASE (gas reprice) -- I don't think this was enabled on hypra as part of Gaspar
-		// EIP1559FBlock: big.NewInt(0), // EIP-1559 transactions are not enabled on Hypra yet -- TODO
+		// London chain upgrades, aka Eudora
+		EIP1559FBlock: big.NewInt(13_524_557), // EIP-1559 transactions are not enabled on Hypra yet
+		EIP3651FBlock: big.NewInt(13_524_557), // Warm COINBASE (gas reprice)
+		EIP6049FBlock: big.NewInt(13_524_557), // Deprecate SELFDESTRUCT
+		EIP3529FBlock: big.NewInt(13_524_557), // Reduction in refunds
+		EIP3541FBlock: big.NewInt(13_524_557), // Reject new contract code starting with the 0xEF byte
 
 		// Spiral, aka Shanghai (partially)
 		// EIP4399FBlock: nil, // Supplant DIFFICULTY with PREVRANDAO. Hypra  does not spec 4399 because it's still PoW, and 4399 is only applicable for the PoS system.

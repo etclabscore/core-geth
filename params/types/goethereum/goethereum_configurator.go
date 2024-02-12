@@ -699,57 +699,51 @@ func (c *ChainConfig) SetEIP4788TransitionTime(n *uint64) error {
 
 // Cancun by block number
 func (c *ChainConfig) GetEIP4844Transition() *uint64 {
-	return c.CancunTime
+	return nil
 }
 
 func (c *ChainConfig) SetEIP4844Transition(n *uint64) error {
-	c.CancunTime = n
-	return nil
+	return ctypes.ErrUnsupportedConfigNoop
 }
 
 func (c *ChainConfig) GetEIP7516Transition() *uint64 {
-	return c.CancunTime
+	return nil
 }
 
 func (c *ChainConfig) SetEIP7516Transition(n *uint64) error {
-	c.CancunTime = n
-	return nil
+	return ctypes.ErrUnsupportedConfigNoop
 }
 
 func (c *ChainConfig) GetEIP1153Transition() *uint64 {
-	return c.CancunTime
+	return nil
 }
 
 func (c *ChainConfig) SetEIP1153Transition(n *uint64) error {
-	c.CancunTime = n
-	return nil
+	return ctypes.ErrUnsupportedConfigNoop
 }
 
 func (c *ChainConfig) GetEIP5656Transition() *uint64 {
-	return c.CancunTime
+	return nil
 }
 
 func (c *ChainConfig) SetEIP5656Transition(n *uint64) error {
-	c.CancunTime = n
-	return nil
+	return ctypes.ErrUnsupportedConfigNoop
 }
 
 func (c *ChainConfig) GetEIP6780Transition() *uint64 {
-	return c.CancunTime
+	return nil
 }
 
 func (c *ChainConfig) SetEIP6780Transition(n *uint64) error {
-	c.CancunTime = n
-	return nil
+	return ctypes.ErrUnsupportedConfigNoop
 }
 
 func (c *ChainConfig) GetEIP4788Transition() *uint64 {
-	return c.CancunTime
+	return nil
 }
 
 func (c *ChainConfig) SetEIP4788Transition(n *uint64) error {
-	c.CancunTime = n
-	return nil
+	return ctypes.ErrUnsupportedConfigNoop
 }
 
 func (c *ChainConfig) GetMergeVirtualTransition() *uint64 {

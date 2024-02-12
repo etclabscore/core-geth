@@ -97,7 +97,8 @@ func MakeProtocols(backend Backend, network uint64, protocolVersions []uint, dns
 
 		// TODO(meowsbits): FIXME re: Cancun config/time/enabled check
 		// Blob transactions require eth/68 announcements, disable everything else
-		if version <= ETH67 && backend.Chain().Config().GetEIP4844TransitionTime() != nil {
+		eip4844Enabled := backend.Chain().Config().GetEIP4844TransitionTime() != nil || backend.Chain().Config().GetEIP4844Transition() != nil
+		if version <= ETH67 && eip4844Enabled {
 			continue
 		}
 

@@ -102,7 +102,7 @@ func PrecompiledContractsForConfig(config ctypes.ChainConfigurator, bn *big.Int,
 		// 10-18 are BLS12-381 precompiles
 		mergeContracts(precompileds, PrecompiledContractsBLS)
 	}
-	if config.IsEnabledByTime(config.GetEIP4844TransitionTime, bt) {
+	if config.IsEnabledByTime(config.GetEIP4844TransitionTime, bt) || config.IsEnabled(config.GetEIP4844Transition, bn) {
 		precompileds[common.BytesToAddress([]byte{0x0a})] = &kzgPointEvaluation{}
 	}
 

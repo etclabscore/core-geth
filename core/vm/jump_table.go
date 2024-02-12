@@ -222,19 +222,19 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, isPostMerge bool, 
 			return validate(instructionSet)
 		}
 	*/
-	if config.IsEnabledByTime(config.GetEIP4844TransitionTime, bt) {
+	if config.IsEnabledByTime(config.GetEIP4844TransitionTime, bt) || config.IsEnabled(config.GetEIP4844Transition, bn) {
 		enable4844(instructionSet) // EIP-4844 (BLOBHASH opcode)
 	}
-	if config.IsEnabledByTime(config.GetEIP7516TransitionTime, bt) { // TODO(meowsbits): create EIP7516 configurator interface method
+	if config.IsEnabledByTime(config.GetEIP7516TransitionTime, bt) || config.IsEnabled(config.GetEIP7516Transition, bn) { // TODO(meowsbits): create EIP7516 configurator interface method
 		enable7516(instructionSet) // EIP-7516 (BLOBBASEFEE opcode)
 	}
-	if config.IsEnabledByTime(config.GetEIP1153TransitionTime, bt) {
+	if config.IsEnabledByTime(config.GetEIP1153TransitionTime, bt) || config.IsEnabled(config.GetEIP1153Transition, bn) {
 		enable1153(instructionSet) // EIP-1153 "Transient Storage"
 	}
-	if config.IsEnabledByTime(config.GetEIP5656TransitionTime, bt) {
+	if config.IsEnabledByTime(config.GetEIP5656TransitionTime, bt) || config.IsEnabled(config.GetEIP5656Transition, bn) {
 		enable5656(instructionSet) // EIP-5656 (MCOPY opcode)
 	}
-	if config.IsEnabledByTime(config.GetEIP6780TransitionTime, bt) {
+	if config.IsEnabledByTime(config.GetEIP6780TransitionTime, bt) || config.IsEnabled(config.GetEIP6780Transition, bn) {
 		enable6780(instructionSet) // EIP-6780 SELFDESTRUCT only in same transaction
 	}
 

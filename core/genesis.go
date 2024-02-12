@@ -485,7 +485,7 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 			withdrawals = make([]*types.Withdrawal, 0)
 		}
 		// EIP4844 and EIP4788 are Cancun features.
-		isEIP4844 := conf.IsEnabledByTime(g.Config.GetEIP4844TransitionTime, &g.Timestamp)
+		isEIP4844 := conf.IsEnabledByTime(g.Config.GetEIP4844TransitionTime, &g.Timestamp) || conf.IsEnabled(conf.GetEIP4844Transition, new(big.Int).SetUint64(g.Number))
 		if isEIP4844 {
 			// EIP-4844 fields
 			head.ExcessBlobGas = g.ExcessBlobGas
@@ -497,7 +497,7 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 				head.BlobGasUsed = new(uint64)
 			}
 		}
-		isEIP4788 := conf.IsEnabledByTime(g.Config.GetEIP4788TransitionTime, &g.Timestamp)
+		isEIP4788 := conf.IsEnabledByTime(g.Config.GetEIP4788TransitionTime, &g.Timestamp) || conf.IsEnabled(g.Config.GetEIP4788Transition, new(big.Int).SetUint64(g.Number))
 		if isEIP4788 {
 			// EIP-4788: The parentBeaconBlockRoot of the genesis block is always
 			// the zero hash. This is because the genesis block does not have a parent

@@ -477,7 +477,7 @@ func GenerateBadBlock(parent *types.Block, engine consensus.Engine, txs types.Tr
 		nBlobs += len(tx.BlobHashes())
 	}
 	header.Root = common.BytesToHash(hasher.Sum(nil))
-	isEip4844 := config.IsEnabledByTime(config.GetEIP4844TransitionTime, &header.Time)
+	isEip4844 := config.IsEnabledByTime(config.GetEIP4844TransitionTime, &header.Time) || config.IsEnabled(config.GetEIP4844Transition, header.Number)
 	if isEip4844 {
 		var pExcess, pUsed = uint64(0), uint64(0)
 		if parent.ExcessBlobGas() != nil {

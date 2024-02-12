@@ -438,7 +438,7 @@ func (cm *chainMaker) makeHeader(parent *types.Block, state *state.StateDB, engi
 			header.GasLimit = CalcGasLimit(parentGasLimit, parentGasLimit)
 		}
 	}
-	if cm.Config().IsEnabledByTime(cm.Config().GetEIP4844TransitionTime, &header.Time) {
+	if cm.Config().IsEnabledByTime(cm.Config().GetEIP4844TransitionTime, &header.Time) || cm.Config().IsEnabled(cm.Config().GetEIP4844Transition, header.Number) {
 		var (
 			parentExcessBlobGas uint64
 			parentBlobGasUsed   uint64
@@ -451,7 +451,7 @@ func (cm *chainMaker) makeHeader(parent *types.Block, state *state.StateDB, engi
 		header.ExcessBlobGas = &excessBlobGas
 		header.BlobGasUsed = new(uint64)
 	}
-	if cm.Config().IsEnabledByTime(cm.Config().GetEIP4788TransitionTime, &header.Time) {
+	if cm.Config().IsEnabledByTime(cm.Config().GetEIP4788TransitionTime, &header.Time) || cm.Config().IsEnabled(cm.Config().GetEIP4788Transition, header.Number) {
 		header.ParentBeaconRoot = new(common.Hash)
 	}
 	return header

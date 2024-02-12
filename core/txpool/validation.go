@@ -64,7 +64,8 @@ func ValidateTransaction(tx *types.Transaction, head *types.Header, signer types
 	if !opts.Config.IsEnabled(opts.Config.GetEIP1559Transition, head.Number) && tx.Type() == types.DynamicFeeTxType {
 		return fmt.Errorf("%w: type %d rejected, pool not yet in London", core.ErrTxTypeNotSupported, tx.Type())
 	}
-	if !opts.Config.IsEnabledByTime(opts.Config.GetEIP4844TransitionTime, &head.Time) && tx.Type() == types.BlobTxType {
+	eip4844Enabled := opts.Config.IsEnabledByTime(opts.Config.GetEIP4844TransitionTime, &head.Time) || opts.Config.IsEnabled(opts.Config.GetEIP4844Transition, head.Number)
+	if !eip4844Enabled && tx.Type() == types.BlobTxType {
 		return fmt.Errorf("%w: type %d rejected, pool not yet in Cancun", core.ErrTxTypeNotSupported, tx.Type())
 	}
 	// Check whether the init code size has been exceeded

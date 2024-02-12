@@ -239,6 +239,20 @@ type ProtocolSpecifier interface {
 	// EIP4788 - Beacon block root in the EVM
 	GetEIP4788TransitionTime() *uint64
 	SetEIP4788TransitionTime(n *uint64) error
+
+	// Cancun expressed as block activation numbers:
+	GetEIP4844Transition() *uint64
+	SetEIP4844Transition(n *uint64) error
+	GetEIP7516Transition() *uint64
+	SetEIP7516Transition(n *uint64) error
+	GetEIP1153Transition() *uint64
+	SetEIP1153Transition(n *uint64) error
+	GetEIP5656Transition() *uint64
+	SetEIP5656Transition(n *uint64) error
+	GetEIP6780Transition() *uint64
+	SetEIP6780Transition(n *uint64) error
+	GetEIP4788Transition() *uint64
+	SetEIP4788Transition(n *uint64) error
 }
 
 type Forker interface {

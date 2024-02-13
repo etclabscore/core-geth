@@ -38,14 +38,14 @@ var (
 		EIP7FBlock: big.NewInt(0),
 		// This is 0 on Hypra but Fork support is nil. Should this be enabled or not?
 		// DAOForkSupport isnt in this struct
-		// DAOForkBlock: big.NewInt(0),
+		DAOForkBlock: big.NewInt(0),
 		EIP150Block:  big.NewInt(0),
 		EIP155Block:  big.NewInt(0),
 		EIP160FBlock: big.NewInt(0),
 		EIP161FBlock: big.NewInt(0),
 		EIP170FBlock: big.NewInt(0),
 
-		// Byzantium eq
+		// Byzantium eq -- Enables Smart contracts
 		EIP100FBlock: big.NewInt(1001),
 		EIP140FBlock: big.NewInt(1001),
 		EIP198FBlock: big.NewInt(1001),
@@ -53,6 +53,7 @@ var (
 		EIP212FBlock: big.NewInt(1001),
 		EIP213FBlock: big.NewInt(1001),
 		EIP214FBlock: big.NewInt(1001),
+		EIP649FBlock: big.NewInt(1001),
 		EIP658FBlock: big.NewInt(1001),
 
 		// Constantinople eq
@@ -100,6 +101,11 @@ var (
 		// EIP4399FBlock: nil, // Supplant DIFFICULTY with PREVRANDAO. Hypra  does not spec 4399 because it's still PoW, and 4399 is only applicable for the PoS system.
 		// EIP4895FBlock: nil, // Beacon chain push withdrawals as operations
 
+		// Dummy EIPs, unused by ethashb3
+		//EIP3554FBlock: big.NewInt(13_524_557),
+		//EIP3541FBlock: big.NewInt(13_524_557),
+		//EIP4345FBlock: big.NewInt(27_200_177),
+		//EIP5133FBlock: big.NewInt(40_725_107),
 		// Define the planned 3 year decreasing rewards.
 		BlockRewardSchedule: map[uint64]*big.Int{
 			0:          big.NewInt(4 * vars.Ether),

@@ -282,6 +282,8 @@ func configOrDefault(g *genesisT.Genesis, ghash common.Hash) ctypes.ChainConfigu
 		return params.SepoliaChainConfig
 	case ghash == params.MintMeGenesisHash:
 		return params.MintMeChainConfig
+	case ghash == params.HypraGenesisHash:
+		return params.HypraChainConfig
 	default:
 		return params.AllEthashProtocolChanges
 	}
@@ -381,6 +383,8 @@ func CommitGenesisState(db ethdb.Database, hash common.Hash) error {
 			genesis = params.DefaultMordorGenesisBlock()
 		case params.MintMeGenesisHash:
 			genesis = params.DefaultMintMeGenesisBlock()
+		case params.HypraGenesisHash:
+			genesis = params.DefaultHypraGenesisBlock()
 		}
 		if genesis != nil {
 			alloc = genesis.Alloc

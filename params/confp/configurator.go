@@ -38,12 +38,12 @@ var (
 	// incompatibleNetworkMap defines matchable naming schemes which are incompatible with certain
 	// legacy networks or networks who use their own forks unincluded in forkid.
 	// Introduced by Hypra (622277)
-	incompatibleNetworNameMap = map[uint64][]string{
+	incompatibleNetworkNameMap = map[uint64][]string{
 		622277: {
-			"HIPVeldin",
-			"EIP3855",
-			"EIP3860",
-			"EIP3198",
+			"HIPVeldin", // Custom fork not used in forkId
+			"EIP3855",   // Enabled on Hypra via Gaspar fork
+			"EIP3860",   // Enabled on Hypra via Gaspar fork
+			"EIP3198",   // Enabled on Hypra via Gaspar fork
 		},
 	}
 )
@@ -58,7 +58,7 @@ func nameSignalsCompatibility(name string) bool {
 }
 
 func networkSignalsCompatibility(netId uint64, name string) bool {
-	for _, s := range incompatibleNetworNameMap[netId] {
+	for _, s := range incompatibleNetworkNameMap[netId] {
 		if regexp.MustCompile(s).MatchString(name) {
 			return true
 		}

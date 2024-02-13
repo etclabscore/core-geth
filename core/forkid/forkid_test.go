@@ -204,6 +204,31 @@ func TestCreation(t *testing.T) {
 				{252500, 0, ID{Hash: checksumToBytes(0x50aed09f), Next: 0}},
 			},
 		},
+		{
+			name:    "Hypra",
+			config:  params.HypraChainConfig,
+			genesis: params.HypraGenesisHash,
+			cases: []testcase{
+				{0, 0, ID{Hash: checksumToBytes(0x61aefa70), Next: 1001}},
+				{1000, 0, ID{Hash: checksumToBytes(0x61aefa70), Next: 1001}},
+				{1001, 0, ID{Hash: checksumToBytes(0x7cc30c12), Next: 5503}},
+				{1002, 0, ID{Hash: checksumToBytes(0x7cc30c12), Next: 5503}},
+				{5502, 0, ID{Hash: checksumToBytes(0x7cc30c12), Next: 5503}},
+				{5503, 0, ID{Hash: checksumToBytes(0xc04d6826), Next: 5507}},
+				{5506, 0, ID{Hash: checksumToBytes(0xc04d6826), Next: 5507}},
+				{5507, 0, ID{Hash: checksumToBytes(0xfbb573dd), Next: 5519}},
+				{5510, 0, ID{Hash: checksumToBytes(0xfbb573dd), Next: 5519}},
+				{5519, 0, ID{Hash: checksumToBytes(0x1aebed3d), Next: 5521}}, // -- fails from here
+				{5521, 0, ID{Hash: checksumToBytes(0xfff37fb6), Next: 5527}},
+				{5526, 0, ID{Hash: checksumToBytes(0xfff37fb6), Next: 5527}},
+				{5527, 0, ID{Hash: checksumToBytes(0x6f27ec43), Next: 13_524_557}},
+				{1_000_000, 0, ID{Hash: checksumToBytes(0x6f27ec43), Next: 13_524_557}},
+				{5_000_000, 0, ID{Hash: checksumToBytes(0x6f27ec43), Next: 13_524_557}},
+				{10_000_000, 0, ID{Hash: checksumToBytes(0x6f27ec43), Next: 13_524_557}},
+				{13_524_557, 0, ID{Hash: checksumToBytes(0xb09ff5ab), Next: 27_200_177}},
+				{27_200_177, 0, ID{Hash: checksumToBytes(0x50ce6e77), Next: 40_725_107}},
+			},
+		},
 	}
 	for i, tt := range tests {
 		for j, ttt := range tt.cases {

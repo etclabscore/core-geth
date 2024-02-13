@@ -945,14 +945,15 @@ func (c *ChainConfig) SetEthashEIP1234Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEthashEIP2384Transition() *uint64 {
-	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
+	engine := c.GetConsensusEngineType()
+	if engine != ctypes.ConsensusEngineT_Ethash && engine != ctypes.ConsensusEngineT_EthashB3 {
 		return nil
 	}
 	return bigNewU64(c.MuirGlacierBlock)
 }
 
 func (c *ChainConfig) SetEthashEIP2384Transition(n *uint64) error {
-	if c.Ethash == nil {
+	if c.Ethash == nil && c.EthashB3 == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
 	c.MuirGlacierBlock = setBig(c.MuirGlacierBlock, n)

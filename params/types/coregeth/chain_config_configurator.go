@@ -980,7 +980,8 @@ func (c *CoreGethChainConfig) SetEthashEIP1234Transition(n *uint64) error {
 }
 
 func (c *CoreGethChainConfig) GetEthashEIP2384Transition() *uint64 {
-	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
+	engine := c.GetConsensusEngineType()
+	if engine != ctypes.ConsensusEngineT_Ethash && engine != ctypes.ConsensusEngineT_EthashB3 {
 		return nil
 	}
 	if c.eip2384Inferred {
@@ -995,11 +996,12 @@ func (c *CoreGethChainConfig) GetEthashEIP2384Transition() *uint64 {
 
 	// Get block number (key) from map where EIP2384 criteria is met.
 	diffN = ctypes.MapMeetsSpecification(c.DifficultyBombDelaySchedule, nil, vars.EIP2384DifficultyBombDelay, nil)
+
 	return diffN
 }
 
 func (c *CoreGethChainConfig) SetEthashEIP2384Transition(n *uint64) error {
-	if c.Ethash == nil {
+	if c.Ethash == nil && c.EthashB3 == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
 

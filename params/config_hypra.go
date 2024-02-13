@@ -128,3 +128,9 @@ var (
 		},
 	}
 )
+
+func init() {
+	// hack to override the default bomb schedule
+	eip2384 := HypraChainConfig.EIP2384FBlock.Uint64()
+	HypraChainConfig.SetEthashEIP2384Transition(&eip2384)
+}

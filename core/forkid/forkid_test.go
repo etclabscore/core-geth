@@ -50,6 +50,161 @@ func TestCreation(t *testing.T) {
 	}{
 		// Mainnet test cases
 		{
+			"mainnet",
+			params.MainnetChainConfig,
+			params.MainnetGenesisHash,
+			[]testcase{
+				{0, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},                    // Unsynced
+				{1149999, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},              // Last Frontier block
+				{1150000, 0, ID{Hash: checksumToBytes(0x97c2c34c), Next: 1920000}},              // First Homestead block
+				{1919999, 0, ID{Hash: checksumToBytes(0x97c2c34c), Next: 1920000}},              // Last Homestead block
+				{1920000, 0, ID{Hash: checksumToBytes(0x91d1f948), Next: 2463000}},              // First DAO block
+				{2462999, 0, ID{Hash: checksumToBytes(0x91d1f948), Next: 2463000}},              // Last DAO block
+				{2463000, 0, ID{Hash: checksumToBytes(0x7a64da13), Next: 2675000}},              // First Tangerine block
+				{2674999, 0, ID{Hash: checksumToBytes(0x7a64da13), Next: 2675000}},              // Last Tangerine block
+				{2675000, 0, ID{Hash: checksumToBytes(0x3edd5b10), Next: 4370000}},              // First Spurious block
+				{4369999, 0, ID{Hash: checksumToBytes(0x3edd5b10), Next: 4370000}},              // Last Spurious block
+				{4370000, 0, ID{Hash: checksumToBytes(0xa00bc324), Next: 7280000}},              // First Byzantium block
+				{7279999, 0, ID{Hash: checksumToBytes(0xa00bc324), Next: 7280000}},              // Last Byzantium block
+				{7280000, 0, ID{Hash: checksumToBytes(0x668db0af), Next: 9069000}},              // First and last Constantinople, first Petersburg block
+				{9068999, 0, ID{Hash: checksumToBytes(0x668db0af), Next: 9069000}},              // Last Petersburg block
+				{9069000, 0, ID{Hash: checksumToBytes(0x879d6e30), Next: 9200000}},              // First Istanbul and first Muir Glacier block
+				{9199999, 0, ID{Hash: checksumToBytes(0x879d6e30), Next: 9200000}},              // Last Istanbul and first Muir Glacier block
+				{9200000, 0, ID{Hash: checksumToBytes(0xe029e991), Next: 12244000}},             // First Muir Glacier block
+				{12243999, 0, ID{Hash: checksumToBytes(0xe029e991), Next: 12244000}},            // Last Muir Glacier block
+				{12244000, 0, ID{Hash: checksumToBytes(0x0eb440f6), Next: 12965000}},            // First Berlin block
+				{12964999, 0, ID{Hash: checksumToBytes(0x0eb440f6), Next: 12965000}},            // Last Berlin block
+				{12965000, 0, ID{Hash: checksumToBytes(0xb715077d), Next: 13773000}},            // First London block
+				{13772999, 0, ID{Hash: checksumToBytes(0xb715077d), Next: 13773000}},            // Last London block
+				{13773000, 0, ID{Hash: checksumToBytes(0x20c327fc), Next: 15050000}},            // First Arrow Glacier block
+				{15049999, 0, ID{Hash: checksumToBytes(0x20c327fc), Next: 15050000}},            // Last Arrow Glacier block
+				{15050000, 0, ID{Hash: checksumToBytes(0xf0afd0e3), Next: 1681338455}},          // First Gray Glacier block
+				{20000000, 1681338454, ID{Hash: checksumToBytes(0xf0afd0e3), Next: 1681338455}}, // Last Gray Glacier block
+				{20000000, 1681338455, ID{Hash: checksumToBytes(0xdce96c2d), Next: 0}},          // First Shanghai block
+				{30000000, 2000000000, ID{Hash: checksumToBytes(0xdce96c2d), Next: 0}},          // Future Shanghai block
+			},
+		},
+		// Goerli test cases
+		{
+			"goerli",
+			params.GoerliChainConfig,
+			params.GoerliGenesisHash,
+			[]testcase{
+				{0, 0, ID{Hash: checksumToBytes(0xa3f5ab08), Next: 1561651}},                   // Unsynced, last Frontier, Homestead, Tangerine, Spurious, Byzantium, Constantinople and first Petersburg block
+				{1561650, 0, ID{Hash: checksumToBytes(0xa3f5ab08), Next: 1561651}},             // Last Petersburg block
+				{1561651, 0, ID{Hash: checksumToBytes(0xc25efa5c), Next: 4460644}},             // First Istanbul block
+				{4460643, 0, ID{Hash: checksumToBytes(0xc25efa5c), Next: 4460644}},             // Last Istanbul block
+				{4460644, 0, ID{Hash: checksumToBytes(0x757a1c47), Next: 5062605}},             // First Berlin block
+				{5000000, 0, ID{Hash: checksumToBytes(0x757a1c47), Next: 5062605}},             // Last Berlin block
+				{5062605, 0, ID{Hash: checksumToBytes(0xB8C6299D), Next: 1678832736}},          // First London block
+				{6000000, 1678832735, ID{Hash: checksumToBytes(0xB8C6299D), Next: 1678832736}}, // Last London block
+				{6000001, 1678832736, ID{Hash: checksumToBytes(0xf9843abf), Next: 0}},          // First Shanghai block
+				{6500000, 2678832736, ID{Hash: checksumToBytes(0xf9843abf), Next: 0}},          // Future Shanghai block
+			},
+		},
+		// Sepolia test cases
+		{
+			"sepolia",
+			params.SepoliaChainConfig,
+			params.SepoliaGenesisHash,
+			[]testcase{
+				{0, 0, ID{Hash: checksumToBytes(0xfe3366e7), Next: 1735371}},                   // Unsynced, last Frontier, Homestead, Tangerine, Spurious, Byzantium, Constantinople, Petersburg, Istanbul, Berlin and first London block
+				{1735370, 0, ID{Hash: checksumToBytes(0xfe3366e7), Next: 1735371}},             // Last London block
+				{1735371, 0, ID{Hash: checksumToBytes(0xb96cbd13), Next: 1677557088}},          // First MergeNetsplit block
+				{1735372, 1677557087, ID{Hash: checksumToBytes(0xb96cbd13), Next: 1677557088}}, // Last MergeNetsplit block
+				{1735372, 1677557088, ID{Hash: checksumToBytes(0xf7f9bc08), Next: 0}},          // First Shanghai block
+			},
+		},
+		{
+			"classic",
+			params.ClassicChainConfig,
+			params.MainnetGenesisHash,
+			[]testcase{
+				{0, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
+				{1, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
+				{2, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
+				{3, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
+				{9, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
+				{10, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
+				{1149999, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
+				{1150000, 0, ID{Hash: checksumToBytes(0x97c2c34c), Next: 2500000}},
+				{1150001, 0, ID{Hash: checksumToBytes(0x97c2c34c), Next: 2500000}},
+				{2499999, 0, ID{Hash: checksumToBytes(0x97c2c34c), Next: 2500000}},
+				{2500000, 0, ID{Hash: checksumToBytes(0xdb06803f), Next: 3000000}},
+				{2500001, 0, ID{Hash: checksumToBytes(0xdb06803f), Next: 3000000}},
+				{2999999, 0, ID{Hash: checksumToBytes(0xdb06803f), Next: 3000000}},
+				{3000000, 0, ID{Hash: checksumToBytes(0xaff4bed4), Next: 5000000}},
+				{3000001, 0, ID{Hash: checksumToBytes(0xaff4bed4), Next: 5000000}},
+				{4999999, 0, ID{Hash: checksumToBytes(0xaff4bed4), Next: 5000000}},
+				{5000000, 0, ID{Hash: checksumToBytes(0xf79a63c0), Next: 5900000}},
+				{5000001, 0, ID{Hash: checksumToBytes(0xf79a63c0), Next: 5900000}},
+				{5899999, 0, ID{Hash: checksumToBytes(0xf79a63c0), Next: 5900000}},
+				{5900000, 0, ID{Hash: checksumToBytes(0x744899d6), Next: 8772000}},
+				{5900001, 0, ID{Hash: checksumToBytes(0x744899d6), Next: 8772000}},
+				{8771999, 0, ID{Hash: checksumToBytes(0x744899d6), Next: 8772000}},
+				{8772000, 0, ID{Hash: checksumToBytes(0x518b59c6), Next: 9573000}},
+				{8772001, 0, ID{Hash: checksumToBytes(0x518b59c6), Next: 9573000}},
+				{9572999, 0, ID{Hash: checksumToBytes(0x518b59c6), Next: 9573000}},
+				{9573000, 0, ID{Hash: checksumToBytes(0x7ba22882), Next: 10500839}},
+				{9573001, 0, ID{Hash: checksumToBytes(0x7ba22882), Next: 10500839}},
+				{10500838, 0, ID{Hash: checksumToBytes(0x7ba22882), Next: 10500839}},
+				{10500839, 0, ID{Hash: checksumToBytes(0x9007bfcc), Next: 11_700_000}},
+				{10500840, 0, ID{Hash: checksumToBytes(0x9007bfcc), Next: 11_700_000}},
+				{11_699_999, 0, ID{Hash: checksumToBytes(0x9007bfcc), Next: 11_700_000}},
+				{11_700_000, 0, ID{Hash: checksumToBytes(0xdb63a1ca), Next: 13_189_133}},
+				{11_700_001, 0, ID{Hash: checksumToBytes(0xdb63a1ca), Next: 13_189_133}},
+				{13_189_132, 0, ID{Hash: checksumToBytes(0xdb63a1ca), Next: 13_189_133}},
+				{13_189_133, 0, ID{Hash: checksumToBytes(0x0f6bf187), Next: 14_525_000}},
+				{13_189_134, 0, ID{Hash: checksumToBytes(0x0f6bf187), Next: 14_525_000}},
+				{14_524_999, 0, ID{Hash: checksumToBytes(0x0f6bf187), Next: 14_525_000}},
+				{14_525_000, 0, ID{Hash: checksumToBytes(0x7fd1bb25), Next: 19_250_000}},
+				{14_525_001, 0, ID{Hash: checksumToBytes(0x7fd1bb25), Next: 19_250_000}},
+				{19_249_999, 0, ID{Hash: checksumToBytes(0x7fd1bb25), Next: 19_250_000}},
+				{19_250_000, 0, ID{Hash: checksumToBytes(0xbe46d57c), Next: 0}},
+				{19_250_001, 0, ID{Hash: checksumToBytes(0xbe46d57c), Next: 0}},
+			},
+		},
+		{
+			"mordor",
+			params.MordorChainConfig,
+			params.MordorGenesisHash,
+			[]testcase{
+				{0, 0, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
+				{1, 0, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
+				{2, 0, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
+				{3, 0, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
+				{9, 0, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
+				{10, 0, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
+				{301242, 0, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
+				{301243, 0, ID{Hash: checksumToBytes(0x604f6ee1), Next: 999983}},
+				{301244, 0, ID{Hash: checksumToBytes(0x604f6ee1), Next: 999983}},
+				{999982, 0, ID{Hash: checksumToBytes(0x604f6ee1), Next: 999983}},
+				{999983, 0, ID{Hash: checksumToBytes(0xf42f5539), Next: 2_520_000}},
+				{999984, 0, ID{Hash: checksumToBytes(0xf42f5539), Next: 2_520_000}},
+				{2_519_999, 0, ID{Hash: checksumToBytes(0xf42f5539), Next: 2_520_000}},
+				{2_520_000, 0, ID{Hash: checksumToBytes(0x66b5c286), Next: 3_985_893}},
+				{3_985_892, 0, ID{Hash: checksumToBytes(0x66b5c286), Next: 3_985_893}},
+				{3_985_893, 0, ID{Hash: checksumToBytes(0x92b323e0), Next: 5_520_000}},
+				{3_985_894, 0, ID{Hash: checksumToBytes(0x92b323e0), Next: 5_520_000}},
+				{5_519_999, 0, ID{Hash: checksumToBytes(0x92b323e0), Next: 5_520_000}},
+				{5_520_000, 0, ID{Hash: checksumToBytes(0x8c9b1797), Next: 9_957_000}},
+				{5_520_001, 0, ID{Hash: checksumToBytes(0x8c9b1797), Next: 9_957_000}},
+				{9_956_999, 0, ID{Hash: checksumToBytes(0x8c9b1797), Next: 9_957_000}},
+				{9_957_000, 0, ID{Hash: checksumToBytes(0x3a6b00d7), Next: 0}},
+				{9_957_001, 0, ID{Hash: checksumToBytes(0x3a6b00d7), Next: 0}},
+			},
+		},
+		// MintMe test cases
+		{
+			"mintme",
+			params.MintMeChainConfig,
+			params.MintMeGenesisHash,
+			[]testcase{
+				{0, 0, ID{Hash: checksumToBytes(0x02bf4180), Next: 252500}},
+				{252500, 0, ID{Hash: checksumToBytes(0x50aed09f), Next: 0}},
+			},
+		},
+		{
 			name:    "Hypra",
 			config:  params.HypraChainConfig,
 			genesis: params.HypraGenesisHash,

@@ -1334,7 +1334,7 @@ func (c *CoreGethChainConfig) SetLyra2NonceTransition(n *uint64) error {
 }
 
 func (c *CoreGethChainConfig) GetHIPVeldinTransition() *uint64 {
-	if c.GetChainID() != big.NewInt(622277) {
+	if c.GetChainID().Uint64() != 622277 {
 		return nil
 	}
 	return bigNewU64(c.HIPVeldinFBlock)

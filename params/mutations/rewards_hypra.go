@@ -43,7 +43,7 @@ func GetRewardsHypra(config ctypes.ChainConfigurator, header *types.Header, uncl
 
 	if len(uncles) == 0 { // If no uncles, the miner gets the entire block fee.
 		minerReward.Add(minerReward, blockFeeReward)
-	} else if config.IsEnabled(config.GetEIP2718Transition, header.Number) { // During Berlin block, each miner and uncles are rewarded the block fee.
+	} else if config.IsEnabled(config.GetEIP2929Transition, header.Number) { // During Berlin block, each miner and uncles are rewarded the block fee.
 		uncleReward.Add(uncleReward, blockFeeReward)
 		minerReward.Add(minerReward, blockFeeReward)
 	} else if config.IsEnabled(config.GetEthashHomesteadTransition, header.Number) { // Until Berlin block, Miners and Uncles are rewarded for the amount of uncles generated.
@@ -54,7 +54,7 @@ func GetRewardsHypra(config ctypes.ChainConfigurator, header *types.Header, uncl
 
 	uncleRewards := make([]*big.Int, len(uncles))
 	for i, _ := range uncles {
-		uncleRewards[i].Set(uncleReward)
+		uncleRewards[i] = uncleReward
 
 		if config.IsEnabled(config.GetHIPVeldinTransition, header.Number) {
 			minerReward.Add(minerReward, uncleReward)

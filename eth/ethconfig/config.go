@@ -228,6 +228,7 @@ type Config struct {
 
 	// Manual configuration field for ECBP1100 activation number. Used for modifying genesis config via CLI flag.
 	ECBP1100 *big.Int
+
 	// Manual configuration field for ECBP1100's disablement block number. Used for modifying genesis config via CLI flag.
 	OverrideECBP1100Deactivate *big.Int
 

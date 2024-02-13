@@ -115,10 +115,10 @@ var (
 		},
 
 		TrustedCheckpoint: &ctypes.TrustedCheckpoint{
-			BloomRoot:    common.HexToHash("0xb09a3dc1215903dc757dd83c960c6dd77ec508e03c185b16df62af069d197fc3"),
-			CHTRoot:      common.HexToHash("0x21f6a69cbd097bd2c1d250ed7144888e483d46105b66a99a68e4847c99a863cd"),
-			SectionHead:  common.HexToHash("0x2461cbf15f92264332e09ba8a9d6b9106c12b3cf0e7d7bfff78483c1b271e902"),
-			SectionIndex: 43,
+			BloomRoot:    common.HexToHash("0x60920705aff6a1441f0d7788864c705a5bfa3bcde92241689428c3a8a591f2ad"),
+			CHTRoot:      common.HexToHash("0x4433e5c69618532e76baac60a97644376abd61709b4f4ac00068ab04c240de8d"),
+			SectionHead:  common.HexToHash("0xab8c36d437605d3ed00c908a5839485e76fb07183932a60661c91fa5ee3ac320"),
+			SectionIndex: 61,
 		},
 
 		RequireBlockHashes: map[uint64]common.Hash{

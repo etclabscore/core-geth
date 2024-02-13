@@ -1272,7 +1272,7 @@ func (c *CoreGethChainConfig) SetEthashDifficultyBombDelaySchedule(m ctypes.Uint
 
 func (c *CoreGethChainConfig) GetEthashBlockRewardSchedule() ctypes.Uint64BigMapEncodesHex {
 	engineType := c.GetConsensusEngineType()
-	if engineType == ctypes.ConsensusEngineT_Ethash || engineType == ctypes.ConsensusEngineT_EthashB3 {
+	if engineType != ctypes.ConsensusEngineT_Ethash && engineType != ctypes.ConsensusEngineT_EthashB3 {
 		return nil
 	}
 	return c.BlockRewardSchedule

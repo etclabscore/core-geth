@@ -102,8 +102,8 @@ var (
 		// EIP4895FBlock: nil, // Beacon chain push withdrawals as operations
 
 		// Dummy EIPs, unused by ethashb3
-		//EIP3554FBlock: big.NewInt(13_524_557),
-		//EIP3541FBlock: big.NewInt(13_524_557),
+		EIP3554FBlock: big.NewInt(13_524_557),
+		EIP3541FBlock: big.NewInt(13_524_557),
 		//EIP4345FBlock: big.NewInt(27_200_177),
 		//EIP5133FBlock: big.NewInt(40_725_107),
 		// Define the planned 3 year decreasing rewards.

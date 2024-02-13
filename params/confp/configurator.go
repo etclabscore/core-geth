@@ -31,9 +31,20 @@ var (
 	// compatibleProtocolNameSchemes define matchable naming schemes used by configuration methods
 	// that are not incompatible with configuration either having or lacking them.
 	compatibleProtocolNameSchemes = []string{
-		"ECBP",      // "Ethereum Classic Best Practice"
-		"EBP",       // "Ethereum Best Practice"
-		"HIPVeldin", // Hypra Veldin reward Patch
+		"ECBP", // "Ethereum Classic Best Practice"
+		"EBP",  // "Ethereum Best Practice"
+	}
+
+	// incompatibleNetworkMap defines matchable naming schemes which are incompatible with certain
+	// legacy networks or networks who use their own forks unincluded in forkid.
+	// Introduced by Hypra (622277)
+	incompatibleNetworNameMap = map[uint64][]string{
+		622277: {
+			"HIPVeldin",
+			"EIP3855",
+			"EIP3860",
+			"EIP3198",
+		},
 	}
 )
 
@@ -44,6 +55,16 @@ func nameSignalsCompatibility(name string) bool {
 		}
 	}
 	return false
+}
+
+func networkSignalsCompatibility(netId uint64, name string) bool {
+	for _, s := range incompatibleNetworNameMap[netId] {
+		if regexp.MustCompile(s).MatchString(name) {
+			return true
+		}
+	}
+	return false
+
 }
 
 var (
@@ -468,6 +489,11 @@ func BlockForks(conf ctypes.ChainConfigurator) []uint64 {
 		if nameSignalsCompatibility(names[i]) {
 			continue
 		}
+
+		if networkSignalsCompatibility(conf.GetChainID().Uint64(), names[i]) {
+			continue
+		}
+
 		// Extract the fork rule block number and aggregate it
 		response := tr()
 		if response == nil ||

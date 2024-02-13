@@ -44,6 +44,7 @@ var (
 			"EIP3855",   // Enabled on Hypra via Gaspar fork
 			"EIP3860",   // Enabled on Hypra via Gaspar fork
 			"EIP3198",   // Enabled on Hypra via Gaspar fork
+			"EIP3529",   // Enabled on Hypra via Gaspar fork
 		},
 	}
 )

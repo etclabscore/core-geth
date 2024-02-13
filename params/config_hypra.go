@@ -38,7 +38,7 @@ var (
 		EIP7FBlock: big.NewInt(0),
 		// This is 0 on Hypra but Fork support is nil. Should this be enabled or not?
 		// DAOForkSupport isnt in this struct
-		DAOForkBlock: big.NewInt(0),
+		//DAOForkBlock: big.NewInt(0),
 		EIP150Block:  big.NewInt(0),
 		EIP155Block:  big.NewInt(0),
 		EIP160FBlock: big.NewInt(0),
@@ -53,7 +53,7 @@ var (
 		EIP212FBlock: big.NewInt(1001),
 		EIP213FBlock: big.NewInt(1001),
 		EIP214FBlock: big.NewInt(1001),
-		EIP649FBlock: big.NewInt(1001),
+		//EIP649FBlock: big.NewInt(1001),
 		EIP658FBlock: big.NewInt(1001),
 
 		// Constantinople eq
@@ -86,11 +86,12 @@ var (
 		EIP3855FBlock: big.NewInt(1_600_957), // PUSH0 instruction
 		EIP3860FBlock: big.NewInt(1_600_957), // Limit and meter initcode
 		EIP3198FBlock: big.NewInt(1_600_957), // BASEFEE Opcode
+		EIP3529FBlock: big.NewInt(1_600_957), // Reduction in refunds
 
 		// London chain upgrades, aka Planned Eudora
 		// TODO: move block numbers closer once testing has concluded
-		EIP1559FBlock: big.NewInt(13_524_557), // EIP-1559 transactions`
-		EIP3529FBlock: big.NewInt(13_524_557), // Reduction in refunds
+		//EIP1559FBlock: big.NewInt(13_524_557), // EIP-1559 transactions`
+		//EIP3541FBlock: big.NewInt(13_524_557), // EIP-3541 Reject code starting with 0xEF
 
 		// Unplanned Upgrade, aka Olantis
 		// EIP3651FBlock: big.NewInt(13_524_557), // Warm COINBASE (gas reprice)
@@ -101,11 +102,12 @@ var (
 		// EIP4399FBlock: nil, // Supplant DIFFICULTY with PREVRANDAO. Hypra  does not spec 4399 because it's still PoW, and 4399 is only applicable for the PoS system.
 		// EIP4895FBlock: nil, // Beacon chain push withdrawals as operations
 
-		// Dummy EIPs, unused by ethashb3
+		// Dummy EIPs, unused by ethashb3 but used by forkid
 		EIP3554FBlock: big.NewInt(13_524_557),
 		EIP3541FBlock: big.NewInt(13_524_557),
 		//EIP4345FBlock: big.NewInt(27_200_177),
 		//EIP5133FBlock: big.NewInt(40_725_107),
+
 		// Define the planned 3 year decreasing rewards.
 		BlockRewardSchedule: map[uint64]*big.Int{
 			0:          big.NewInt(4 * vars.Ether),

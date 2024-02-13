@@ -19,9 +19,9 @@ Upstream development from [ethereum/go-ethereum](https://github.com/ethereum/go-
 Networks supported by the respective go-ethereum packaged `geth` program.
 
 | Ticker | Consensus         | Network                               | core-geth                                                | ethereum/go-ethereum |
-| ---    | ---               | ---                                   | ---                                                      | ---                  |
-| ETC    | :zap:             | Ethereum Classic                      | :heavy_check_mark:                                       |                      |
-| ETH    | :zap:             | Ethereum (Foundation)                 | :heavy_check_mark:                                       | :heavy_check_mark:   |
+|--------|-------------------|---------------------------------------| ---                                                      | ---                  |
+| ETC    | :zap: Ethash      | Ethereum Classic                      | :heavy_check_mark:                                       |                      |
+| ETH    | :zap: Ethash      | Ethereum (Foundation)                 | :heavy_check_mark:                                       | :heavy_check_mark:   |
 | -      | :zap: :handshake: | Private chains                        | :heavy_check_mark:                                       | :heavy_check_mark:   |
 |        | :zap:             | Mordor (Geth+Parity ETH PoW Testnet)  | :heavy_check_mark:                                       |                      |
 |        | :zap:             | Morden (Geth+Parity ETH PoW Testnet)  |                                                          |                      |
@@ -31,10 +31,17 @@ Networks supported by the respective go-ethereum packaged `geth` program.
 |        | :handshake:       | Kovan (Parity-only ETH PoA Testnet)   |                                                          |                      |
 |        |                   | Tobalaba (EWF Testnet)                |                                                          |                      |
 |        |                   | Ephemeral development PoA network     | :heavy_check_mark:                                       | :heavy_check_mark:   |
-| MINTME | :zap:             | MintMe.com Coin                       | :heavy_check_mark:                                       |                      |
+| MINTME | :zap: Lyra2       | MintMe.com Coin                       | :heavy_check_mark:                                       |                      |
+| HYP    | :zap: EthashB3    | Hypra Network                         | :heavy_check_mark:                                       |                      |
 
 - :zap: = __Proof of Work__
 - :handshake: = __Proof of Authority__
+
+Supported Algorithms
+- Ethash
+- Etchash
+- EthashB3
+- Lyra2
 
 <a name="ellaism-footnote">1</a>: This is originally an [Ellaism
 Project](https://github.com/ellaism). However, A [recent hard

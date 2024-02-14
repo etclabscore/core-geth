@@ -1865,6 +1865,11 @@ func setMiner(ctx *cli.Context, cfg *miner.Config) {
 	}
 	if ctx.IsSet(MinerGasLimitFlag.Name) {
 		cfg.GasCeil = ctx.Uint64(MinerGasLimitFlag.Name)
+	} else {
+		// For classic and mordor chains, maintain the gas limit at 8M
+		if ctx.Bool(ClassicFlag.Name) || ctx.Bool(MordorFlag.Name) {
+			cfg.GasCeil = 8000000
+		}
 	}
 	if ctx.IsSet(MinerGasPriceFlag.Name) {
 		cfg.GasPrice = flags.GlobalBig(ctx, MinerGasPriceFlag.Name)

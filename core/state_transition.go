@@ -19,6 +19,7 @@ package core
 import (
 	"errors"
 	"fmt"
+	"github.com/ethereum/go-ethereum/params"
 	"math"
 	"math/big"
 
@@ -376,35 +377,38 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		msg              = st.msg
 		sender           = vm.AccountRef(msg.From)
 		contractCreation = msg.To == nil
+		chainConfig      = st.evm.ChainConfig()
 
 		// EIP-2: Homestead
-		eip2f = st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP2Transition, st.evm.Context.BlockNumber)
+		eip2f = chainConfig.IsEnabled(chainConfig.GetEIP2Transition, st.evm.Context.BlockNumber)
 
 		// Istanbul
 		// https://eips.ethereum.org/EIPS/eip-1679
 		// EIP-2028: Calldata gas cost reduction
-		eip2028f = st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP2028Transition, st.evm.Context.BlockNumber)
+		eip2028f = chainConfig.IsEnabled(chainConfig.GetEIP2028Transition, st.evm.Context.BlockNumber)
 
 		// Berlin
 		// https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/berlin.md
 		// EIP-2930: Optional access lists
-		eip2930f = st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP2930Transition, st.evm.Context.BlockNumber)
+		eip2930f = chainConfig.IsEnabled(chainConfig.GetEIP2930Transition, st.evm.Context.BlockNumber)
 
 		// London
 		// https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/london.md
 		// EIP-1559: Fee market change: burn fee and tips
-		eip1559f = st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP1559Transition, st.evm.Context.BlockNumber)
+		eip1559f = chainConfig.IsEnabled(chainConfig.GetEIP1559Transition, st.evm.Context.BlockNumber)
 
 		// EIP-3529: Reduction in refunds
-		eip3529f = st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP3529Transition, st.evm.Context.BlockNumber)
+		eip3529f = chainConfig.IsEnabled(chainConfig.GetEIP3529Transition, st.evm.Context.BlockNumber) &&
+			chainConfig.GetChainID().Uint64() != params.HypraChainId // Hypra did an oopsie and didn't fully enable EIP-3860, will be appended with another fork to TODO: fix this
 
 		// EIP-3860: Limit and meter initcode
-		eip3860f = st.evm.ChainConfig().IsEnabledByTime(st.evm.ChainConfig().GetEIP3860TransitionTime, &st.evm.Context.Time) ||
-			st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP3860Transition, st.evm.Context.BlockNumber)
+		eip3860f = chainConfig.IsEnabledByTime(chainConfig.GetEIP3860TransitionTime, &st.evm.Context.Time) ||
+			chainConfig.IsEnabled(chainConfig.GetEIP3860Transition, st.evm.Context.BlockNumber) &&
+				chainConfig.GetChainID().Uint64() != params.HypraChainId // Hypra did an oopsie and didn't fully enable EIP-3860, will be appended with another fork to TODO: fix this
 
 		// EIP-3651: Warm coinbase
-		eip3651f = st.evm.ChainConfig().IsEnabledByTime(st.evm.ChainConfig().GetEIP3651TransitionTime, &st.evm.Context.Time) ||
-			st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP3651Transition, st.evm.Context.BlockNumber)
+		eip3651f = chainConfig.IsEnabledByTime(chainConfig.GetEIP3651TransitionTime, &st.evm.Context.Time) ||
+			chainConfig.IsEnabled(chainConfig.GetEIP3651Transition, st.evm.Context.BlockNumber)
 	)
 
 	// Check clauses 4-5, subtract intrinsic gas if everything is correct

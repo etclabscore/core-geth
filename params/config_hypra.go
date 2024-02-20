@@ -53,7 +53,6 @@ var (
 		EIP212FBlock: big.NewInt(1001),
 		EIP213FBlock: big.NewInt(1001),
 		EIP214FBlock: big.NewInt(1001),
-		//EIP649FBlock: big.NewInt(1001),
 		EIP658FBlock: big.NewInt(1001),
 
 		// Constantinople eq
@@ -88,13 +87,14 @@ var (
 		EIP3198FBlock: big.NewInt(1_600_957), // BASEFEE Opcode
 		EIP3529FBlock: big.NewInt(1_600_957), // Reduction in refunds
 
-		// London chain upgrades, aka Planned Eudora
+		// London chain upgrades TX Type 2, aka Planned Eudora
 		// TODO: move block numbers closer once testing has concluded
-		//EIP1559FBlock: big.NewInt(13_524_557), // EIP-1559 transactions`
-		//EIP3541FBlock: big.NewInt(13_524_557), // EIP-3541 Reject code starting with 0xEF
+		// EIP1559FBlock: big.NewInt(13_524_557), // EIP-1559 transactions`
+		// EIP3541FBlock: big.NewInt(13_524_557), // EIP-3541 Reject code starting with 0xEF
+		// EIP3651FBlock: big.NewInt(13_524_557), // Warm COINBASE (gas reprice)
+		// EIP3541FBlock: big.NewInt(13_524_557), // Reject new contract code starting with the 0xEF byte
 
 		// Unplanned Upgrade, aka Olantis
-		// EIP3651FBlock: big.NewInt(13_524_557), // Warm COINBASE (gas reprice)
 		// EIP6049FBlock: big.NewInt(13_524_557), // Deprecate SELFDESTRUCT
 		// EIP3541FBlock: big.NewInt(13_524_557), // Reject new contract code starting with the 0xEF byte
 
@@ -128,6 +128,11 @@ var (
 			512_000:   common.HexToHash("0xd547c896967174295c61ea18534d3c69337a6fa6e957909dc29e4bcba873592a"),
 			1_878_299: common.HexToHash("0x1834091726bd0890539db04a22b673a6d9262d8b350dffaefdb10abc72e2113d"),
 		},
+
+		// No go
+		EIP4399FBlock:           nil, // Supplant DIFFICULTY with PREVRANDAO. Hypra  does not spec 4399 because it's still PoW, and 4399 is only applicable for the PoS system.
+		EIP4895FBlock:           nil, // Beacon chain push withdrawals as operations
+		TerminalTotalDifficulty: nil, // Ewwww
 	}
 )
 

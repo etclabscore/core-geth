@@ -18,8 +18,8 @@ var _ = (*stTransactionMarshaling)(nil)
 func (s stTransaction) MarshalJSON() ([]byte, error) {
 	type stTransaction struct {
 		GasPrice             *math.HexOrDecimal256 `json:"gasPrice"`
-		MaxFeePerGas         *math.HexOrDecimal256 `json:"maxFeePerGas"`
-		MaxPriorityFeePerGas *math.HexOrDecimal256 `json:"maxPriorityFeePerGas"`
+		MaxFeePerGas         *math.HexOrDecimal256 `json:"maxFeePerGas,omitempty"`
+		MaxPriorityFeePerGas *math.HexOrDecimal256 `json:"maxPriorityFeePerGas,omitempty"`
 		Nonce                math.HexOrDecimal64   `json:"nonce"`
 		To                   string                `json:"to"`
 		Data                 []string              `json:"data"`
@@ -27,7 +27,7 @@ func (s stTransaction) MarshalJSON() ([]byte, error) {
 		GasLimit             []math.HexOrDecimal64 `json:"gasLimit"`
 		Value                []string              `json:"value"`
 		PrivateKey           hexutil.Bytes         `json:"secretKey"`
-		Sender               *common.Address       `json:"sender"`
+		Sender               *common.Address       `json:"sender,omitempty"`
 		BlobVersionedHashes  []common.Hash         `json:"blobVersionedHashes,omitempty"`
 		BlobGasFeeCap        *math.HexOrDecimal256 `json:"maxFeePerBlobGas,omitempty"`
 	}
@@ -57,8 +57,8 @@ func (s stTransaction) MarshalJSON() ([]byte, error) {
 func (s *stTransaction) UnmarshalJSON(input []byte) error {
 	type stTransaction struct {
 		GasPrice             *math.HexOrDecimal256 `json:"gasPrice"`
-		MaxFeePerGas         *math.HexOrDecimal256 `json:"maxFeePerGas"`
-		MaxPriorityFeePerGas *math.HexOrDecimal256 `json:"maxPriorityFeePerGas"`
+		MaxFeePerGas         *math.HexOrDecimal256 `json:"maxFeePerGas,omitempty"`
+		MaxPriorityFeePerGas *math.HexOrDecimal256 `json:"maxPriorityFeePerGas,omitempty"`
 		Nonce                *math.HexOrDecimal64  `json:"nonce"`
 		To                   *string               `json:"to"`
 		Data                 []string              `json:"data"`
@@ -66,7 +66,7 @@ func (s *stTransaction) UnmarshalJSON(input []byte) error {
 		GasLimit             []math.HexOrDecimal64 `json:"gasLimit"`
 		Value                []string              `json:"value"`
 		PrivateKey           *hexutil.Bytes        `json:"secretKey"`
-		Sender               *common.Address       `json:"sender"`
+		Sender               *common.Address       `json:"sender,omitempty"`
 		BlobVersionedHashes  []common.Hash         `json:"blobVersionedHashes,omitempty"`
 		BlobGasFeeCap        *math.HexOrDecimal256 `json:"maxFeePerBlobGas,omitempty"`
 	}

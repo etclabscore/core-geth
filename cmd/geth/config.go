@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"math/big"
 	"os"
 	"reflect"
 	"runtime"
@@ -174,7 +173,7 @@ func makeFullNode(ctx *cli.Context) (*node.Node, ethapi.Backend) {
 	stack, cfg := makeConfigNode(ctx)
 	if ctx.IsSet(utils.ECBP1100Flag.Name) {
 		if n := ctx.Uint64(utils.ECBP1100Flag.Name); n != math.MaxUint64 {
-			cfg.Eth.ECBP1100 = new(big.Int).SetUint64(n)
+			cfg.Eth.OverrideECBP1100 = &n
 		}
 	}
 	if ctx.IsSet(utils.ECBP1100NoDisableFlag.Name) {
@@ -184,7 +183,7 @@ func makeFullNode(ctx *cli.Context) (*node.Node, ethapi.Backend) {
 	}
 	if ctx.IsSet(utils.OverrideECBP1100DeactivateFlag.Name) {
 		if n := ctx.Uint64(utils.OverrideECBP1100DeactivateFlag.Name); n != math.MaxUint64 {
-			cfg.Eth.OverrideECBP1100Deactivate = new(big.Int).SetUint64(n)
+			cfg.Eth.OverrideECBP1100Deactivate = &n
 		}
 	}
 	if ctx.IsSet(utils.OverrideShanghai.Name) {

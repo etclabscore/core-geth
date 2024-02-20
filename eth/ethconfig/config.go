@@ -18,7 +18,6 @@
 package ethconfig
 
 import (
-	"math/big"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -227,10 +226,9 @@ type Config struct {
 	CheckpointOracle *ctypes.CheckpointOracleConfig `toml:",omitempty"`
 
 	// Manual configuration field for ECBP1100 activation number. Used for modifying genesis config via CLI flag.
-	ECBP1100 *big.Int
-
+	OverrideECBP1100 *uint64 `toml:",omitempty"`
 	// Manual configuration field for ECBP1100's disablement block number. Used for modifying genesis config via CLI flag.
-	OverrideECBP1100Deactivate *big.Int
+	OverrideECBP1100Deactivate *uint64 `toml:",omitempty"`
 
 	// ECBP1100NoDisable overrides
 	// When this value is *true, ECBP100 will not (ever) be disabled; when *false, it will never be enabled.

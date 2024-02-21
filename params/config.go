@@ -23,7 +23,6 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
-	"github.com/ethereum/go-ethereum/params/forks"
 )
 
 // Genesis hashes to enforce below configs on.
@@ -261,7 +260,7 @@ var (
 
 	// MergedTestChainConfig contains every protocol change (EIPs) introduced
 	// and accepted by the Ethereum core developers for testing purposes.
-	MergedTestChainConfig = &ChainConfig{
+	MergedTestChainConfig = &goethereum.ChainConfig{
 		ChainID:                       big.NewInt(1),
 		HomesteadBlock:                big.NewInt(0),
 		DAOForkBlock:                  nil,
@@ -285,7 +284,7 @@ var (
 		VerkleTime:                    nil,
 		TerminalTotalDifficulty:       big.NewInt(0),
 		TerminalTotalDifficultyPassed: true,
-		Ethash:                        new(EthashConfig),
+		Ethash:                        new(ctypes.EthashConfig),
 		Clique:                        nil,
 	}
 

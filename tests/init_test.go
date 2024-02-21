@@ -65,10 +65,11 @@ var (
 	legacyStateTestDir = filepath.Join(baseDir, "LegacyTests", "Constantinople", "GeneralStateTests")
 	transactionTestDir = filepath.Join(baseDir, "TransactionTests")
 	rlpTestDir         = filepath.Join(baseDir, "RLPTests")
-	difficultyTestDir  = filepath.Join(baseDir, "DifficultyTests") // TODO(meowsbits): upstream: BasicTests. Did they rename? Did we?
-	// difficultyTestDir  = filepath.Join(baseDir, "BasicTests")
-	executionSpecDir = filepath.Join(".", "spec-tests", "fixtures")
-	benchmarksDir    = filepath.Join(".", "evm-benchmarks", "benchmarks")
+	difficultyTestDir  = filepath.Join(baseDir, "BasicTests")
+	// difficultyTestDir  = filepath.Join(baseDir, "DifficultyTests") // TODO(meowsbits): upstream: BasicTests. Did they rename? Did we?
+	executionSpecBlockchainTestDir = filepath.Join(".", "spec-tests", "fixtures", "blockchain_tests")
+	executionSpecStateTestDir      = filepath.Join(".", "spec-tests", "fixtures", "state_tests")
+	benchmarksDir                  = filepath.Join(".", "evm-benchmarks", "benchmarks")
 
 	baseDirETC           = filepath.Join(".", "testdata-etc")
 	stateTestDirETC      = filepath.Join(baseDirETC, "GeneralStateTests")

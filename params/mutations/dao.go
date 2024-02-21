@@ -25,6 +25,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
+	"github.com/holiman/uint256"
 )
 
 var (
@@ -111,6 +112,6 @@ func ApplyDAOHardFork(statedb *state.StateDB) {
 	// Move every DAO account and extra-balance account funds into the refund contract
 	for _, addr := range vars.DAODrainList() {
 		statedb.AddBalance(vars.DAORefundContract, statedb.GetBalance(addr))
-		statedb.SetBalance(addr, new(big.Int))
+		statedb.SetBalance(addr, new(uint256.Int))
 	}
 }

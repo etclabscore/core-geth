@@ -19,6 +19,7 @@ package trie
 import (
 	"bytes"
 	"fmt"
+	"math/rand"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -31,7 +32,7 @@ import (
 )
 
 // makeTestTrie create a sample test trie to test node-wise reconstruction.
-func makeTestTrie(scheme string) (ethdb.Database, *Database, *StateTrie, map[string][]byte) {
+func makeTestTrie(scheme string) (ethdb.Database, *testDb, *StateTrie, map[string][]byte) {
 	// Create an empty trie
 	db := rawdb.NewMemoryDatabase()
 	triedb := newTestDatabase(db, scheme)
@@ -57,10 +58,10 @@ func makeTestTrie(scheme string) (ethdb.Database, *Database, *StateTrie, map[str
 		}
 	}
 	root, nodes, _ := trie.Commit(false)
-	if err := triedb.Update(root, types.EmptyRootHash, 0, trienode.NewWithNodeSet(nodes), nil); err != nil {
+	if err := triedb.Update(root, types.EmptyRootHash, trienode.NewWithNodeSet(nodes)); err != nil {
 		panic(fmt.Errorf("failed to commit db %v", err))
 	}
-	if err := triedb.Commit(root, false); err != nil {
+	if err := triedb.Commit(root); err != nil {
 		panic(err)
 	}
 	// Re-create the trie based on the new state
@@ -142,7 +143,7 @@ func TestEmptySync(t *testing.T) {
 	emptyD, _ := New(TrieID(types.EmptyRootHash), dbD)
 
 	for i, trie := range []*Trie{emptyA, emptyB, emptyC, emptyD} {
-		sync := NewSync(trie.Hash(), memorydb.New(), nil, []*Database{dbA, dbB, dbC, dbD}[i].Scheme())
+		sync := NewSync(trie.Hash(), memorydb.New(), nil, []*testDb{dbA, dbB, dbC, dbD}[i].Scheme())
 		if paths, nodes, codes := sync.Missing(1); len(paths) != 0 || len(nodes) != 0 || len(codes) != 0 {
 			t.Errorf("test %d: content requested for empty trie: %v, %v, %v", i, paths, nodes, codes)
 		}
@@ -571,7 +572,7 @@ func testIncompleteSync(t *testing.T, scheme string) {
 			hash := crypto.Keccak256Hash(result.Data)
 			if hash != root {
 				addedKeys = append(addedKeys, result.Path)
-				addedHashes = append(addedHashes, crypto.Keccak256Hash(result.Data))
+				addedHashes = append(addedHashes, hash)
 			}
 		}
 		// Fetch the next batch to retrieve
@@ -587,6 +588,10 @@ func testIncompleteSync(t *testing.T, scheme string) {
 	}
 	// Sanity check that removing any node from the database is detected
 	for i, path := range addedKeys {
+		if rand.Int31n(100) > 5 {
+			// Only check 5 percent of added keys as a sanity check
+			continue
+		}
 		owner, inner := ResolvePath([]byte(path))
 		nodeHash := addedHashes[i]
 		value := rawdb.ReadTrieNode(diskdb, owner, inner, nodeHash, scheme)
@@ -679,8 +684,11 @@ func testSyncOrdering(t *testing.T, scheme string) {
 		}
 	}
 }
+func syncWith(t *testing.T, root common.Hash, db ethdb.Database, srcDb *testDb) {
+	syncWithHookWriter(t, root, db, srcDb, nil)
+}
 
-func syncWith(t *testing.T, root common.Hash, db ethdb.Database, srcDb *Database) {
+func syncWithHookWriter(t *testing.T, root common.Hash, db ethdb.Database, srcDb *testDb, hookWriter ethdb.KeyValueWriter) {
 	// Create a destination trie and sync with the scheduler
 	sched := NewSync(root, db, nil, srcDb.Scheme())
 
@@ -718,8 +726,11 @@ func syncWith(t *testing.T, root common.Hash, db ethdb.Database, srcDb *Database
 		if err := sched.Commit(batch); err != nil {
 			t.Fatalf("failed to commit data: %v", err)
 		}
-		batch.Write()
-
+		if hookWriter != nil {
+			batch.Replay(hookWriter)
+		} else {
+			batch.Write()
+		}
 		paths, nodes, _ = sched.Missing(0)
 		elements = elements[:0]
 		for i := 0; i < len(paths); i++ {
@@ -760,10 +771,10 @@ func testSyncMovingTarget(t *testing.T, scheme string) {
 		diff[string(key)] = val
 	}
 	root, nodes, _ := srcTrie.Commit(false)
-	if err := srcDb.Update(root, preRoot, 0, trienode.NewWithNodeSet(nodes), nil); err != nil {
+	if err := srcDb.Update(root, preRoot, trienode.NewWithNodeSet(nodes)); err != nil {
 		panic(err)
 	}
-	if err := srcDb.Commit(root, false); err != nil {
+	if err := srcDb.Commit(root); err != nil {
 		panic(err)
 	}
 	preRoot = root
@@ -785,10 +796,10 @@ func testSyncMovingTarget(t *testing.T, scheme string) {
 		reverted[k] = val
 	}
 	root, nodes, _ = srcTrie.Commit(false)
-	if err := srcDb.Update(root, preRoot, 0, trienode.NewWithNodeSet(nodes), nil); err != nil {
+	if err := srcDb.Update(root, preRoot, trienode.NewWithNodeSet(nodes)); err != nil {
 		panic(err)
 	}
-	if err := srcDb.Commit(root, false); err != nil {
+	if err := srcDb.Commit(root); err != nil {
 		panic(err)
 	}
 	srcTrie, _ = NewStateTrie(TrieID(root), srcDb)
@@ -843,10 +854,10 @@ func testPivotMove(t *testing.T, scheme string, tiny bool) {
 	writeFn([]byte{0x13, 0x44}, nil, srcTrie, stateA)
 
 	rootA, nodesA, _ := srcTrie.Commit(false)
-	if err := srcTrieDB.Update(rootA, types.EmptyRootHash, 0, trienode.NewWithNodeSet(nodesA), nil); err != nil {
+	if err := srcTrieDB.Update(rootA, types.EmptyRootHash, trienode.NewWithNodeSet(nodesA)); err != nil {
 		panic(err)
 	}
-	if err := srcTrieDB.Commit(rootA, false); err != nil {
+	if err := srcTrieDB.Commit(rootA); err != nil {
 		panic(err)
 	}
 	// Create a destination trie and sync with the scheduler
@@ -862,10 +873,10 @@ func testPivotMove(t *testing.T, scheme string, tiny bool) {
 	writeFn([]byte{0x01, 0x24}, nil, srcTrie, stateB)
 
 	rootB, nodesB, _ := srcTrie.Commit(false)
-	if err := srcTrieDB.Update(rootB, rootA, 0, trienode.NewWithNodeSet(nodesB), nil); err != nil {
+	if err := srcTrieDB.Update(rootB, rootA, trienode.NewWithNodeSet(nodesB)); err != nil {
 		panic(err)
 	}
-	if err := srcTrieDB.Commit(rootB, false); err != nil {
+	if err := srcTrieDB.Commit(rootB); err != nil {
 		panic(err)
 	}
 	syncWith(t, rootB, destDisk, srcTrieDB)
@@ -880,10 +891,123 @@ func testPivotMove(t *testing.T, scheme string, tiny bool) {
 	writeFn([]byte{0x13, 0x44}, nil, srcTrie, stateC)
 
 	rootC, nodesC, _ := srcTrie.Commit(false)
-	if err := srcTrieDB.Update(rootC, rootB, 0, trienode.NewWithNodeSet(nodesC), nil); err != nil {
+	if err := srcTrieDB.Update(rootC, rootB, trienode.NewWithNodeSet(nodesC)); err != nil {
 		panic(err)
 	}
-	if err := srcTrieDB.Commit(rootC, false); err != nil {
+	if err := srcTrieDB.Commit(rootC); err != nil {
+		panic(err)
+	}
+	syncWith(t, rootC, destDisk, srcTrieDB)
+	checkTrieContents(t, destDisk, scheme, srcTrie.Hash().Bytes(), stateC, true)
+}
+
+func TestSyncAbort(t *testing.T) {
+	testSyncAbort(t, rawdb.PathScheme)
+	testSyncAbort(t, rawdb.HashScheme)
+}
+
+type hookWriter struct {
+	db     ethdb.KeyValueStore
+	filter func(key []byte, value []byte) bool
+}
+
+// Put inserts the given value into the key-value data store.
+func (w *hookWriter) Put(key []byte, value []byte) error {
+	if w.filter != nil && w.filter(key, value) {
+		return nil
+	}
+	return w.db.Put(key, value)
+}
+
+// Delete removes the key from the key-value data store.
+func (w *hookWriter) Delete(key []byte) error {
+	return w.db.Delete(key)
+}
+
+func testSyncAbort(t *testing.T, scheme string) {
+	var (
+		srcDisk    = rawdb.NewMemoryDatabase()
+		srcTrieDB  = newTestDatabase(srcDisk, scheme)
+		srcTrie, _ = New(TrieID(types.EmptyRootHash), srcTrieDB)
+
+		deleteFn = func(key []byte, tr *Trie, states map[string][]byte) {
+			tr.Delete(key)
+			delete(states, string(key))
+		}
+		writeFn = func(key []byte, val []byte, tr *Trie, states map[string][]byte) {
+			if val == nil {
+				val = randBytes(32)
+			}
+			tr.Update(key, val)
+			states[string(key)] = common.CopyBytes(val)
+		}
+		copyStates = func(states map[string][]byte) map[string][]byte {
+			cpy := make(map[string][]byte)
+			for k, v := range states {
+				cpy[k] = v
+			}
+			return cpy
+		}
+	)
+	var (
+		stateA = make(map[string][]byte)
+		key    = randBytes(32)
+		val    = randBytes(32)
+	)
+	for i := 0; i < 256; i++ {
+		writeFn(randBytes(32), nil, srcTrie, stateA)
+	}
+	writeFn(key, val, srcTrie, stateA)
+
+	rootA, nodesA, _ := srcTrie.Commit(false)
+	if err := srcTrieDB.Update(rootA, types.EmptyRootHash, trienode.NewWithNodeSet(nodesA)); err != nil {
+		panic(err)
+	}
+	if err := srcTrieDB.Commit(rootA); err != nil {
+		panic(err)
+	}
+	// Create a destination trie and sync with the scheduler
+	destDisk := rawdb.NewMemoryDatabase()
+	syncWith(t, rootA, destDisk, srcTrieDB)
+	checkTrieContents(t, destDisk, scheme, srcTrie.Hash().Bytes(), stateA, true)
+
+	// Delete the element from the trie
+	stateB := copyStates(stateA)
+	srcTrie, _ = New(TrieID(rootA), srcTrieDB)
+	deleteFn(key, srcTrie, stateB)
+
+	rootB, nodesB, _ := srcTrie.Commit(false)
+	if err := srcTrieDB.Update(rootB, rootA, trienode.NewWithNodeSet(nodesB)); err != nil {
+		panic(err)
+	}
+	if err := srcTrieDB.Commit(rootB); err != nil {
+		panic(err)
+	}
+
+	// Sync the new state, but never persist the new root node. Before the
+	// fix #28595, the original old root node will still be left in database
+	// which breaks the next healing cycle.
+	syncWithHookWriter(t, rootB, destDisk, srcTrieDB, &hookWriter{db: destDisk, filter: func(key []byte, value []byte) bool {
+		if scheme == rawdb.HashScheme {
+			return false
+		}
+		if len(value) == 0 {
+			return false
+		}
+		ok, path := rawdb.ResolveAccountTrieNodeKey(key)
+		return ok && len(path) == 0
+	}})
+
+	// Add elements to expand trie
+	stateC := copyStates(stateB)
+	srcTrie, _ = New(TrieID(rootB), srcTrieDB)
+
+	writeFn(key, val, srcTrie, stateC)
+	rootC, nodesC, _ := srcTrie.Commit(false)
+	if err := srcTrieDB.Update(rootC, rootB, trienode.NewWithNodeSet(nodesC)); err != nil {
+		panic(err)
+	}
+	if err := srcTrieDB.Commit(rootC); err != nil {
 		panic(err)
 	}
 	syncWith(t, rootC, destDisk, srcTrieDB)

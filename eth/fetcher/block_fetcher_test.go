@@ -35,6 +35,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/trie"
+	"github.com/ethereum/go-ethereum/triedb"
 )
 
 var (
@@ -46,7 +47,7 @@ var (
 		Alloc:   genesisT.GenesisAlloc{testAddress: {Balance: big.NewInt(1000000000000000)}},
 		BaseFee: big.NewInt(vars.InitialBaseFee),
 	}
-	genesis      = core.MustCommitGenesis(testdb, trie.NewDatabase(testdb, trie.HashDefaults), gspec)
+	genesis      = core.MustCommitGenesis(testdb, triedb.NewDatabase(testdb, triedb.HashDefaults), gspec)
 	unknownBlock = types.NewBlock(&types.Header{Root: types.EmptyRootHash, GasLimit: vars.GenesisGasLimit, BaseFee: big.NewInt(vars.InitialBaseFee)}, nil, nil, nil, trie.NewStackTrie(nil))
 )
 

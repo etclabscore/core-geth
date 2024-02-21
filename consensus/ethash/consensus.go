@@ -292,6 +292,11 @@ func (ethash *Ethash) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 			return err
 		}
 	}
+	// Verify the non-existence of withdrawalsHash.
+	// FIXME(meowsbits): Withdrawals hash validations should depend on EIP-XXXX activation state.
+	if header.WithdrawalsHash != nil {
+		return fmt.Errorf("invalid withdrawalsHash: have %x, expected nil", header.WithdrawalsHash)
+	}
 	eip4788Enabled := chain.Config().IsEnabledByTime(chain.Config().GetEIP4788TransitionTime, &header.Time) || chain.Config().IsEnabled(chain.Config().GetEIP4788Transition, header.Number)
 	if !eip4788Enabled {
 		if header.ParentBeaconRoot != nil {
@@ -302,6 +307,22 @@ func (ethash *Ethash) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 			return errors.New("header is missing beaconRoot")
 		}
 	}
+
+	// FIXME(meowsbits): Validations should depend on EIP-XXXX activation state.
+	// ethereum/go-ethereum:
+	// Verify the non-existence of cancun-specific header fields
+	// switch {
+	// case header.ExcessBlobGas != nil:
+	// 	return fmt.Errorf("invalid excessBlobGas: have %d, expected nil", header.ExcessBlobGas)
+	// case header.BlobGasUsed != nil:
+	// 	return fmt.Errorf("invalid blobGasUsed: have %d, expected nil", header.BlobGasUsed)
+	// case header.ParentBeaconRoot != nil:
+	// 	return fmt.Errorf("invalid parentBeaconRoot, have %#x, expected nil", header.ParentBeaconRoot)
+	// }
+	// // Add some fake checks for tests
+	// if ethash.fakeDelay != nil {
+	// 	time.Sleep(*ethash.fakeDelay)
+	// }
 
 	// Verify the engine specific seal securing the block
 	if seal {
@@ -637,6 +658,15 @@ func (ethash *Ethash) SealHash(header *types.Header) (hash common.Hash) {
 	}
 	if header.WithdrawalsHash != nil {
 		panic("withdrawal hash set on ethash")
+	}
+	if header.ExcessBlobGas != nil {
+		panic("excess blob gas set on ethash")
+	}
+	if header.BlobGasUsed != nil {
+		panic("blob gas used set on ethash")
+	}
+	if header.ParentBeaconRoot != nil {
+		panic("parent beacon root set on ethash")
 	}
 	rlp.Encode(hasher, enc)
 	hasher.Sum(hash[:0])

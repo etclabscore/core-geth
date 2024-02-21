@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestJumpTableCopy tests that deep copy is necessery to prevent modify shared jump table
+// TestJumpTableCopy tests that deep copy is necessary to prevent modify shared jump table
 func TestJumpTableCopy(t *testing.T) {
 	zero := uint64(0)
 	tbl := instructionSetForConfig(params.TestChainConfig, true, big.NewInt(0), &zero)

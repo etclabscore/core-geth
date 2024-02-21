@@ -37,8 +37,9 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/trie"
-	"github.com/ethereum/go-ethereum/trie/triedb/hashdb"
-	"github.com/ethereum/go-ethereum/trie/triedb/pathdb"
+	"github.com/ethereum/go-ethereum/triedb"
+	"github.com/ethereum/go-ethereum/triedb/hashdb"
+	"github.com/ethereum/go-ethereum/triedb/pathdb"
 )
 
 // rewindTest is a test case for chain rollback upon user request.
@@ -2037,13 +2038,13 @@ func testSetHeadWithScheme(t *testing.T, tt *rewindTest, snapshots bool, scheme 
 	}
 	// Reopen the trie database without persisting in-memory dirty nodes.
 	chain.triedb.Close()
-	dbconfig := &trie.Config{}
+	dbconfig := &triedb.Config{}
 	if scheme == rawdb.PathScheme {
 		dbconfig.PathDB = pathdb.Defaults
 	} else {
 		dbconfig.HashDB = hashdb.Defaults
 	}
-	chain.triedb = trie.NewDatabase(chain.db, dbconfig)
+	chain.triedb = triedb.NewDatabase(chain.db, dbconfig)
 	chain.stateCache = state.NewDatabaseWithNodeDB(chain.db, chain.triedb)
 
 	// Force run a freeze cycle

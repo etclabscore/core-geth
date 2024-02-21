@@ -35,15 +35,15 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/trie"
+	"github.com/ethereum/go-ethereum/triedb"
 )
 
 var errGenesisNoConfig = errors.New("genesis has no chain configuration")
 
 // ChainOverrides contains the changes to chain config.
 type ChainOverrides struct {
-	OverrideShanghai *uint64
-	OverrideCancun   *uint64
-	OverrideVerkle   *uint64
+	OverrideCancun *uint64
+	OverrideVerkle *uint64
 }
 
 func ReadGenesis(db ethdb.Database) (*genesisT.Genesis, error) {
@@ -311,6 +311,10 @@ func configOrDefault(g *genesisT.Genesis, ghash common.Hash) ctypes.ChainConfigu
 		return g.Config
 	case ghash == params.MainnetGenesisHash:
 		return params.MainnetChainConfig
+	case ghash == params.HoleskyGenesisHash:
+		return params.HoleskyChainConfig
+	case ghash == params.SepoliaGenesisHash:
+		return params.SepoliaChainConfig
 	case ghash == params.GoerliGenesisHash:
 		return params.GoerliChainConfig
 	case ghash == params.MordorGenesisHash:
@@ -324,9 +328,16 @@ func configOrDefault(g *genesisT.Genesis, ghash common.Hash) ctypes.ChainConfigu
 	}
 }
 
+// FIXME(meowsbits): This method should be in genesisT.
+// IsVerkle indicates whether the state is already stored in a verkle
+// tree at genesis time.
+func (g *Genesis) IsVerkle() bool {
+	return g.Config.IsVerkle(new(big.Int).SetUint64(g.Number), g.Timestamp)
+}
+
 // Flush adds allocated genesis accounts into a fresh new statedb and
 // commit the state changes into the given database handler.
-func gaFlush(ga *genesisT.GenesisAlloc, triedb *trie.Database, db ethdb.Database) error {
+func gaFlush(ga *genesisT.GenesisAlloc, triedb *triedb.Database, db ethdb.Database) error {
 	statedb, err := state.New(types.EmptyRootHash, state.NewDatabaseWithNodeDB(db, triedb), nil)
 	if err != nil {
 		return err
@@ -510,7 +521,7 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 
 // CommitGenesis writes the block and state of a genesis specification to the database.
 // The block is committed as the canonical head block.
-func CommitGenesis(g *genesisT.Genesis, db ethdb.Database, triedb *trie.Database) (*types.Block, error) {
+func CommitGenesis(g *genesisT.Genesis, db ethdb.Database, triedb *triedb.Database) (*types.Block, error) {
 	block := GenesisToBlock(g, db)
 	if block.Number().Sign() != 0 {
 		return nil, errors.New("can't commit genesis block with number > 0")
@@ -527,7 +538,7 @@ func CommitGenesis(g *genesisT.Genesis, db ethdb.Database, triedb *trie.Database
 	if config.GetConsensusEngineType().IsClique() && len(block.Extra()) == 0 {
 		return nil, errors.New("can't start clique chain without signers")
 	}
-	// All the checks has passed, flush the states derived from the genesis
+	// All the checks has passed, flushAlloc the states derived from the genesis
 	// specification as well as the specification itself into the provided
 	// database.
 	if err := gaWrite(&g.Alloc, db, block.Hash()); err != nil {
@@ -551,7 +562,7 @@ func CommitGenesis(g *genesisT.Genesis, db ethdb.Database, triedb *trie.Database
 // The block is committed as the canonical head block.
 // Note the state changes will be committed in hash-based scheme, use Commit
 // if path-scheme is preferred.
-func MustCommitGenesis(db ethdb.Database, triedb *trie.Database, g *genesisT.Genesis) *types.Block {
+func MustCommitGenesis(db ethdb.Database, triedb *triedb.Database, g *genesisT.Genesis) *types.Block {
 	block, err := CommitGenesis(g, db, triedb)
 	if err != nil {
 		panic(err)
@@ -565,5 +576,5 @@ func GenesisBlockForTesting(db ethdb.Database, addr common.Address, balance *big
 		Alloc:   genesisT.GenesisAlloc{addr: {Balance: balance}},
 		BaseFee: big.NewInt(vars.InitialBaseFee),
 	}
-	return MustCommitGenesis(db, trie.NewDatabase(db, nil), &g)
+	return MustCommitGenesis(db, triedb.NewDatabase(db, nil), &g)
 }

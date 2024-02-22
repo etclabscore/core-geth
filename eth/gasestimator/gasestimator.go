@@ -31,6 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 // Options are the contextual parameters to execute the requested call.
@@ -58,7 +59,7 @@ func Estimate(ctx context.Context, call *core.Message, opts *Options, gasCap uin
 	)
 	// Determine the highest gas limit can be used during the estimation.
 	hi = opts.Header.GasLimit
-	if call.GasLimit >= params.TxGas {
+	if call.GasLimit >= vars.TxGas {
 		hi = call.GasLimit
 	}
 	// Normalize the max fee per gas the call is willing to spend.
@@ -105,9 +106,9 @@ func Estimate(ctx context.Context, call *core.Message, opts *Options, gasCap uin
 	// unused access list items). Ever so slightly wasteful, but safer overall.
 	if len(call.Data) == 0 {
 		if call.To != nil && opts.State.GetCodeSize(*call.To) == 0 {
-			failed, _, err := execute(ctx, call, opts, params.TxGas)
+			failed, _, err := execute(ctx, call, opts, vars.TxGas)
 			if !failed && err == nil {
-				return params.TxGas, nil, nil
+				return vars.TxGas, nil, nil
 			}
 		}
 	}

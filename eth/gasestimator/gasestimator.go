@@ -30,6 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
 // Options are the contextual parameters to execute the requested call.
@@ -38,10 +39,10 @@ import (
 // these together, it would be excessively hard to test. Splitting the parts out
 // allows testing without needing a proper live chain.
 type Options struct {
-	Config *params.ChainConfig // Chain configuration for hard fork selection
-	Chain  core.ChainContext   // Chain context to access past block hashes
-	Header *types.Header       // Header defining the block context to execute in
-	State  *state.StateDB      // Pre-state on top of which to estimate the gas
+	Config ctypes.ChainConfigurator // Chain configuration for hard fork selection
+	Chain  core.ChainContext        // Chain context to access past block hashes
+	Header *types.Header            // Header defining the block context to execute in
+	State  *state.StateDB           // Pre-state on top of which to estimate the gas
 
 	ErrorRatio float64 // Allowed overestimation ratio for faster estimation termination
 }

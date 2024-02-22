@@ -85,11 +85,11 @@ func ReadGenesis(db ethdb.Database) (*genesisT.Genesis, error) {
 }
 
 // SetupGenesisBlock wraps SetupGenesisBlockWithOverride, always using a nil value for the override.
-func SetupGenesisBlock(db ethdb.Database, triedb *trie.Database, genesis *genesisT.Genesis) (ctypes.ChainConfigurator, common.Hash, error) {
+func SetupGenesisBlock(db ethdb.Database, triedb *triedb.Database, genesis *genesisT.Genesis) (ctypes.ChainConfigurator, common.Hash, error) {
 	return SetupGenesisBlockWithOverride(db, triedb, genesis, nil)
 }
 
-func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, genesis *genesisT.Genesis, overrides *ChainOverrides) (ctypes.ChainConfigurator, common.Hash, error) {
+func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *triedb.Database, genesis *genesisT.Genesis, overrides *ChainOverrides) (ctypes.ChainConfigurator, common.Hash, error) {
 	if genesis != nil && confp.IsEmpty(genesis.Config) {
 		return params.AllEthashProtocolChanges, common.Hash{}, genesisT.ErrGenesisNoConfig
 	}
@@ -98,15 +98,9 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, gen
 		if config != nil {
 			// Block-based overrides are not provided because Shanghai is
 			// ETH-network specific and that protocol is defined exclusively in time-based forks.
-			if overrides != nil && overrides.OverrideShanghai != nil {
-				config.SetEIP3651TransitionTime(overrides.OverrideShanghai)
-				config.SetEIP3855TransitionTime(overrides.OverrideShanghai)
-				config.SetEIP3860TransitionTime(overrides.OverrideShanghai)
-				config.SetEIP4895TransitionTime(overrides.OverrideShanghai)
-				config.SetEIP6049TransitionTime(overrides.OverrideShanghai)
-			}
 			if overrides != nil && overrides.OverrideCancun != nil {
 				config.SetEIP4844TransitionTime(overrides.OverrideCancun)
+				// TODO(meowsbits) Install the remaining Cancun EIP overrides.
 			}
 			if overrides != nil && overrides.OverrideVerkle != nil {
 				log.Warn("Verkle-fork is not yet supported")
@@ -254,7 +248,7 @@ func LoadCliqueConfig(db ethdb.Database, genesis *genesisT.Genesis) (*ctypes.Cli
 		// external ancient chain segment), ensure the provided genesis
 		// is matched.
 		db := rawdb.NewMemoryDatabase()
-		genesisBlock := MustCommitGenesis(db, trie.NewDatabase(db, nil), genesis)
+		genesisBlock := MustCommitGenesis(db, triedb.NewDatabase(db, nil), genesis)
 		if stored != (common.Hash{}) && genesisBlock.Hash() != stored {
 			return nil, &genesisT.GenesisMismatchError{Stored: stored, New: genesisBlock.Hash()}
 		}

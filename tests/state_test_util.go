@@ -320,7 +320,7 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 		// - the block body is verified against the header in block_validator.go:ValidateBody
 		// Here, we just do this shortcut smaller fix, since state tests do not
 		// utilize those codepaths
-		if len(msg.BlobHashes)*params.BlobTxBlobGasPerBlob > params.MaxBlobGasPerBlock {
+		if len(msg.BlobHashes)*vars.BlobTxBlobGasPerBlob > params.MaxBlobGasPerBlock {
 			return state, common.Hash{}, errors.New("blob gas exceeds maximum")
 		}
 	}

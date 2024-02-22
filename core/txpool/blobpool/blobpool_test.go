@@ -1302,7 +1302,7 @@ func BenchmarkPoolPending10GB(b *testing.B)  { benchmarkPoolPending(b, 10_000_00
 func benchmarkPoolPending(b *testing.B, datacap uint64) {
 	// Calculate the maximum number of transaction that would fit into the pool
 	// and generate a set of random accounts to seed them with.
-	capacity := datacap / params.BlobTxBlobGasPerBlob
+	capacity := datacap / vars.BlobTxBlobGasPerBlob
 
 	var (
 		basefee    = uint64(1050)

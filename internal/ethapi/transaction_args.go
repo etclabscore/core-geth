@@ -38,7 +38,7 @@ import (
 )
 
 var (
-	maxBlobsPerTransaction = params.MaxBlobGasPerBlock / params.BlobTxBlobGasPerBlob
+	maxBlobsPerTransaction = params.MaxBlobGasPerBlock / vars.BlobTxBlobGasPerBlob
 )
 
 // TransactionArgs represents the arguments to construct a new transaction

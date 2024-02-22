@@ -347,7 +347,7 @@ loop:
 		// default status message
 		status = &eth.StatusPacket{
 			ProtocolVersion: uint32(c.negotiatedProtoVersion),
-			NetworkID:       chain.config.ChainID.Uint64(),
+			NetworkID:       chain.config.GetChainID().Uint64(),
 			TD:              chain.TD(),
 			Head:            chain.blocks[chain.Len()-1].Hash(),
 			Genesis:         chain.blocks[0].Hash(),

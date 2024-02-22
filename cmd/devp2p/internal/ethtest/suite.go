@@ -467,7 +467,7 @@ func (s *Suite) TestMaliciousStatus(t *utesting.T) {
 	// Create status with large total difficulty.
 	status := &eth.StatusPacket{
 		ProtocolVersion: uint32(conn.negotiatedProtoVersion),
-		NetworkID:       s.chain.config.ChainID.Uint64(),
+		NetworkID:       s.chain.config.GetChainID().Uint64(),
 		TD:              new(big.Int).SetBytes(randBuf(2048)),
 		Head:            s.chain.Head().Hash(),
 		Genesis:         s.chain.GetBlock(0).Hash(),

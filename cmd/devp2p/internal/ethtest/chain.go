@@ -32,11 +32,13 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/forkid"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/eth/protocols/eth"
+	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/rlp"
@@ -46,11 +48,11 @@ import (
 // Chain is a lightweight blockchain-like store which can read a hivechain
 // created chain.
 type Chain struct {
-	genesis     genesisT.Genesis
-	blocks      []*types.Block
-	state       map[common.Address]state.DumpAccount // state of head block
-	senders     map[common.Address]*senderInfo
-	chainConfig ctypes.ChainConfigurator
+	genesis genesisT.Genesis
+	blocks  []*types.Block
+	state   map[common.Address]state.DumpAccount // state of head block
+	senders map[common.Address]*senderInfo
+	config  ctypes.ChainConfigurator
 }
 
 // NewChain takes the given chain.rlp file, and decodes and returns
@@ -60,7 +62,7 @@ func NewChain(dir string) (*Chain, error) {
 	if err != nil {
 		return nil, err
 	}
-	gblock := gen.ToBlock()
+	gblock := core.GenesisToBlock(&gen, nil)
 
 	blocks, err := blocksFromFile(path.Join(dir, "chain.rlp"), gblock)
 	if err != nil {
@@ -242,10 +244,13 @@ func (c *Chain) Shorten(height int) *Chain {
 	blocks := make([]*types.Block, height)
 	copy(blocks, c.blocks[:height])
 
-	config := *c.config
+	config, err := confp.CloneChainConfigurator(c.config)
+	if err != nil {
+		panic(err)
+	}
 	return &Chain{
 		blocks: blocks,
-		config: &config,
+		config: config,
 	}
 }
 

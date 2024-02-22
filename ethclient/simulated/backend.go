@@ -21,8 +21,6 @@ import (
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/eth/catalyst"
 	"github.com/ethereum/go-ethereum/eth/downloader"
@@ -32,6 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
@@ -71,7 +70,7 @@ type Backend struct {
 // contract bindings in unit tests.
 //
 // A simulated backend always uses chainID 1337.
-func NewBackend(alloc types.GenesisAlloc, options ...func(nodeConf *node.Config, ethConf *ethconfig.Config)) *Backend {
+func NewBackend(alloc genesisT.GenesisAlloc, options ...func(nodeConf *node.Config, ethConf *ethconfig.Config)) *Backend {
 	// Create the default configurations for the outer node shell and the Ethereum
 	// service to mutate with the options afterwards
 	nodeConf := node.DefaultConfig
@@ -79,7 +78,7 @@ func NewBackend(alloc types.GenesisAlloc, options ...func(nodeConf *node.Config,
 	nodeConf.P2P = p2p.Config{NoDiscovery: true}
 
 	ethConf := ethconfig.Defaults
-	ethConf.Genesis = &core.Genesis{
+	ethConf.Genesis = &genesisT.Genesis{
 		Config:   params.AllDevChainProtocolChanges,
 		GasLimit: ethconfig.Defaults.Miner.GasCeil,
 		Alloc:    alloc,

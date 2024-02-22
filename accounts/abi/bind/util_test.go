@@ -30,6 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient/simulated"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 var testKey, _ = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
@@ -65,7 +66,7 @@ func TestWaitDeployed(t *testing.T) {
 
 		// Create the transaction
 		head, _ := backend.Client().HeaderByNumber(context.Background(), nil) // Should be child's, good enough
-		gasPrice := new(big.Int).Add(head.BaseFee, big.NewInt(params.GWei))
+		gasPrice := new(big.Int).Add(head.BaseFee, big.NewInt(vars.GWei))
 
 		tx := types.NewContractCreation(0, big.NewInt(0), test.gas, gasPrice, common.FromHex(test.code))
 		tx, _ = types.SignTx(tx, types.LatestSignerForChainID(big.NewInt(1337)), testKey)

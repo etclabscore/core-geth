@@ -30,7 +30,6 @@ import (
 	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/node"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
@@ -259,7 +258,7 @@ func (c *SimulatedBeacon) Rollback() {
 	c.eth.TxPool().SetGasTip(maxUint256)
 	// Set the gas tip back to accept new transactions
 	// TODO (Marius van der Wijden): set gas tip to parameter passed by config
-	c.eth.TxPool().SetGasTip(big.NewInt(params.GWei))
+	c.eth.TxPool().SetGasTip(big.NewInt(vars.GWei))
 }
 
 // Fork sets the head to the provided hash.

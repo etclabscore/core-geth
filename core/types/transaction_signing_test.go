@@ -24,7 +24,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -184,7 +183,7 @@ func createTestLegacyTxInner() *LegacyTx {
 		To:       nil,
 		Value:    big.NewInt(0),
 		Gas:      vars.TxGas,
-		GasPrice: big.NewInt(params.GWei),
+		GasPrice: big.NewInt(vars.GWei),
 		Data:     nil,
 	}
 }

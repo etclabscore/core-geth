@@ -21,6 +21,7 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
+	"log/slog"
 	"math/big"
 	"strings"
 	"time"
@@ -33,7 +34,6 @@ import (
 	"github.com/ethereum/go-ethereum/contracts/checkpointoracle/contract"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/urfave/cli/v2"
@@ -114,7 +114,7 @@ func deploy(ctx *cli.Context) error {
 	if err != nil {
 		utils.Fatalf("Failed to deploy checkpoint oracle %v", err)
 	}
-	log.Info("Deployed checkpoint oracle", "address", oracle, "tx", tx.Hash().Hex())
+	slog.Info("Deployed checkpoint oracle", "address", oracle, "tx", tx.Hash().Hex())
 
 	return nil
 }
@@ -306,6 +306,6 @@ func publish(ctx *cli.Context) error {
 	if err != nil {
 		utils.Fatalf("Register contract failed %v", err)
 	}
-	log.Info("Successfully registered checkpoint", "tx", tx.Hash().Hex())
+	slog.Info("Successfully registered checkpoint", "tx", tx.Hash().Hex())
 	return nil
 }

@@ -28,6 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -38,9 +39,9 @@ func TestTxIndexer(t *testing.T) {
 		testBankAddress = crypto.PubkeyToAddress(testBankKey.PublicKey)
 		testBankFunds   = big.NewInt(1000000000000000000)
 
-		gspec = &Genesis{
+		gspec = &genesisT.Genesis{
 			Config:  params.TestChainConfig,
-			Alloc:   types.GenesisAlloc{testBankAddress: {Balance: testBankFunds}},
+			Alloc:   genesisT.GenesisAlloc{testBankAddress: {Balance: testBankFunds}},
 			BaseFee: big.NewInt(vars.InitialBaseFee),
 		}
 		engine    = ethash.NewFaker()
@@ -213,8 +214,9 @@ func TestTxIndexer(t *testing.T) {
 	}
 	for _, c := range cases {
 		frdir := t.TempDir()
+		gblock := GenesisToBlock(gspec, nil)
 		db, _ := rawdb.NewDatabaseWithFreezer(rawdb.NewMemoryDatabase(), frdir, "", false)
-		rawdb.WriteAncientBlocks(db, append([]*types.Block{gspec.ToBlock()}, blocks...), append([]types.Receipts{{}}, receipts...), big.NewInt(0))
+		rawdb.WriteAncientBlocks(db, append([]*types.Block{gblock}, blocks...), append([]types.Receipts{{}}, receipts...), big.NewInt(0))
 
 		// Index the initial blocks from ancient store
 		indexer := &txIndexer{

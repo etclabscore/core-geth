@@ -36,6 +36,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/trie"
 	"github.com/ethereum/go-ethereum/triedb"
+	"github.com/holiman/uint256"
 )
 
 var errGenesisNoConfig = errors.New("genesis has no chain configuration")
@@ -338,7 +339,7 @@ func gaFlush(ga *genesisT.GenesisAlloc, triedb *triedb.Database, db ethdb.Databa
 	}
 	for addr, account := range *ga {
 		if account.Balance != nil {
-			statedb.AddBalance(addr, account.Balance)
+			statedb.AddBalance(addr, uint256.MustFromBig(account.Balance))
 		}
 		statedb.SetCode(addr, account.Code)
 		statedb.SetNonce(addr, account.Nonce)
@@ -376,7 +377,7 @@ func gaDeriveHash(ga *genesisT.GenesisAlloc) (common.Hash, error) {
 		return common.Hash{}, err
 	}
 	for addr, account := range *ga {
-		statedb.AddBalance(addr, account.Balance)
+		statedb.AddBalance(addr, uint256.MustFromBig(account.Balance))
 		statedb.SetCode(addr, account.Code)
 		statedb.SetNonce(addr, account.Nonce)
 		for key, value := range account.Storage {

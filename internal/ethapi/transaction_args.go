@@ -32,13 +32,13 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto/kzg4844"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/holiman/uint256"
 )
 
 var (
-	maxBlobsPerTransaction = params.MaxBlobGasPerBlock / vars.BlobTxBlobGasPerBlob
+	maxBlobsPerTransaction = vars.MaxBlobGasPerBlock / vars.BlobTxBlobGasPerBlob
 )
 
 // TransactionArgs represents the arguments to construct a new transaction

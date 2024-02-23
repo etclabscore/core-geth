@@ -36,7 +36,6 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
-	"github.com/ethereum/go-ethereum/trie"
 	"github.com/ethereum/go-ethereum/triedb"
 	"github.com/ethereum/go-ethereum/triedb/hashdb"
 	"github.com/ethereum/go-ethereum/triedb/pathdb"
@@ -2009,7 +2008,7 @@ func testSetHeadWithScheme(t *testing.T, tt *rewindTest, snapshots bool, scheme 
 	// If sidechain blocks are needed, make a light chain and import it
 	var sideblocks types.Blocks
 	mem := rawdb.NewMemoryDatabase()
-	genesisBlock := MustCommitGenesis(mem, trie.NewDatabase(mem, nil), gspec)
+	genesisBlock := MustCommitGenesis(mem, triedb.NewDatabase(mem, nil), gspec)
 	if tt.sidechainBlocks > 0 {
 		sideblocks, _ = GenerateChain(gspec.Config, genesisBlock, engine, rawdb.NewMemoryDatabase(), tt.sidechainBlocks, func(i int, b *BlockGen) {
 			b.SetCoinbase(common.Address{0x01})

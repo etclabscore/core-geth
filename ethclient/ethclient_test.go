@@ -46,7 +46,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
-	"github.com/ethereum/go-ethereum/trie"
+	"github.com/ethereum/go-ethereum/triedb"
 	meta_schema "github.com/open-rpc/meta-schema"
 )
 
@@ -274,7 +274,7 @@ func generateTestChain() []*types.Block {
 	}
 	_, blocks, _ := core.GenerateChainWithGenesis(genesis, ethash.NewFaker(), 2, generate)
 	mem := rawdb.NewMemoryDatabase()
-	genesisBlock := core.MustCommitGenesis(mem, trie.NewDatabase(mem, nil), genesis)
+	genesisBlock := core.MustCommitGenesis(mem, triedb.NewDatabase(mem, nil), genesis)
 	return append([]*types.Block{genesisBlock}, blocks...)
 }
 

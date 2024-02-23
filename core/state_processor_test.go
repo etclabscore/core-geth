@@ -37,6 +37,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/trie"
+	"github.com/ethereum/go-ethereum/triedb"
 	"github.com/holiman/uint256"
 	"golang.org/x/crypto/sha3"
 )
@@ -257,7 +258,7 @@ func TestStateProcessorErrors(t *testing.T) {
 			},
 		} {
 			mem := rawdb.NewMemoryDatabase()
-			genesisBlock := MustCommitGenesis(mem, trie.NewDatabase(mem, nil), gspec)
+			genesisBlock := MustCommitGenesis(mem, triedb.NewDatabase(mem, nil), gspec)
 			block := GenerateBadBlock(genesisBlock, beacon.New(ethash.NewFaker()), tt.txs, gspec.Config)
 			_, err := blockchain.InsertChain(types.Blocks{block})
 			if err == nil {
@@ -294,7 +295,7 @@ func TestStateProcessorErrors(t *testing.T) {
 				},
 			}
 			mem           = rawdb.NewMemoryDatabase()
-			genesis       = MustCommitGenesis(mem, trie.NewDatabase(mem, nil), gspec)
+			genesis       = MustCommitGenesis(mem, triedb.NewDatabase(mem, nil), gspec)
 			blockchain, _ = NewBlockChain(db, nil, gspec, nil, ethash.NewFaker(), vm.Config{}, nil, nil)
 		)
 		defer blockchain.Stop()
@@ -335,7 +336,7 @@ func TestStateProcessorErrors(t *testing.T) {
 				},
 			}
 			mem           = rawdb.NewMemoryDatabase()
-			genesis       = MustCommitGenesis(mem, trie.NewDatabase(mem, nil), gspec)
+			genesis       = MustCommitGenesis(mem, triedb.NewDatabase(mem, nil), gspec)
 			blockchain, _ = NewBlockChain(db, nil, gspec, nil, beacon.New(ethash.NewFaker()), vm.Config{}, nil, nil)
 		)
 		defer blockchain.Stop()
@@ -393,7 +394,7 @@ func TestStateProcessorErrors(t *testing.T) {
 					},
 				},
 			}
-			genesis        = MustCommitGenesis(db, trie.NewDatabase(db, nil), gspec)
+			genesis        = MustCommitGenesis(db, triedb.NewDatabase(db, nil), gspec)
 			blockchain, _  = NewBlockChain(db, nil, gspec, nil, beacon.New(ethash.NewFaker()), vm.Config{}, nil, nil)
 			tooBigInitCode = make([]byte, vars.MaxInitCodeSize+1)
 			smallInitCode  = [320]byte{}

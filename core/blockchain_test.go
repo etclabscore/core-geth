@@ -1781,7 +1781,7 @@ func testBlockchainHeaderchainReorgConsistency(t *testing.T, scheme string) {
 	forks := make([]*types.Block, len(blocks))
 	for i := 0; i < len(forks); i++ {
 		mem := rawdb.NewMemoryDatabase()
-		parent := MustCommitGenesis(mem, trie.NewDatabase(mem, nil), genesis)
+		parent := MustCommitGenesis(mem, triedb.NewDatabase(mem, nil), genesis)
 		if i > 0 {
 			parent = blocks[i-1]
 		}
@@ -1827,7 +1827,7 @@ func TestTrieForkGC(t *testing.T) {
 	forks := make([]*types.Block, len(blocks))
 	for i := 0; i < len(forks); i++ {
 		mem := rawdb.NewMemoryDatabase()
-		parent := MustCommitGenesis(mem, trie.NewDatabase(mem, nil), genesis)
+		parent := MustCommitGenesis(mem, triedb.NewDatabase(mem, nil), genesis)
 		if i > 0 {
 			parent = blocks[i-1]
 		}
@@ -2241,7 +2241,7 @@ func TestForkChoice_CommonAncestor(t *testing.T) {
 
 	db := rawdb.NewMemoryDatabase()
 	genesis := params.DefaultMessNetGenesisBlock()
-	genesisB := MustCommitGenesis(db, trie.NewDatabase(db, nil), genesis)
+	genesisB := MustCommitGenesis(db, triedb.NewDatabase(db, nil), genesis)
 
 	chain, err := NewBlockChain(db, nil, genesis, nil, engine, vm.Config{}, nil, nil)
 	if err != nil {

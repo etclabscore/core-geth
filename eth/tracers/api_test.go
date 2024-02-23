@@ -287,7 +287,7 @@ func TestTraceCall(t *testing.T) {
 			call: ethapi.TransactionArgs{
 				From:  &accounts[2].addr,
 				To:    &accounts[0].addr,
-				Value: (*hexutil.Big)(new(big.Int).Add(big.NewInt(params.Ether), big.NewInt(100))),
+				Value: (*hexutil.Big)(new(big.Int).Add(big.NewInt(vars.Ether), big.NewInt(100))),
 			},
 			config: nil,
 			expect: `{"gas":21000,"failed":false,"returnValue":"","structLogs":[]}`,
@@ -298,7 +298,7 @@ func TestTraceCall(t *testing.T) {
 			call: ethapi.TransactionArgs{
 				From:  &accounts[2].addr,
 				To:    &accounts[0].addr,
-				Value: (*hexutil.Big)(new(big.Int).Add(big.NewInt(params.Ether), big.NewInt(100))),
+				Value: (*hexutil.Big)(new(big.Int).Add(big.NewInt(vars.Ether), big.NewInt(100))),
 			},
 			config:    &TraceCallConfig{TxIndex: uintPtr(0)},
 			expectErr: fmt.Errorf("tracing failed: insufficient funds for gas * price + value: address %s have 1000000000000000000 want 1000000000000000100", accounts[2].addr),
@@ -309,7 +309,7 @@ func TestTraceCall(t *testing.T) {
 			call: ethapi.TransactionArgs{
 				From:  &accounts[2].addr,
 				To:    &accounts[0].addr,
-				Value: (*hexutil.Big)(new(big.Int).Add(big.NewInt(params.Ether), big.NewInt(100))),
+				Value: (*hexutil.Big)(new(big.Int).Add(big.NewInt(vars.Ether), big.NewInt(100))),
 			},
 			config:    &TraceCallConfig{TxIndex: uintPtr(1)},
 			expectErr: fmt.Errorf("tracing failed: insufficient funds for gas * price + value: address %s have 1000000000000000000 want 1000000000000000100", accounts[2].addr),
@@ -320,7 +320,7 @@ func TestTraceCall(t *testing.T) {
 			call: ethapi.TransactionArgs{
 				From:  &accounts[2].addr,
 				To:    &accounts[0].addr,
-				Value: (*hexutil.Big)(new(big.Int).Add(big.NewInt(params.Ether), big.NewInt(100))),
+				Value: (*hexutil.Big)(new(big.Int).Add(big.NewInt(vars.Ether), big.NewInt(100))),
 			},
 			config:    &TraceCallConfig{TxIndex: uintPtr(2)},
 			expectErr: nil,

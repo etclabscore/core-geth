@@ -499,7 +499,7 @@ transaction gets propagated.`)
 	}
 	from, nonce := s.chain.GetSender(0)
 	inner := &types.DynamicFeeTx{
-		ChainID:   s.chain.config.ChainID,
+		ChainID:   s.chain.config.GetChainID(),
 		Nonce:     nonce,
 		GasTipCap: common.Big1,
 		GasFeeCap: s.chain.Head().BaseFee(),
@@ -528,7 +528,7 @@ does not propagate them.`)
 
 	from, nonce := s.chain.GetSender(0)
 	inner := &types.DynamicFeeTx{
-		ChainID:   s.chain.config.ChainID,
+		ChainID:   s.chain.config.GetChainID(),
 		Nonce:     nonce,
 		GasTipCap: common.Big1,
 		GasFeeCap: s.chain.Head().BaseFee(),
@@ -547,7 +547,7 @@ does not propagate them.`)
 	inners := []*types.DynamicFeeTx{
 		// Nonce already used
 		{
-			ChainID:   s.chain.config.ChainID,
+			ChainID:   s.chain.config.GetChainID(),
 			Nonce:     nonce - 1,
 			GasTipCap: common.Big1,
 			GasFeeCap: s.chain.Head().BaseFee(),
@@ -619,7 +619,7 @@ on another peer connection using GetPooledTransactions.`)
 	)
 	for i := 0; i < count; i++ {
 		inner := &types.DynamicFeeTx{
-			ChainID:   s.chain.config.ChainID,
+			ChainID:   s.chain.config.GetChainID(),
 			Nonce:     nonce + uint64(i),
 			GasTipCap: common.Big1,
 			GasFeeCap: s.chain.Head().BaseFee(),
@@ -691,7 +691,7 @@ the transactions using a GetPooledTransactions request.`)
 	)
 	for i := 0; i < count; i++ {
 		inner := &types.DynamicFeeTx{
-			ChainID:   s.chain.config.ChainID,
+			ChainID:   s.chain.config.GetChainID(),
 			Nonce:     nonce + uint64(i),
 			GasTipCap: common.Big1,
 			GasFeeCap: s.chain.Head().BaseFee(),
@@ -776,7 +776,7 @@ func (s *Suite) makeBlobTxs(count, blobs int, discriminator byte) (txs types.Tra
 			blobs -= 1
 		}
 		inner := &types.BlobTx{
-			ChainID:    uint256.MustFromBig(s.chain.config.ChainID),
+			ChainID:    uint256.MustFromBig(s.chain.config.GetChainID()),
 			Nonce:      nonce + uint64(i),
 			GasTipCap:  uint256.NewInt(1),
 			GasFeeCap:  uint256.MustFromBig(s.chain.Head().BaseFee()),

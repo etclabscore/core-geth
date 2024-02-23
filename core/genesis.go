@@ -323,13 +323,6 @@ func configOrDefault(g *genesisT.Genesis, ghash common.Hash) ctypes.ChainConfigu
 	}
 }
 
-// FIXME(meowsbits): This method should be in genesisT.
-// IsVerkle indicates whether the state is already stored in a verkle
-// tree at genesis time.
-func (g *Genesis) IsVerkle() bool {
-	return g.Config.IsVerkle(new(big.Int).SetUint64(g.Number), g.Timestamp)
-}
-
 // Flush adds allocated genesis accounts into a fresh new statedb and
 // commit the state changes into the given database handler.
 func gaFlush(ga *genesisT.GenesisAlloc, triedb *triedb.Database, db ethdb.Database) error {

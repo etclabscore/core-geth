@@ -249,6 +249,10 @@ type CoreGethChainConfig struct {
 	EIP6780FBlock *big.Int `json:"eip6780FBlock,omitempty"` // EIP-6780: SELFDESTRUCT only in same transaction https://eips.ethereum.org/EIPS/eip-6780
 	EIP4788FBlock *big.Int `json:"eip4788FBlock,omitempty"` // EIP-4788: Beacon block root in the EVM https://eips.ethereum.org/EIPS/eip-4788
 
+	// Verkle Trie
+	VerkleFTime  *uint64  `json:"verkleFTime,omitempty"`
+	VerkleFBlock *big.Int `json:"verkleFBlock,omitempty"`
+
 	MergeNetsplitVBlock *big.Int `json:"mergeNetsplitVBlock,omitempty"` // Virtual fork after The Merge to use as a network splitter
 
 	DisposalBlock *big.Int `json:"disposalBlock,omitempty"` // Bomb disposal HF block

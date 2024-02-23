@@ -253,6 +253,27 @@ func (g *Genesis) SetEIP4788Transition(n *uint64) error {
 	return g.Config.SetEIP4788Transition(n)
 }
 
+// Verkle Trie
+func (g *Genesis) GetVerkleTransitionTime() *uint64 {
+	return g.Config.GetVerkleTransitionTime()
+}
+
+func (g *Genesis) SetVerkleTransitionTime(n *uint64) error {
+	return g.Config.SetVerkleTransitionTime(n)
+}
+
+func (g *Genesis) GetVerkleTransition() *uint64 {
+	return g.Config.GetVerkleTransition()
+}
+
+func (g *Genesis) SetVerkleTransition(n *uint64) error {
+	return g.Config.SetVerkleTransition(n)
+}
+
+func (g *Genesis) IsVerkle() bool {
+	return g.IsEnabledByTime(g.GetVerkleTransitionTime, &g.Timestamp) || g.IsEnabled(g.GetVerkleTransition, new(big.Int).SetUint64(g.Number))
+}
+
 func (g *Genesis) IsEnabledByTime(fn func() *uint64, n *uint64) bool {
 	return g.Config.IsEnabledByTime(fn, n)
 }

@@ -757,6 +757,25 @@ func (c *CoreGethChainConfig) SetMergeVirtualTransition(n *uint64) error {
 	return nil
 }
 
+// Verkle Trie
+func (c *CoreGethChainConfig) GetVerkleTransitionTime() *uint64 {
+	return c.VerkleFTime
+}
+
+func (c *CoreGethChainConfig) SetVerkleTransitionTime(n *uint64) error {
+	c.VerkleFTime = n
+	return nil
+}
+
+func (c *CoreGethChainConfig) GetVerkleTransition() *uint64 {
+	return bigNewU64(c.VerkleFBlock)
+}
+
+func (c *CoreGethChainConfig) SetVerkleTransition(n *uint64) error {
+	c.VerkleFBlock = setBig(c.VerkleFBlock, n)
+	return nil
+}
+
 func (c *CoreGethChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {

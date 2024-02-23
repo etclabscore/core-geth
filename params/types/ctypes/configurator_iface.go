@@ -253,6 +253,12 @@ type ProtocolSpecifier interface {
 	SetEIP6780Transition(n *uint64) error
 	GetEIP4788Transition() *uint64
 	SetEIP4788Transition(n *uint64) error
+
+	// Verkle Trie
+	GetVerkleTransitionTime() *uint64
+	SetVerkleTransitionTime(n *uint64) error
+	GetVerkleTransition() *uint64
+	SetVerkleTransition(n *uint64) error
 }
 
 type Forker interface {

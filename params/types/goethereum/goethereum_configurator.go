@@ -767,6 +767,24 @@ func (c *ChainConfig) SetMergeVirtualTransition(n *uint64) error {
 	return nil
 }
 
+// Verkle Trie
+func (c *ChainConfig) GetVerkleTransitionTime() *uint64 {
+	return c.VerkleTime
+}
+
+func (c *ChainConfig) SetVerkleTransitionTime(n *uint64) error {
+	c.VerkleTime = n
+	return nil
+}
+
+func (c *ChainConfig) GetVerkleTransition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetVerkleTransition(n *uint64) error {
+	return ctypes.ErrUnsupportedConfigNoop
+}
+
 func (c *ChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {

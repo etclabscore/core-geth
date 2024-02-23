@@ -400,7 +400,7 @@ func gaWrite(ga *genesisT.GenesisAlloc, db ethdb.KeyValueWriter, hash common.Has
 
 // CommitGenesisState loads the stored genesis state with the given block
 // hash and commits them into the given database handler.
-func CommitGenesisState(db ethdb.Database, triedb *trie.Database, blockhash common.Hash) error {
+func CommitGenesisState(db ethdb.Database, triedb *triedb.Database, blockhash common.Hash) error {
 	var alloc genesisT.GenesisAlloc
 	blob := rawdb.ReadGenesisStateSpec(db, blockhash)
 	if len(blob) != 0 {
@@ -448,7 +448,7 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 	if err != nil {
 		panic(err)
 	}
-	err = gaFlush(&g.Alloc, trie.NewDatabase(db, nil), db)
+	err = gaFlush(&g.Alloc, triedb.NewDatabase(db, nil), db)
 	if err != nil {
 		panic(err)
 	}

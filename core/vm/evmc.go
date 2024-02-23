@@ -203,7 +203,7 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 }
 
 func (host *hostContext) GetBalance(addr evmc.Address) evmc.Hash {
-	return evmc.Hash(common.BigToHash(host.env.StateDB.GetBalance(common.Address(addr))))
+	return evmc.Hash(common.BigToHash(host.env.StateDB.GetBalance(common.Address(addr)).ToBig()))
 }
 
 func (host *hostContext) GetCodeSize(addr evmc.Address) int {
@@ -289,15 +289,15 @@ func (host *hostContext) Call(kind evmc.CallKind,
 		if static {
 			output, gasLeftU, err = host.env.StaticCall(host.contract, destination, input, gasU)
 		} else {
-			output, gasLeftU, err = host.env.Call(host.contract, destination, input, gasU, value.ToBig())
+			output, gasLeftU, err = host.env.Call(host.contract, destination, input, gasU, value)
 		}
 	case evmc.DelegateCall:
 		output, gasLeftU, err = host.env.DelegateCall(host.contract, destination, input, gasU)
 	case evmc.CallCode:
-		output, gasLeftU, err = host.env.CallCode(host.contract, destination, input, gasU, value.ToBig())
+		output, gasLeftU, err = host.env.CallCode(host.contract, destination, input, gasU, value)
 	case evmc.Create:
 		var createOutput []byte
-		createOutput, createAddr, gasLeftU, err = host.env.Create(host.contract, input, gasU, value.ToBig())
+		createOutput, createAddr, gasLeftU, err = host.env.Create(host.contract, input, gasU, value)
 		createAddrEvmc = evmc.Address(createAddr)
 		isHomestead := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP7Transition, host.env.Context.BlockNumber)
 		if !isHomestead && err == ErrCodeStoreOutOfGas {
@@ -315,7 +315,7 @@ func (host *hostContext) Call(kind evmc.CallKind,
 		saltInt256 := new(uint256.Int)
 		saltInt256.SetBytes(salt.Bytes())
 
-		createOutput, createAddr, gasLeftU, err = host.env.Create2(host.contract, input, gasU, value.ToBig(), saltInt256)
+		createOutput, createAddr, gasLeftU, err = host.env.Create2(host.contract, input, gasU, value, saltInt256)
 		createAddrEvmc = evmc.Address(createAddr)
 		if err == ErrExecutionReverted {
 			// Assign return buffer from REVERT.
@@ -401,7 +401,7 @@ func (evm *EVMC) Run(contract *Contract, input []byte, readOnly bool) (ret []byt
 		evmc.Address(contract.Address()),
 		evmc.Address(contract.Caller()),
 		input,
-		evmc.Hash(common.BigToHash(contract.value)),
+		evmc.Hash(common.BigToHash(contract.value.ToBig())),
 		contract.Code,
 		evmc.Hash{})
 

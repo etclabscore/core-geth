@@ -27,7 +27,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params"
@@ -36,7 +35,6 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
-	"github.com/ethereum/go-ethereum/trie"
 	"github.com/ethereum/go-ethereum/triedb"
 	"github.com/ethereum/go-ethereum/triedb/pathdb"
 )
@@ -46,7 +44,7 @@ func TestSetupGenesisBlock(t *testing.T) {
 
 	defaultGenesisBlock := params.DefaultGenesisBlock()
 
-	config, hash, err := SetupGenesisBlock(db, trie.NewDatabase(db, nil), defaultGenesisBlock)
+	config, hash, err := SetupGenesisBlock(db, triedb.NewDatabase(db, nil), defaultGenesisBlock)
 	if err != nil {
 		t.Errorf("err: %v", err)
 	}
@@ -61,7 +59,7 @@ func TestSetupGenesisBlock(t *testing.T) {
 
 	classicGenesisBlock := params.DefaultClassicGenesisBlock()
 
-	clConfig, clHash, clErr := SetupGenesisBlock(db, trie.NewDatabase(db, nil), classicGenesisBlock)
+	clConfig, clHash, clErr := SetupGenesisBlock(db, triedb.NewDatabase(db, nil), classicGenesisBlock)
 	if clErr != nil {
 		t.Errorf("err: %v", clErr)
 	}
@@ -158,7 +156,7 @@ func testSetupGenesis(t *testing.T, scheme string) {
 		{
 			name: "compatible config in DB",
 			fn: func(db ethdb.Database) (ctypes.ChainConfigurator, common.Hash, error) {
-				tdb := trie.NewDatabase(db, newDbConfig(scheme))
+				tdb := triedb.NewDatabase(db, newDbConfig(scheme))
 				MustCommitGenesis(db, triedb.NewDatabase(db, nil), &oldcustomg)
 				return SetupGenesisBlock(db, tdb, &customg)
 			},
@@ -303,7 +301,7 @@ func newDbConfig(scheme string) *triedb.Config {
 
 func TestVerkleGenesisCommit(t *testing.T) {
 	var verkleTime uint64 = 0
-	verkleConfig := &params.ChainConfig{
+	verkleConfig := &goethereum.ChainConfig{
 		ChainID:                       big.NewInt(1),
 		HomesteadBlock:                big.NewInt(0),
 		DAOForkBlock:                  nil,
@@ -331,25 +329,27 @@ func TestVerkleGenesisCommit(t *testing.T) {
 		Clique:                        nil,
 	}
 
-	genesis := &Genesis{
+	genesis := &genesisT.Genesis{
 		BaseFee:    big.NewInt(vars.InitialBaseFee),
 		Config:     verkleConfig,
 		Timestamp:  verkleTime,
 		Difficulty: big.NewInt(0),
-		Alloc: types.GenesisAlloc{
+		Alloc: genesisT.GenesisAlloc{
 			{1}: {Balance: big.NewInt(1), Storage: map[common.Hash]common.Hash{{1}: {1}}},
 		},
 	}
 
+	db := rawdb.NewMemoryDatabase()
+
 	expected := common.Hex2Bytes("14398d42be3394ff8d50681816a4b7bf8d8283306f577faba2d5bc57498de23b")
-	got := genesis.ToBlock().Root().Bytes()
+	genesisBlock := MustCommitGenesis(db, triedb.NewDatabase(db, triedb.HashDefaults), genesis)
+	got := genesisBlock.Root().Bytes()
 	if !bytes.Equal(got, expected) {
 		t.Fatalf("invalid genesis state root, expected %x, got %x", expected, got)
 	}
 
-	db := rawdb.NewMemoryDatabase()
 	triedb := triedb.NewDatabase(db, &triedb.Config{IsVerkle: true, PathDB: pathdb.Defaults})
-	block := genesis.MustCommit(db, triedb)
+	block := MustCommitGenesis(db, triedb, genesis)
 	if !bytes.Equal(block.Root().Bytes(), expected) {
 		t.Fatalf("invalid genesis state root, expected %x, got %x", expected, got)
 	}

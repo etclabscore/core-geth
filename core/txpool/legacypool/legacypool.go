@@ -37,7 +37,6 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/holiman/uint256"
 )
 

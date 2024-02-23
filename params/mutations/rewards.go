@@ -22,6 +22,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/holiman/uint256"
 )
 
 // Some weird constants to avoid constant memory allocs for them.
@@ -65,9 +66,9 @@ func GetRewards(config ctypes.ChainConfigurator, header *types.Header, uncles []
 func AccumulateRewards(config ctypes.ChainConfigurator, state *state.StateDB, header *types.Header, uncles []*types.Header) {
 	minerReward, uncleRewards := GetRewards(config, header, uncles)
 	for i, uncle := range uncles {
-		state.AddBalance(uncle.Coinbase, uncleRewards[i])
+		state.AddBalance(uncle.Coinbase, uint256.MustFromBig(uncleRewards[i]))
 	}
-	state.AddBalance(header.Coinbase, minerReward)
+	state.AddBalance(header.Coinbase, uint256.MustFromBig(minerReward))
 }
 
 // As of "Era 2" (zero-index era 1), uncle miners and winners are rewarded equally for each included block.

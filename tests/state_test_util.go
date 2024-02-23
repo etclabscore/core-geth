@@ -40,6 +40,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/triedb"
 	"github.com/ethereum/go-ethereum/triedb/hashdb"
@@ -320,7 +321,7 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 		// - the block body is verified against the header in block_validator.go:ValidateBody
 		// Here, we just do this shortcut smaller fix, since state tests do not
 		// utilize those codepaths
-		if len(msg.BlobHashes)*vars.BlobTxBlobGasPerBlob > params.MaxBlobGasPerBlock {
+		if len(msg.BlobHashes)*vars.BlobTxBlobGasPerBlob > vars.BlobTxBlobGasPerBlob {
 			return state, common.Hash{}, errors.New("blob gas exceeds maximum")
 		}
 	}

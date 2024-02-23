@@ -35,6 +35,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/internal/era"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/trie"
 	"github.com/ethereum/go-ethereum/triedb"
 )
@@ -50,7 +51,7 @@ func TestHistoryImportAndExport(t *testing.T) {
 		address = crypto.PubkeyToAddress(key.PublicKey)
 		genesis = &core.Genesis{
 			Config: params.TestChainConfig,
-			Alloc:  types.GenesisAlloc{address: {Balance: big.NewInt(1000000000000000000)}},
+			Alloc:  genesisT.GenesisAlloc{address: {Balance: big.NewInt(1000000000000000000)}},
 		}
 		signer = types.LatestSigner(genesis.Config)
 	)

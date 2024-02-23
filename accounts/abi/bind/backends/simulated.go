@@ -20,8 +20,8 @@ import (
 	"context"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient/simulated"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 )
 
 // SimulatedBackend is a simulated blockchain.
@@ -43,7 +43,7 @@ func (b *SimulatedBackend) Fork(ctx context.Context, parentHash common.Hash) err
 //
 // Deprecated: please use simulated.Backend from package
 // github.com/ethereum/go-ethereum/ethclient/simulated instead.
-func NewSimulatedBackend(alloc types.GenesisAlloc, gasLimit uint64) *SimulatedBackend {
+func NewSimulatedBackend(alloc genesisT.GenesisAlloc, gasLimit uint64) *SimulatedBackend {
 	b := simulated.NewBackend(alloc, simulated.WithBlockGasLimit(gasLimit))
 	return &SimulatedBackend{
 		Backend: b,

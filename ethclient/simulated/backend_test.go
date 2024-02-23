@@ -28,6 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -40,7 +41,7 @@ var (
 
 func simTestBackend(testAddr common.Address) *Backend {
 	return NewBackend(
-		types.GenesisAlloc{
+		genesisT.GenesisAlloc{
 			testAddr: {Balance: big.NewInt(10000000000000000)},
 		},
 	)
@@ -70,7 +71,7 @@ func newTx(sim *Backend, key *ecdsa.PrivateKey) (*types.Transaction, error) {
 }
 
 func TestNewBackend(t *testing.T) {
-	sim := NewBackend(types.GenesisAlloc{})
+	sim := NewBackend(genesisT.GenesisAlloc{})
 	defer sim.Close()
 
 	client := sim.Client()
@@ -93,7 +94,7 @@ func TestNewBackend(t *testing.T) {
 }
 
 func TestAdjustTime(t *testing.T) {
-	sim := NewBackend(types.GenesisAlloc{})
+	sim := NewBackend(genesisT.GenesisAlloc{})
 	defer sim.Close()
 
 	client := sim.Client()

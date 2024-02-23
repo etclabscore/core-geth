@@ -717,7 +717,7 @@ func TestEstimateGas(t *testing.T) {
 		//            require(block.basefee > 0);
 		//        }
 		//    }
-		//}
+		// }
 		{
 			blockNumber: rpc.LatestBlockNumber,
 			call: TransactionArgs{
@@ -988,7 +988,7 @@ func TestSignTransaction(t *testing.T) {
 		to      = crypto.PubkeyToAddress(key.PublicKey)
 		genesis = &core.Genesis{
 			Config: params.MergedTestChainConfig,
-			Alloc:  types.GenesisAlloc{},
+			Alloc:  genesisT.GenesisAlloc{},
 		}
 	)
 	b := newTestBackend(t, 1, genesis, beacon.New(ethash.NewFaker()), func(i int, b *core.BlockGen) {
@@ -1026,7 +1026,7 @@ func TestSignBlobTransaction(t *testing.T) {
 		to      = crypto.PubkeyToAddress(key.PublicKey)
 		genesis = &core.Genesis{
 			Config: params.MergedTestChainConfig,
-			Alloc:  types.GenesisAlloc{},
+			Alloc:  genesisT.GenesisAlloc{},
 		}
 	)
 	b := newTestBackend(t, 1, genesis, beacon.New(ethash.NewFaker()), func(i int, b *core.BlockGen) {
@@ -1060,7 +1060,7 @@ func TestSendBlobTransaction(t *testing.T) {
 		to      = crypto.PubkeyToAddress(key.PublicKey)
 		genesis = &core.Genesis{
 			Config: params.MergedTestChainConfig,
-			Alloc:  types.GenesisAlloc{},
+			Alloc:  genesisT.GenesisAlloc{},
 		}
 	)
 	b := newTestBackend(t, 1, genesis, beacon.New(ethash.NewFaker()), func(i int, b *core.BlockGen) {
@@ -1093,7 +1093,7 @@ func TestFillBlobTransaction(t *testing.T) {
 		to      = crypto.PubkeyToAddress(key.PublicKey)
 		genesis = &core.Genesis{
 			Config: params.MergedTestChainConfig,
-			Alloc:  types.GenesisAlloc{},
+			Alloc:  genesisT.GenesisAlloc{},
 		}
 		emptyBlob                      = kzg4844.Blob{}
 		emptyBlobCommit, _             = kzg4844.BlobToCommitment(emptyBlob)
@@ -1291,7 +1291,7 @@ func argsFromTransaction(tx *types.Transaction, from common.Address) Transaction
 		Input:                (*hexutil.Bytes)(&input),
 		ChainID:              (*hexutil.Big)(tx.ChainId()),
 		// TODO: impl accessList conversion
-		//AccessList: tx.AccessList(),
+		// AccessList: tx.AccessList(),
 		BlobFeeCap: (*hexutil.Big)(tx.BlobGasFeeCap()),
 		BlobHashes: tx.BlobHashes(),
 	}

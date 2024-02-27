@@ -410,7 +410,7 @@ func ExportHistory(bc *core.BlockChain, dir string, first, last, step uint64) er
 		last = head
 	}
 	network := "unknown"
-	if name, ok := params.NetworkNames[bc.Config().ChainID.String()]; ok {
+	if name, ok := params.NetworkNames[bc.Config().GetChainID().String()]; ok {
 		network = name
 	}
 	if err := os.MkdirAll(dir, os.ModePerm); err != nil {

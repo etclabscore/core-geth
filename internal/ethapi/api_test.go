@@ -986,7 +986,7 @@ func TestSignTransaction(t *testing.T) {
 	var (
 		key, _  = crypto.HexToECDSA("8a1f9a8f95be41cd7ccb6168179afb4504aefe388d1e14474d32c45c72ce7b7a")
 		to      = crypto.PubkeyToAddress(key.PublicKey)
-		genesis = &core.Genesis{
+		genesis = &genesisT.Genesis{
 			Config: params.MergedTestChainConfig,
 			Alloc:  genesisT.GenesisAlloc{},
 		}
@@ -1024,7 +1024,7 @@ func TestSignBlobTransaction(t *testing.T) {
 	var (
 		key, _  = crypto.HexToECDSA("8a1f9a8f95be41cd7ccb6168179afb4504aefe388d1e14474d32c45c72ce7b7a")
 		to      = crypto.PubkeyToAddress(key.PublicKey)
-		genesis = &core.Genesis{
+		genesis = &genesisT.Genesis{
 			Config: params.MergedTestChainConfig,
 			Alloc:  genesisT.GenesisAlloc{},
 		}
@@ -1058,7 +1058,7 @@ func TestSendBlobTransaction(t *testing.T) {
 	var (
 		key, _  = crypto.HexToECDSA("8a1f9a8f95be41cd7ccb6168179afb4504aefe388d1e14474d32c45c72ce7b7a")
 		to      = crypto.PubkeyToAddress(key.PublicKey)
-		genesis = &core.Genesis{
+		genesis = &genesisT.Genesis{
 			Config: params.MergedTestChainConfig,
 			Alloc:  genesisT.GenesisAlloc{},
 		}
@@ -1091,7 +1091,7 @@ func TestFillBlobTransaction(t *testing.T) {
 	var (
 		key, _  = crypto.HexToECDSA("8a1f9a8f95be41cd7ccb6168179afb4504aefe388d1e14474d32c45c72ce7b7a")
 		to      = crypto.PubkeyToAddress(key.PublicKey)
-		genesis = &core.Genesis{
+		genesis = &genesisT.Genesis{
 			Config: params.MergedTestChainConfig,
 			Alloc:  genesisT.GenesisAlloc{},
 		}

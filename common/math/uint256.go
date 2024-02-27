@@ -23,16 +23,6 @@ import (
 	"github.com/holiman/uint256"
 )
 
-// Various big integer limit values.
-var (
-	u256_tt255    = Uint256Pow(2, 255)
-	u256_tt256    = Uint256Pow(2, 256)
-	u256_tt256m1  = new(uint256.Int).Sub(u256_tt256, uint256.NewInt(1))
-	u256_tt63     = Uint256Pow(2, 63)
-	MaxUint256    = new(uint256.Int).Set(u256_tt256m1)
-	MaxUint256_63 = new(uint256.Int).Sub(u256_tt63, uint256.NewInt(1))
-)
-
 // HexOrDecimalUint256 marshals uint256.Int as hex or decimal.
 type HexOrDecimalUint256 uint256.Int
 

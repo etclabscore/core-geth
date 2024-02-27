@@ -21,6 +21,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"log/slog"
 	"math"
 	"math/big"
 	"math/rand"
@@ -564,7 +565,7 @@ type Config struct {
 	// be block header JSON objects instead of work package arrays.
 	NotifyFull bool
 
-	Log log.Logger `toml:"-"`
+	Log *slog.Logger `toml:"-"`
 	// ECIP-1099
 	ECIP1099Block *uint64 `toml:"-"`
 }
@@ -598,7 +599,7 @@ type Ethash struct {
 // packages.
 func New(config Config, notify []string, noverify bool) *Ethash {
 	if config.Log == nil {
-		config.Log = log.Root()
+		config.Log = slog.Default()
 	}
 	if config.CachesInMem <= 0 {
 		config.Log.Warn("One ethash cache must always be in memory", "requested", config.CachesInMem)
@@ -637,7 +638,7 @@ func NewFaker() *Ethash {
 	return &Ethash{
 		config: Config{
 			PowMode: ModeFake,
-			Log:     log.Root(),
+			Log:     slog.Default(),
 		},
 	}
 }
@@ -649,7 +650,7 @@ func NewFakeFailer(fail uint64) *Ethash {
 	return &Ethash{
 		config: Config{
 			PowMode: ModeFake,
-			Log:     log.Root(),
+			Log:     slog.Default(),
 		},
 		fakeFail: fail,
 	}
@@ -662,7 +663,7 @@ func NewFakeDelayer(delay time.Duration) *Ethash {
 	return &Ethash{
 		config: Config{
 			PowMode: ModeFake,
-			Log:     log.Root(),
+			Log:     slog.Default(),
 		},
 		fakeDelay: delay,
 	}
@@ -675,7 +676,7 @@ func NewPoissonFaker() *Ethash {
 	return &Ethash{
 		config: Config{
 			PowMode: ModePoissonFake,
-			Log:     log.Root(),
+			Log:     slog.Default(),
 		},
 	}
 }
@@ -686,7 +687,7 @@ func NewFullFaker() *Ethash {
 	return &Ethash{
 		config: Config{
 			PowMode: ModeFullFake,
-			Log:     log.Root(),
+			Log:     slog.Default(),
 		},
 	}
 }

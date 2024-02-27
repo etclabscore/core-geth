@@ -3774,7 +3774,7 @@ func testEIP1559Transition(t *testing.T, scheme string) {
 	actual = state.GetBalance(block.Coinbase()).ToBig()
 	expected = new(big.Int).Add(
 		new(big.Int).SetUint64(block.GasUsed()*effectiveTip),
-		vars.EIP1234FBlockReward,
+		vars.EIP1234FBlockReward.ToBig(),
 	)
 	if actual.Cmp(expected) != 0 {
 		t.Fatalf("miner balance incorrect: expected %d, got %d", expected, actual)

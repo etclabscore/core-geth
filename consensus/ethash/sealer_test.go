@@ -30,7 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/internal/testlog"
-	"github.com/ethereum/go-ethereum/log"
+	"golang.org/x/exp/slog"
 )
 
 func TestSealFakePoisson(t *testing.T) {
@@ -116,7 +116,7 @@ func TestRemoteNotifyFull(t *testing.T) {
 	config := Config{
 		PowMode:    ModeTest,
 		NotifyFull: true,
-		Log:        testlog.Logger(t, log.LvlWarn),
+		Log:        testlog.Logger(t, slog.LevelWarn),
 	}
 	ethash := New(config, []string{server.URL}, false)
 	defer ethash.Close()
@@ -159,7 +159,7 @@ func TestRemoteMultiNotify(t *testing.T) {
 
 	// Create the custom ethash engine.
 	ethash := NewTester([]string{server.URL}, false)
-	ethash.config.Log = testlog.Logger(t, log.LvlWarn)
+	ethash.config.Log = testlog.Logger(t, slog.LevelWarn)
 	defer ethash.Close()
 
 	// Provide a results reader.
@@ -206,7 +206,7 @@ func TestRemoteMultiNotifyFull(t *testing.T) {
 	config := Config{
 		PowMode:    ModeTest,
 		NotifyFull: true,
-		Log:        testlog.Logger(t, log.LvlWarn),
+		Log:        testlog.Logger(t, slog.LevelWarn),
 	}
 	ethash := New(config, []string{server.URL}, false)
 	defer ethash.Close()

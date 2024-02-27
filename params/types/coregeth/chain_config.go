@@ -275,8 +275,8 @@ type CoreGethChainConfig struct {
 	TrustedCheckpoint       *ctypes.TrustedCheckpoint      `json:"trustedCheckpoint,omitempty"`
 	TrustedCheckpointOracle *ctypes.CheckpointOracleConfig `json:"trustedCheckpointOracle,omitempty"`
 
-	DifficultyBombDelaySchedule ctypes.Uint64BigMapEncodesHex `json:"difficultyBombDelays,omitempty"` // JSON tag matches Parity's
-	BlockRewardSchedule         ctypes.Uint64BigMapEncodesHex `json:"blockReward,omitempty"`          // JSON tag matches Parity's
+	DifficultyBombDelaySchedule ctypes.Uint64Uint256MapEncodesHex `json:"difficultyBombDelays,omitempty"` // JSON tag matches Parity's
+	BlockRewardSchedule         ctypes.Uint64Uint256MapEncodesHex `json:"blockReward,omitempty"`          // JSON tag matches Parity's
 
 	RequireBlockHashes map[uint64]common.Hash `json:"requireBlockHashes"`
 

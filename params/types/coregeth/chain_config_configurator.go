@@ -61,13 +61,13 @@ func setBig(i *big.Int, u *uint64) *big.Int {
 
 func (c *CoreGethChainConfig) ensureExistingRewardSchedule() {
 	if c.BlockRewardSchedule == nil {
-		c.BlockRewardSchedule = ctypes.Uint64BigMapEncodesHex{}
+		c.BlockRewardSchedule = ctypes.Uint64Uint256MapEncodesHex{}
 	}
 }
 
 func (c *CoreGethChainConfig) ensureExistingDifficultySchedule() {
 	if c.DifficultyBombDelaySchedule == nil {
-		c.DifficultyBombDelaySchedule = ctypes.Uint64BigMapEncodesHex{}
+		c.DifficultyBombDelaySchedule = ctypes.Uint64Uint256MapEncodesHex{}
 	}
 }
 
@@ -1337,14 +1337,14 @@ func (c *CoreGethChainConfig) SetEthashEIP5133Transition(n *uint64) error {
 	return nil
 }
 
-func (c *CoreGethChainConfig) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {
+func (c *CoreGethChainConfig) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64Uint256MapEncodesHex {
 	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil
 	}
 	return c.DifficultyBombDelaySchedule
 }
 
-func (c *CoreGethChainConfig) SetEthashDifficultyBombDelaySchedule(m ctypes.Uint64BigMapEncodesHex) error {
+func (c *CoreGethChainConfig) SetEthashDifficultyBombDelaySchedule(m ctypes.Uint64Uint256MapEncodesHex) error {
 	if c.Ethash == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
@@ -1352,14 +1352,14 @@ func (c *CoreGethChainConfig) SetEthashDifficultyBombDelaySchedule(m ctypes.Uint
 	return nil
 }
 
-func (c *CoreGethChainConfig) GetEthashBlockRewardSchedule() ctypes.Uint64BigMapEncodesHex {
+func (c *CoreGethChainConfig) GetEthashBlockRewardSchedule() ctypes.Uint64Uint256MapEncodesHex {
 	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil
 	}
 	return c.BlockRewardSchedule
 }
 
-func (c *CoreGethChainConfig) SetEthashBlockRewardSchedule(m ctypes.Uint64BigMapEncodesHex) error {
+func (c *CoreGethChainConfig) SetEthashBlockRewardSchedule(m ctypes.Uint64Uint256MapEncodesHex) error {
 	if c.Ethash == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}

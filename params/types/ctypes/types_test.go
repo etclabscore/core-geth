@@ -28,12 +28,13 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/vars"
+	"github.com/holiman/uint256"
 )
 
 // Tests for map data types.
 
 type fakeConfig struct {
-	Number Uint64BigValOrMapHex `json:"num"`
+	Number Uint64Uint256ValOrMapHex `json:"num"`
 }
 
 var uint64bigMaybeNoD []byte = []byte(`
@@ -63,12 +64,12 @@ type testCase struct {
 var testCases = []testCase{
 	{
 		uint64bigMaybeNoD,
-		fakeConfig{Uint64BigValOrMapHex{0: big.NewInt(2000000000000000000)}},
+		fakeConfig{Uint64Uint256ValOrMapHex{0: uint256.NewInt(2000000000000000000)}},
 		uint64bigMaybeNoDMarshaledMap,
 	},
 	{
 		uint64bigMaybeYesD,
-		fakeConfig{Uint64BigValOrMapHex{0: big.NewInt(2000000000000000000), 5: big.NewInt(3000000000000000000)}},
+		fakeConfig{Uint64Uint256ValOrMapHex{0: uint256.NewInt(2000000000000000000), 5: uint256.NewInt(3000000000000000000)}},
 		uint64bigMaybeYesD,
 	},
 }
@@ -115,23 +116,23 @@ func TestUint64BigMapMaybe_MarshalJSON(t *testing.T) {
 
 func TestBigMapEncodesHex_UnmarshalJSON(t *testing.T) {
 	type conf struct {
-		Nums Uint64BigMapEncodesHex `json:"num"`
+		Nums Uint64Uint256MapEncodesHex `json:"num"`
 	}
 	c := conf{}
 	err := json.Unmarshal(uint64bigMaybeYesD, &c)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if c.Nums[0].Cmp(big.NewInt(2000000000000000000)) != 0 {
+	if c.Nums[0].Cmp(uint256.NewInt(2000000000000000000)) != 0 {
 		t.Error("mismatch")
 	}
 }
 
 func TestBigMapEncodesHex_MarshalJSON(t *testing.T) {
 	type conf struct {
-		Nums Uint64BigMapEncodesHex `json:"num"`
+		Nums Uint64Uint256MapEncodesHex `json:"num"`
 	}
-	c := conf{Uint64BigMapEncodesHex{0: big.NewInt(2000000000000000000), 5: big.NewInt(3000000000000000000)}}
+	c := conf{Uint64Uint256MapEncodesHex{0: uint256.NewInt(2000000000000000000), 5: uint256.NewInt(3000000000000000000)}}
 	got, err := json.Marshal(c)
 	if err != nil {
 		t.Fatal(err)
@@ -152,8 +153,8 @@ func TestBigMapEncodesHex_MarshalJSON(t *testing.T) {
 }
 
 func TestUint64BigMapEncodesHex_SetValueTotalForHeight(t *testing.T) {
-	newMG := func() Uint64BigMapEncodesHex {
-		v := Uint64BigMapEncodesHex{}
+	newMG := func() Uint64Uint256MapEncodesHex {
+		v := Uint64Uint256MapEncodesHex{}
 		return v
 	}
 	byzaBlock := big.NewInt(4370000).Uint64()
@@ -162,7 +163,7 @@ func TestUint64BigMapEncodesHex_SetValueTotalForHeight(t *testing.T) {
 
 	max := uint64(math.MaxUint64)
 
-	check := func(mg Uint64BigMapEncodesHex, got, want uint64) {
+	check := func(mg Uint64Uint256MapEncodesHex, got, want uint64) {
 		if got != want {
 			t.Log(runtime.Caller(1))
 			t.Log(runtime.Caller(2))
@@ -180,7 +181,7 @@ func TestUint64BigMapEncodesHex_SetValueTotalForHeight(t *testing.T) {
 	check(mgSoloOrdered, mgSoloOrdered.SumValues(&muirBlock), vars.EIP2384DifficultyBombDelay.Uint64())
 	check(mgSoloOrdered, mgSoloOrdered.SumValues(&max), vars.EIP2384DifficultyBombDelay.Uint64())
 
-	checkFinal := func(mg Uint64BigMapEncodesHex) {
+	checkFinal := func(mg Uint64Uint256MapEncodesHex) {
 		check(mg, mg.SumValues(&byzaBlock), vars.EIP649DifficultyBombDelay.Uint64())
 		check(mg, mg.SumValues(&consBlock), vars.EIP1234DifficultyBombDelay.Uint64())
 		check(mg, mg.SumValues(&muirBlock), vars.EIP2384DifficultyBombDelay.Uint64())
@@ -223,7 +224,7 @@ func TestUint64BigMapEncodesHex_SetValueTotalForHeight(t *testing.T) {
 
 	// Set a random.
 	randoK := new(big.Int).Div(new(big.Int).Add(big.NewInt(int64(byzaBlock)), big.NewInt(int64(consBlock))), common.Big2).Uint64()
-	randoV := new(big.Int).Div(new(big.Int).Add(vars.EIP649DifficultyBombDelay, vars.EIP1234DifficultyBombDelay), common.Big2)
+	randoV := new(uint256.Int).Div(new(uint256.Int).Add(vars.EIP649DifficultyBombDelay, vars.EIP1234DifficultyBombDelay), uint256.NewInt(2))
 	mgWildUnordered2.SetValueTotalForHeight(&randoK, randoV)
 
 	checkFinal(mgWildUnordered2)
@@ -258,8 +259,8 @@ func TestMapMeetsSpecification_1234(t *testing.T) {
         }}`
 
 	im := struct {
-		DifficultyBombDelaySchedule Uint64BigMapEncodesHex `json:"difficultyBombDelays,omitempty"` // JSON tag matches Parity's
-		BlockRewardSchedule         Uint64BigMapEncodesHex `json:"blockReward,omitempty"`          // JSON tag matches Parity's
+		DifficultyBombDelaySchedule Uint64Uint256MapEncodesHex `json:"difficultyBombDelays,omitempty"` // JSON tag matches Parity's
+		BlockRewardSchedule         Uint64Uint256MapEncodesHex `json:"blockReward,omitempty"`          // JSON tag matches Parity's
 	}{}
 	err := json.Unmarshal([]byte(data), &im)
 	if err != nil {

@@ -1175,25 +1175,25 @@ func (c *ChainConfig) SetEthashEIP5133Transition(n *uint64) error {
 	return nil
 }
 
-func (c *ChainConfig) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {
+func (c *ChainConfig) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64Uint256MapEncodesHex {
 	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil
 	}
 	return nil
 }
 
-func (c *ChainConfig) SetEthashDifficultyBombDelaySchedule(m ctypes.Uint64BigMapEncodesHex) error {
+func (c *ChainConfig) SetEthashDifficultyBombDelaySchedule(m ctypes.Uint64Uint256MapEncodesHex) error {
 	return ctypes.ErrUnsupportedConfigNoop
 }
 
-func (c *ChainConfig) GetEthashBlockRewardSchedule() ctypes.Uint64BigMapEncodesHex {
+func (c *ChainConfig) GetEthashBlockRewardSchedule() ctypes.Uint64Uint256MapEncodesHex {
 	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil
 	}
 	return nil
 }
 
-func (c *ChainConfig) SetEthashBlockRewardSchedule(m ctypes.Uint64BigMapEncodesHex) error {
+func (c *ChainConfig) SetEthashBlockRewardSchedule(m ctypes.Uint64Uint256MapEncodesHex) error {
 	return ctypes.ErrUnsupportedConfigNoop
 }
 

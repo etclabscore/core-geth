@@ -21,13 +21,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"math/big"
 	"sort"
 	"strconv"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/holiman/uint256"
 )
 
 type UnsupportedConfigErr error
@@ -62,18 +62,18 @@ func UnsupportedConfigError(err error, method string, value interface{}) ErrUnsu
 	}
 }
 
-// Uint64BigValOrMapHex is an encoding type for Parity's chain config,
+// Uint64Uint256ValOrMapHex is an encoding type for Parity's chain config,
 // used for their 'blockReward' field.
 // When only an initial value, eg 0:0x42 is set, the type is a hex-encoded string.
 // When multiple values are set, eg modified block rewards, the type is a map of hex-encoded strings.
-type Uint64BigValOrMapHex map[uint64]*big.Int
+type Uint64Uint256ValOrMapHex map[uint64]*uint256.Int
 
 // UnmarshalJSON implements the json Unmarshaler interface.
-func (m *Uint64BigValOrMapHex) UnmarshalJSON(input []byte) error {
-	mm := make(map[math.HexOrDecimal64]math.HexOrDecimal256)
+func (m *Uint64Uint256ValOrMapHex) UnmarshalJSON(input []byte) error {
+	mm := make(map[math.HexOrDecimal64]math.HexOrDecimalUint256)
 	err := json.Unmarshal(input, &mm)
 	if err == nil {
-		mp := Uint64BigValOrMapHex{}
+		mp := Uint64Uint256ValOrMapHex{}
 		for k, v := range mm {
 			u := uint64(k)
 			mp[u] = v.ToInt()
@@ -86,33 +86,33 @@ func (m *Uint64BigValOrMapHex) UnmarshalJSON(input []byte) error {
 		return err
 	}
 	input = []byte(uq)
-	var b = new(math.HexOrDecimal256)
+	var b = new(math.HexOrDecimalUint256)
 	err = b.UnmarshalText(input)
 	if err != nil {
 		return err
 	}
-	*m = Uint64BigValOrMapHex{0: b.ToInt()}
+	*m = Uint64Uint256ValOrMapHex{0: b.ToInt()}
 	return nil
 }
 
 // MarshalJSON implements the json Marshaler interface.
-func (m Uint64BigValOrMapHex) MarshalJSON() (output []byte, err error) {
-	mm := make(map[math.HexOrDecimal64]*math.HexOrDecimal256)
+func (m Uint64Uint256ValOrMapHex) MarshalJSON() (output []byte, err error) {
+	mm := make(map[math.HexOrDecimal64]*math.HexOrDecimalUint256)
 	for k, v := range m {
 		if v == nil {
 			continue // should never happen
 		}
-		d := math.HexOrDecimal256(*v)
+		d := math.HexOrDecimalUint256(*v)
 		mm[math.HexOrDecimal64(k)] = &d
 	}
 	return json.Marshal(mm)
 }
 
-// Uint64BigMapEncodesHex is a map that encodes and decodes w/ JSON hex format.
-type Uint64BigMapEncodesHex map[uint64]*big.Int
+// Uint64Uint256MapEncodesHex is a map that encodes and decodes w/ JSON hex format.
+type Uint64Uint256MapEncodesHex map[uint64]*uint256.Int
 
 // UnmarshalJSON implements the json Unmarshaler interface.
-func (bb *Uint64BigMapEncodesHex) UnmarshalJSON(input []byte) error {
+func (bb *Uint64Uint256MapEncodesHex) UnmarshalJSON(input []byte) error {
 	// HACK: Parity uses raw numbers here...
 	// It would be better to use a consistent format... instead of having to do interface{}-ing
 	// and switch on types.
@@ -121,25 +121,25 @@ func (bb *Uint64BigMapEncodesHex) UnmarshalJSON(input []byte) error {
 	if err != nil {
 		return err
 	}
-	b := make(map[uint64]*big.Int)
+	b := make(map[uint64]*uint256.Int)
 	for k, v := range m {
-		var vv *big.Int
+		var vv *uint256.Int
 		switch v := v.(type) {
 		case string:
-			var b = new(math.HexOrDecimal256)
+			var b = new(math.HexOrDecimalUint256)
 			err = b.UnmarshalText([]byte(v))
 			if err != nil {
 				return err
 			}
 			vv = b.ToInt()
 		case int, int64:
-			vv = big.NewInt(v.(int64))
+			vv = uint256.NewInt(uint64(v.(int64)))
 		case float64:
 			i, err := strconv.ParseUint(fmt.Sprintf("%.0f", v), 10, 64)
 			if err != nil {
 				panic(err)
 			}
-			vv = big.NewInt(int64(i))
+			vv = uint256.NewInt(i)
 		default:
 			panic(fmt.Sprintf("unknown type: %t %v", v, v))
 		}
@@ -152,26 +152,26 @@ func (bb *Uint64BigMapEncodesHex) UnmarshalJSON(input []byte) error {
 }
 
 // MarshalJSON implements the json Marshaler interface.
-func (b Uint64BigMapEncodesHex) MarshalJSON() ([]byte, error) {
-	mm := make(map[math.HexOrDecimal64]*math.HexOrDecimal256)
+func (b Uint64Uint256MapEncodesHex) MarshalJSON() ([]byte, error) {
+	mm := make(map[math.HexOrDecimal64]*math.HexOrDecimalUint256)
 	for k, v := range b {
 		if v == nil {
 			continue // should never happen
 		}
-		d := math.HexOrDecimal256(*v)
+		d := math.HexOrDecimalUint256(*v)
 		mm[math.HexOrDecimal64(k)] = &d
 	}
 	return json.Marshal(mm)
 }
 
-func (b Uint64BigMapEncodesHex) SetValueTotalForHeight(n *uint64, val *big.Int) {
+func (b Uint64Uint256MapEncodesHex) SetValueTotalForHeight(n *uint64, val *uint256.Int) {
 	if n == nil || val == nil {
 		return
 	}
 
-	sums := make(map[uint64]*big.Int)
+	sums := make(map[uint64]*uint256.Int)
 	for k := range b {
-		sums[k] = new(big.Int).SetUint64(b.SumValues(&k))
+		sums[k] = new(uint256.Int).SetUint64(b.SumValues(&k))
 	}
 	if sums[*n] != nil {
 		if sums[*n].Cmp(val) < 0 {
@@ -181,7 +181,7 @@ func (b Uint64BigMapEncodesHex) SetValueTotalForHeight(n *uint64, val *big.Int) 
 		sums[*n] = val
 	}
 
-	sumR := big.NewInt(0)
+	sumR := uint256.NewInt(0)
 	sl := []uint64{}
 	for k := range sums {
 		sl = append(sl, k)
@@ -190,14 +190,14 @@ func (b Uint64BigMapEncodesHex) SetValueTotalForHeight(n *uint64, val *big.Int) 
 		return sl[i] < sl[j]
 	})
 	for _, s := range sl {
-		d := new(big.Int).Sub(sums[s], sumR)
+		d := new(uint256.Int).Sub(sums[s], sumR)
 		b[s] = d
 		sumR.Add(sumR, d)
 	}
 }
 
-func (b Uint64BigMapEncodesHex) SumValues(n *uint64) uint64 {
-	var sumB = big.NewInt(0)
+func (b Uint64Uint256MapEncodesHex) SumValues(n *uint64) uint64 {
+	var sumB = uint256.NewInt(0)
 	var sl = []uint64{}
 
 	for k := range b {
@@ -221,7 +221,7 @@ func (b Uint64BigMapEncodesHex) SumValues(n *uint64) uint64 {
 
 // MapMeetsSpecification returns the block number at which a difficulty/+reward map meet specifications, eg. EIP649 and/or EIP1234, or EIP2384.
 // This is a reverse lookup to extract EIP-spec'd parameters from difficulty and reward maps implementations.
-func MapMeetsSpecification(difficulties Uint64BigMapEncodesHex, rewards Uint64BigMapEncodesHex, difficultySum, wantedReward *big.Int) *uint64 {
+func MapMeetsSpecification(difficulties Uint64Uint256MapEncodesHex, rewards Uint64Uint256MapEncodesHex, difficultySum, wantedReward *uint256.Int) *uint64 {
 	var diffN *uint64
 	var sl = []uint64{}
 
@@ -233,7 +233,7 @@ func MapMeetsSpecification(difficulties Uint64BigMapEncodesHex, rewards Uint64Bi
 		return sl[i] < sl[j]
 	})
 
-	var total = new(big.Int)
+	var total = new(uint256.Int)
 	for _, s := range sl {
 		d := difficulties[s]
 		if d == nil {

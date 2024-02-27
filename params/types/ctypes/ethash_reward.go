@@ -42,7 +42,7 @@ func EthashBlockReward(c ChainConfigurator, n *big.Int) *uint256.Int {
 			if activation <= n.Uint64() { // Is forked
 				if activation >= lastActivation {
 					lastActivation = activation
-					blockReward = uint256.MustFromBig(reward)
+					blockReward = reward
 				}
 			}
 		}

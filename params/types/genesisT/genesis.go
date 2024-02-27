@@ -1113,19 +1113,19 @@ func (g *Genesis) SetEthashECIP1099Transition(n *uint64) error {
 	return g.Config.SetEthashECIP1099Transition(n)
 }
 
-func (g *Genesis) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {
+func (g *Genesis) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64Uint256MapEncodesHex {
 	return g.Config.GetEthashDifficultyBombDelaySchedule()
 }
 
-func (g *Genesis) SetEthashDifficultyBombDelaySchedule(m ctypes.Uint64BigMapEncodesHex) error {
+func (g *Genesis) SetEthashDifficultyBombDelaySchedule(m ctypes.Uint64Uint256MapEncodesHex) error {
 	return g.Config.SetEthashDifficultyBombDelaySchedule(m)
 }
 
-func (g *Genesis) GetEthashBlockRewardSchedule() ctypes.Uint64BigMapEncodesHex {
+func (g *Genesis) GetEthashBlockRewardSchedule() ctypes.Uint64Uint256MapEncodesHex {
 	return g.Config.GetEthashBlockRewardSchedule()
 }
 
-func (g *Genesis) SetEthashBlockRewardSchedule(m ctypes.Uint64BigMapEncodesHex) error {
+func (g *Genesis) SetEthashBlockRewardSchedule(m ctypes.Uint64Uint256MapEncodesHex) error {
 	return g.Config.SetEthashBlockRewardSchedule(m)
 }
 

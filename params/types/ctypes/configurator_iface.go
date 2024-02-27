@@ -336,10 +336,10 @@ type EthashConfigurator interface {
 
 	IsTerminalPoWBlock(parentTotalDiff *big.Int, totalDiff *big.Int) bool
 
-	GetEthashDifficultyBombDelaySchedule() Uint64BigMapEncodesHex
-	SetEthashDifficultyBombDelaySchedule(m Uint64BigMapEncodesHex) error
-	GetEthashBlockRewardSchedule() Uint64BigMapEncodesHex
-	SetEthashBlockRewardSchedule(m Uint64BigMapEncodesHex) error
+	GetEthashDifficultyBombDelaySchedule() Uint64Uint256MapEncodesHex
+	SetEthashDifficultyBombDelaySchedule(m Uint64Uint256MapEncodesHex) error
+	GetEthashBlockRewardSchedule() Uint64Uint256MapEncodesHex
+	SetEthashBlockRewardSchedule(m Uint64Uint256MapEncodesHex) error
 }
 
 type CliqueConfigurator interface {

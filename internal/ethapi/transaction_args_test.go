@@ -262,7 +262,7 @@ type backendMock struct {
 
 func newBackendMock() *backendMock {
 	var cancunTime uint64 = 600
-		config := &goethereum.ChainConfig{
+	config := &goethereum.ChainConfig{
 		ChainID:             big.NewInt(42),
 		HomesteadBlock:      big.NewInt(0),
 		DAOForkBlock:        nil,

@@ -31,8 +31,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/state"
-	"github.com/ethereum/go-ethereum/core/state/snapshot"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/internal/build"
@@ -403,7 +401,7 @@ func (tm *testMatcherGen) stateTestRunner(t *testing.T, name string, test *State
 			// vmConfig is constructed using global variables for possible EVM and EWASM interpreters.
 			// These interpreters are configured with environment variables and are assigned in an init() function.
 			vmConfig := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
-			test.Run(st, vmConfig, false, rawdb.HashScheme, func(err error, snaps *snapshot.Tree, state *state.StateDB) {
+			test.Run(st, vmConfig, false, rawdb.HashScheme, func(err error, state *StateTestState) {
 				if err != nil && len(test.json.Post[st.Fork][st.Index].ExpectException) > 0 {
 					// Ignore expected errors (TODO MariusVanDerWijden check error string)
 					return

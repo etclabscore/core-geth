@@ -21,9 +21,10 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
+	"github.com/holiman/uint256"
 )
 
-func ecip1017BlockReward(config ctypes.ChainConfigurator, header *types.Header, uncles []*types.Header) (*big.Int, []*big.Int) {
+func ecip1017BlockReward(config ctypes.ChainConfigurator, header *types.Header, uncles []*types.Header) (*uint256.Int, []*uint256.Int) {
 	blockReward := vars.FrontierBlockReward
 
 	// Ensure value 'era' is configured.
@@ -34,7 +35,7 @@ func ecip1017BlockReward(config ctypes.ChainConfigurator, header *types.Header, 
 	wr.Add(wr, wurs)
 
 	// Reward uncle miners.
-	uncleRewards := make([]*big.Int, len(uncles))
+	uncleRewards := make([]*uint256.Int, len(uncles))
 	for i, uncle := range uncles {
 		ur := GetBlockUncleRewardByEra(era, header, uncle, blockReward)
 		uncleRewards[i] = ur

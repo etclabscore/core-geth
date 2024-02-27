@@ -434,14 +434,14 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 			if exPeriodRef.Cmp(big.NewInt(int64(activated))) < 0 {
 				continue
 			}
-			fakeBlockNumber.Sub(fakeBlockNumber, dur)
+			fakeBlockNumber.Sub(fakeBlockNumber, dur.ToBig())
 		}
 		exPeriodRef.Set(fakeBlockNumber)
 	} else if config.IsEnabled(config.GetEthashEIP5133Transition, next) {
 		// calcDifficultyEip4345 is the difficulty adjustment algorithm as specified by EIP 4345.
 		// It offsets the bomb a total of 10.7M blocks.
 		fakeBlockNumber := new(big.Int)
-		delayWithOffset := new(big.Int).Sub(vars.EIP5133DifficultyBombDelay, common.Big1)
+		delayWithOffset := new(big.Int).Sub(vars.EIP5133DifficultyBombDelay.ToBig(), common.Big1)
 		if parent.Number.Cmp(delayWithOffset) >= 0 {
 			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, delayWithOffset)
 		}
@@ -450,7 +450,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		// calcDifficultyEip4345 is the difficulty adjustment algorithm as specified by EIP 4345.
 		// It offsets the bomb a total of 10.7M blocks.
 		fakeBlockNumber := new(big.Int)
-		delayWithOffset := new(big.Int).Sub(vars.EIP4345DifficultyBombDelay, common.Big1)
+		delayWithOffset := new(big.Int).Sub(vars.EIP4345DifficultyBombDelay.ToBig(), common.Big1)
 		if parent.Number.Cmp(delayWithOffset) >= 0 {
 			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, delayWithOffset)
 		}
@@ -459,7 +459,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		// calcDifficultyEIP3554 is the difficulty adjustment algorithm for London (December 2021).
 		// The calculation uses the Byzantium rules, but with bomb offset 9.7M.
 		fakeBlockNumber := new(big.Int)
-		delayWithOffset := new(big.Int).Sub(vars.EIP3554DifficultyBombDelay, common.Big1)
+		delayWithOffset := new(big.Int).Sub(vars.EIP3554DifficultyBombDelay.ToBig(), common.Big1)
 		if parent.Number.Cmp(delayWithOffset) >= 0 {
 			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, delayWithOffset)
 		}
@@ -468,7 +468,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		// calcDifficultyEIP2384 is the difficulty adjustment algorithm for Muir Glacier.
 		// The calculation uses the Byzantium rules, but with bomb offset 9M.
 		fakeBlockNumber := new(big.Int)
-		delayWithOffset := new(big.Int).Sub(vars.EIP2384DifficultyBombDelay, common.Big1)
+		delayWithOffset := new(big.Int).Sub(vars.EIP2384DifficultyBombDelay.ToBig(), common.Big1)
 		if parent.Number.Cmp(delayWithOffset) >= 0 {
 			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, delayWithOffset)
 		}
@@ -483,7 +483,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		// calculate a fake block number for the ice-age delay
 		// Specification: https://eips.ethereum.org/EIPS/eip-1234
 		fakeBlockNumber := new(big.Int)
-		delayWithOffset := new(big.Int).Sub(vars.EIP1234DifficultyBombDelay, common.Big1)
+		delayWithOffset := new(big.Int).Sub(vars.EIP1234DifficultyBombDelay.ToBig(), common.Big1)
 		if parent.Number.Cmp(delayWithOffset) >= 0 {
 			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, delayWithOffset)
 		}
@@ -496,7 +496,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		// the block number. Thus we remove one from the delay given
 
 		fakeBlockNumber := new(big.Int)
-		delayWithOffset := new(big.Int).Sub(vars.EIP649DifficultyBombDelay, common.Big1)
+		delayWithOffset := new(big.Int).Sub(vars.EIP649DifficultyBombDelay.ToBig(), common.Big1)
 		if parent.Number.Cmp(delayWithOffset) >= 0 {
 			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, delayWithOffset)
 		}
@@ -511,8 +511,8 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 	//   2^(( periodRef // EDP) - 2)
 	//
 	x := new(big.Int)
-	x.Div(exPeriodRef, params.ExpDiffPeriod) // (periodRef // EDP)
-	if x.Cmp(big1) > 0 {                     // if result large enough (not in algo explicitly)
+	x.Div(exPeriodRef, params.ExpDiffPeriod.ToBig()) // (periodRef // EDP)
+	if x.Cmp(big1) > 0 {                             // if result large enough (not in algo explicitly)
 		x.Sub(x, big2)      // - 2
 		x.Exp(big2, x, nil) // 2^
 	} else {

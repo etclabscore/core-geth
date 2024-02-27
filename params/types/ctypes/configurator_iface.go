@@ -236,7 +236,7 @@ type ProtocolSpecifier interface {
 	GetEIP6780TransitionTime() *uint64
 	SetEIP6780TransitionTime(n *uint64) error
 
-	// EIP4788 - Beacon block root in the EVM
+	// EIP4788 - Beacon block root in the EVM - https://eips.ethereum.org/EIPS/eip-4788
 	GetEIP4788TransitionTime() *uint64
 	SetEIP4788TransitionTime(n *uint64) error
 

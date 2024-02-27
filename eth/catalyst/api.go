@@ -517,23 +517,14 @@ func (api *ConsensusAPI) NewPayloadV2(params engine.ExecutableData) (engine.Payl
 			return engine.PayloadStatusV1{Status: engine.INVALID}, engine.InvalidParams.With(errors.New("non-nil withdrawals pre-shanghai"))
 		}
 	}
-	is4844 := api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4844TransitionTime, &params.Timestamp) || api.eth.BlockChain().Config().IsEnabled(api.eth.BlockChain().Config().GetEIP4844Transition, new(big.Int).SetUint64(params.Number))
-	if is4844 {
-		if params.ExcessBlobGas == nil {
-			// FIXME(meowsbits) This whole thing needs to be revisited with a bigger picture in mind.
-			// V1 ~= Berlin?
-			// V2 =~ London?
-			// V3 =~ Shanghai+Cancun?
-		}
-		return engine.PayloadStatusV1{Status: engine.INVALID}, engine.InvalidParams.With(errors.New("newPayloadV2 called post-cancun"))
-	} else {
-		if params.ExcessBlobGas != nil {
-			return engine.PayloadStatusV1{Status: engine.INVALID}, engine.InvalidParams.With(errors.New("non-nil excessBlobGas pre-cancun"))
-		}
-		if params.BlobGasUsed != nil {
-			return engine.PayloadStatusV1{Status: engine.INVALID}, engine.InvalidParams.With(errors.New("non-nil params.BlobGasUsed pre-cancun"))
-		}
+
+	if params.ExcessBlobGas != nil {
+		return engine.PayloadStatusV1{Status: engine.INVALID}, engine.InvalidParams.With(errors.New("non-nil excessBlobGas pre-cancun"))
 	}
+	if params.BlobGasUsed != nil {
+		return engine.PayloadStatusV1{Status: engine.INVALID}, engine.InvalidParams.With(errors.New("non-nil params.BlobGasUsed pre-cancun"))
+	}
+
 	return api.newPayload(params, nil, nil)
 }
 
@@ -557,6 +548,7 @@ func (api *ConsensusAPI) NewPayloadV3(params engine.ExecutableData, versionedHas
 	}
 
 	// Since both 4844 (blob txes) and 4788 (beacon root) features are checked, we assert BOTH config values.
+	// Both belong to the Cancun fork.
 	eip4844Enabled := api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4844TransitionTime, &params.Timestamp) || api.eth.BlockChain().Config().IsEnabled(api.eth.BlockChain().Config().GetEIP4844Transition, new(big.Int).SetUint64(params.Number))
 	if !eip4844Enabled {
 		return engine.PayloadStatusV1{Status: engine.INVALID}, engine.UnsupportedFork.With(errors.New("newPayloadV3 must only be called for cancun payloads"))

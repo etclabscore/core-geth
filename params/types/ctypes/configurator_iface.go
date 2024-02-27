@@ -178,7 +178,7 @@ type ProtocolSpecifier interface {
 
 	// Paris:
 	// EIP3675 - "Upgrade" consensus to Proof-of-Stake
-	// EIP4399 - Supplant DIFFICULTY opcode wtih PREVRANDAO - https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4399.md
+	// EIP4399 - Supplant DIFFICULTY opcode with PREVRANDAO - https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4399.md
 	GetEIP4399Transition() *uint64
 	SetEIP4399Transition(n *uint64) error
 

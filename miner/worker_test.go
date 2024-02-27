@@ -18,7 +18,6 @@ package miner
 
 import (
 	"crypto/rand"
-	"errors"
 	"math/big"
 	"sync/atomic"
 	"testing"
@@ -31,7 +30,6 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/txpool"
 	"github.com/ethereum/go-ethereum/core/txpool/legacypool"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -176,9 +174,6 @@ func newTestWorkerBackend(t *testing.T, chainConfig ctypes.ChainConfigurator, en
 
 func (b *testWorkerBackend) BlockChain() *core.BlockChain { return b.chain }
 func (b *testWorkerBackend) TxPool() *txpool.TxPool       { return b.txPool }
-func (b *testWorkerBackend) StateAtBlock(block *types.Block, reexec uint64, base *state.StateDB, checkLive bool, preferDisk bool) (statedb *state.StateDB, err error) {
-	return nil, errors.New("not supported")
-}
 
 func (b *testWorkerBackend) newRandomUncle() *types.Block {
 	var parent *types.Block
@@ -319,12 +314,10 @@ func testEmptyWork(t *testing.T, chainConfig ctypes.ChainConfigurator, engine co
 		time.Sleep(100 * time.Millisecond)
 	}
 	w.start() // Start mining!
-	for i := 0; i < 2; i += 1 {
-		select {
-		case <-taskCh:
-		case <-time.NewTimer(3 * time.Second).C:
-			t.Error("new task timeout")
-		}
+	select {
+	case <-taskCh:
+	case <-time.NewTimer(3 * time.Second).C:
+		t.Error("new task timeout")
 	}
 }
 

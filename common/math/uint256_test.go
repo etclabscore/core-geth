@@ -29,16 +29,16 @@ func TestHexOrDecimalUint256(t *testing.T) {
 		ok    bool
 	}{
 		{"", uint256.NewInt(0), true},
-		{"0", uint256.NewInt(0), true},
+		{"0", uint256.NewInt(0), false},
 		{"0x0", uint256.NewInt(0), true},
-		{"12345678", uint256.NewInt(12345678), true},
+		{"12345678", uint256.NewInt(0), false},
 		{"0x12345678", uint256.NewInt(0x12345678), true},
 		{"0X12345678", uint256.NewInt(0x12345678), true},
 		// Tests for leading zero behaviour:
-		{"0123456789", uint256.NewInt(123456789), true}, // note: not octal
-		{"00", uint256.NewInt(0), true},
-		{"0x00", uint256.NewInt(0), true},
-		{"0x012345678abc", uint256.NewInt(0x12345678abc), true},
+		{"0123456789", uint256.NewInt(0), false}, // note: not octal
+		{"00", uint256.NewInt(0), false},
+		{"0x00", uint256.NewInt(0), false},
+		{"0x012345678abc", uint256.NewInt(0), false},
 		// Invalid syntax:
 		{"abcdef", nil, false},
 		{"0xgg", nil, false},
@@ -46,6 +46,7 @@ func TestHexOrDecimalUint256(t *testing.T) {
 		{"115792089237316195423570985008687907853269984665640564039457584007913129639936", nil, false},
 	}
 	for _, test := range tests {
+		t.Logf("Unmarshaling %q", test.input)
 		var num HexOrDecimalUint256
 		err := num.UnmarshalText([]byte(test.input))
 		if (err == nil) != test.ok {

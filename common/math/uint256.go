@@ -110,13 +110,14 @@ func ParseUint256(s string) (*uint256.Int, bool) {
 	if s == "" {
 		return new(uint256.Int), true
 	}
-	var bigint *uint256.Int
+	var bigint = new(uint256.Int)
 	var ok bool
 	if len(s) >= 2 && (s[:2] == "0x" || s[:2] == "0X") {
 		// bigint, ok = new(uint256.Int).SetString(s[2:], 16)
-		bigint.SetFromHex(s)
-	} else {
-		bigint.SetFromHex("0X" + s)
+		if err := bigint.SetFromHex(s); err != nil {
+			return nil, false
+		}
+		ok = true
 	}
 	if ok && bigint.BitLen() > 256 {
 		bigint, ok = nil, false

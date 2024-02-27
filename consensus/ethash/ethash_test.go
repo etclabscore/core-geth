@@ -18,6 +18,7 @@ package ethash
 
 import (
 	"fmt"
+	"log/slog"
 	"math"
 	"math/big"
 	"math/rand"
@@ -30,13 +31,10 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/log"
 )
 
 func verboseLogging() {
-	glogger := log.NewGlogHandler(log.StreamHandler(os.Stdout, log.TerminalFormat(false)))
-	glogger.Verbosity(log.Lvl(99))
-	log.Root().SetHandler(glogger)
+	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug})))
 }
 
 func TestEthashECIP1099UniqueSeedHashes(t *testing.T) {

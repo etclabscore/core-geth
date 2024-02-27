@@ -145,7 +145,7 @@ func (api *TraceAPI) traceBlockReward(ctx context.Context, block *types.Block, c
 	tr := &ParityTrace{
 		Type: "reward",
 		Action: TraceRewardAction{
-			Value:      (*hexutil.Big)(minerReward),
+			Value:      (*hexutil.Big)(minerReward.ToBig()),
 			Author:     &coinbase,
 			RewardType: "block",
 		},
@@ -170,7 +170,7 @@ func (api *TraceAPI) traceBlockUncleRewards(ctx context.Context, block *types.Bl
 			results[i] = &ParityTrace{
 				Type: "reward",
 				Action: TraceRewardAction{
-					Value:      (*hexutil.Big)(uncleRewards[i]),
+					Value:      (*hexutil.Big)(uncleRewards[i].ToBig()),
 					Author:     &coinbase,
 					RewardType: "uncle",
 				},

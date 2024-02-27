@@ -80,14 +80,14 @@ func callTracerParityTestRunner(tracerName string, filename string, dirPath stri
 		Difficulty:  (*big.Int)(test.Context.Difficulty),
 		GasLimit:    uint64(test.Context.GasLimit),
 	}
-	_, _, statedb := tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false, rawdb.HashScheme)
+	state := tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false, rawdb.HashScheme)
 
 	// Create the tracer, the EVM environment and run it
 	tracer, err := tracers.DefaultDirectory.New(tracerName, new(tracers.Context), test.TracerConfig)
 	if err != nil {
 		return fmt.Errorf("failed to create call tracer: %v", err)
 	}
-	evm := vm.NewEVM(context, txContext, statedb, test.Genesis.Config, vm.Config{Tracer: tracer})
+	evm := vm.NewEVM(context, txContext, state.StateDB, test.Genesis.Config, vm.Config{Tracer: tracer})
 
 	msg, err := core.TransactionToMessage(tx, signer, nil)
 	if err != nil {
@@ -242,9 +242,9 @@ func stateDiffTracerTestRunner(tracerName string, filename string, dirPath strin
 		Difficulty:  (*big.Int)(test.Context.Difficulty),
 		GasLimit:    uint64(test.Context.GasLimit),
 	}
-	_, _, statedb := tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false, rawdb.HashScheme)
+	state := tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false, rawdb.HashScheme)
 
-	if err := test.StateOverrides.Apply(statedb); err != nil {
+	if err := test.StateOverrides.Apply(state.StateDB); err != nil {
 		return fmt.Errorf("failed to apply test stateOverrides: %v", err)
 	}
 
@@ -253,7 +253,7 @@ func stateDiffTracerTestRunner(tracerName string, filename string, dirPath strin
 	if err != nil {
 		return fmt.Errorf("failed to create state diff tracer: %v", err)
 	}
-	evm := vm.NewEVM(context, txContext, statedb, test.Genesis.Config, vm.Config{Tracer: tracer})
+	evm := vm.NewEVM(context, txContext, state.StateDB, test.Genesis.Config, vm.Config{Tracer: tracer})
 
 	if traceStateCapturer, ok := tracer.(vm.EVMLogger_StateCapturer); ok {
 		traceStateCapturer.CapturePreEVM(evm)

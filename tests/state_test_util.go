@@ -293,7 +293,7 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 	vmconfig.ExtraEips = eips
 
 	block := core.GenesisToBlock(t.genesis(config), nil)
-	state = MakePreState(rawdb.NewMemoryDatabase(), t.json.Pre, snapshotter, scheme)
+	state = MakePreState(rawdb.NewMemoryDatabase(), t.json.Pre.toGenesisAlloc(), snapshotter, scheme)
 
 	var baseFee *big.Int
 	if config.IsEnabled(config.GetEIP1559Transition, new(big.Int)) {

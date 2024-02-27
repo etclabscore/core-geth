@@ -245,7 +245,7 @@ func BenchmarkChainWrite_full_500k(b *testing.B) {
 
 // makeChainForBench writes a given number of headers or empty blocks/receipts
 // into a database.
-func makeChainForBench(db ethdb.Database, genesis *Genesis, full bool, count uint64) {
+func makeChainForBench(db ethdb.Database, genesis *genesisT.Genesis, full bool, count uint64) {
 	var hash common.Hash
 	for n := uint64(0); n < count; n++ {
 		header := &types.Header{
@@ -258,7 +258,7 @@ func makeChainForBench(db ethdb.Database, genesis *Genesis, full bool, count uin
 			ReceiptHash: types.EmptyReceiptsHash,
 		}
 		if n == 0 {
-			header = genesis.ToBlock().Header()
+			header = GenesisToBlock(genesis, nil).Header()
 		}
 		hash = header.Hash()
 
@@ -281,7 +281,7 @@ func makeChainForBench(db ethdb.Database, genesis *Genesis, full bool, count uin
 }
 
 func benchWriteChain(b *testing.B, full bool, count uint64) {
-	genesis := &Genesis{Config: params.AllEthashProtocolChanges}
+	genesis := &genesisT.Genesis{Config: params.AllEthashProtocolChanges}
 	for i := 0; i < b.N; i++ {
 		dir := b.TempDir()
 		db, err := rawdb.NewLevelDBDatabase(dir, 128, 1024, "", false)
@@ -300,7 +300,7 @@ func benchReadChain(b *testing.B, full bool, count uint64) {
 	if err != nil {
 		b.Fatalf("error opening database at %v: %v", dir, err)
 	}
-	genesis := &Genesis{Config: params.AllEthashProtocolChanges}
+	genesis := &genesisT.Genesis{Config: params.AllEthashProtocolChanges}
 	makeChainForBench(db, genesis, full, count)
 	db.Close()
 	cacheConfig := *defaultCacheConfig

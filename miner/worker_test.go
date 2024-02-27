@@ -405,7 +405,7 @@ func testRegenerateMiningBlock(t *testing.T, chainConfig ctypes.ChainConfigurato
 			// The first task is an empty task, the second
 			// one has 1 pending tx, the third one has 2 txs
 			if taskIndex == 2 {
-				receiptLen, balance := 2, big.NewInt(2000)
+				receiptLen, balance := 2, uint256.NewInt(2000)
 				if len(task.receipts) != receiptLen {
 					t.Errorf("receipt number mismatch: have %d, want %d", len(task.receipts), receiptLen)
 				}

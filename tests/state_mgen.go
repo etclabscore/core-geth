@@ -25,7 +25,7 @@ import (
 // RunSetPost runs the state subtest for a given config, and writes the resulting
 // state to the corresponding subtest post field.
 func (t *StateTest) RunSetPost(subtest StateSubtest, vmconfig vm.Config) error {
-	_, _, statedb, root, err := t.RunNoVerify(subtest, vmconfig, false, rawdb.HashScheme)
+	statedb, root, err := t.RunNoVerify(subtest, vmconfig, false, rawdb.HashScheme)
 	if err != nil {
 		return err
 	}

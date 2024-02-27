@@ -572,3 +572,12 @@ func isTimeForked(x, head *uint64) bool {
 	}
 	return *x <= *head
 }
+
+// Uint64Ptr2Big converts a *uint64 to a *big.Int.
+// It returns nil if the input is nil.
+func Uint64Ptr2Big(x *uint64) *big.Int {
+	if x == nil {
+		return nil
+	}
+	return new(big.Int).SetUint64(*x)
+}

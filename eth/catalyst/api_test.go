@@ -46,6 +46,7 @@ import (
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
@@ -1246,7 +1247,9 @@ func TestNilWithdrawals(t *testing.T) {
 		var (
 			err            error
 			payloadVersion engine.PayloadVersion
-			shanghai       = genesis.Config.IsShanghai(genesis.Config.LondonBlock, test.blockParams.Timestamp)
+			// Use EIP4895 as an indicator features for Shanghai.
+			shanghai = genesis.Config.IsEnabledByTime(genesis.Config.GetEIP4895TransitionTime, &test.blockParams.Timestamp) ||
+				genesis.Config.IsEnabled(genesis.Config.GetEIP4895Transition, confp.Uint64Ptr2Big(test.blockParams.Number))
 		)
 		if !shanghai {
 			payloadVersion = engine.PayloadV1

@@ -13,6 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/holiman/uint256"
 )
 
 var (
@@ -399,7 +400,7 @@ func TestAccumulateRewards(t *testing.T) {
 		}
 
 		// Manual tallies for reward accumulation.
-		totalB := new(big.Int)
+		totalB := new(uint256.Int)
 
 		blockWinner := *stateDB.GetBalance(header.Coinbase) // start balance. 0
 		uncleMiner1 := *stateDB.GetBalance(uncles[0].Coinbase)
@@ -410,7 +411,7 @@ func TestAccumulateRewards(t *testing.T) {
 		totalB.Add(totalB, &uncleMiner2)
 
 		// make sure we are starting clean (everything is 0)
-		if totalB.Cmp(big.NewInt(0)) != 0 {
+		if totalB.IsZero() {
 			t.Errorf("unexpected: %v", totalB)
 		}
 		for _, c := range cases[i] {

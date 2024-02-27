@@ -142,7 +142,7 @@ func execStateTest(t *testing.T, st *testMatcher, test *StateTest) {
 		t.Skip("test (randomly) skipped on 32-bit windows")
 		return
 	}
-	for _, subtest := range test.Subtests() {
+	for _, subtest := range test.Subtests(nil) {
 		subtest := subtest
 		key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
 

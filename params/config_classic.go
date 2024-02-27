@@ -24,6 +24,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
+	"github.com/holiman/uint256"
 )
 
 var (
@@ -109,9 +110,9 @@ var (
 		},
 	}
 
-	DisinflationRateQuotient = big.NewInt(4)      // Disinflation rate quotient for ECIP1017
-	DisinflationRateDivisor  = big.NewInt(5)      // Disinflation rate divisor for ECIP1017
-	ExpDiffPeriod            = big.NewInt(100000) // Exponential diff period for diff bomb & ECIP1010
+	DisinflationRateQuotient = uint256.NewInt(4)      // Disinflation rate quotient for ECIP1017
+	DisinflationRateDivisor  = uint256.NewInt(5)      // Disinflation rate divisor for ECIP1017
+	ExpDiffPeriod            = uint256.NewInt(100000) // Exponential diff period for diff bomb & ECIP1010
 
 	MessNetConfig = &coregeth.CoreGethChainConfig{
 		NetworkID:                 1,

@@ -176,8 +176,9 @@ type ProtocolSpecifier interface {
 	GetEIP3198Transition() *uint64
 	SetEIP3198Transition(n *uint64) error
 
-	// EIP4399 is the RANDOM opcode.
-	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4399.md
+	// Paris:
+	// EIP3675 - "Upgrade" consensus to Proof-of-Stake
+	// EIP4399 - Supplant DIFFICULTY opcode wtih PREVRANDAO - https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4399.md
 	GetEIP4399Transition() *uint64
 	SetEIP4399Transition(n *uint64) error
 
@@ -192,7 +193,7 @@ type ProtocolSpecifier interface {
 	// EIP3860: Limit and meter initcode
 	GetEIP3860TransitionTime() *uint64
 	SetEIP3860TransitionTime(n *uint64) error
-	// EIP4895: Beacon chain push withdrawals as operations
+	// EIP4895: Beacon chain push WITHDRAWALS as operations
 	GetEIP4895TransitionTime() *uint64
 	SetEIP4895TransitionTime(n *uint64) error
 	// EIP6049: Deprecate SELFDESTRUCT

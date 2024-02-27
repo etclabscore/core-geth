@@ -36,7 +36,6 @@ import (
 	"github.com/ethereum/go-ethereum/miner"
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/forks"
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
@@ -195,18 +194,32 @@ func (api *ConsensusAPI) ForkchoiceUpdatedV1(update engine.ForkchoiceStateV1, pa
 // attributes. It supports both PayloadAttributesV1 and PayloadAttributesV2.
 func (api *ConsensusAPI) ForkchoiceUpdatedV2(update engine.ForkchoiceStateV1, params *engine.PayloadAttributes) (engine.ForkChoiceResponse, error) {
 	if params != nil {
-		switch api.eth.BlockChain().Config().LatestFork(params.Timestamp) {
-		case forks.Paris:
+		// EIP4895 - Beacon chain push withdrawals as operations.
+		eip4895 := api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4895TransitionTime, &params.Timestamp)
+
+		// This method validates the omission of withdrawals in the payload attributes
+		// IFF the latest fork is Paris.
+		// EIP4399 - Supplant DIFFICULTY opcode.... -- this is a placeholder/indicator for ethereum/go-ethereum's idea of fork == Paris.
+		eip4399 := api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4399Transition, params.Number)
+		isParis := eip4399
+
+		switch {
+		// case forks.Paris:
+		case isParis && !eip4895:
+			// EIP4895 is not enabled, so withdrawals are not supported.
 			if params.Withdrawals != nil {
 				return engine.STATUS_INVALID, engine.InvalidParams.With(errors.New("withdrawals before shanghai"))
 			}
-		case forks.Shanghai:
+		case eip4895:
 			if params.Withdrawals == nil {
 				return engine.STATUS_INVALID, engine.InvalidParams.With(errors.New("missing withdrawals"))
 			}
 		default:
 			return engine.STATUS_INVALID, engine.UnsupportedFork.With(errors.New("forkchoiceUpdatedV2 must only be called with paris and shanghai payloads"))
 		}
+
+		// BeaconRoot comes with EIP4788, via the Cancun fork.
+		// This method may not be called under those conditions.
 		if params.BeaconRoot != nil {
 			return engine.STATUS_INVALID, engine.InvalidParams.With(errors.New("unexpected beacon root"))
 		}
@@ -228,8 +241,9 @@ func (api *ConsensusAPI) ForkchoiceUpdatedV3(update engine.ForkchoiceStateV1, pa
 		if params.BeaconRoot == nil {
 			return engine.STATUS_INVALID, engine.InvalidParams.With(errors.New("missing beacon root"))
 		}
-		// FIXME(meowsbits): LatestFork method DNE, but probably can be done with confp
-		if api.eth.BlockChain().Config().LatestFork(params.Timestamp) != forks.Cancun {
+		// EIP4844 is an indicator equivocating Cancun == EIP4844 (Shard Blob Transactions).
+		if !api.eth.BlockChain().Config().IsEnabledByTime(api.eth.BlockChain().Config().GetEIP4844TransitionTime, &params.Timestamp) &&
+			!api.eth.BlockChain().Config().IsEnabled(api.eth.BlockChain().Config().GetEIP4844Transition, new(big.Int).SetUint64(*params.Number)) {
 			return engine.STATUS_INVALID, engine.UnsupportedFork.With(errors.New("forkchoiceUpdatedV3 must only be called for cancun payloads"))
 		}
 	}

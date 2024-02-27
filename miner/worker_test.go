@@ -310,8 +310,7 @@ func testEmptyWork(t *testing.T, chainConfig ctypes.ChainConfigurator, engine co
 	}
 	w.newTaskHook = func(task *task) {
 		if task.block.NumberU64() == 1 {
-			checkEqual(t, task, taskIndex)
-			taskIndex += 1
+			checkEqual(t, task)
 			taskCh <- struct{}{}
 		}
 	}

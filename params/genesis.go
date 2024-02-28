@@ -21,7 +21,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
@@ -102,7 +101,6 @@ func DeveloperGenesisBlock(gasLimit uint64, faucet *common.Address, useEthash bo
 				common.BytesToAddress([]byte{7}): {Balance: big.NewInt(1)}, // ECScalarMul
 				common.BytesToAddress([]byte{8}): {Balance: big.NewInt(1)}, // ECPairing
 				common.BytesToAddress([]byte{9}): {Balance: big.NewInt(1)}, // BLAKE2b
-				*faucet:                          {Balance: new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 256), big.NewInt(9))},
 			},
 		}
 		if faucet != nil {
@@ -159,7 +157,6 @@ func DeveloperGenesisBlock(gasLimit uint64, faucet *common.Address, useEthash bo
 	// Assemble and return the genesis with the precompiles and faucet pre-funded
 	genesis := &genesisT.Genesis{
 		Config:     config,
-		ExtraData:  append(append(make([]byte, 32), faucet[:]...), make([]byte, crypto.SignatureLength)...),
 		GasLimit:   6283185,
 		Difficulty: vars.MinimumDifficulty,
 		BaseFee:    big.NewInt(vars.InitialBaseFee),

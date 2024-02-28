@@ -290,8 +290,8 @@ var bindTests = []struct {
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 
-			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 		`,
 		`
 			// Generate a new random account and a funded simulator
@@ -346,8 +346,8 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 		`,
 		`
 			// Generate a new random account and a funded simulator
@@ -392,8 +392,8 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 		`,
 		`
 			// Generate a new random account and a funded simulator
@@ -450,8 +450,8 @@ var bindTests = []struct {
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 			"github.com/ethereum/go-ethereum/common"
-			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 		`,
 		`
 			// Generate a new random account and a funded simulator
@@ -498,8 +498,8 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 		`,
 		`
 			// Generate a new random account and a funded simulator
@@ -565,8 +565,8 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 		`,
 		`
 			// Generate a new random account and a funded simulator
@@ -697,8 +697,8 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 		`,
 		`
 			// Generate a new random account and a funded simulator
@@ -747,8 +747,8 @@ var bindTests = []struct {
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 			"github.com/ethereum/go-ethereum/common"
-			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 		`,
 		`
 			// Generate a new random account and a funded simulator
@@ -822,8 +822,8 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 		`,
 		`
 			// Generate a new random account and a funded simulator
@@ -916,8 +916,8 @@ var bindTests = []struct {
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 			"github.com/ethereum/go-ethereum/common"
-			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 		`,
 		`
 			// Generate a new random account and a funded simulator
@@ -1106,8 +1106,8 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 		`,
 		`
 			// Generate a new random account and a funded simulator
@@ -1241,8 +1241,8 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 		`,
 
 		`
@@ -1383,8 +1383,8 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 		`,
 		`
 			// Generate a new random account and a funded simulator
@@ -1449,8 +1449,8 @@ var bindTests = []struct {
 
 		"github.com/ethereum/go-ethereum/accounts/abi/bind"
 		"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-		"github.com/ethereum/go-ethereum/params/types/genesisT"
 		"github.com/ethereum/go-ethereum/crypto"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 		`,
 		`
 		// Initialize test accounts
@@ -1662,8 +1662,8 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 		`,
 		`
 			// Generate a new random account and a funded simulator
@@ -1723,8 +1723,8 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 	   `,
 		`
 			key, _ := crypto.GenerateKey()
@@ -1811,9 +1811,9 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
 			"github.com/ethereum/go-ethereum/eth/ethconfig"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 	   `,
 		`
 			var (
@@ -1882,9 +1882,9 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
 			"github.com/ethereum/go-ethereum/eth/ethconfig"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 	   `,
 		`
 			var (
@@ -1918,12 +1918,12 @@ var bindTests = []struct {
 		name: `ConstructorWithStructParam`,
 		contract: `
 		pragma solidity >=0.8.0 <0.9.0;
-
+		
 		contract ConstructorWithStructParam {
 			struct StructType {
 				uint256 field;
 			}
-
+		
 			constructor(StructType memory st) {}
 		}
 		`,
@@ -1935,9 +1935,9 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
 			"github.com/ethereum/go-ethereum/eth/ethconfig"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 		`,
 		tester: `
 			var (
@@ -1952,7 +1952,7 @@ var bindTests = []struct {
 				t.Fatalf("DeployConstructorWithStructParam() got err %v; want nil err", err)
 			}
 			sim.Commit()
-
+			
 			if _, err = bind.WaitDeployed(context.Background(), sim, tx); err != nil {
 				t.Logf("Deployment tx: %+v", tx)
 				t.Errorf("bind.WaitDeployed(nil, %T, <deployment tx>) got err %v; want nil err", sim, err)
@@ -1984,9 +1984,9 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
 			"github.com/ethereum/go-ethereum/eth/ethconfig"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 		`,
 		tester: `
 			var (
@@ -2001,7 +2001,7 @@ var bindTests = []struct {
 				t.Fatalf("DeployNameConflict() got err %v; want nil err", err)
 			}
 			sim.Commit()
-
+			
 			if _, err = bind.WaitDeployed(context.Background(), sim, tx); err != nil {
 				t.Logf("Deployment tx: %+v", tx)
 				t.Errorf("bind.WaitDeployed(nil, %T, <deployment tx>) got err %v; want nil err", sim, err)
@@ -2025,9 +2025,9 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
 			"github.com/ethereum/go-ethereum/eth/ethconfig"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 		`,
 		tester: `
 			var (

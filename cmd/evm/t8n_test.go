@@ -27,6 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/cmd/evm/internal/t8ntool"
 	"github.com/ethereum/go-ethereum/internal/cmdtest"
 	"github.com/ethereum/go-ethereum/internal/reexec"
+	"github.com/go-test/deep"
 )
 
 func TestMain(m *testing.M) {
@@ -261,6 +262,7 @@ func TestT8n(t *testing.T) {
 			expOut: "exp.json",
 		},
 		{ // Cancun tests
+			// FIXME: blobGasUsed 0x0 != 0x20000
 			base: "./testdata/28",
 			input: t8nInput{
 				"alloc.json", "txs.rlp", "env.json", "Cancun", "",
@@ -311,6 +313,9 @@ func TestT8n(t *testing.T) {
 			case err != nil:
 				t.Fatalf("test %d, file %v: json parsing failed: %v", i, file, err)
 			case !ok:
+				for _, line := range deep.Equal(string(have), string(want)) {
+					t.Logf("diff: %v", line)
+				}
 				t.Fatalf("test %d, file %v: output wrong, have \n%v\nwant\n%v\n", i, file, string(have), string(want))
 			}
 		}

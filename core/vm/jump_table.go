@@ -225,7 +225,7 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, isPostMerge bool, 
 	if config.IsEnabledByTime(config.GetEIP4844TransitionTime, bt) || config.IsEnabled(config.GetEIP4844Transition, bn) {
 		enable4844(instructionSet) // EIP-4844 (BLOBHASH opcode)
 	}
-	if config.IsEnabledByTime(config.GetEIP7516TransitionTime, bt) || config.IsEnabled(config.GetEIP7516Transition, bn) { // TODO(meowsbits): create EIP7516 configurator interface method
+	if config.IsEnabledByTime(config.GetEIP7516TransitionTime, bt) || config.IsEnabled(config.GetEIP7516Transition, bn) {
 		enable7516(instructionSet) // EIP-7516 (BLOBBASEFEE opcode)
 	}
 	if config.IsEnabledByTime(config.GetEIP1153TransitionTime, bt) || config.IsEnabled(config.GetEIP1153Transition, bn) {

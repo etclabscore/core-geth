@@ -315,13 +315,14 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 		return state, common.Hash{}, err
 	}
 
+	// PTAL(meowsbits) Is this an empty aliases code section? Like if without the if...
 	{ // Blob transactions may be present after the Cancun fork.
 		// In production,
 		// - the header is verified against the max in eip4844.go:VerifyEIP4844Header
 		// - the block body is verified against the header in block_validator.go:ValidateBody
 		// Here, we just do this shortcut smaller fix, since state tests do not
 		// utilize those codepaths
-		if len(msg.BlobHashes)*vars.BlobTxBlobGasPerBlob > vars.BlobTxBlobGasPerBlob {
+		if len(msg.BlobHashes)*vars.BlobTxBlobGasPerBlob > vars.MaxBlobGasPerBlock {
 			return state, common.Hash{}, errors.New("blob gas exceeds maximum")
 		}
 	}

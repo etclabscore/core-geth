@@ -19,12 +19,13 @@ package main
 
 import (
 	"crypto/ecdsa"
-	"log/slog"
 	"math/big"
 	"math/rand"
 	"os"
 	"os/signal"
 	"time"
+
+	"golang.org/x/exp/slog"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/fdlimit"

@@ -18,7 +18,6 @@ package ethash
 
 import (
 	"fmt"
-	"log/slog"
 	"math"
 	"math/big"
 	"math/rand"
@@ -27,6 +26,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"golang.org/x/exp/slog"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"

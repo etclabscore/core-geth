@@ -1162,7 +1162,6 @@ var allRPCMethods = []string{
 	"admin_stopRPC",
 	"admin_stopWS",
 	"debug_accountRange",
-	"debug_backtraceAt",
 	"debug_blockProfile",
 	"debug_chaindbCompact",
 	"debug_chaindbProperty",

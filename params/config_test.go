@@ -33,6 +33,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/trie"
+	"github.com/holiman/uint256"
 )
 
 func uint64P(n uint64) *uint64 {
@@ -314,7 +315,9 @@ func genesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 	}
 	statedb, _ := state.New(common.Hash{}, state.NewDatabase(db), nil)
 	for addr, account := range g.Alloc {
-		statedb.AddBalance(addr, account.Balance)
+		if account.Balance != nil {
+			statedb.AddBalance(addr, uint256.MustFromBig(account.Balance))
+		}
 		statedb.SetCode(addr, account.Code)
 		statedb.SetNonce(addr, account.Nonce)
 		for key, value := range account.Storage {

@@ -292,10 +292,17 @@ func testEmptyWork(t *testing.T, chainConfig ctypes.ChainConfigurator, engine co
 	w, _ := newTestWorker(t, chainConfig, engine, rawdb.NewMemoryDatabase(), 0)
 	defer w.close()
 
-	taskCh := make(chan struct{}, 2)
-	checkEqual := func(t *testing.T, task *task) {
-		// The work should contain 1 tx
-		receiptLen, balance := 1, uint256.NewInt(1000)
+	var (
+		taskIndex int
+		taskCh    = make(chan struct{}, 2)
+	)
+	checkEqual := func(t *testing.T, task *task, index int) {
+		// The first empty work without any txs included
+		receiptLen, balance := 0, uint256.NewInt(0)
+		if index == 1 {
+			// The second full work with 1 tx included
+			receiptLen, balance = 1, uint256.NewInt(1000)
+		}
 		if len(task.receipts) != receiptLen {
 			t.Fatalf("receipt number mismatch: have %d, want %d", len(task.receipts), receiptLen)
 		}
@@ -305,7 +312,8 @@ func testEmptyWork(t *testing.T, chainConfig ctypes.ChainConfigurator, engine co
 	}
 	w.newTaskHook = func(task *task) {
 		if task.block.NumberU64() == 1 {
-			checkEqual(t, task)
+			checkEqual(t, task, taskIndex)
+			taskIndex += 1
 			taskCh <- struct{}{}
 		}
 	}
@@ -314,10 +322,12 @@ func testEmptyWork(t *testing.T, chainConfig ctypes.ChainConfigurator, engine co
 		time.Sleep(100 * time.Millisecond)
 	}
 	w.start() // Start mining!
-	select {
-	case <-taskCh:
-	case <-time.NewTimer(3 * time.Second).C:
-		t.Error("new task timeout")
+	for i := 0; i < 2; i += 1 {
+		select {
+		case <-taskCh:
+		case <-time.NewTimer(3 * time.Second).C:
+			t.Error("new task timeout")
+		}
 	}
 }
 

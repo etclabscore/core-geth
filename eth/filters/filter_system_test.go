@@ -263,10 +263,13 @@ func TestSideBlockSubscription(t *testing.T) {
 	t.Parallel()
 
 	var (
-		db              = rawdb.NewMemoryDatabase()
-		backend, sys    = newTestFilterSystem(t, db, Config{})
-		api             = NewFilterAPI(sys, false)
-		gspec           = &genesisT.Genesis{BaseFee: big.NewInt(vars.InitialBaseFee)}
+		db           = rawdb.NewMemoryDatabase()
+		backend, sys = newTestFilterSystem(t, db, Config{})
+		api          = NewFilterAPI(sys, false)
+		gspec        = &genesisT.Genesis{
+			Config:  params.TestChainConfig,
+			BaseFee: big.NewInt(vars.InitialBaseFee),
+		}
 		genesis         = core.MustCommitGenesis(db, triedb.NewDatabase(db, nil), gspec)
 		chain, _        = core.GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), db, 10, func(i int, gen *core.BlockGen) {})
 		chainSideEvents = []core.ChainSideEvent{}

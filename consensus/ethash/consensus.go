@@ -279,6 +279,8 @@ func (ethash *Ethash) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 		// Verify the header's EIP-1559 attributes.
 		return err
 	}
+
+	// Verify the non-existence of cancun-specific header fields
 	eip4844Enabled := chain.Config().IsEnabledByTime(chain.Config().GetEIP4844TransitionTime, &header.Time) || chain.Config().IsEnabled(chain.Config().GetEIP4844Transition, header.Number)
 	if !eip4844Enabled {
 		switch {
@@ -286,6 +288,8 @@ func (ethash *Ethash) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 			return fmt.Errorf("invalid excessBlobGas: have %d, expected nil", header.ExcessBlobGas)
 		case header.BlobGasUsed != nil:
 			return fmt.Errorf("invalid blobGasUsed: have %d, expected nil", header.BlobGasUsed)
+		case header.ParentBeaconRoot != nil:
+			return fmt.Errorf("invalid parentBeaconRoot, have %#x, expected nil", header.ParentBeaconRoot)
 		}
 	} else {
 		if err := eip4844.VerifyEIP4844Header(parent, header); err != nil {
@@ -308,17 +312,6 @@ func (ethash *Ethash) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 		}
 	}
 
-	// FIXME(meowsbits): Validations should depend on EIP-XXXX activation state.
-	// ethereum/go-ethereum:
-	// Verify the non-existence of cancun-specific header fields
-	// switch {
-	// case header.ExcessBlobGas != nil:
-	// 	return fmt.Errorf("invalid excessBlobGas: have %d, expected nil", header.ExcessBlobGas)
-	// case header.BlobGasUsed != nil:
-	// 	return fmt.Errorf("invalid blobGasUsed: have %d, expected nil", header.BlobGasUsed)
-	// case header.ParentBeaconRoot != nil:
-	// 	return fmt.Errorf("invalid parentBeaconRoot, have %#x, expected nil", header.ParentBeaconRoot)
-	// }
 	// // Add some fake checks for tests
 	// if ethash.fakeDelay != nil {
 	// 	time.Sleep(*ethash.fakeDelay)

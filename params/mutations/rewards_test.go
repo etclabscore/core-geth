@@ -411,7 +411,7 @@ func TestAccumulateRewards(t *testing.T) {
 		totalB.Add(totalB, &uncleMiner2)
 
 		// make sure we are starting clean (everything is 0)
-		if totalB.IsZero() {
+		if !totalB.IsZero() {
 			t.Errorf("unexpected: %v", totalB)
 		}
 		for _, c := range cases[i] {

@@ -649,7 +649,9 @@ func TestEstimateGas(t *testing.T) {
 		//    fee:   0 wei
 		tx, _ := types.SignTx(types.NewTx(&types.LegacyTx{Nonce: uint64(i), To: &accounts[1].addr, Value: big.NewInt(1000), Gas: vars.TxGas, GasPrice: b.BaseFee(), Data: nil}), signer, accounts[0].key)
 		b.AddTx(tx)
-		b.SetPoS()
+		if genesis.GetEthashTerminalTotalDifficultyPassed() {
+			b.SetPoS()
+		}
 	}))
 	var testSuite = []struct {
 		blockNumber rpc.BlockNumber

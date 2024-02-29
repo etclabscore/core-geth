@@ -217,7 +217,7 @@ func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig ctypes.ChainConfigura
 		}
 		txBlobGas := uint64(0)
 		if tx.Type() == types.BlobTxType {
-			txBlobGas := uint64(vars.BlobTxBlobGasPerBlob * len(tx.BlobHashes()))
+			txBlobGas = uint64(vars.BlobTxBlobGasPerBlob * len(tx.BlobHashes()))
 			if used, max := blobGasUsed+txBlobGas, uint64(vars.MaxBlobGasPerBlock); used > max {
 				err := fmt.Errorf("blob gas (%d) would exceed maximum allowance %d", used, max)
 				log.Warn("rejected tx", "index", i, "err", err)

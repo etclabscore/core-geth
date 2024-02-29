@@ -792,7 +792,7 @@ func TestCall(t *testing.T) {
 	var (
 		accounts = newAccounts(3)
 		genesis  = &genesisT.Genesis{
-			Config: params.TestChainConfig,
+			Config: params.MergedTestChainConfig,
 			Alloc: genesisT.GenesisAlloc{
 				accounts[0].addr: {Balance: big.NewInt(vars.Ether)},
 				accounts[1].addr: {Balance: big.NewInt(vars.Ether)},
@@ -808,7 +808,9 @@ func TestCall(t *testing.T) {
 		//    fee:   0 wei
 		tx, _ := types.SignTx(types.NewTx(&types.LegacyTx{Nonce: uint64(i), To: &accounts[1].addr, Value: big.NewInt(1000), Gas: vars.TxGas, GasPrice: b.BaseFee(), Data: nil}), signer, accounts[0].key)
 		b.AddTx(tx)
-		b.SetPoS()
+		if genesis.GetEthashTerminalTotalDifficultyPassed() {
+			b.SetPoS()
+		}
 	}))
 	randomAccounts := newAccounts(3)
 	var testSuite = []struct {

@@ -36,6 +36,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/trie"
 	"github.com/ethereum/go-ethereum/triedb"
+	"github.com/ethereum/go-ethereum/triedb/pathdb"
 	"github.com/holiman/uint256"
 )
 
@@ -360,11 +361,21 @@ func gaFlush(ga *genesisT.GenesisAlloc, triedb *triedb.Database, db ethdb.Databa
 	return nil
 }
 
-// gaDeriveHash computes the state root according to the genesis specification.
-func gaDeriveHash(ga *genesisT.GenesisAlloc) (common.Hash, error) {
+// gaHash computes the state root according to the genesis specification.
+func gaHash(ga *genesisT.GenesisAlloc, isVerkle bool) (common.Hash, error) {
+	// If a genesis-time verkle trie is requested, create a trie config
+	// with the verkle trie enabled so that the tree can be initialized
+	// as such.
+	var config *triedb.Config
+	if isVerkle {
+		config = &triedb.Config{
+			PathDB:   pathdb.Defaults,
+			IsVerkle: true,
+		}
+	}
 	// Create an ephemeral in-memory database for computing hash,
 	// all the derived states will be discarded to not pollute disk.
-	db := state.NewDatabase(rawdb.NewMemoryDatabase())
+	db := state.NewDatabaseWithConfig(rawdb.NewMemoryDatabase(), config)
 	statedb, err := state.New(types.EmptyRootHash, db, nil)
 	if err != nil {
 		return common.Hash{}, err
@@ -439,7 +450,7 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 	if db == nil {
 		db = rawdb.NewMemoryDatabase()
 	}
-	root, err := gaDeriveHash(&g.Alloc)
+	root, err := gaHash(&g.Alloc, g.IsVerkle())
 	if err != nil {
 		panic(err)
 	}

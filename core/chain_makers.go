@@ -388,10 +388,15 @@ func GenerateChain(config ctypes.ChainConfigurator, parent *types.Block, engine 
 		} else if len(receipts) < len(txs) {
 			txs = txs[:len(receipts)]
 		}
+
 		var blobGasPrice *big.Int
-		if block.ExcessBlobGas() != nil {
-			blobGasPrice = eip4844.CalcBlobFee(*block.ExcessBlobGas())
+		blockTime := block.Time()
+		if config.IsEnabledByTime(config.GetEIP4844TransitionTime, &blockTime) || config.IsEnabled(config.GetEIP4844Transition, block.Number()) {
+			if block.ExcessBlobGas() != nil {
+				blobGasPrice = eip4844.CalcBlobFee(*block.ExcessBlobGas())
+			}
 		}
+
 		if err := receipts.DeriveFields(config, block.Hash(), block.NumberU64(), block.Time(), block.BaseFee(), blobGasPrice, txs); err != nil {
 			panic(err)
 		}

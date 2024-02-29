@@ -280,7 +280,23 @@ func (ethash *Ethash) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 		return err
 	}
 
-	// Verify the non-existence of cancun-specific header fields
+	// Shanghai
+	// EIP-4895: Beacon chain push withdrawals as operations
+	// Verify the non-existence of withdrawalsHash (EIP-4895: Beacon chain push withdrawals as operations).
+	eip4895Enabled := chain.Config().IsEnabledByTime(chain.Config().GetEIP4895TransitionTime, &header.Time) || chain.Config().IsEnabled(chain.Config().GetEIP4895Transition, header.Number)
+	if !eip4895Enabled {
+		if header.WithdrawalsHash != nil {
+			return fmt.Errorf("invalid withdrawalsHash: have %x, expected nil", header.WithdrawalsHash)
+		}
+	} else {
+		if header.WithdrawalsHash == nil {
+			return errors.New("header is missing withdrawalsHash")
+		}
+	}
+
+	// Cancun
+	// EIP-4844: Shard Blob Txes
+	// EIP-4788: Beacon block root in the EVM
 	eip4844Enabled := chain.Config().IsEnabledByTime(chain.Config().GetEIP4844TransitionTime, &header.Time) || chain.Config().IsEnabled(chain.Config().GetEIP4844Transition, header.Number)
 	if !eip4844Enabled {
 		switch {
@@ -288,19 +304,14 @@ func (ethash *Ethash) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 			return fmt.Errorf("invalid excessBlobGas: have %d, expected nil", header.ExcessBlobGas)
 		case header.BlobGasUsed != nil:
 			return fmt.Errorf("invalid blobGasUsed: have %d, expected nil", header.BlobGasUsed)
-		case header.ParentBeaconRoot != nil:
-			return fmt.Errorf("invalid parentBeaconRoot, have %#x, expected nil", header.ParentBeaconRoot)
 		}
 	} else {
 		if err := eip4844.VerifyEIP4844Header(parent, header); err != nil {
 			return err
 		}
 	}
-	// Verify the non-existence of withdrawalsHash.
-	// FIXME(meowsbits): Withdrawals hash validations should depend on EIP-XXXX activation state.
-	if header.WithdrawalsHash != nil {
-		return fmt.Errorf("invalid withdrawalsHash: have %x, expected nil", header.WithdrawalsHash)
-	}
+
+	// EIP-4788: Beacon block root in the EVM
 	eip4788Enabled := chain.Config().IsEnabledByTime(chain.Config().GetEIP4788TransitionTime, &header.Time) || chain.Config().IsEnabled(chain.Config().GetEIP4788Transition, header.Number)
 	if !eip4788Enabled {
 		if header.ParentBeaconRoot != nil {

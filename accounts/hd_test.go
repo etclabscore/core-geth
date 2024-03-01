@@ -26,6 +26,7 @@ import (
 // representation.
 func TestHDPathParsing(t *testing.T) {
 	t.Parallel()
+	SetCoinTypeConfiguration(BIP0044CoinTypeEther)
 	tests := []struct {
 		input  string
 		output DerivationPath
@@ -91,6 +92,7 @@ func testDerive(t *testing.T, next func() DerivationPath, expected []string) {
 
 func TestHdPathIteration(t *testing.T) {
 	t.Parallel()
+	SetCoinTypeConfiguration(BIP0044CoinTypeEther)
 	testDerive(t, DefaultIterator(DefaultBaseDerivationPath),
 		[]string{
 			"m/44'/60'/0'/0/0", "m/44'/60'/0'/0/1",

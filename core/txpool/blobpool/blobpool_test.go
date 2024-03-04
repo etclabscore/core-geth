@@ -1245,7 +1245,7 @@ func TestAdd(t *testing.T) {
 				},
 				{ // Same as above but blob fee cap equals minimum, should be accepted
 					from: "alice",
-					tx:   makeUnsignedTx(0, 1, 1, params.BlobTxMinBlobGasprice),
+					tx:   makeUnsignedTx(0, 1, 1, vars.BlobTxMinBlobGasprice),
 					err:  nil,
 				},
 			},

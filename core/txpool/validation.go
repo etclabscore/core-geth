@@ -34,7 +34,7 @@ import (
 var (
 	// blobTxMinBlobGasPrice is the big.Int version of the configured protocol
 	// parameter to avoid constucting a new big integer for every transaction.
-	blobTxMinBlobGasPrice = big.NewInt(params.BlobTxMinBlobGasprice)
+	blobTxMinBlobGasPrice = big.NewInt(vars.BlobTxMinBlobGasprice)
 )
 
 // ValidationOptions define certain differences between transaction validation

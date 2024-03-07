@@ -53,6 +53,7 @@ var (
 		EIP212FBlock: big.NewInt(1001),
 		EIP213FBlock: big.NewInt(1001),
 		EIP214FBlock: big.NewInt(1001),
+		//EIP649FBlock: big.NewInt(1001),
 		EIP658FBlock: big.NewInt(1001),
 
 		// Constantinople eq
@@ -87,14 +88,13 @@ var (
 		EIP3198FBlock: big.NewInt(1_600_957), // BASEFEE Opcode
 		EIP3529FBlock: big.NewInt(1_600_957), // Reduction in refunds
 
-		// London chain upgrades TX Type 2, aka Planned Eudora
+		// London chain upgrades, aka Planned Eudora
 		// TODO: move block numbers closer once testing has concluded
-		// EIP1559FBlock: big.NewInt(13_524_557), // EIP-1559 transactions`
-		// EIP3541FBlock: big.NewInt(13_524_557), // EIP-3541 Reject code starting with 0xEF
-		// EIP3651FBlock: big.NewInt(13_524_557), // Warm COINBASE (gas reprice)
-		// EIP3541FBlock: big.NewInt(13_524_557), // Reject new contract code starting with the 0xEF byte
+		//EIP1559FBlock: big.NewInt(13_524_557), // EIP-1559 transactions`
+		//EIP3541FBlock: big.NewInt(13_524_557), // EIP-3541 Reject code starting with 0xEF
 
 		// Unplanned Upgrade, aka Olantis
+		// EIP3651FBlock: big.NewInt(13_524_557), // Warm COINBASE (gas reprice)
 		// EIP6049FBlock: big.NewInt(13_524_557), // Deprecate SELFDESTRUCT
 		// EIP3541FBlock: big.NewInt(13_524_557), // Reject new contract code starting with the 0xEF byte
 

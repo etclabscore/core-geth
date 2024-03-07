@@ -19,7 +19,6 @@ package light
 import (
 	"context"
 	"fmt"
-	"github.com/ethereum/go-ethereum/params"
 	"math/big"
 	"sync"
 	"time"
@@ -340,9 +339,7 @@ func (pool *TxPool) setNewHead(head *types.Header) {
 	pool.eip2028f = pool.config.IsEnabled(pool.config.GetEIP2028Transition, next)
 	pool.eip2718 = pool.config.IsEnabled(pool.config.GetEIP2718Transition, next)
 	now := uint64(time.Now().Unix())
-	pool.eip3860 = pool.config.IsEnabledByTime(pool.config.GetEIP3860TransitionTime, &now) ||
-		pool.config.IsEnabled(pool.config.GetEIP3860Transition, next) &&
-			pool.config.GetChainID().Uint64() != params.HypraChainId // Hypra did an oopsie and didn't fully enable EIP-3860, will be appended with another fork to TODO: fix this
+	pool.eip3860 = pool.config.IsEnabledByTime(pool.config.GetEIP3860TransitionTime, &now) || pool.config.IsEnabled(pool.config.GetEIP3860Transition, next)
 }
 
 // Stop stops the light transaction pool

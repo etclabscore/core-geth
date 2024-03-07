@@ -72,6 +72,7 @@ var (
 		executablePath("abigen"),
 		executablePath("bootnode"),
 		executablePath("echainspec"),
+		executablePath("checkpoint-ez"),
 		executablePath("evm"),
 		executablePath("geth"),
 		executablePath("rlpdump"),
@@ -91,6 +92,10 @@ var (
 		{
 			BinaryName:  "echainspec",
 			Description: "Developer utility to manage chain external chain configuration",
+		},
+		{
+			BinaryName:  "checkpoint-ez",
+			Description: "Ethereum checkpoint creator tool",
 		},
 		{
 			BinaryName:  "evm",

@@ -96,6 +96,13 @@ var (
 		ECBP1100FBlock:           big.NewInt(2380000),    // ETA 29 Sept 2020, ~1500 UTC
 		ECBP1100DeactivateFBlock: big.NewInt(10_400_000), // ETA 13 January 2024
 
+		TrustedCheckpoint: &ctypes.TrustedCheckpoint{
+			SectionIndex: 324,
+			SectionHead:  common.HexToHash("0x5362a8a299115a52d3854976a4d04b83bf731bed18bbf2cfe631d003ca3a9ae7"),
+			CHTRoot:      common.HexToHash("0x9da668da517a2e2d7976a48e3d7fe89973c5daf9c235304bb49bda7b88968ece"),
+			BloomRoot:    common.Hash{},
+		},
+
 		RequireBlockHashes: map[uint64]common.Hash{
 			840013: common.HexToHash("0x2ceada2b191879b71a5bcf2241dd9bc50d6d953f1640e62f9c2cee941dc61c9d"),
 			840014: common.HexToHash("0x8ec29dd692c8985b82410817bac232fc82805b746538d17bc924624fe74a0fcf"),

@@ -351,7 +351,7 @@ func (c *TrustedCheckpoint) Hash() common.Hash {
 
 // Empty returns an indicator whether the checkpoint is regarded as empty.
 func (c *TrustedCheckpoint) Empty() bool {
-	return c.SectionHead == (common.Hash{}) || c.CHTRoot == (common.Hash{}) || c.BloomRoot == (common.Hash{})
+	return c.SectionHead == (common.Hash{}) || c.CHTRoot == (common.Hash{})
 }
 
 // CheckpointOracleConfig represents a set of checkpoint contract(which acts as an oracle)

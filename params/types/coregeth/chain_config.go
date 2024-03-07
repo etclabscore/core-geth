@@ -272,6 +272,9 @@ type CoreGethChainConfig struct {
 	// Veldin fork was used to enable rewards to miners for including uncle blocks on Hypra network.
 	// Previously overlooked and unrewarded.
 	HIPVeldinFBlock *big.Int `json:"hipveldinfblock,omitempty"`
+
+	// Gaspar fork was used to upgrade the EVM to include new opcodes and features.
+	HIPGasparFBlock *big.Int `json:"hipgasparfblock,omitempty"`
 }
 
 // String implements the fmt.Stringer interface.

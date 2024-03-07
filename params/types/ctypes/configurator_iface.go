@@ -235,6 +235,10 @@ type ProtocolSpecifier interface {
 	// Hypra Network Specific Veldin Fork for uncle rewards fix
 	GetHIPVeldinTransition() *uint64
 	SetHIPVeldinTransition(n *uint64) error
+
+	// Hypra Network Specific Gaspar Fork for EVM upgrade
+	GetHIPGasparTransition() *uint64
+	SetHIPGasparTransition(n *uint64) error
 }
 
 type Forker interface {

@@ -1344,3 +1344,15 @@ func (c *CoreGethChainConfig) SetHIPVeldinTransition(n *uint64) error {
 	c.HIPVeldinFBlock = setBig(c.HIPVeldinFBlock, n)
 	return nil
 }
+
+func (c *CoreGethChainConfig) GetHIPGasparTransition() *uint64 {
+	if c.GetChainID().Uint64() != 622277 {
+		return nil
+	}
+	return bigNewU64(c.HIPGasparFBlock)
+}
+
+func (c *CoreGethChainConfig) SetHIPGasparTransition(n *uint64) error {
+	c.HIPGasparFBlock = setBig(c.HIPGasparFBlock, n)
+	return nil
+}

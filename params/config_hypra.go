@@ -82,6 +82,9 @@ var (
 		// Previously overlooked and unrewarded.
 		HIPVeldinFBlock: big.NewInt(500_009),
 
+		//Gaspar fork was used to upgrade the EVM to include new opcodes and features.
+		HIPGasparFBlock: big.NewInt(1_600_957),
+
 		// London + shanghai EVM upgrade, aka Gaspar
 		EIP3855FBlock: big.NewInt(1_600_957), // PUSH0 instruction
 		EIP3860FBlock: big.NewInt(1_600_957), // Limit and meter initcode

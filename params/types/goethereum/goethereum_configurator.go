@@ -1177,3 +1177,11 @@ func (c *ChainConfig) GetHIPVeldinTransition() *uint64 {
 func (c *ChainConfig) SetHIPVeldinTransition(_ *uint64) error {
 	return ctypes.ErrUnsupportedConfigNoop
 }
+
+func (c *ChainConfig) GetHIPGasparTransition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetHIPGasparTransition(_ *uint64) error {
+	return ctypes.ErrUnsupportedConfigNoop
+}

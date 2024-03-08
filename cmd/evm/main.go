@@ -151,8 +151,6 @@ var stateTransitionCommand = &cli.Command{
 		t8ntool.ChainIDFlag,
 		t8ntool.RewardFlag,
 		t8ntool.VerbosityFlag,
-		utils.EVMInterpreterFlag,
-		utils.EWASMInterpreterFlag,
 	},
 }
 
@@ -217,6 +215,7 @@ func init() {
 		DisableStorageFlag,
 		DisableReturnDataFlag,
 		utils.EVMInterpreterFlag,
+		utils.EWASMInterpreterFlag,
 	}
 	app.Commands = []*cli.Command{
 		compileCommand,

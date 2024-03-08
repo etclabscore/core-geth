@@ -24,7 +24,7 @@ require (
 	github.com/edsrzf/mmap-go v1.1.0
 	github.com/etclabscore/go-openrpc-reflect v0.0.37
 	github.com/ethereum/c-kzg-4844 v0.3.1
-	github.com/ethereum/evmc/v7 v7.5.0
+	github.com/ethereum/evmc/v10 v10.0.0
 	github.com/fatih/color v1.7.0
 	github.com/fjl/gencodec v0.0.0-20230517082657-f9840df7b83e
 	github.com/fjl/memsize v0.0.0-20190710130421-bcb5799ab5e5
@@ -57,6 +57,7 @@ require (
 	github.com/mattn/go-colorable v0.1.13
 	github.com/mattn/go-isatty v0.0.17
 	github.com/naoina/toml v0.1.2-0.20170918210437-9fafd6967416
+	github.com/nsf/jsondiff v0.0.0-20210926074059-1e845ec5d249
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/open-rpc/meta-schema v0.0.0-20201029221707-1b72ef2ea333
 	github.com/peterh/liner v1.1.1-0.20190123174540-a2c9a5303de7

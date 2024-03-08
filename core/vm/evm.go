@@ -21,7 +21,7 @@ import (
 	"math/big"
 	"sync/atomic"
 
-	"github.com/ethereum/evmc/v7/bindings/go/evmc"
+	"github.com/ethereum/evmc/v10/bindings/go/evmc"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"

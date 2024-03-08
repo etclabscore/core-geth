@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/cmd/utils"
 	"github.com/ethereum/go-ethereum/common"
@@ -39,22 +40,22 @@ var stateTestCommand = &cli.Command{
 	Usage:     "Executes the given state tests. Filenames can be fed via standard input (batch mode) or as an argument (one-off execution).",
 	ArgsUsage: "<file>",
 	Flags: []cli.Flag{
-		stateTestForkFlag,
-		stateTestEVMCEWASMFlag,
+		forkFlag,
+		evmcEWASMFlag,
 		utils.EVMInterpreterFlag,
 	},
 	Category: flags.DevCategory,
 }
 
-var stateTestEVMCEWASMFlag = &cli.StringFlag{
-	Name:     "evmc.ewasm",
-	Usage:    "EVMC EWASM configuration",
-	Category: flags.DevCategory,
+var forkFlag = &cli.StringFlag{
+	Name:  "forks",
+	Usage: "Run only these forks, comma separated",
+	Value: "",
 }
 
-var stateTestForkFlag = &cli.StringFlag{
-	Name:     "fork",
-	Usage:    "Fork to use for the test",
+var evmcEWASMFlag = &cli.StringFlag{
+	Name:     "evmc.ewasm",
+	Usage:    "EVMC EWASM configuration",
 	Category: flags.DevCategory,
 }
 
@@ -91,7 +92,7 @@ func stateTestCmd(ctx *cli.Context) error {
 		cfg.Tracer = logger.NewStructLogger(config)
 	}
 
-	cfg.EWASMInterpreter = ctx.String(stateTestEVMCEWASMFlag.Name)
+	cfg.EWASMInterpreter = ctx.String(evmcEWASMFlag.Name)
 	cfg.EVMInterpreter = ctx.String(utils.EVMInterpreterFlag.Name)
 
 	if cfg.EVMInterpreter != "" {
@@ -105,7 +106,7 @@ func stateTestCmd(ctx *cli.Context) error {
 
 	// Load the test content from the input file
 	if len(ctx.Args().First()) != 0 {
-		return runStateTest(ctx.Args().First(), cfg, ctx.Bool(MachineFlag.Name), ctx.Bool(DumpFlag.Name), ctx.String(stateTestForkFlag.Name))
+		return runStateTest(ctx.Args().First(), cfg, ctx.Bool(MachineFlag.Name), ctx.Bool(DumpFlag.Name), ctx.String(forkFlag.Name))
 	}
 	// Read filenames from stdin and execute back-to-back
 	scanner := bufio.NewScanner(os.Stdin)
@@ -114,7 +115,7 @@ func stateTestCmd(ctx *cli.Context) error {
 		if len(fname) == 0 {
 			return nil
 		}
-		if err := runStateTest(fname, cfg, ctx.Bool(MachineFlag.Name), ctx.Bool(DumpFlag.Name), ctx.String(stateTestForkFlag.Name)); err != nil {
+		if err := runStateTest(fname, cfg, ctx.Bool(MachineFlag.Name), ctx.Bool(DumpFlag.Name), ctx.String(forkFlag.Name)); err != nil {
 			return err
 		}
 	}
@@ -131,12 +132,22 @@ func runStateTest(fname string, cfg vm.Config, jsonOut, dump bool, testFork stri
 	if err := json.Unmarshal(src, &tests); err != nil {
 		return err
 	}
+
 	// Iterate over all the tests, run them and aggregate the results
 	results := make([]StatetestResult, 0, len(tests))
 	for key, test := range tests {
 		for _, st := range test.Subtests(nil) {
-			if testFork != "" && testFork != st.Fork {
-				continue
+			if len(testFork) > 0 {
+				forkMatched := false
+				for _, fork := range strings.Split(testFork, ",") {
+					if strings.Contains(fork, st.Fork) {
+						forkMatched = true
+						break
+					}
+				}
+				if !forkMatched {
+					continue
+				}
 			}
 			// Run the test and aggregate the result
 			result := &StatetestResult{Name: key, Fork: st.Fork, Pass: true}
@@ -152,11 +163,11 @@ func runStateTest(fname string, cfg vm.Config, jsonOut, dump bool, testFork stri
 			if err != nil {
 				// Test failed, mark as so and dump any state to aid debugging
 				result.Pass, result.Error = false, err.Error()
-				if dump && s != nil {
-					s, _ = state.New(*result.Root, s.Database(), nil)
-					dump := s.RawDump(nil)
-					result.State = &dump
-				}
+			}
+			if dump && s != nil {
+				s, _ = state.New(*result.Root, s.Database(), nil)
+				dump := s.RawDump(nil)
+				result.State = &dump
 			}
 
 			results = append(results, *result)

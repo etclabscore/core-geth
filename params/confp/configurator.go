@@ -41,6 +41,7 @@ var (
 	incompatibleNetworkNameMap = map[uint64][]string{
 		622277: {
 			"HIPVeldin", // Custom fork not used in forkId
+			"HIPGaspar", // Custom fork not used in forkId
 			"EIP3855",   // Enabled on Hypra via Gaspar fork
 			"EIP3860",   // Enabled on Hypra via Gaspar fork
 			"EIP3198",   // Enabled on Hypra via Gaspar fork

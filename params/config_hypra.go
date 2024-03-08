@@ -86,10 +86,10 @@ var (
 		HIPGasparFBlock: big.NewInt(1_600_957),
 
 		// London + shanghai EVM upgrade, aka Gaspar
-		EIP3855FBlock: big.NewInt(1_600_957), // PUSH0 instruction
-		EIP3860FBlock: big.NewInt(1_600_957), // Limit and meter initcode
-		EIP3198FBlock: big.NewInt(1_600_957), // BASEFEE Opcode
-		EIP3529FBlock: big.NewInt(1_600_957), // Reduction in refunds
+		//EIP3855FBlock: big.NewInt(1_600_957), // PUSH0 instruction
+		//EIP3860FBlock: big.NewInt(1_600_957), // Limit and meter initcode
+		//EIP3198FBlock: big.NewInt(1_600_957), // BASEFEE Opcode
+		//EIP3529FBlock: big.NewInt(1_600_957), // Reduction in refunds
 
 		// London chain upgrades, aka Planned Eudora
 		// TODO: move block numbers closer once testing has concluded

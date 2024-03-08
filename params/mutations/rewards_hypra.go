@@ -27,7 +27,9 @@ var (
 
 func GetRewardsHypra(config ctypes.ChainConfigurator, header *types.Header, uncles []*types.Header, txs []*types.Transaction) (*big.Int, []*big.Int) {
 	// Select the correct block minerReward based on chain progression
-	minerReward := ctypes.EthashBlockReward(config, header.Number)
+	blockReward := ctypes.EthashBlockReward(config, header.Number)
+
+	minerReward := new(big.Int).Set(blockReward)
 	uncleReward := new(big.Int).Set(UncleBlockReward)
 	uncleCount := new(big.Int).SetUint64(uint64(len(uncles)))
 	blockFeeReward := new(big.Int)

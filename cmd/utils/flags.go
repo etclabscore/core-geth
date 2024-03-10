@@ -2604,7 +2604,6 @@ func makeConsensusEngine(ctx *cli.Context, stack *node.Node, gspec *genesisT.Gen
 			ethashConfig.PowMode = ethash.ModePoissonFake
 		}
 		engine = ethconfig.CreateConsensusEngineEthash(stack, &ethashConfig, nil, false)
-		break
 
 	case ctypes.ConsensusEngineT_EthashB3:
 		ethashb3Config := ethconfig.Defaults.EthashB3
@@ -2614,7 +2613,6 @@ func makeConsensusEngine(ctx *cli.Context, stack *node.Node, gspec *genesisT.Gen
 			ethashb3Config.PowMode = ethashb3.ModePoissonFake
 		}
 		engine = ethconfig.CreateConsensusEngineEthashB3(stack, &ethashb3Config, nil, false)
-		break
 
 	case ctypes.ConsensusEngineT_Clique:
 		cliqueConfig, err := core.LoadCliqueConfig(chainDb, gspec)
@@ -2622,7 +2620,6 @@ func makeConsensusEngine(ctx *cli.Context, stack *node.Node, gspec *genesisT.Gen
 			Fatalf("%v", err)
 		}
 		engine = ethconfig.CreateConsensusEngineClique(cliqueConfig, chainDb)
-		break
 
 	case ctypes.ConsensusEngineT_Lyra2:
 		var lyra2Config *lyra2.Config
@@ -2630,7 +2627,7 @@ func makeConsensusEngine(ctx *cli.Context, stack *node.Node, gspec *genesisT.Gen
 			lyra2Config = &lyra2.Config{}
 		}
 		engine = ethconfig.CreateConsensusEngineLyra2(lyra2Config, nil, false)
-		break
+
 	}
 
 	return engine

@@ -66,7 +66,6 @@ func networkSignalsCompatibility(netId uint64, name string) bool {
 		}
 	}
 	return false
-
 }
 
 var (

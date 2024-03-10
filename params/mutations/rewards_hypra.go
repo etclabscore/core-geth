@@ -53,7 +53,7 @@ func GetRewardsHypra(config ctypes.ChainConfigurator, header *types.Header, uncl
 	}
 
 	uncleRewards := make([]*big.Int, len(uncles))
-	for i, _ := range uncles {
+	for i := range uncles {
 		uncleRewards[i] = uncleReward
 
 		if config.IsEnabled(config.GetHIPVeldinTransition, header.Number) {

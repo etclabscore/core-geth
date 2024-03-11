@@ -19,8 +19,10 @@ package core
 import (
 	"fmt"
 	"math/big"
+	"reflect"
 	"testing"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus/beacon"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
@@ -32,9 +34,10 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
+	"github.com/ethereum/go-ethereum/trie"
 )
 
-func TestGenerateWithdrawalChain(t *testing.T) {
+func TestGeneratePOSChain(t *testing.T) {
 	var (
 		keyHex  = "9c647b8b7c4e7c3490668fb6c11473619db80c93704c70893d3813af4090c39c"
 		key, _  = crypto.HexToECDSA(keyHex)
@@ -43,21 +46,25 @@ func TestGenerateWithdrawalChain(t *testing.T) {
 		bb      = common.Address{0xbb}
 		funds   = big.NewInt(0).Mul(big.NewInt(1337), big.NewInt(vars.Ether))
 		config  = *params.AllEthashProtocolChanges
+		asm4788 = common.Hex2Bytes("3373fffffffffffffffffffffffffffffffffffffffe14604d57602036146024575f5ffd5b5f35801560495762001fff810690815414603c575f5ffd5b62001fff01545f5260205ff35b5f5ffd5b62001fff42064281555f359062001fff015500")
 		gspec   = &genesisT.Genesis{
-			Config:     &config,
-			Alloc:      genesisT.GenesisAlloc{address: {Balance: funds}},
+			Config: &config,
+			Alloc: genesisT.GenesisAlloc{
+				address:                        {Balance: funds},
+				vars.BeaconRootsStorageAddress: {Balance: common.Big0, Code: asm4788},
+			},
 			BaseFee:    big.NewInt(vars.InitialBaseFee),
 			Difficulty: common.Big1,
 			GasLimit:   5_000_000,
 		}
-		gendb  = rawdb.NewMemoryDatabase()
-		signer = types.LatestSigner(gspec.Config)
-		db     = rawdb.NewMemoryDatabase()
+		gendb = rawdb.NewMemoryDatabase()
+		db    = rawdb.NewMemoryDatabase()
 	)
 
 	config.TerminalTotalDifficultyPassed = true
 	config.TerminalTotalDifficulty = common.Big0
 	config.ShanghaiTime = u64(0)
+	config.CancunTime = u64(0)
 
 	// init 0xaa with some storage elements
 	storage := make(map[common.Hash]common.Hash)
@@ -77,12 +84,22 @@ func TestGenerateWithdrawalChain(t *testing.T) {
 		Storage: storage,
 		Code:    common.Hex2Bytes("600154600354"),
 	}
+	genesis := MustCommitGenesis(gendb, trie.NewDatabase(gendb, trie.HashDefaults), gspec)
 
-	genesis := MustCommitGenesis(gendb, gspec)
+	genchain, genreceipts := GenerateChain(gspec.Config, genesis, beacon.NewFaker(), gendb, 4, func(i int, gen *BlockGen) {
+		gen.SetParentBeaconRoot(common.Hash{byte(i + 1)})
 
-	chain, _ := GenerateChain(gspec.Config, genesis, beacon.NewFaker(), gendb, 4, func(i int, gen *BlockGen) {
-		tx, _ := types.SignTx(types.NewTransaction(gen.TxNonce(address), address, big.NewInt(1000), vars.TxGas, new(big.Int).Add(gen.BaseFee(), common.Big1), nil), signer, key)
+		// Add value transfer tx.
+		tx := types.MustSignNewTx(key, gen.Signer(), &types.LegacyTx{
+			Nonce:    gen.TxNonce(address),
+			To:       &address,
+			Value:    big.NewInt(1000),
+			Gas:      vars.TxGas,
+			GasPrice: new(big.Int).Add(gen.BaseFee(), common.Big1),
+		})
 		gen.AddTx(tx)
+
+		// Add withdrawals.
 		if i == 1 {
 			gen.AddWithdrawal(&types.Withdrawal{
 				Validator: 42,
@@ -113,21 +130,42 @@ func TestGenerateWithdrawalChain(t *testing.T) {
 	blockchain, _ := NewBlockChain(db, nil, gspec, nil, beacon.NewFaker(), vm.Config{}, nil, nil)
 	defer blockchain.Stop()
 
-	if i, err := blockchain.InsertChain(chain); err != nil {
-		fmt.Printf("insert error (block %d): %v\n", chain[i].NumberU64(), err)
-		return
+	if i, err := blockchain.InsertChain(genchain); err != nil {
+		t.Fatalf("insert error (block %d): %v\n", genchain[i].NumberU64(), err)
 	}
 
 	// enforce that withdrawal indexes are monotonically increasing from 0
 	var (
 		withdrawalIndex uint64
-		head            = blockchain.CurrentBlock().Number.Uint64()
 	)
-	for i := 0; i < int(head); i++ {
-		block := blockchain.GetBlockByNumber(uint64(i))
+	for i := range genchain {
+		blocknum := genchain[i].NumberU64()
+		block := blockchain.GetBlockByNumber(blocknum)
 		if block == nil {
-			t.Fatalf("block %d not found", i)
+			t.Fatalf("block %d not found", blocknum)
 		}
+
+		// Verify receipts.
+		genBlockReceipts := genreceipts[i]
+		for _, r := range genBlockReceipts {
+			if r.BlockNumber.Cmp(block.Number()) != 0 {
+				t.Errorf("receipt has wrong block number %d, want %d", r.BlockNumber, block.Number())
+			}
+			if r.BlockHash != block.Hash() {
+				t.Errorf("receipt has wrong block hash %v, want %v", r.BlockHash, block.Hash())
+			}
+
+			// patch up empty logs list to make DeepEqual below work
+			if r.Logs == nil {
+				r.Logs = []*types.Log{}
+			}
+		}
+		blockchainReceipts := blockchain.GetReceiptsByHash(block.Hash())
+		if !reflect.DeepEqual(genBlockReceipts, blockchainReceipts) {
+			t.Fatalf("receipts mismatch\ngenerated: %s\nblockchain: %s", spew.Sdump(genBlockReceipts), spew.Sdump(blockchainReceipts))
+		}
+
+		// Verify withdrawals.
 		if len(block.Withdrawals()) == 0 {
 			continue
 		}
@@ -136,6 +174,18 @@ func TestGenerateWithdrawalChain(t *testing.T) {
 				t.Fatalf("withdrawal index %d does not equal expected index %d", block.Withdrawals()[j].Index, withdrawalIndex)
 			}
 			withdrawalIndex += 1
+		}
+
+		// Verify parent beacon root.
+		want := common.Hash{byte(blocknum)}
+		if got := block.BeaconRoot(); *got != want {
+			t.Fatalf("block %d, wrong parent beacon root: got %s, want %s", i, got, want)
+		}
+		state, _ := blockchain.State()
+		idx := block.Time()%8191 + 8191
+		got := state.GetState(vars.BeaconRootsStorageAddress, common.BigToHash(new(big.Int).SetUint64(idx)))
+		if got != want {
+			t.Fatalf("block %d, wrong parent beacon root in state: got %s, want %s", i, got, want)
 		}
 	}
 }
@@ -149,6 +199,7 @@ func ExampleGenerateChain() {
 		addr2   = crypto.PubkeyToAddress(key2.PublicKey)
 		addr3   = crypto.PubkeyToAddress(key3.PublicKey)
 		db      = rawdb.NewMemoryDatabase()
+		genDb   = rawdb.NewMemoryDatabase()
 	)
 
 	// Ensure that key1 has some funds in the genesis block.
@@ -156,13 +207,13 @@ func ExampleGenerateChain() {
 		Config: &goethereum.ChainConfig{HomesteadBlock: new(big.Int)},
 		Alloc:  genesisT.GenesisAlloc{addr1: {Balance: big.NewInt(1000000)}},
 	}
-	genesis := MustCommitGenesis(db, gspec)
+	genesis := MustCommitGenesis(genDb, trie.NewDatabase(genDb, trie.HashDefaults), gspec)
 
 	// This call generates a chain of 5 blocks. The function runs for
 	// each block and adds different features to gen based on the
 	// block index.
 	signer := types.HomesteadSigner{}
-	chain, _ := GenerateChain(gspec.Config, genesis, ethash.NewFaker(), db, 5, func(i int, gen *BlockGen) {
+	chain, _ := GenerateChain(gspec.Config, genesis, ethash.NewFaker(), genDb, 5, func(i int, gen *BlockGen) {
 		switch i {
 		case 0:
 			// In block 1, addr1 sends addr2 some ether.
@@ -191,7 +242,7 @@ func ExampleGenerateChain() {
 	})
 
 	// Import the chain. This runs all block validation rules.
-	blockchain, _ := NewBlockChain(db, nil, gspec, nil, ethash.NewFaker(), vm.Config{}, nil, nil)
+	blockchain, _ := NewBlockChain(db, DefaultCacheConfigWithScheme(rawdb.HashScheme), gspec, nil, ethash.NewFaker(), vm.Config{}, nil, nil)
 	defer blockchain.Stop()
 
 	if i, err := blockchain.InsertChain(chain); err != nil {

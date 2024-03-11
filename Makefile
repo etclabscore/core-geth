@@ -6,7 +6,7 @@
 
 GOBIN = ./build/bin
 GO ?= latest
-GORUN = env GO111MODULE=on go run
+GORUN = go run
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 geth:
@@ -95,7 +95,7 @@ lint: ## Run linters.
 	$(GORUN) build/ci.go lint
 
 clean: clean-evmc
-	env GO111MODULE=on go clean -cache
+	go clean -cache
 	rm -fr build/_workspace/pkg/ $(GOBIN)/*
 
 mkdocs-serve: ## Serve generated documentation (during development)

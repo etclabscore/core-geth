@@ -21,14 +21,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/mclock"
 	vfs "github.com/ethereum/go-ethereum/les/vflux/server"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 )
 
 var (
-	errNoCheckpoint         = errors.New("no local checkpoint provided")
+	// errNoCheckpoint         = errors.New("no local checkpoint provided")
 	errNotActivated         = errors.New("checkpoint registrar is not activated")
 	errUnknownBenchmarkType = errors.New("unknown benchmark type")
 )
@@ -67,7 +66,7 @@ func (api *LightServerAPI) ServerInfo() map[string]interface{} {
 	res["maximumCapacity"] = api.server.maxCapacity
 	_, res["totalCapacity"] = api.server.clientPool.Limits()
 	_, res["totalConnectedCapacity"] = api.server.clientPool.Active()
-	res["priorityConnectedCapacity"] = 0 //TODO connect when token sale module is added
+	res["priorityConnectedCapacity"] = 0 // TODO connect when token sale module is added
 	return res
 }
 
@@ -373,13 +372,7 @@ func NewLightAPI(backend *lesCommons) *LightAPI {
 //	result[3], 32 bytes hex encoded latest section bloom trie root hash
 func (api *LightAPI) LatestCheckpoint() ([4]string, error) {
 	var res [4]string
-	cp := api.backend.latestLocalCheckpoint()
-	if cp.Empty() {
-		return res, errNoCheckpoint
-	}
-	res[0] = hexutil.EncodeUint64(cp.SectionIndex)
-	res[1], res[2], res[3] = cp.SectionHead.Hex(), cp.CHTRoot.Hex(), cp.BloomRoot.Hex()
-	return res, nil
+	return res, errNotActivated
 }
 
 // GetCheckpoint returns the specific local checkpoint package.
@@ -391,18 +384,10 @@ func (api *LightAPI) LatestCheckpoint() ([4]string, error) {
 //	result[2], 32 bytes hex encoded latest section bloom trie root hash
 func (api *LightAPI) GetCheckpoint(index uint64) ([3]string, error) {
 	var res [3]string
-	cp := api.backend.localCheckpoint(index)
-	if cp.Empty() {
-		return res, errNoCheckpoint
-	}
-	res[0], res[1], res[2] = cp.SectionHead.Hex(), cp.CHTRoot.Hex(), cp.BloomRoot.Hex()
-	return res, nil
+	return res, errNotActivated
 }
 
 // GetCheckpointContractAddress returns the contract contract address in hex format.
 func (api *LightAPI) GetCheckpointContractAddress() (string, error) {
-	if api.backend.oracle == nil {
-		return "", errNotActivated
-	}
-	return api.backend.oracle.Contract().ContractAddr().Hex(), nil
+	return "", errNotActivated
 }

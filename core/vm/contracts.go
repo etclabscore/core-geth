@@ -98,11 +98,12 @@ func PrecompiledContractsForConfig(config ctypes.ChainConfigurator, bn *big.Int,
 	if config.IsEnabled(config.GetEIP152Transition, bn) {
 		precompileds[common.BytesToAddress([]byte{9})] = &blake2F{}
 	}
-	if config.IsEnabledByTime(config.GetEIP4844TransitionTime, bt) {
-		precompileds[common.BytesToAddress([]byte{0x0a})] = &kzgPointEvaluation{}
-	}
 	if config.IsEnabled(config.GetEIP2537Transition, bn) {
+		// 10-18 are BLS12-381 precompiles
 		mergeContracts(precompileds, PrecompiledContractsBLS)
+	}
+	if config.IsEnabledByTime(config.GetEIP4844TransitionTime, bt) || config.IsEnabled(config.GetEIP4844Transition, bn) {
+		precompileds[common.BytesToAddress([]byte{0x0a})] = &kzgPointEvaluation{}
 	}
 
 	return precompileds
@@ -301,7 +302,7 @@ func (c *bigModExp) RequiredGas(input []byte) uint64 {
 		// def mult_complexity(x):
 		//    ceiling(x/8)^2
 		//
-		//where is x is max(length_of_MODULUS, length_of_BASE)
+		// where is x is max(length_of_MODULUS, length_of_BASE)
 		gas = gas.Add(gas, big7)
 		gas = gas.Div(gas, big8)
 		gas.Mul(gas, gas)
@@ -355,7 +356,7 @@ func (c *bigModExp) Run(input []byte) ([]byte, error) {
 		// Modulo 0 is undefined, return zero
 		return common.LeftPadBytes([]byte{}, int(modLen)), nil
 	case base.BitLen() == 1: // a bit length of 1 means it's 1 (or -1).
-		//If base == 1, then we can just return base % mod (if mod >= 1, which it is)
+		// If base == 1, then we can just return base % mod (if mod >= 1, which it is)
 		v = base.Mod(base, mod).Bytes()
 	default:
 		v = base.Exp(base, exp, mod).Bytes()

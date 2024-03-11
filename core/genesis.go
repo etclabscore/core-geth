@@ -124,22 +124,24 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, gen
 		} else {
 			log.Info("Writing custom genesis block")
 		}
-
+		applyOverrides(genesis.Config)
 		block, err := CommitGenesis(genesis, db, triedb)
 		if err != nil {
 			return genesis.Config, common.Hash{}, err
 		}
-		applyOverrides(genesis.Config)
 		log.Info("Wrote genesis block OK", "config", genesis.Config)
 		return genesis.Config, block.Hash(), nil
 	}
-	// We have the genesis block in database(perhaps in ancient database)
-	// but the corresponding state is missing.
+	// The genesis block is present(perhaps in ancient database) while the
+	// state database is not initialized yet. It can happen that the node
+	// is initialized with an external ancient store. Commit genesis state
+	// in this case.
 	header := rawdb.ReadHeader(db, stored, 0)
-	if header.Root != types.EmptyRootHash && !rawdb.HasLegacyTrieNode(db, header.Root) {
+	if header.Root != types.EmptyRootHash && !triedb.Initialized(header.Root) {
 		if genesis == nil {
 			genesis = params.DefaultGenesisBlock()
 		}
+		applyOverrides(genesis.Config)
 		// Ensure the stored genesis matches with the given one.
 		hash := GenesisToBlock(genesis, nil).Hash()
 		if hash != stored {
@@ -149,11 +151,11 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, gen
 		if err != nil {
 			return genesis.Config, hash, err
 		}
-		applyOverrides(genesis.Config)
 		return genesis.Config, block.Hash(), nil
 	}
 	// Check whether the genesis block is already written.
 	if genesis != nil {
+		applyOverrides(genesis.Config)
 		hash := GenesisToBlock(genesis, nil).Hash()
 		if hash != stored {
 			return genesis.Config, hash, &genesisT.GenesisMismatchError{Stored: stored, New: hash}
@@ -251,7 +253,8 @@ func LoadCliqueConfig(db ethdb.Database, genesis *genesisT.Genesis) (*ctypes.Cli
 		// config is missing(initialize the empty leveldb with an
 		// external ancient chain segment), ensure the provided genesis
 		// is matched.
-		genesisBlock := MustCommitGenesis(rawdb.NewMemoryDatabase(), genesis)
+		db := rawdb.NewMemoryDatabase()
+		genesisBlock := MustCommitGenesis(db, trie.NewDatabase(db, nil), genesis)
 		if stored != (common.Hash{}) && genesisBlock.Hash() != stored {
 			return nil, &genesisT.GenesisMismatchError{Stored: stored, New: genesisBlock.Hash()}
 		}
@@ -266,6 +269,40 @@ func LoadCliqueConfig(db ethdb.Database, genesis *genesisT.Genesis) (*ctypes.Cli
 	// In this case the default chain config(mainnet) will be used,
 	// namely ethash is the specified consensus engine, return nil.
 	return nil, nil
+}
+
+// LoadChainConfig loads the stored chain config if it is already present in
+// database, otherwise, return the config in the provided genesis specification.
+func LoadChainConfig(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.ChainConfigurator, error) {
+	// Load the stored chain config from the database. It can be nil
+	// in case the database is empty. Notably, we only care about the
+	// chain config corresponds to the canonical chain.
+	stored := rawdb.ReadCanonicalHash(db, 0)
+	if stored != (common.Hash{}) {
+		storedcfg := rawdb.ReadChainConfig(db, stored)
+		if storedcfg != nil {
+			return storedcfg, nil
+		}
+	}
+	// Load the config from the provided genesis specification
+	if genesis != nil {
+		// Reject invalid genesis spec without valid chain config
+		if genesis.Config == nil {
+			return nil, errGenesisNoConfig
+		}
+		// If the canonical genesis header is present, but the chain
+		// config is missing(initialize the empty leveldb with an
+		// external ancient chain segment), ensure the provided genesis
+		// is matched.
+		genesisBlock := GenesisToBlock(genesis, nil)
+		if stored != (common.Hash{}) && genesisBlock.Hash() != stored {
+			return nil, &genesisT.GenesisMismatchError{Stored: stored, New: genesisBlock.Hash()}
+		}
+		return genesis.Config, nil
+	}
+	// There is no stored chain config and no new config provided,
+	// In this case the default chain config(mainnet) will be used
+	return params.MainnetChainConfig, nil
 }
 
 func configOrDefault(g *genesisT.Genesis, ghash common.Hash) ctypes.ChainConfigurator {
@@ -289,13 +326,15 @@ func configOrDefault(g *genesisT.Genesis, ghash common.Hash) ctypes.ChainConfigu
 
 // Flush adds allocated genesis accounts into a fresh new statedb and
 // commit the state changes into the given database handler.
-func gaFlush(ga *genesisT.GenesisAlloc, db ethdb.Database) error {
-	statedb, err := state.New(common.Hash{}, state.NewDatabaseWithConfig(db, &trie.Config{Preimages: true}), nil)
+func gaFlush(ga *genesisT.GenesisAlloc, triedb *trie.Database, db ethdb.Database) error {
+	statedb, err := state.New(types.EmptyRootHash, state.NewDatabaseWithNodeDB(db, triedb), nil)
 	if err != nil {
 		return err
 	}
 	for addr, account := range *ga {
-		statedb.AddBalance(addr, account.Balance)
+		if account.Balance != nil {
+			statedb.AddBalance(addr, account.Balance)
+		}
 		statedb.SetCode(addr, account.Code)
 		statedb.SetNonce(addr, account.Nonce)
 		for key, value := range account.Storage {
@@ -308,8 +347,7 @@ func gaFlush(ga *genesisT.GenesisAlloc, db ethdb.Database) error {
 	}
 	// Commit newly generated states into disk if it's not empty.
 	if root != types.EmptyRootHash {
-		err = statedb.Database().TrieDB().Commit(root, true)
-		if err != nil {
+		if err := triedb.Commit(root, true); err != nil {
 			return err
 		}
 	}
@@ -356,9 +394,9 @@ func gaWrite(ga *genesisT.GenesisAlloc, db ethdb.KeyValueWriter, hash common.Has
 
 // CommitGenesisState loads the stored genesis state with the given block
 // hash and commits them into the given database handler.
-func CommitGenesisState(db ethdb.Database, hash common.Hash) error {
+func CommitGenesisState(db ethdb.Database, triedb *trie.Database, blockhash common.Hash) error {
 	var alloc genesisT.GenesisAlloc
-	blob := rawdb.ReadGenesisStateSpec(db, hash)
+	blob := rawdb.ReadGenesisStateSpec(db, blockhash)
 	if len(blob) != 0 {
 		if err := alloc.UnmarshalJSON(blob); err != nil {
 			return err
@@ -370,7 +408,7 @@ func CommitGenesisState(db ethdb.Database, hash common.Hash) error {
 		// - supported networks(mainnet, testnets), recover with defined allocations
 		// - private network, can't recover
 		var genesis *genesisT.Genesis
-		switch hash {
+		switch blockhash {
 		case params.MainnetGenesisHash:
 			genesis = params.DefaultGenesisBlock()
 		case params.GoerliGenesisHash:
@@ -381,6 +419,8 @@ func CommitGenesisState(db ethdb.Database, hash common.Hash) error {
 			genesis = params.DefaultMordorGenesisBlock()
 		case params.MintMeGenesisHash:
 			genesis = params.DefaultMintMeGenesisBlock()
+		case params.HoleskyGenesisHash:
+			genesis = params.DefaultHoleskyGenesisBlock()
 		}
 		if genesis != nil {
 			alloc = genesis.Alloc
@@ -388,7 +428,7 @@ func CommitGenesisState(db ethdb.Database, hash common.Hash) error {
 			return errors.New("not found")
 		}
 	}
-	err := gaFlush(&alloc, db)
+	err := gaFlush(&alloc, triedb, db)
 	return err
 }
 
@@ -402,7 +442,7 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 	if err != nil {
 		panic(err)
 	}
-	err = gaFlush(&g.Alloc, db)
+	err = gaFlush(&g.Alloc, trie.NewDatabase(db, nil), db)
 	if err != nil {
 		panic(err)
 	}
@@ -444,8 +484,10 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 			head.WithdrawalsHash = &types.EmptyWithdrawalsHash
 			withdrawals = make([]*types.Withdrawal, 0)
 		}
-		isCancun := conf.IsEnabledByTime(g.Config.GetEIP4844TransitionTime, &g.Timestamp)
-		if isCancun {
+		// EIP4844 and EIP4788 are Cancun features.
+		isEIP4844 := conf.IsEnabledByTime(g.Config.GetEIP4844TransitionTime, &g.Timestamp) || conf.IsEnabled(conf.GetEIP4844Transition, new(big.Int).SetUint64(g.Number))
+		if isEIP4844 {
+			// EIP-4844 fields
 			head.ExcessBlobGas = g.ExcessBlobGas
 			head.BlobGasUsed = g.BlobGasUsed
 			if head.ExcessBlobGas == nil {
@@ -454,6 +496,13 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 			if head.BlobGasUsed == nil {
 				head.BlobGasUsed = new(uint64)
 			}
+		}
+		isEIP4788 := conf.IsEnabledByTime(g.Config.GetEIP4788TransitionTime, &g.Timestamp) || conf.IsEnabled(g.Config.GetEIP4788Transition, new(big.Int).SetUint64(g.Number))
+		if isEIP4788 {
+			// EIP-4788: The parentBeaconBlockRoot of the genesis block is always
+			// the zero hash. This is because the genesis block does not have a parent
+			// by definition.
+			head.ParentBeaconRoot = new(common.Hash)
 		}
 	}
 	return types.NewBlock(head, nil, nil, nil, trie.NewStackTrie(nil)).WithWithdrawals(withdrawals)
@@ -484,6 +533,9 @@ func CommitGenesis(g *genesisT.Genesis, db ethdb.Database, triedb *trie.Database
 	if err := gaWrite(&g.Alloc, db, block.Hash()); err != nil {
 		return nil, err
 	}
+	if err := gaFlush(&g.Alloc, triedb, db); err != nil {
+		return nil, err
+	}
 	rawdb.WriteTd(db, block.Hash(), block.NumberU64(), block.Difficulty())
 	rawdb.WriteBlock(db, block)
 	rawdb.WriteReceipts(db, block.Hash(), block.NumberU64(), nil)
@@ -499,8 +551,8 @@ func CommitGenesis(g *genesisT.Genesis, db ethdb.Database, triedb *trie.Database
 // The block is committed as the canonical head block.
 // Note the state changes will be committed in hash-based scheme, use Commit
 // if path-scheme is preferred.
-func MustCommitGenesis(db ethdb.Database, g *genesisT.Genesis) *types.Block {
-	block, err := CommitGenesis(g, db, trie.NewDatabase(db))
+func MustCommitGenesis(db ethdb.Database, triedb *trie.Database, g *genesisT.Genesis) *types.Block {
+	block, err := CommitGenesis(g, db, triedb)
 	if err != nil {
 		panic(err)
 	}
@@ -513,5 +565,5 @@ func GenesisBlockForTesting(db ethdb.Database, addr common.Address, balance *big
 		Alloc:   genesisT.GenesisAlloc{addr: {Balance: balance}},
 		BaseFee: big.NewInt(vars.InitialBaseFee),
 	}
-	return MustCommitGenesis(db, &g)
+	return MustCommitGenesis(db, trie.NewDatabase(db, nil), &g)
 }

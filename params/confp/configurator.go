@@ -131,7 +131,7 @@ func newTimestampCompatError(what string, storedtime, newtime *uint64) *ConfigCo
 		NewTime:      newtime,
 		RewindToTime: 0,
 	}
-	if rew != nil {
+	if rew != nil && *rew > 0 {
 		err.RewindToTime = *rew - 1
 	}
 	return err
@@ -338,7 +338,7 @@ func Equivalent(a, b ctypes.ChainConfigurator) error {
 		}
 	}
 
-	fat, fbt := TimeForks(a), TimeForks(b)
+	fat, fbt := TimeForks(a, 0), TimeForks(b, 0)
 	if len(fat) != len(fbt) {
 		return fmt.Errorf("different time-fork count: %d / %d (%v / %v)", len(fat), len(fbt), fat, fbt)
 	}
@@ -486,11 +486,16 @@ func BlockForks(conf ctypes.ChainConfigurator) []uint64 {
 		return forks[i] < forks[j]
 	})
 
+	// Skip any forks in block 0, that's the genesis ruleset
+	if len(forks) > 0 && forks[0] == 0 {
+		forks = forks[1:]
+	}
+
 	return forks
 }
 
 // TimeForks returns non-nil, non <maxUin64>, unique sorted forks defined by block time for a ChainConfigurator.
-func TimeForks(conf ctypes.ChainConfigurator) []uint64 {
+func TimeForks(conf ctypes.ChainConfigurator, genesis uint64) []uint64 {
 	var forks []uint64
 	var forksM = make(map[uint64]struct{}) // Will key for uniqueness as fork numbers are appended to slice.
 
@@ -523,6 +528,11 @@ func TimeForks(conf ctypes.ChainConfigurator) []uint64 {
 	sort.Slice(forks, func(i, j int) bool {
 		return forks[i] < forks[j]
 	})
+
+	// Skip any forks before genesis.
+	for len(forks) > 0 && forks[0] <= genesis {
+		forks = forks[1:]
+	}
 
 	return forks
 }

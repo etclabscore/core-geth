@@ -659,6 +659,16 @@ func (c *ChainConfig) SetEIP4844TransitionTime(n *uint64) error {
 	return nil
 }
 
+// GetEIP7516TransitionTime EIP7516: Shard Block Transactions
+func (c *ChainConfig) GetEIP7516TransitionTime() *uint64 {
+	return c.CancunTime
+}
+
+func (c *ChainConfig) SetEIP7516TransitionTime(n *uint64) error {
+	c.CancunTime = n
+	return nil
+}
+
 // GetEIP1153TransitionTime EIP1153: Transient Storage opcodes
 func (c *ChainConfig) GetEIP1153TransitionTime() *uint64 {
 	return c.CancunTime
@@ -687,6 +697,65 @@ func (c *ChainConfig) GetEIP6780TransitionTime() *uint64 {
 func (c *ChainConfig) SetEIP6780TransitionTime(n *uint64) error {
 	c.CancunTime = n
 	return nil
+}
+
+// GetEIP6780TransitionTime EIP4788: Beacon block root in the EVM
+func (c *ChainConfig) GetEIP4788TransitionTime() *uint64 {
+	return c.CancunTime
+}
+
+func (c *ChainConfig) SetEIP4788TransitionTime(n *uint64) error {
+	c.CancunTime = n
+	return nil
+}
+
+// Cancun by block number
+func (c *ChainConfig) GetEIP4844Transition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetEIP4844Transition(n *uint64) error {
+	return ctypes.ErrUnsupportedConfigNoop
+}
+
+func (c *ChainConfig) GetEIP7516Transition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetEIP7516Transition(n *uint64) error {
+	return ctypes.ErrUnsupportedConfigNoop
+}
+
+func (c *ChainConfig) GetEIP1153Transition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetEIP1153Transition(n *uint64) error {
+	return ctypes.ErrUnsupportedConfigNoop
+}
+
+func (c *ChainConfig) GetEIP5656Transition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetEIP5656Transition(n *uint64) error {
+	return ctypes.ErrUnsupportedConfigNoop
+}
+
+func (c *ChainConfig) GetEIP6780Transition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetEIP6780Transition(n *uint64) error {
+	return ctypes.ErrUnsupportedConfigNoop
+}
+
+func (c *ChainConfig) GetEIP4788Transition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetEIP4788Transition(n *uint64) error {
+	return ctypes.ErrUnsupportedConfigNoop
 }
 
 func (c *ChainConfig) GetMergeVirtualTransition() *uint64 {

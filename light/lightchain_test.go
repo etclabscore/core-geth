@@ -30,6 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/trie"
 )
 
 // So we can deterministically seed different blockchains
@@ -56,7 +57,7 @@ func makeHeaderChain(parent *types.Header, n int, db ethdb.Database, seed int) [
 func newCanonical(n int) (ethdb.Database, *LightChain, error) {
 	db := rawdb.NewMemoryDatabase()
 	gspec := genesisT.Genesis{Config: params.TestChainConfig}
-	genesis := core.MustCommitGenesis(db, &gspec)
+	genesis := core.MustCommitGenesis(db, trie.NewDatabase(db, trie.HashDefaults), &gspec)
 	blockchain, _ := NewLightChain(&dummyOdr{db: db, indexerConfig: TestClientIndexerConfig}, gspec.Config, ethash.NewFaker(), nil)
 
 	// Create and inject the requested chain
@@ -76,7 +77,7 @@ func newTestLightChain() *LightChain {
 		Difficulty: big.NewInt(1),
 		Config:     params.TestChainConfig,
 	}
-	core.MustCommitGenesis(db, gspec)
+	core.MustCommitGenesis(db, trie.NewDatabase(db, trie.HashDefaults), gspec)
 	lc, err := NewLightChain(&dummyOdr{db: db}, gspec.Config, ethash.NewFullFaker(), nil)
 	if err != nil {
 		panic(err)

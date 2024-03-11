@@ -220,6 +220,10 @@ type ProtocolSpecifier interface {
 	GetEIP4844TransitionTime() *uint64
 	SetEIP4844TransitionTime(n *uint64) error
 
+	// EIP7516 - Blob Base Fee Opcode - https://eips.ethereum.org/EIPS/eip-7516
+	GetEIP7516TransitionTime() *uint64
+	SetEIP7516TransitionTime(n *uint64) error
+
 	// EIP1153 - Transient Storage opcodes - https://eips.ethereum.org/EIPS/eip-1153
 	GetEIP1153TransitionTime() *uint64
 	SetEIP1153TransitionTime(n *uint64) error
@@ -231,6 +235,24 @@ type ProtocolSpecifier interface {
 	// EIP6780 - SELFDESTRUCT only in same transaction - https://eips.ethereum.org/EIPS/eip-6780
 	GetEIP6780TransitionTime() *uint64
 	SetEIP6780TransitionTime(n *uint64) error
+
+	// EIP4788 - Beacon block root in the EVM
+	GetEIP4788TransitionTime() *uint64
+	SetEIP4788TransitionTime(n *uint64) error
+
+	// Cancun expressed as block activation numbers:
+	GetEIP4844Transition() *uint64
+	SetEIP4844Transition(n *uint64) error
+	GetEIP7516Transition() *uint64
+	SetEIP7516Transition(n *uint64) error
+	GetEIP1153Transition() *uint64
+	SetEIP1153Transition(n *uint64) error
+	GetEIP5656Transition() *uint64
+	SetEIP5656Transition(n *uint64) error
+	GetEIP6780Transition() *uint64
+	SetEIP6780Transition(n *uint64) error
+	GetEIP4788Transition() *uint64
+	SetEIP4788Transition(n *uint64) error
 }
 
 type Forker interface {

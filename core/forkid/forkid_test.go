@@ -19,6 +19,7 @@ package forkid
 import (
 	"bytes"
 	"fmt"
+	"hash/crc32"
 	"math"
 	"math/big"
 	"os"
@@ -27,10 +28,13 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -45,14 +49,14 @@ func TestCreation(t *testing.T) {
 	tests := []struct {
 		name    string
 		config  ctypes.ChainConfigurator
-		genesis common.Hash
+		genesis *types.Block
 		cases   []testcase
 	}{
 		// Mainnet test cases
 		{
 			"mainnet",
 			params.MainnetChainConfig,
-			params.MainnetGenesisHash,
+			core.GenesisToBlock(params.DefaultGenesisBlock(), nil),
 			[]testcase{
 				{0, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},                    // Unsynced
 				{1149999, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},              // Last Frontier block
@@ -88,7 +92,7 @@ func TestCreation(t *testing.T) {
 		{
 			"goerli",
 			params.GoerliChainConfig,
-			params.GoerliGenesisHash,
+			core.GenesisToBlock(params.DefaultGoerliGenesisBlock(), nil),
 			[]testcase{
 				{0, 0, ID{Hash: checksumToBytes(0xa3f5ab08), Next: 1561651}},                   // Unsynced, last Frontier, Homestead, Tangerine, Spurious, Byzantium, Constantinople and first Petersburg block
 				{1561650, 0, ID{Hash: checksumToBytes(0xa3f5ab08), Next: 1561651}},             // Last Petersburg block
@@ -106,7 +110,7 @@ func TestCreation(t *testing.T) {
 		{
 			"sepolia",
 			params.SepoliaChainConfig,
-			params.SepoliaGenesisHash,
+			core.GenesisToBlock(params.DefaultSepoliaGenesisBlock(), nil),
 			[]testcase{
 				{0, 0, ID{Hash: checksumToBytes(0xfe3366e7), Next: 1735371}},                   // Unsynced, last Frontier, Homestead, Tangerine, Spurious, Byzantium, Constantinople, Petersburg, Istanbul, Berlin and first London block
 				{1735370, 0, ID{Hash: checksumToBytes(0xfe3366e7), Next: 1735371}},             // Last London block
@@ -115,10 +119,21 @@ func TestCreation(t *testing.T) {
 				{1735372, 1677557088, ID{Hash: checksumToBytes(0xf7f9bc08), Next: 0}},          // First Shanghai block
 			},
 		},
+		// Holesky test cases
+		{
+			"holesky",
+			params.HoleskyChainConfig,
+			core.GenesisToBlock(params.DefaultHoleskyGenesisBlock(), nil),
+			[]testcase{
+				{0, 0, ID{Hash: checksumToBytes(0xc61a6098), Next: 1696000704}},   // Unsynced, last Frontier, Homestead, Tangerine, Spurious, Byzantium, Constantinople, Petersburg, Istanbul, Berlin, London, Paris block
+				{123, 0, ID{Hash: checksumToBytes(0xc61a6098), Next: 1696000704}}, // First MergeNetsplit block
+				{123, 1696000704, ID{Hash: checksumToBytes(0xfd4f016b), Next: 0}}, // Last MergeNetsplit block
+			},
+		},
 		{
 			"classic",
 			params.ClassicChainConfig,
-			params.MainnetGenesisHash,
+			core.GenesisToBlock(params.DefaultClassicGenesisBlock(), nil),
 			[]testcase{
 				{0, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
 				{1, 0, ID{Hash: checksumToBytes(0xfc64ec04), Next: 1150000}},
@@ -167,7 +182,7 @@ func TestCreation(t *testing.T) {
 		{
 			"mordor",
 			params.MordorChainConfig,
-			params.MordorGenesisHash,
+			core.GenesisToBlock(params.DefaultMordorGenesisBlock(), nil),
 			[]testcase{
 				{0, 0, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
 				{1, 0, ID{Hash: checksumToBytes(0x175782aa), Next: 301243}},
@@ -198,7 +213,7 @@ func TestCreation(t *testing.T) {
 		{
 			"mintme",
 			params.MintMeChainConfig,
-			params.MintMeGenesisHash,
+			core.GenesisToBlock(params.DefaultMintMeGenesisBlock(), nil),
 			[]testcase{
 				{0, 0, ID{Hash: checksumToBytes(0x02bf4180), Next: 252500}},
 				{252500, 0, ID{Hash: checksumToBytes(0x50aed09f), Next: 0}},
@@ -454,7 +469,7 @@ func TestValidation(t *testing.T) {
 		// {params.MainnetChainConfig, 20999999, 1677999999, ID{Hash: checksumToBytes(0x71147644), Next: 1678000000}, ErrLocalIncompatibleOrStale},
 	}
 	for i, tt := range tests {
-		filter := newFilter(tt.config, params.MainnetGenesisHash, func() (uint64, uint64) { return tt.head, tt.time })
+		filter := newFilter(tt.config, core.GenesisToBlock(params.DefaultGenesisBlock(), nil), func() (uint64, uint64) { return tt.head, tt.time })
 		if err := filter(tt.id); err != tt.err {
 			t.Errorf("test %d, head: %d: validation error mismatch: have %v, want %v\nConfig=%s", i, tt.head, err, tt.err, tt.config)
 		}
@@ -548,7 +563,7 @@ func TestGatherForks(t *testing.T) {
 		return true
 	}
 	for _, c := range cases {
-		blockForks, timeForks := gatherForks(c.config)
+		blockForks, timeForks := gatherForks(c.config, 0)
 		if !slicesEquivalent(blockForks, c.blockForks) {
 			t.Errorf("config=%s block forks mismatch: have %v, want %v", c.name, blockForks, c.blockForks)
 		}
@@ -566,7 +581,7 @@ func TestGenerateSpecificationCases(t *testing.T) {
 	}
 	type testCaseJSON struct {
 		ChainConfig *coregeth.CoreGethChainConfig `json:"geth_chain_config"`
-		GenesisHash common.Hash                   `json:"genesis_hash"`
+		Genesis     *types.Block                  `json:"genesis_hash"`
 		Head        uint64                        `json:"head"`
 		ForkHash    common.Hash                   `json:"fork_hash"`
 		ForkNext    uint64                        `json:"fork_next"`
@@ -576,50 +591,35 @@ func TestGenerateSpecificationCases(t *testing.T) {
 	generatedCases := []*testCaseJSON{}
 
 	tests := []struct {
-		name        string
-		config      ctypes.ChainConfigurator
-		genesisHash common.Hash
+		name    string
+		config  ctypes.ChainConfigurator
+		genesis *types.Block
 	}{
 		{"Ethereum Classic Mainnet (ETC)",
 			params.ClassicChainConfig,
-			params.MainnetGenesisHash,
+			core.GenesisToBlock(params.DefaultClassicGenesisBlock(), nil),
 		},
 		{
 			"Mordor",
 			params.MordorChainConfig,
-			params.MordorGenesisHash,
-		},
-		{
-			"Morden",
-			&coregeth.CoreGethChainConfig{
-				Ethash:            &ctypes.EthashConfig{},
-				EIP2FBlock:        big.NewInt(494000),
-				EIP150Block:       big.NewInt(1783000),
-				EIP155Block:       big.NewInt(1915000),
-				ECIP1017FBlock:    big.NewInt(2000000),
-				ECIP1017EraRounds: big.NewInt(2000000),
-				DisposalBlock:     big.NewInt(2300000),
-				EIP198FBlock:      big.NewInt(4729274), // Atlantis
-				EIP1052FBlock:     big.NewInt(5000381), // Agharta
-			},
-			common.HexToHash("0cd786a2425d16f152c658316c423e6ce1181e15c3295826d7c9904cba9ce303"),
+			core.GenesisToBlock(params.DefaultMordorGenesisBlock(), nil),
 		},
 		{
 			"MintMe",
 			params.MintMeChainConfig,
-			params.MintMeGenesisHash,
+			core.GenesisToBlock(params.DefaultMintMeGenesisBlock(), nil),
 		},
 	}
 	for _, tt := range tests {
 		cs := []uint64{0}
-		blockForks, _ := gatherForks(tt.config)
+		blockForks, _ := gatherForks(tt.config, tt.genesis.Time())
 		for _, f := range blockForks {
 			cs = append(cs, f-1, f, f+1)
 		}
 		fmt.Printf("##### %s\n", tt.name)
 		fmt.Println()
-		fmt.Printf("- Genesis Hash: `0x%x`\n", tt.genesisHash)
-		forks, _ := gatherForks(tt.config)
+		fmt.Printf("- Genesis Hash: `0x%x`\n", tt.genesis.Hash())
+		forks, _ := gatherForks(tt.config, 441806400)
 		forksS := []string{}
 		for _, fi := range forks {
 			forksS = append(forksS, strconv.Itoa(int(fi)))
@@ -629,7 +629,7 @@ func TestGenerateSpecificationCases(t *testing.T) {
 		fmt.Println("| Head Block Number | `FORK_HASH` | `FORK_NEXT` | RLP Encoded (Hex) |")
 		fmt.Println("| --- | --- | --- | --- |")
 		for _, c := range cs {
-			id := NewID(tt.config, tt.genesisHash, c, 0)
+			id := NewID(tt.config, tt.genesis, c, 0)
 			isCanonical := false
 			for _, fi := range forks {
 				if c == fi {
@@ -650,7 +650,7 @@ func TestGenerateSpecificationCases(t *testing.T) {
 			}
 			generatedCases = append(generatedCases, &testCaseJSON{
 				ChainConfig: gethConfig,
-				GenesisHash: tt.genesisHash,
+				Genesis:     tt.genesis,
 				Head:        c,
 				ForkHash:    common.BytesToHash(id.Hash[:]),
 				ForkNext:    id.Next,
@@ -660,5 +660,57 @@ func TestGenerateSpecificationCases(t *testing.T) {
 		fmt.Println()
 		fmt.Println()
 		t.Log("generated cases", generatedCases)
+	}
+}
+
+// Tests that time-based forks which are active at genesis are not included in
+// forkid hash.
+func TestTimeBasedForkInGenesis(t *testing.T) {
+	var (
+		time       = uint64(1690475657)
+		genesis    = types.NewBlockWithHeader(&types.Header{Time: time})
+		forkidHash = checksumToBytes(crc32.ChecksumIEEE(genesis.Hash().Bytes()))
+		config     = func(shanghai, cancun uint64) ctypes.ChainConfigurator {
+			return &goethereum.ChainConfig{
+				ChainID:                       big.NewInt(1337),
+				HomesteadBlock:                big.NewInt(0),
+				DAOForkBlock:                  nil,
+				DAOForkSupport:                true,
+				EIP150Block:                   big.NewInt(0),
+				EIP155Block:                   big.NewInt(0),
+				EIP158Block:                   big.NewInt(0),
+				ByzantiumBlock:                big.NewInt(0),
+				ConstantinopleBlock:           big.NewInt(0),
+				PetersburgBlock:               big.NewInt(0),
+				IstanbulBlock:                 big.NewInt(0),
+				MuirGlacierBlock:              big.NewInt(0),
+				BerlinBlock:                   big.NewInt(0),
+				LondonBlock:                   big.NewInt(0),
+				TerminalTotalDifficulty:       big.NewInt(0),
+				TerminalTotalDifficultyPassed: true,
+				MergeNetsplitBlock:            big.NewInt(0),
+				ShanghaiTime:                  &shanghai,
+				CancunTime:                    &cancun,
+				Ethash:                        new(ctypes.EthashConfig),
+			}
+		}
+	)
+	tests := []struct {
+		config ctypes.ChainConfigurator
+		want   ID
+	}{
+		// Shanghai active before genesis, skip
+		{config(time-1, time+1), ID{Hash: forkidHash, Next: time + 1}},
+
+		// Shanghai active at genesis, skip
+		{config(time, time+1), ID{Hash: forkidHash, Next: time + 1}},
+
+		// Shanghai not active, skip
+		{config(time+1, time+2), ID{Hash: forkidHash, Next: time + 1}},
+	}
+	for _, tt := range tests {
+		if have := NewID(tt.config, genesis, 0, time); have != tt.want {
+			t.Fatalf("incorrect forkid hash: have %x, want %x", have, tt.want)
+		}
 	}
 }

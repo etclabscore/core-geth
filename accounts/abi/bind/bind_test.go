@@ -2123,44 +2123,16 @@ func TestGolangBindings(t *testing.T) {
 	pwd, _ := os.Getwd()
 	repoRoot := filepath.Join(pwd, "..", "..", "..")
 
-	replacer := exec.Command(gocmd, "mod", "edit", "-replace", "github.com/ethereum/go-ethereum="+repoRoot) // Repo root
+	replacer := exec.Command(gocmd, "mod", "edit", "-x", "-require", "github.com/ethereum/go-ethereum@v0.0.0", "-replace", "github.com/ethereum/go-ethereum="+repoRoot) // Repo root
 	replacer.Dir = pkg
 	if out, err := replacer.CombinedOutput(); err != nil {
 		t.Fatalf("failed to replace binding test 'replace' dependency to current source tree: %v\n%s", err, out)
 	}
 
-	tidyer := exec.Command(gocmd, "mod", "tidy")
-	tidyer.Dir = pkg
-	if out, err := tidyer.CombinedOutput(); err != nil {
-		t.Log("WARN: go mod tidy errored", err, string(out))
-		// The use of flag -compat=1.17 solves test error as follows:
-		/*
-				...
-				       bindtest imports
-				                github.com/ethereum/go-ethereum/core/types tested by
-				                github.com/ethereum/go-ethereum/core/types.test imports
-				                github.com/ethereum/go-ethereum/core/rawdb imports
-				                github.com/prometheus/tsdb/fileutil tested by
-				                github.com/prometheus/tsdb/fileutil.test imports
-				                github.com/prometheus/tsdb/testutil imports
-				                github.com/go-kit/kit/log imports
-				                github.com/go-logfmt/logfmt loaded from github.com/go-logfmt/logfmt@v0.3.0,
-				                but go 1.16 would select v0.4.0
-				...
-
-			        To upgrade to the versions selected by go 1.16:
-			                go mod tidy -go=1.16 && go mod tidy -go=1.17
-			        If reproducibility with go 1.16 is not needed:
-			                go mod tidy -compat=1.17
-			        For other options, see:
-			                https://golang.org/doc/modules/pruning
-
-		*/
-		tidyer = exec.Command(gocmd, "mod", "tidy", "-compat=1.17")
-		tidyer.Dir = pkg
-		if out, err := tidyer.CombinedOutput(); err != nil {
-			t.Fatal(err, string(out))
-		}
+	tidier := exec.Command(gocmd, "mod", "tidy")
+	tidier.Dir = pkg
+	if out, err := tidier.CombinedOutput(); err != nil {
+		t.Fatalf("failed to tidy Go module file: %v\n%s", err, out)
 	}
 
 	// Test the entire package and report any failures

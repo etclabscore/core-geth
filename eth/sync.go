@@ -201,8 +201,8 @@ func (cs *chainSyncer) nextSyncOp() *chainSyncOp {
 	} else if minPeers > cs.handler.maxPeers {
 		minPeers = cs.handler.maxPeers
 	}
-	if cs.handler.peers.len() < minArtificialFinalityPeers {
-		if cs.handler.chain.IsArtificialFinalityEnabled() {
+	if cs.handler.chain.IsArtificialFinalityEnabled() {
+		if cs.handler.peers.len() < minArtificialFinalityPeers {
 			// If artificial finality state is forcefully set (overridden) this will just be a noop.
 			cs.handler.chain.EnableArtificialFinality(false, "reason", "low peers", "peers", cs.handler.peers.len())
 		}

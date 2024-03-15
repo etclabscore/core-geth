@@ -41,6 +41,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/ethereum/go-ethereum/trie/trienode"
 )
 
 var (
@@ -907,7 +908,7 @@ func (p *clientPeer) replyReceiptsRLP(reqID uint64, receipts []rlp.RawValue) *re
 }
 
 // replyProofsV2 creates a reply with a batch of merkle proofs, corresponding to the ones requested.
-func (p *clientPeer) replyProofsV2(reqID uint64, proofs light.NodeList) *reply {
+func (p *clientPeer) replyProofsV2(reqID uint64, proofs trienode.ProofList) *reply {
 	data, _ := rlp.EncodeToBytes(proofs)
 	return &reply{p.rw, ProofsV2Msg, reqID, data}
 }
@@ -1046,16 +1047,6 @@ func (p *clientPeer) Handshake(td *big.Int, head common.Hash, headNum uint64, ge
 		*lists = (*lists).add("flowControl/MRC", costList)
 		p.fcCosts = costList.decode(ProtocolLengths[uint(p.version)])
 		p.fcParams = server.defParams
-
-		// Add advertised checkpoint and register block height which
-		// client can verify the checkpoint validity.
-		if server.oracle != nil && server.oracle.IsRunning() {
-			cp, height := server.oracle.StableCheckpoint()
-			if cp != nil {
-				*lists = (*lists).add("checkpoint/value", cp)
-				*lists = (*lists).add("checkpoint/registerHeight", height)
-			}
-		}
 	}, func(recv keyValueMap) error {
 		p.server = recv.get("flowControl/MRR", nil) == nil
 		if p.server {

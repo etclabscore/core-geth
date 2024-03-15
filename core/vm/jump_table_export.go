@@ -23,7 +23,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
-// LookupInstructionSet returns the instructionset for the fork configured by
+// LookupInstructionSet returns the instruction set for the fork configured by
 // the rules.
 // PTAL(meowsbits)
 func LookupInstructionSet(config ctypes.ChainConfigurator, blockN *big.Int, blockTime *uint64) (JumpTable, error) {
@@ -34,7 +34,7 @@ func LookupInstructionSet(config ctypes.ChainConfigurator, blockN *big.Int, bloc
 	return JumpTable{}, errors.New("no instruction set available")
 }
 
-// Stack returns the mininum and maximum stack requirements.
+// Stack returns the minimum and maximum stack requirements.
 func (op *operation) Stack() (int, int) {
 	return op.minStack, op.maxStack
 }

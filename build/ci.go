@@ -125,15 +125,15 @@ var (
 	// Distros for which packages are created.
 	// Note: vivid is unsupported because there is no golang-1.6 package for it.
 	// Note: the following Ubuntu releases have been officially deprecated on Launchpad:
-	//   wily, yakkety, zesty, artful, cosmic, disco, eoan, groovy, hirsuite, impish
+	//   wily, yakkety, zesty, artful, cosmic, disco, eoan, groovy, hirsuite, impish,
+	//   kinetic
 	debDistroGoBoots = map[string]string{
-		"trusty":  "golang-1.11", // EOL: 04/2024
-		"xenial":  "golang-go",   // EOL: 04/2026
-		"bionic":  "golang-go",   // EOL: 04/2028
-		"focal":   "golang-go",   // EOL: 04/2030
-		"jammy":   "golang-go",   // EOL: 04/2032
-		"kinetic": "golang-go",   // EOL: 07/2023
-		"lunar":   "golang-go",   // EOL: 01/2024
+		"trusty": "golang-1.11", // EOL: 04/2024
+		"xenial": "golang-go",   // EOL: 04/2026
+		"bionic": "golang-go",   // EOL: 04/2028
+		"focal":  "golang-go",   // EOL: 04/2030
+		"jammy":  "golang-go",   // EOL: 04/2032
+		"lunar":  "golang-go",   // EOL: 01/2024
 	}
 
 	debGoBootPaths = map[string]string{
@@ -141,18 +141,8 @@ var (
 		"golang-go":   "/usr/lib/go",
 	}
 
-	// This is the version of Go that will be downloaded by
-	//
-	//     go run ci.go install -dlgo
-	dlgoVersion = "1.20.7"
-
-	// This is the version of Go that will be used to bootstrap the PPA builder.
-	//
-	// This version is fine to be old and full of security holes, we just use it
-	// to build the latest Go. Don't change it. If it ever becomes insufficient,
-	// we need to switch over to a recursive builder to jumpt across supported
-	// versions.
-	gobootVersion = "1.19.6"
+	// This is where the tests should be unpacked.
+	executionSpecTestsDir = "tests/spec-tests"
 )
 
 var GOBIN, _ = filepath.Abs(filepath.Join("build", "bin"))
@@ -190,6 +180,8 @@ func main() {
 		doWindowsInstaller(os.Args[2:])
 	case "purge":
 		doPurge(os.Args[2:])
+	case "sanitycheck":
+		doSanityCheck()
 	default:
 		log.Fatal("unknown command ", os.Args[1])
 	}
@@ -211,9 +203,8 @@ func doInstall(cmdline []string) {
 	tc := build.GoToolchain{GOARCH: *arch, CC: *cc}
 	if *dlgo {
 		csdb := build.MustLoadChecksums("build/checksums.txt")
-		tc.Root = build.DownloadGo(csdb, dlgoVersion)
+		tc.Root = build.DownloadGo(csdb)
 	}
-
 	// Disable CLI markdown doc generation in release builds.
 	buildTags := []string{"urfave_cli_no_docs"}
 
@@ -305,15 +296,20 @@ func doTest(cmdline []string) {
 		coverage = flag.Bool("coverage", false, "Whether to record code coverage")
 		verbose  = flag.Bool("v", false, "Whether to log verbosely")
 		race     = flag.Bool("race", false, "Execute the race detector")
+		short    = flag.Bool("short", false, "Pass the 'short'-flag to go test")
+		cachedir = flag.String("cachedir", "./build/cache", "directory for caching downloads")
 		timeout  = flag.String("timeout", "", "Timeout limit")
 	)
 	flag.CommandLine.Parse(cmdline)
 
+	// Get test fixtures.
+	csdb := build.MustLoadChecksums("build/checksums.txt")
+	downloadSpecTestFixtures(csdb, *cachedir)
+
 	// Configure the toolchain.
 	tc := build.GoToolchain{GOARCH: *arch, CC: *cc}
 	if *dlgo {
-		csdb := build.MustLoadChecksums("build/checksums.txt")
-		tc.Root = build.DownloadGo(csdb, dlgoVersion)
+		tc.Root = build.DownloadGo(csdb)
 	}
 	gotest := tc.Go("test")
 
@@ -322,6 +318,9 @@ func doTest(cmdline []string) {
 
 	// Enable CKZG backend in CI.
 	gotest.Args = append(gotest.Args, "-tags=ckzg")
+
+	// Enable integration-tests
+	gotest.Args = append(gotest.Args, "-tags=integrationtests")
 
 	// Test a single package at a time. CI builders are slow
 	// and some tests run into timeouts under load.
@@ -338,6 +337,9 @@ func doTest(cmdline []string) {
 	if *timeout != "" {
 		gotest.Args = append(gotest.Args, "-timeout", *timeout)
 	}
+	if *short {
+		gotest.Args = append(gotest.Args, "-short")
+	}
 
 	packages := []string{"./..."}
 	if len(flag.CommandLine.Args()) > 0 {
@@ -345,6 +347,25 @@ func doTest(cmdline []string) {
 	}
 	gotest.Args = append(gotest.Args, packages...)
 	build.MustRun(gotest)
+}
+
+// downloadSpecTestFixtures downloads and extracts the execution-spec-tests fixtures.
+func downloadSpecTestFixtures(csdb *build.ChecksumDB, cachedir string) string {
+	executionSpecTestsVersion, err := build.Version(csdb, "spec-tests")
+	if err != nil {
+		log.Fatal(err)
+	}
+	ext := ".tar.gz"
+	base := "fixtures_develop" // TODO(MariusVanDerWijden) rename once the version becomes part of the filename
+	url := fmt.Sprintf("https://github.com/ethereum/execution-spec-tests/releases/download/v%s/%s%s", executionSpecTestsVersion, base, ext)
+	archivePath := filepath.Join(cachedir, base+ext)
+	if err := csdb.DownloadFile(url, archivePath); err != nil {
+		log.Fatal(err)
+	}
+	if err := build.ExtractArchive(archivePath, executionSpecTestsDir); err != nil {
+		log.Fatal(err)
+	}
+	return filepath.Join(cachedir, base)
 }
 
 // doLint runs golangci-lint on requested packages.
@@ -366,9 +387,11 @@ func doLint(cmdline []string) {
 
 // downloadLinter downloads and unpacks golangci-lint.
 func downloadLinter(cachedir string) string {
-	const version = "1.51.1"
-
 	csdb := build.MustLoadChecksums("build/checksums.txt")
+	version, err := build.Version(csdb, "golangci")
+	if err != nil {
+		log.Fatal(err)
+	}
 	arch := runtime.GOARCH
 	ext := ".tar.gz"
 
@@ -750,6 +773,10 @@ func doDebianSource(cmdline []string) {
 // to bootstrap the builder Go.
 func downloadGoBootstrapSources(cachedir string) string {
 	csdb := build.MustLoadChecksums("build/checksums.txt")
+	gobootVersion, err := build.Version(csdb, "ppa-builder")
+	if err != nil {
+		log.Fatal(err)
+	}
 	file := fmt.Sprintf("go%s.src.tar.gz", gobootVersion)
 	url := "https://dl.google.com/go/" + file
 	dst := filepath.Join(cachedir, file)
@@ -762,6 +789,10 @@ func downloadGoBootstrapSources(cachedir string) string {
 // downloadGoSources downloads the Go source tarball.
 func downloadGoSources(cachedir string) string {
 	csdb := build.MustLoadChecksums("build/checksums.txt")
+	dlgoVersion, err := build.Version(csdb, "golang")
+	if err != nil {
+		log.Fatal(err)
+	}
 	file := fmt.Sprintf("go%s.src.tar.gz", dlgoVersion)
 	url := "https://dl.google.com/go/" + file
 	dst := filepath.Join(cachedir, file)
@@ -1087,4 +1118,8 @@ func doPurge(cmdline []string) {
 	if err := build.AzureBlobstoreDelete(auth, blobs); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func doSanityCheck() {
+	build.DownloadAndVerifyChecksums(build.MustLoadChecksums("build/checksums.txt"))
 }

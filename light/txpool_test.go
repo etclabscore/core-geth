@@ -32,6 +32,7 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
+	"github.com/ethereum/go-ethereum/trie"
 )
 
 type testTxRelay struct {
@@ -98,7 +99,7 @@ func TestTxPool(t *testing.T) {
 		panic(err)
 	}
 
-	core.MustCommitGenesis(ldb, gspec)
+	core.MustCommitGenesis(ldb, trie.NewDatabase(ldb, trie.HashDefaults), gspec)
 	odr := &testOdr{sdb: sdb, ldb: ldb, serverState: blockchain.StateCache(), indexerConfig: TestClientIndexerConfig}
 	relay := &testTxRelay{
 		send:    make(chan int, 1),

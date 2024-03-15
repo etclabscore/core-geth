@@ -228,9 +228,9 @@ func New(checkpoint uint64, stateDb ethdb.Database, mux *event.TypeMux, chain Bl
 		stateCh:        make(chan dataPack),
 		SnapSyncer:     snap.NewSyncer(stateDb, rawdb.HashScheme),
 		stateSyncStart: make(chan *stateSync),
-		//syncStatsState: stateSyncStats{
+		// syncStatsState: stateSyncStats{
 		//	processed: rawdb.ReadFastTrieProgress(stateDb),
-		//},
+		// },
 		trackStateReq: make(chan *stateReq),
 	}
 	go dl.stateFetcher()
@@ -265,8 +265,8 @@ func (d *Downloader) Progress() ethereum.SyncProgress {
 		StartingBlock: d.syncStatsChainOrigin,
 		CurrentBlock:  current,
 		HighestBlock:  d.syncStatsChainHeight,
-		//PulledStates:  d.syncStatsState.processed,
-		//KnownStates:   d.syncStatsState.processed + d.syncStatsState.pending,
+		// PulledStates:  d.syncStatsState.processed,
+		// KnownStates:   d.syncStatsState.processed + d.syncStatsState.pending,
 	}
 }
 

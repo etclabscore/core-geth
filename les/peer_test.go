@@ -34,6 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/trie"
 )
 
 type testServerPeerSub struct {
@@ -101,7 +102,8 @@ type fakeChain struct{}
 
 func (f *fakeChain) Config() ctypes.ChainConfigurator { return params.MainnetChainConfig }
 func (f *fakeChain) Genesis() *types.Block {
-	return core.MustCommitGenesis(rawdb.NewMemoryDatabase(), params.DefaultGenesisBlock())
+	mem := rawdb.NewMemoryDatabase()
+	return core.MustCommitGenesis(mem, trie.NewDatabase(mem, nil), params.DefaultGenesisBlock())
 }
 func (f *fakeChain) CurrentHeader() *types.Header { return &types.Header{Number: big.NewInt(10000000)} }
 
@@ -126,8 +128,8 @@ func TestHandshake(t *testing.T) {
 		genesis = common.HexToHash("cafebabe")
 
 		chain1, chain2   = &fakeChain{}, &fakeChain{}
-		forkID1          = forkid.NewID(chain1.Config(), chain1.Genesis().Hash(), chain1.CurrentHeader().Number.Uint64(), chain1.CurrentHeader().Time)
-		forkID2          = forkid.NewID(chain2.Config(), chain2.Genesis().Hash(), chain2.CurrentHeader().Number.Uint64(), chain2.CurrentHeader().Time)
+		forkID1          = forkid.NewID(chain1.Config(), chain1.Genesis(), chain1.CurrentHeader().Number.Uint64(), chain1.CurrentHeader().Time)
+		forkID2          = forkid.NewID(chain2.Config(), chain2.Genesis(), chain2.CurrentHeader().Number.Uint64(), chain2.CurrentHeader().Time)
 		filter1, filter2 = forkid.NewFilter(chain1), forkid.NewFilter(chain2)
 	)
 

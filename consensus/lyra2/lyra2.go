@@ -54,7 +54,7 @@ func New(config *Config, notify []string, noverify bool) *Lyra2 {
 		fakeFail:  config.FakeFail,
 		fakeDelay: config.FakeDelay,
 		log:       log.Root(),
-		hashrate:  metrics.NewMeterForced(),
+		hashrate:  metrics.NewMeter(),
 		update:    make(chan struct{}),
 	}
 	if config.Log != nil {
@@ -73,7 +73,7 @@ func NewTester(notify []string, noverify bool) *Lyra2 {
 		fakeFail:  0,
 		fakeDelay: 0,
 		log:       log.Root(),
-		hashrate:  metrics.NewMeterForced(),
+		hashrate:  metrics.NewMeter(),
 		update:    make(chan struct{}),
 	}
 	lyra2.remote = startRemoteSealer(lyra2, notify, noverify)
@@ -125,7 +125,7 @@ func (lyra2 *Lyra2) APIs(chain consensus.ChainHeaderReader) []rpc.API {
 }
 
 func (lyra2 *Lyra2) Hashrate() float64 {
-	return lyra2.hashrate.Rate1()
+	return lyra2.hashrate.Snapshot().Rate1()
 }
 
 // Threads returns the number of mining threads currently enabled. This doesn't

@@ -637,6 +637,16 @@ func (c *CoreGethChainConfig) SetEIP4844TransitionTime(n *uint64) error {
 	return nil
 }
 
+// GetEIP7516TransitionTime EIP7516: Blob Base Fee Opcode
+func (c *CoreGethChainConfig) GetEIP7516TransitionTime() *uint64 {
+	return c.EIP7516FTime
+}
+
+func (c *CoreGethChainConfig) SetEIP7516TransitionTime(n *uint64) error {
+	c.EIP7516FTime = n
+	return nil
+}
+
 // GetEIP1153TransitionTime EIP1153: Transient Storage opcodes
 func (c *CoreGethChainConfig) GetEIP1153TransitionTime() *uint64 {
 	return c.EIP1153FTime
@@ -664,6 +674,77 @@ func (c *CoreGethChainConfig) GetEIP6780TransitionTime() *uint64 {
 
 func (c *CoreGethChainConfig) SetEIP6780TransitionTime(n *uint64) error {
 	c.EIP6780FTime = n
+	return nil
+}
+
+// GetEIP6780TransitionTime EIP4788: Beacon block root in the EVM
+func (c *CoreGethChainConfig) GetEIP4788TransitionTime() *uint64 {
+	return c.EIP4788FTime
+}
+
+func (c *CoreGethChainConfig) SetEIP4788TransitionTime(n *uint64) error {
+	c.EIP4788FTime = n
+	return nil
+}
+
+// Cancun by block
+// GetEIP4844Transition EIP4844: Shard Blob Transactions
+func (c *CoreGethChainConfig) GetEIP4844Transition() *uint64 {
+	return bigNewU64(c.EIP4844FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP4844Transition(n *uint64) error {
+	c.EIP4844FBlock = setBig(c.EIP4844FBlock, n)
+	return nil
+}
+
+// GetEIP7516Transition EIP7516: Blob Base Fee Opcode
+func (c *CoreGethChainConfig) GetEIP7516Transition() *uint64 {
+	return bigNewU64(c.EIP7516FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP7516Transition(n *uint64) error {
+	c.EIP7516FBlock = setBig(c.EIP7516FBlock, n)
+	return nil
+}
+
+// GetEIP1153Transition EIP1153: Transient Storage opcodes
+func (c *CoreGethChainConfig) GetEIP1153Transition() *uint64 {
+	return bigNewU64(c.EIP1153FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP1153Transition(n *uint64) error {
+	c.EIP1153FBlock = setBig(c.EIP1153FBlock, n)
+	return nil
+}
+
+// GetEIP5656Transition EIP5656: MCOPY - Memory copying instruction
+func (c *CoreGethChainConfig) GetEIP5656Transition() *uint64 {
+	return bigNewU64(c.EIP5656FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP5656Transition(n *uint64) error {
+	c.EIP5656FBlock = setBig(c.EIP5656FBlock, n)
+	return nil
+}
+
+// GetEIP6780Transition EIP6780: SELFDESTRUCT only in same transaction
+func (c *CoreGethChainConfig) GetEIP6780Transition() *uint64 {
+	return bigNewU64(c.EIP6780FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP6780Transition(n *uint64) error {
+	c.EIP6780FBlock = setBig(c.EIP6780FBlock, n)
+	return nil
+}
+
+// GetEIP6780Transition EIP4788: Beacon block root in the EVM
+func (c *CoreGethChainConfig) GetEIP4788Transition() *uint64 {
+	return bigNewU64(c.EIP4788FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP4788Transition(n *uint64) error {
+	c.EIP4788FBlock = setBig(c.EIP4788FBlock, n)
 	return nil
 }
 

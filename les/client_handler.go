@@ -32,8 +32,7 @@ import (
 	"github.com/ethereum/go-ethereum/light"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/params/vars"
+	"github.com/ethereum/go-ethereum/trie/trienode"
 )
 
 // clientHandler is responsible for receiving and processing all incoming server
@@ -41,7 +40,6 @@ import (
 type clientHandler struct {
 	ulc        *ulc
 	forkFilter forkid.Filter
-	checkpoint *ctypes.TrustedCheckpoint
 	fetcher    *lightFetcher
 	downloader *downloader.Downloader
 	backend    *LightEthereum
@@ -54,10 +52,9 @@ type clientHandler struct {
 	syncEnd   func(header *types.Header) // Hook called when the syncing is done
 }
 
-func newClientHandler(ulcServers []string, ulcFraction int, checkpoint *ctypes.TrustedCheckpoint, backend *LightEthereum) *clientHandler {
+func newClientHandler(ulcServers []string, ulcFraction int, backend *LightEthereum) *clientHandler {
 	handler := &clientHandler{
 		forkFilter: forkid.NewFilter(backend.blockchain),
-		checkpoint: checkpoint,
 		backend:    backend,
 		closeCh:    make(chan struct{}),
 	}
@@ -69,12 +66,8 @@ func newClientHandler(ulcServers []string, ulcFraction int, checkpoint *ctypes.T
 		handler.ulc = ulc
 		log.Info("Enable ultra light client mode")
 	}
-	var height uint64
-	if checkpoint != nil {
-		height = (checkpoint.SectionIndex+1)*vars.CHTFrequency - 1
-	}
 	handler.fetcher = newLightFetcher(backend.blockchain, backend.engine, backend.peers, handler.ulc, backend.chainDb, backend.reqDist, handler.synchronise)
-	handler.downloader = downloader.New(height, backend.chainDb, backend.eventMux, nil, backend.blockchain, handler.removePeer)
+	handler.downloader = downloader.New(0, backend.chainDb, backend.eventMux, nil, backend.blockchain, handler.removePeer)
 	handler.backend.peers.subscribe((*downloaderPeerNotify)(handler))
 	return handler
 }
@@ -111,7 +104,7 @@ func (h *clientHandler) handle(p *serverPeer, noInitAnnounce bool) error {
 	p.Log().Debug("Light Ethereum peer connected", "name", p.Name())
 
 	// Execute the LES handshake
-	forkid := forkid.NewID(h.backend.blockchain.Config(), h.backend.genesis, h.backend.blockchain.CurrentHeader().Number.Uint64(), h.backend.blockchain.CurrentHeader().Time)
+	forkid := forkid.NewID(h.backend.blockchain.Config(), h.backend.BlockChain().Genesis(), h.backend.blockchain.CurrentHeader().Number.Uint64(), h.backend.blockchain.CurrentHeader().Time)
 	if err := p.Handshake(h.backend.blockchain.Genesis().Hash(), forkid, h.forkFilter); err != nil {
 		p.Log().Debug("Light Ethereum handshake failed", "err", err)
 		return err
@@ -304,7 +297,7 @@ func (h *clientHandler) handleMsg(p *serverPeer) error {
 		p.Log().Trace("Received les/2 proofs response")
 		var resp struct {
 			ReqID, BV uint64
-			Data      light.NodeList
+			Data      trienode.ProofList
 		}
 		if err := msg.Decode(&resp); err != nil {
 			return errResp(ErrDecode, "msg %v: %v", msg, err)

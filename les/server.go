@@ -117,7 +117,6 @@ func NewLesServer(node *node.Node, e ethBackend, config *ethconfig.Config) (*Les
 	}
 	srv.handler = newServerHandler(srv, e.BlockChain(), e.ChainDb(), e.TxPool(), issync)
 	srv.costTracker, srv.minCapacity = newCostTracker(e.ChainDb(), config)
-	srv.oracle = srv.setupOracle(node, e.BlockChain().Genesis().Hash(), config)
 
 	// Initialize the bloom trie indexer.
 	e.BloomIndexer().AddChildIndexer(srv.bloomTrieIndexer)
@@ -143,11 +142,6 @@ func NewLesServer(node *node.Node, e ethBackend, config *ethconfig.Config) (*Les
 	srv.clientPool.SetDefaultFactors(defaultPosFactors, defaultNegFactors)
 	srv.vfluxServer.Register(srv.clientPool, "les", "Ethereum light client service")
 
-	checkpoint := srv.latestLocalCheckpoint()
-	if !checkpoint.Empty() {
-		log.Info("Loaded latest checkpoint", "section", checkpoint.SectionIndex, "head", checkpoint.SectionHead,
-			"chtroot", checkpoint.CHTRoot, "bloomroot", checkpoint.BloomRoot)
-	}
 	srv.chtIndexer.Start(e.BlockChain())
 
 	node.RegisterProtocols(srv.Protocols())

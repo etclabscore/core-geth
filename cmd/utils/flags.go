@@ -23,9 +23,6 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"github.com/ethereum/go-ethereum/consensus"
-	"github.com/ethereum/go-ethereum/consensus/ethashb3"
-	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"math"
 	"math/big"
 	"net"
@@ -38,6 +35,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/ethereum/go-ethereum/consensus"
+	"github.com/ethereum/go-ethereum/consensus/ethashb3"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
@@ -1227,8 +1228,8 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 			urls = params.ClassicBootnodes
 		case ctx.Bool(MintMeFlag.Name):
 			urls = params.MintMeBootnodes
-    case ctx.Bool(HypraFlag.Name):
-		  urls = params.HypraBootnodes
+		case ctx.Bool(HypraFlag.Name):
+			urls = params.HypraBootnodes
 		case ctx.Bool(MordorFlag.Name):
 			urls = params.MordorBootnodes
 		case ctx.Bool(SepoliaFlag.Name):

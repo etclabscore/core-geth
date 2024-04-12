@@ -603,7 +603,7 @@ func New(config Config, notify []string, noverify bool) *EthashB3 {
 		caches:   newlru(config.CachesInMem, newCache),
 		datasets: newlru(config.DatasetsInMem, newDataset),
 		update:   make(chan struct{}),
-		hashrate: metrics.NewMeterForced(),
+		hashrate: metrics.NewMeter(),
 	}
 	if config.PowMode == ModeShared {
 		ethash.shared = sharedEthash
@@ -789,7 +789,8 @@ func (ethashb3 *EthashB3) SetThreads(threads int) {
 func (ethashb3 *EthashB3) Hashrate() float64 {
 	// Short circuit if we are run the ethashb3 in normal/test mode.
 	if ethashb3.config.PowMode != ModeNormal && ethashb3.config.PowMode != ModeTest {
-		return ethashb3.hashrate.Rate1()
+		ms := ethashb3.hashrate.Snapshot()
+		return ms.Rate1()
 	}
 	var res = make(chan uint64, 1)
 
@@ -797,11 +798,14 @@ func (ethashb3 *EthashB3) Hashrate() float64 {
 	case ethashb3.remote.fetchRateCh <- res:
 	case <-ethashb3.remote.exitCh:
 		// Return local hashrate only if ethashb3 is stopped.
-		return ethashb3.hashrate.Rate1()
+		ms := ethashb3.hashrate.Snapshot()
+		return ms.Rate1()
+
 	}
 
 	// Gather total submitted hash rate of remote sealers.
-	return ethashb3.hashrate.Rate1() + float64(<-res)
+	ms := ethashb3.hashrate.Snapshot()
+	return ms.Rate1() + float64(<-res)
 }
 
 // APIs implements consensus.Engine, returning the user facing RPC APIs.

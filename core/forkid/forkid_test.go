@@ -220,10 +220,10 @@ func TestCreation(t *testing.T) {
 			},
 		},
 		{
-			name:    "Hypra",
-			config:  params.HypraChainConfig,
-			genesis: params.HypraGenesisHash,
-			cases: []testcase{
+			"Hypra",
+			params.HypraChainConfig,
+			core.GenesisToBlock(params.DefaultHypraGenesisBlock(), nil),
+			[]testcase{
 				{0, 0, ID{Hash: checksumToBytes(0x61aefa70), Next: 1001}},
 				{1000, 0, ID{Hash: checksumToBytes(0x61aefa70), Next: 1001}},
 				{1001, 0, ID{Hash: checksumToBytes(0x7cc30c12), Next: 5503}},

@@ -821,6 +821,9 @@ func (c *ChainConfig) GetConsensusEngineType() ctypes.ConsensusEngineT {
 	if c.Lyra2 != nil {
 		return ctypes.ConsensusEngineT_Lyra2
 	}
+	if c.EthashB3 != nil {
+		return ctypes.ConsensusEngineT_EthashB3
+	}
 	return ctypes.ConsensusEngineT_Ethash
 }
 
@@ -828,15 +831,24 @@ func (c *ChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) erro
 	switch t {
 	case ctypes.ConsensusEngineT_Ethash:
 		c.Ethash = new(ctypes.EthashConfig)
+		c.EthashB3 = nil
+		c.Clique = nil
+		return nil
+	case ctypes.ConsensusEngineT_EthashB3:
+		c.EthashB3 = new(ctypes.EthashB3Config)
+		c.Lyra2 = nil
+		c.Ethash = nil
 		c.Clique = nil
 		return nil
 	case ctypes.ConsensusEngineT_Clique:
 		c.Clique = new(ctypes.CliqueConfig)
 		c.Ethash = nil
+		c.EthashB3 = nil
 		return nil
 	case ctypes.ConsensusEngineT_Lyra2:
 		c.Lyra2 = new(ctypes.Lyra2Config)
 		c.Ethash = nil
+		c.EthashB3 = nil
 		c.Clique = nil
 		return nil
 	default:
@@ -1002,14 +1014,15 @@ func (c *ChainConfig) SetEthashEIP1234Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEthashEIP2384Transition() *uint64 {
-	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
+	engine := c.GetConsensusEngineType()
+	if engine != ctypes.ConsensusEngineT_Ethash && engine != ctypes.ConsensusEngineT_EthashB3 {
 		return nil
 	}
 	return bigNewU64(c.MuirGlacierBlock)
 }
 
 func (c *ChainConfig) SetEthashEIP2384Transition(n *uint64) error {
-	if c.Ethash == nil {
+	if c.Ethash == nil && c.EthashB3 == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
 	c.MuirGlacierBlock = setBig(c.MuirGlacierBlock, n)
@@ -1224,4 +1237,20 @@ func (c *ChainConfig) SetLyra2NonceTransition(n *uint64) error {
 	c.Lyra2NonceTransitionBlock = setBig(c.Lyra2NonceTransitionBlock, n)
 
 	return nil
+}
+
+func (c *ChainConfig) GetHIPVeldinTransition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetHIPVeldinTransition(_ *uint64) error {
+	return ctypes.ErrUnsupportedConfigNoop
+}
+
+func (c *ChainConfig) GetHIPGasparTransition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetHIPGasparTransition(_ *uint64) error {
+	return ctypes.ErrUnsupportedConfigNoop
 }

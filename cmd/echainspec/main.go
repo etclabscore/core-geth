@@ -48,6 +48,7 @@ var defaultChainspecValues = map[string]ctypes.Configurator{
 	"sepolia":    params.DefaultSepoliaGenesisBlock(),
 
 	"mintme": params.DefaultMintMeGenesisBlock(),
+	"hypra":  params.DefaultHypraGenesisBlock(),
 }
 
 var defaultChainspecNames = func() []string {

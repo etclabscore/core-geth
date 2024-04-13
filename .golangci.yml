@@ -12,6 +12,7 @@ run:
     - params/alloc_mintme.go
     - evmc/*
 
+
 linters:
   disable-all: true
   enable:
@@ -29,7 +30,7 @@ linters:
     - durationcheck
     - exportloopref
     - whitespace
-
+    - 
     # - structcheck # lots of false positives
     # - errcheck #lot of false positives
     # - contextcheck

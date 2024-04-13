@@ -386,6 +386,7 @@ func TestAccumulateRewards(t *testing.T) {
 		}
 
 		var header *types.Header = &types.Header{}
+		var txs []*types.Transaction = []*types.Transaction{}
 		var uncles []*types.Header = []*types.Header{{}, {}}
 
 		if i == 0 {
@@ -443,7 +444,7 @@ func TestAccumulateRewards(t *testing.T) {
 
 			totalB.Add(totalB, &blockWinner)
 
-			AccumulateRewards(config, stateDB, header, uncles)
+			AccumulateRewards(config, stateDB, header, uncles, txs)
 
 			// Check balances.
 			// t.Logf("config=%d block=%d era=%d w:%d u1:%d u2:%d", i, bn, new(big.Int).Add(era, big.NewInt(1)), blockWinner, uncleMiner1, uncleMiner2)

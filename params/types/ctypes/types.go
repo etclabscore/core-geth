@@ -273,12 +273,15 @@ const (
 	ConsensusEngineT_Ethash
 	ConsensusEngineT_Clique
 	ConsensusEngineT_Lyra2
+	ConsensusEngineT_EthashB3
 )
 
 func (c ConsensusEngineT) String() string {
 	switch c {
 	case ConsensusEngineT_Ethash:
 		return "ethash"
+	case ConsensusEngineT_EthashB3:
+		return "ethashb3"
 	case ConsensusEngineT_Clique:
 		return "clique"
 	case ConsensusEngineT_Lyra2:
@@ -290,6 +293,10 @@ func (c ConsensusEngineT) String() string {
 
 func (c ConsensusEngineT) IsEthash() bool {
 	return c == ConsensusEngineT_Ethash
+}
+
+func (c ConsensusEngineT) IsEthashB3() bool {
+	return c == ConsensusEngineT_EthashB3
 }
 
 func (c ConsensusEngineT) IsClique() bool {
@@ -387,4 +394,12 @@ type Lyra2Config struct{}
 // String implements the stringer interface, returning the consensus engine details.
 func (c *Lyra2Config) String() string {
 	return "lyra2"
+}
+
+// EthashB3Config is the consensus engine configs for proof-of-work based sealing.
+type EthashB3Config struct{}
+
+// String implements the stringer interface, returning the consensus engine details.
+func (c *EthashB3Config) String() string {
+	return "ethashb3"
 }

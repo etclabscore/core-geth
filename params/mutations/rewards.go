@@ -62,8 +62,17 @@ func GetRewards(config ctypes.ChainConfigurator, header *types.Header, uncles []
 
 // AccumulateRewards credits the coinbase of the given block with the mining
 // reward. The coinbase of each uncle block is also rewarded.
-func AccumulateRewards(config ctypes.ChainConfigurator, state *state.StateDB, header *types.Header, uncles []*types.Header) {
-	minerReward, uncleRewards := GetRewards(config, header, uncles)
+func AccumulateRewards(config ctypes.ChainConfigurator, state *state.StateDB, header *types.Header, uncles []*types.Header, txs []*types.Transaction) {
+	var minerReward *big.Int
+	var uncleRewards []*big.Int
+
+	if config.GetChainID().Uint64() == params.HypraChainId {
+		// Hypra has a unique miner reward system which requires the translations.
+		minerReward, uncleRewards = GetRewardsHypra(config, header, uncles, txs)
+	} else {
+		minerReward, uncleRewards = GetRewards(config, header, uncles)
+	}
+
 	for i, uncle := range uncles {
 		state.AddBalance(uncle.Coinbase, uncleRewards[i])
 	}

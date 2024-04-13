@@ -808,6 +808,9 @@ func (c *CoreGethChainConfig) GetConsensusEngineType() ctypes.ConsensusEngineT {
 	if c.Ethash != nil {
 		return ctypes.ConsensusEngineT_Ethash
 	}
+	if c.EthashB3 != nil {
+		return ctypes.ConsensusEngineT_EthashB3
+	}
 	if c.Clique != nil {
 		return ctypes.ConsensusEngineT_Clique
 	}
@@ -821,15 +824,26 @@ func (c *CoreGethChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngin
 	switch t {
 	case ctypes.ConsensusEngineT_Ethash:
 		c.Ethash = new(ctypes.EthashConfig)
+		c.EthashB3 = nil
 		c.Clique = nil
+		c.Lyra2 = nil
+		return nil
+	case ctypes.ConsensusEngineT_EthashB3:
+		c.EthashB3 = new(ctypes.EthashB3Config)
+		c.Ethash = nil
+		c.Clique = nil
+		c.Lyra2 = nil
 		return nil
 	case ctypes.ConsensusEngineT_Clique:
 		c.Clique = new(ctypes.CliqueConfig)
 		c.Ethash = nil
+		c.EthashB3 = nil
+		c.Lyra2 = nil
 		return nil
 	case ctypes.ConsensusEngineT_Lyra2:
 		c.Lyra2 = new(ctypes.Lyra2Config)
 		c.Ethash = nil
+		c.EthashB3 = nil
 		c.Clique = nil
 		return nil
 	default:
@@ -906,7 +920,8 @@ func (c *CoreGethChainConfig) SetEthashDurationLimit(i *big.Int) error {
 }
 
 func (c *CoreGethChainConfig) GetEthashHomesteadTransition() *uint64 {
-	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
+	engine := c.GetConsensusEngineType()
+	if engine != ctypes.ConsensusEngineT_Ethash && engine != ctypes.ConsensusEngineT_EthashB3 {
 		return nil
 	}
 	if c.EIP2FBlock == nil || c.EIP7FBlock == nil {
@@ -1046,7 +1061,8 @@ func (c *CoreGethChainConfig) SetEthashEIP1234Transition(n *uint64) error {
 }
 
 func (c *CoreGethChainConfig) GetEthashEIP2384Transition() *uint64 {
-	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
+	engine := c.GetConsensusEngineType()
+	if engine != ctypes.ConsensusEngineT_Ethash && engine != ctypes.ConsensusEngineT_EthashB3 {
 		return nil
 	}
 	if c.eip2384Inferred {
@@ -1061,11 +1077,12 @@ func (c *CoreGethChainConfig) GetEthashEIP2384Transition() *uint64 {
 
 	// Get block number (key) from map where EIP2384 criteria is met.
 	diffN = ctypes.MapMeetsSpecification(c.DifficultyBombDelaySchedule, nil, vars.EIP2384DifficultyBombDelay, nil)
+
 	return diffN
 }
 
 func (c *CoreGethChainConfig) SetEthashEIP2384Transition(n *uint64) error {
-	if c.Ethash == nil {
+	if c.Ethash == nil && c.EthashB3 == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
 
@@ -1237,14 +1254,15 @@ func (c *CoreGethChainConfig) SetEthashECIP1017EraRounds(n *uint64) error {
 }
 
 func (c *CoreGethChainConfig) GetEthashEIP100BTransition() *uint64 {
-	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
+	engineType := c.GetConsensusEngineType()
+	if !(engineType == ctypes.ConsensusEngineT_Ethash || engineType == ctypes.ConsensusEngineT_EthashB3) {
 		return nil
 	}
 	return bigNewU64(c.EIP100FBlock)
 }
 
 func (c *CoreGethChainConfig) SetEthashEIP100BTransition(n *uint64) error {
-	if c.Ethash == nil {
+	if c.Ethash == nil || c.EthashB3 == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
 	c.EIP100FBlock = setBig(c.EIP100FBlock, n)
@@ -1334,14 +1352,15 @@ func (c *CoreGethChainConfig) SetEthashDifficultyBombDelaySchedule(m ctypes.Uint
 }
 
 func (c *CoreGethChainConfig) GetEthashBlockRewardSchedule() ctypes.Uint64BigMapEncodesHex {
-	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
+	engineType := c.GetConsensusEngineType()
+	if engineType != ctypes.ConsensusEngineT_Ethash && engineType != ctypes.ConsensusEngineT_EthashB3 {
 		return nil
 	}
 	return c.BlockRewardSchedule
 }
 
 func (c *CoreGethChainConfig) SetEthashBlockRewardSchedule(m ctypes.Uint64BigMapEncodesHex) error {
-	if c.Ethash == nil {
+	if c.Ethash == nil || c.EthashB3 == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
 	c.BlockRewardSchedule = m
@@ -1392,5 +1411,29 @@ func (c *CoreGethChainConfig) SetLyra2NonceTransition(n *uint64) error {
 
 	c.Lyra2NonceTransitionBlock = setBig(c.Lyra2NonceTransitionBlock, n)
 
+	return nil
+}
+
+func (c *CoreGethChainConfig) GetHIPVeldinTransition() *uint64 {
+	if c.GetChainID().Uint64() != 622277 {
+		return nil
+	}
+	return bigNewU64(c.HIPVeldinFBlock)
+}
+
+func (c *CoreGethChainConfig) SetHIPVeldinTransition(n *uint64) error {
+	c.HIPVeldinFBlock = setBig(c.HIPVeldinFBlock, n)
+	return nil
+}
+
+func (c *CoreGethChainConfig) GetHIPGasparTransition() *uint64 {
+	if c.GetChainID().Uint64() != 622277 {
+		return nil
+	}
+	return bigNewU64(c.HIPGasparFBlock)
+}
+
+func (c *CoreGethChainConfig) SetHIPGasparTransition(n *uint64) error {
+	c.HIPGasparFBlock = setBig(c.HIPGasparFBlock, n)
 	return nil
 }

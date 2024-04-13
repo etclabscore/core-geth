@@ -18,6 +18,7 @@
 package ethconfig
 
 import (
+	"github.com/ethereum/go-ethereum/consensus/ethashb3"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -75,6 +76,17 @@ var Defaults = Config{
 		DatasetsOnDisk:   2,
 		DatasetsLockMmap: false,
 	},
+
+	EthashB3: ethashb3.Config{
+		CacheDir:         "ethashb3",
+		CachesInMem:      2,
+		CachesOnDisk:     3,
+		CachesLockMmap:   false,
+		DatasetsInMem:    1,
+		DatasetsOnDisk:   2,
+		DatasetsLockMmap: false,
+	},
+
 	NetworkId:          0, // enable auto configuration of networkID == chainID
 	ProtocolVersions:   vars.DefaultProtocolVersions,
 	TxLookupLimit:      2350000,
@@ -106,15 +118,19 @@ func init() {
 	}
 	if runtime.GOOS == "darwin" {
 		Defaults.Ethash.DatasetDir = filepath.Join(home, "Library", "Ethash")
+		Defaults.EthashB3.DatasetDir = filepath.Join(home, "Library", "EthashB3")
 	} else if runtime.GOOS == "windows" {
 		localappdata := os.Getenv("LOCALAPPDATA")
 		if localappdata != "" {
 			Defaults.Ethash.DatasetDir = filepath.Join(localappdata, "Ethash")
+			Defaults.EthashB3.DatasetDir = filepath.Join(localappdata, "EthashB3")
 		} else {
 			Defaults.Ethash.DatasetDir = filepath.Join(home, "AppData", "Local", "Ethash")
+			Defaults.EthashB3.DatasetDir = filepath.Join(home, "AppData", "Local", "EthashB3")
 		}
 	} else {
 		Defaults.Ethash.DatasetDir = filepath.Join(home, ".ethash")
+		Defaults.EthashB3.DatasetDir = filepath.Join(home, ".ethashb3")
 	}
 }
 
@@ -190,6 +206,9 @@ type Config struct {
 	// Ethash options
 	Ethash ethash.Config
 
+	// EthashB3 options
+	EthashB3 ethashb3.Config
+
 	// Transaction pool options
 	TxPool   legacypool.Config
 	BlobPool blobpool.Config
@@ -245,13 +264,15 @@ type Config struct {
 }
 
 // CreateConsensusEngine creates a consensus engine for the given chain configuration.
-func CreateConsensusEngine(stack *node.Node, ethashConfig *ethash.Config, cliqueConfig *ctypes.CliqueConfig, lyra2Config *lyra2.Config, notify []string, noverify bool, db ethdb.Database) consensus.Engine {
+func CreateConsensusEngine(stack *node.Node, ethashConfig *ethash.Config, ethashb3Config *ethashb3.Config, cliqueConfig *ctypes.CliqueConfig, lyra2Config *lyra2.Config, notify []string, noverify bool, db ethdb.Database) consensus.Engine {
 	// If proof-of-authority is requested, set it up
 	var engine consensus.Engine
 	if cliqueConfig != nil {
 		engine = clique.New(cliqueConfig, db)
 	} else if lyra2Config != nil {
 		engine = lyra2.New(lyra2Config, notify, noverify)
+	} else if ethashb3Config != nil {
+		engine = CreateConsensusEngineEthashB3(stack, ethashb3Config, notify, noverify)
 	} else {
 		switch ethashConfig.PowMode {
 		case ethash.ModeFake:
@@ -285,4 +306,80 @@ func CreateConsensusEngine(stack *node.Node, ethashConfig *ethash.Config, clique
 	}
 
 	return beacon.New(engine)
+}
+
+func CreateConsensusEngineEthash(stack *node.Node, ethashConfig *ethash.Config, notify []string, noverify bool) (engine consensus.Engine) {
+	switch ethashConfig.PowMode {
+	case ethash.ModeFake:
+		log.Warn("Ethash used in fake mode")
+		engine = ethash.NewFaker()
+	case ethash.ModeTest:
+		log.Warn("Ethash used in test mode")
+		engine = ethash.NewTester(nil, noverify)
+	case ethash.ModeShared:
+		log.Warn("Ethash used in shared mode")
+		engine = ethash.NewShared()
+	case ethash.ModePoissonFake:
+		log.Warn("Ethash used in fake Poisson mode")
+		engine = ethash.NewPoissonFaker()
+	default:
+		engine = ethash.New(ethash.Config{
+			PowMode:          ethashConfig.PowMode,
+			CacheDir:         stack.ResolvePath(ethashConfig.CacheDir),
+			CachesInMem:      ethashConfig.CachesInMem,
+			CachesOnDisk:     ethashConfig.CachesOnDisk,
+			CachesLockMmap:   ethashConfig.CachesLockMmap,
+			DatasetDir:       ethashConfig.DatasetDir,
+			DatasetsInMem:    ethashConfig.DatasetsInMem,
+			DatasetsOnDisk:   ethashConfig.DatasetsOnDisk,
+			DatasetsLockMmap: ethashConfig.DatasetsLockMmap,
+			NotifyFull:       ethashConfig.NotifyFull,
+			ECIP1099Block:    ethashConfig.ECIP1099Block,
+		}, notify, noverify)
+		engine.(*ethash.Ethash).SetThreads(-1) // Disable CPU mining
+	}
+	engine = beacon.New(engine)
+	return
+}
+
+func CreateConsensusEngineEthashB3(stack *node.Node, ethashb3Config *ethashb3.Config, notify []string, noverify bool) (engine consensus.Engine) {
+	switch ethashb3Config.PowMode {
+	case ethashb3.ModeFake:
+		log.Warn("EthashB3 used in fake mode")
+		engine = ethashb3.NewFaker()
+	case ethashb3.ModeTest:
+		log.Warn("EthashB3 used in test mode")
+		engine = ethashb3.NewTester(nil, noverify)
+	case ethashb3.ModeShared:
+		log.Warn("EthashB3 used in shared mode")
+		engine = ethashb3.NewShared()
+	case ethashb3.ModePoissonFake:
+		log.Warn("EthashB3 used in fake Poisson mode")
+		engine = ethashb3.NewPoissonFaker()
+	default:
+		engine = ethashb3.New(ethashb3.Config{
+			PowMode:          ethashb3Config.PowMode,
+			CacheDir:         stack.ResolvePath(ethashb3Config.CacheDir),
+			CachesInMem:      ethashb3Config.CachesInMem,
+			CachesOnDisk:     ethashb3Config.CachesOnDisk,
+			CachesLockMmap:   ethashb3Config.CachesLockMmap,
+			DatasetDir:       ethashb3Config.DatasetDir,
+			DatasetsInMem:    ethashb3Config.DatasetsInMem,
+			DatasetsOnDisk:   ethashb3Config.DatasetsOnDisk,
+			DatasetsLockMmap: ethashb3Config.DatasetsLockMmap,
+			NotifyFull:       ethashb3Config.NotifyFull,
+		}, notify, noverify)
+		engine.(*ethashb3.EthashB3).SetThreads(-1) // Disable CPU mining
+	}
+	return
+}
+
+func CreateConsensusEngineClique(cliqueConfig *ctypes.CliqueConfig, db ethdb.Database) (engine consensus.Engine) {
+	engine = clique.New(cliqueConfig, db)
+	return
+}
+
+func CreateConsensusEngineLyra2(lyra2Config *lyra2.Config, notify []string, noverify bool) (engine consensus.Engine) {
+	engine = lyra2.New(lyra2Config, notify, noverify)
+	return
 }

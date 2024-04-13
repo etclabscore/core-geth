@@ -36,6 +36,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ethereum/go-ethereum/consensus"
+	"github.com/ethereum/go-ethereum/consensus/ethashb3"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
+
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
@@ -194,11 +198,17 @@ var (
 		Usage:    "Sepolia network: pre-configured proof-of-work test network",
 		Category: flags.EthCategory,
 	}
+	HypraFlag = &cli.BoolFlag{
+		Name:     "hypra",
+		Usage:    "Hypra Network mainnet: pre-configured Hypra Network mainnet",
+		Category: flags.EthCategory,
+	}
 	HoleskyFlag = &cli.BoolFlag{
 		Name:     "holesky",
 		Usage:    "Holesky network: pre-configured proof-of-stake test network",
 		Category: flags.EthCategory,
 	}
+
 	// Dev mode
 	DeveloperFlag = &cli.BoolFlag{
 		Name:     "dev",
@@ -1139,6 +1149,7 @@ var (
 		MainnetFlag,
 		ClassicFlag,
 		MintMeFlag,
+		HypraFlag,
 	}, TestnetFlags...)
 
 	// DatabaseFlags is the flag group of all database flags.
@@ -1217,6 +1228,8 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 			urls = params.ClassicBootnodes
 		case ctx.Bool(MintMeFlag.Name):
 			urls = params.MintMeBootnodes
+		case ctx.Bool(HypraFlag.Name):
+			urls = params.HypraBootnodes
 		case ctx.Bool(MordorFlag.Name):
 			urls = params.MordorBootnodes
 		case ctx.Bool(SepoliaFlag.Name):
@@ -1260,6 +1273,8 @@ func setBootstrapNodesV5(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.GoerliBootnodes
 	case ctx.Bool(MintMeFlag.Name):
 		urls = params.MintMeBootnodes
+	case ctx.Bool(HypraFlag.Name):
+		urls = params.HypraBootnodes
 	case cfg.BootstrapNodesV5 != nil:
 		return // already set, don't apply defaults.
 	}
@@ -1730,6 +1745,8 @@ func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) stri
 		return filepath.Join(baseDataDirPath, "sepolia")
 	case ctx.Bool(MintMeFlag.Name):
 		return filepath.Join(baseDataDirPath, "mintme")
+	case ctx.Bool(HypraFlag.Name):
+		return filepath.Join(baseDataDirPath, "hypra")
 	case ctx.Bool(HoleskyFlag.Name):
 		return filepath.Join(baseDataDirPath, "holesky")
 	}
@@ -1987,7 +2004,7 @@ func CheckExclusive(ctx *cli.Context, args ...interface{}) {
 // SetEthConfig applies eth-related command line flags to the config.
 func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	// Avoid conflicting network flags
-	CheckExclusive(ctx, MainnetFlag, DeveloperFlag, DeveloperPoWFlag, GoerliFlag, SepoliaFlag, ClassicFlag, MordorFlag, MintMeFlag, HoleskyFlag)
+	CheckExclusive(ctx, MainnetFlag, DeveloperFlag, DeveloperPoWFlag, GoerliFlag, SepoliaFlag, ClassicFlag, MordorFlag, MintMeFlag, HypraFlag, HoleskyFlag)
 	CheckExclusive(ctx, LightServeFlag, SyncModeFlag, "light")
 	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, ExternalSignerFlag) // Can't use both ephemeral unlocked and external signer
 
@@ -2560,6 +2577,8 @@ func genesisForCtxChainConfig(ctx *cli.Context) *genesisT.Genesis {
 		genesis = params.DefaultGoerliGenesisBlock()
 	case ctx.Bool(MintMeFlag.Name):
 		genesis = params.DefaultMintMeGenesisBlock()
+	case ctx.Bool(HypraFlag.Name):
+		genesis = params.DefaultHypraGenesisBlock()
 	case ctx.Bool(HoleskyFlag.Name):
 		genesis = params.DefaultHoleskyGenesisBlock()
 	case ctx.Bool(DeveloperFlag.Name):
@@ -2581,31 +2600,10 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readonly bool) (*core.BlockCh
 		gspec   = MakeGenesis(ctx)
 		chainDb = MakeChainDatabase(ctx, stack, readonly)
 	)
-	cliqueConfig, err := core.LoadCliqueConfig(chainDb, gspec)
-	if err != nil {
-		Fatalf("%v", err)
-	}
-	ethashConfig := ethconfig.Defaults.Ethash
 
-	// ETC-specific configuration: ECIP1099 modifies the original Ethash algo, doubling the epoch size.
-	if gspec != nil && gspec.Config != nil {
-		ethashConfig.ECIP1099Block = gspec.GetEthashECIP1099Transition() // This will panic if the genesis config field is not nil.
-	}
+	engine := makeConsensusEngine(ctx, stack, gspec, chainDb)
 
-	var lyra2Config *lyra2.Config
-	if ctx.Bool(MintMeFlag.Name) {
-		lyra2Config = &lyra2.Config{}
-	}
-
-	// Toggle PoW modes at user request.
-	if ctx.Bool(FakePoWFlag.Name) {
-		ethashConfig.PowMode = ethash.ModeFake
-	} else if ctx.Bool(FakePoWPoissonFlag.Name) {
-		ethashConfig.PowMode = ethash.ModePoissonFake
-	}
-
-	engine := ethconfig.CreateConsensusEngine(stack, &ethashConfig, cliqueConfig, lyra2Config, nil, false, chainDb)
-	if gcmode := ctx.String(GCModeFlag.Name); gcmode != gcModeFull && gcmode != gcModeArchive {
+	if gcmode := ctx.String(GCModeFlag.Name); gcmode != "full" && gcmode != "archive" {
 		Fatalf("--%s must be either 'full' or 'archive'", GCModeFlag.Name)
 	}
 	scheme, err := rawdb.ParseStateScheme(ctx.String(StateSchemeFlag.Name), chainDb)
@@ -2649,6 +2647,49 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readonly bool) (*core.BlockCh
 		Fatalf("Can't create BlockChain: %v", err)
 	}
 	return chain, chainDb
+}
+
+// Create a Consensus Engine for a specific chains config
+func makeConsensusEngine(ctx *cli.Context, stack *node.Node, gspec *genesisT.Genesis, chainDb ethdb.Database) (engine consensus.Engine) {
+	switch gspec.GetConsensusEngineType() {
+	case ctypes.ConsensusEngineT_Ethash:
+		ethashConfig := ethconfig.Defaults.Ethash
+		if gspec != nil && gspec.Config != nil {
+			ethashConfig.ECIP1099Block = gspec.GetEthashECIP1099Transition() // This will panic if the genesis config field is not nil.
+		}
+		if ctx.Bool(FakePoWFlag.Name) {
+			ethashConfig.PowMode = ethash.ModeFake
+		} else if ctx.Bool(FakePoWPoissonFlag.Name) {
+			ethashConfig.PowMode = ethash.ModePoissonFake
+		}
+		engine = ethconfig.CreateConsensusEngineEthash(stack, &ethashConfig, nil, false)
+
+	case ctypes.ConsensusEngineT_EthashB3:
+		ethashb3Config := ethconfig.Defaults.EthashB3
+		if ctx.Bool(FakePoWFlag.Name) {
+			ethashb3Config.PowMode = ethashb3.ModeFake
+		} else if ctx.Bool(FakePoWPoissonFlag.Name) {
+			ethashb3Config.PowMode = ethashb3.ModePoissonFake
+		}
+		engine = ethconfig.CreateConsensusEngineEthashB3(stack, &ethashb3Config, nil, false)
+
+	case ctypes.ConsensusEngineT_Clique:
+		cliqueConfig, err := core.LoadCliqueConfig(chainDb, gspec)
+		if err != nil {
+			Fatalf("%v", err)
+		}
+		engine = ethconfig.CreateConsensusEngineClique(cliqueConfig, chainDb)
+
+	case ctypes.ConsensusEngineT_Lyra2:
+		var lyra2Config *lyra2.Config
+		if ctx.Bool(MintMeFlag.Name) {
+			lyra2Config = &lyra2.Config{}
+		}
+		engine = ethconfig.CreateConsensusEngineLyra2(lyra2Config, nil, false)
+
+	}
+
+	return engine
 }
 
 // MakeConsolePreloads retrieves the absolute paths for the console JavaScript

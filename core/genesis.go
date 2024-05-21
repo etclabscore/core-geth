@@ -101,8 +101,12 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *triedb.Database, g
 			// Block-based overrides are not provided because Shanghai is
 			// ETH-network specific and that protocol is defined exclusively in time-based forks.
 			if overrides != nil && overrides.OverrideCancun != nil {
+				config.SetEIP1153TransitionTime(overrides.OverrideCancun)
+				config.SetEIP4788TransitionTime(overrides.OverrideCancun)
 				config.SetEIP4844TransitionTime(overrides.OverrideCancun)
-				// TODO(meowsbits) Install the remaining Cancun EIP overrides.
+				config.SetEIP5656TransitionTime(overrides.OverrideCancun)
+				config.SetEIP6780TransitionTime(overrides.OverrideCancun)
+				config.SetEIP7516TransitionTime(overrides.OverrideCancun)
 			}
 			if overrides != nil && overrides.OverrideVerkle != nil {
 				log.Warn("Verkle-fork is not yet supported")

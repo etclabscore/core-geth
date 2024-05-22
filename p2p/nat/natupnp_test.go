@@ -169,17 +169,13 @@ func TestUPNP_DDWRT(t *testing.T) {
 			t.Skipf("UPnP not discovered (known issue, see https://github.com/ethereum/go-ethereum/issues/21476)")
 		}
 	}
-
 	upnp, _ := discovered.(*upnp)
-	if upnp.service == "IGDv1-IP1" {
-		wantURL := "http://" + dev.listener.Addr().String() + "/InternetGatewayDevice.xml"
-		if upnp.dev.URLBaseStr != wantURL {
-			t.Errorf("upnp.dev.URLBaseStr mismatch: got %q, want %q", upnp.dev.URLBaseStr, wantURL)
-		}
-	} else if upnp.service == "IGDv2-IP1" {
-		t.Skipf("disabled: non dd-wrt IGDv2-IP1 detected")
-	} else {
+	if upnp.service != "IGDv1-IP1" {
 		t.Errorf("upnp.service mismatch: got %q, want %q", upnp.service, "IGDv1-IP1")
+	}
+	wantURL := "http://" + dev.listener.Addr().String() + "/InternetGatewayDevice.xml"
+	if upnp.dev.URLBaseStr != wantURL {
+		t.Errorf("upnp.dev.URLBaseStr mismatch: got %q, want %q", upnp.dev.URLBaseStr, wantURL)
 	}
 }
 

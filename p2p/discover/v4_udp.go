@@ -364,7 +364,7 @@ func (t *UDPv4) RequestENR(n *enode.Node) (*enode.Node, error) {
 		return nil, err
 	}
 	if respN.ID() != n.ID() {
-		return nil, fmt.Errorf("invalid ID in response record")
+		return nil, errors.New("invalid ID in response record")
 	}
 	if respN.Seq() < n.Seq() {
 		return n, nil // response record is older
@@ -548,7 +548,7 @@ func (t *UDPv4) handlePacket(from *net.UDPAddr, buf []byte) error {
 	}
 	packet := t.wrapPacket(rawpacket)
 	fromID := fromKey.ID()
-	if err == nil && packet.preverify != nil {
+	if packet.preverify != nil {
 		err = packet.preverify(packet, from, fromID, fromKey)
 	}
 	t.log.Trace("<< "+packet.Name(), "id", fromID, "addr", from, "err", err)

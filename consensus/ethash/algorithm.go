@@ -20,7 +20,6 @@ import (
 	"encoding/binary"
 	"hash"
 	"math/big"
-	"reflect"
 	"runtime"
 	"sync"
 	"sync/atomic"
@@ -305,12 +304,7 @@ func generateDataset(dest []uint32, epoch uint64, epochLength uint64, cache []ui
 	swapped := !isLittleEndian()
 
 	// Convert our destination slice to a byte buffer
-	var dataset []byte
-	datasetHdr := (*reflect.SliceHeader)(unsafe.Pointer(&dataset))
-	destHdr := (*reflect.SliceHeader)(unsafe.Pointer(&dest))
-	datasetHdr.Data = destHdr.Data
-	datasetHdr.Len = destHdr.Len * 4
-	datasetHdr.Cap = destHdr.Cap * 4
+	dataset := unsafe.Slice((*byte)(unsafe.Pointer(&dest[0])), len(dest)*4)
 
 	// Generate the dataset on many goroutines since it takes a while
 	threads := runtime.NumCPU()

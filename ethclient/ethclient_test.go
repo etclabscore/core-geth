@@ -867,7 +867,7 @@ func TestRPCDiscover(t *testing.T) {
 
 			responseDocument, _ := json.MarshalIndent(r, "", "    ")
 			t.Logf(`Response Document:
-			
+
 %s`, string(responseDocument))
 			t.Fatalf(`OVER (methods which do not appear in the current API, but exist in the hardcoded response document):):
 %v
@@ -1169,6 +1169,7 @@ var allRPCMethods = []string{
 	"debug_dbAncient",
 	"debug_dbAncients",
 	"debug_dbGet",
+	"debug_discoveryV4Table",
 	"debug_dumpBlock",
 	"debug_freeOSMemory",
 	"debug_gcStats",

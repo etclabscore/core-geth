@@ -20,7 +20,6 @@ import (
 	"encoding/binary"
 	"hash"
 	"math/big"
-	"reflect"
 	"runtime"
 	"sync"
 	"sync/atomic"
@@ -176,12 +175,7 @@ func generateCache(dest []uint32, epoch uint64, epochLength uint64, seed []byte)
 		logFn("Generated ethash verification cache", "epochLength", epochLength, "elapsed", common.PrettyDuration(elapsed))
 	}()
 	// Convert our destination slice to a byte buffer
-	var cache []byte
-	cacheHdr := (*reflect.SliceHeader)(unsafe.Pointer(&cache))
-	dstHdr := (*reflect.SliceHeader)(unsafe.Pointer(&dest))
-	cacheHdr.Data = dstHdr.Data
-	cacheHdr.Len = dstHdr.Len * 4
-	cacheHdr.Cap = dstHdr.Cap * 4
+	cache := unsafe.Slice((*byte)(unsafe.Pointer(&dest[0])), len(dest)*4)
 
 	// Calculate the number of theoretical rows (we'll store in one buffer nonetheless)
 	size := uint64(len(cache))
@@ -310,12 +304,7 @@ func generateDataset(dest []uint32, epoch uint64, epochLength uint64, cache []ui
 	swapped := !isLittleEndian()
 
 	// Convert our destination slice to a byte buffer
-	var dataset []byte
-	datasetHdr := (*reflect.SliceHeader)(unsafe.Pointer(&dataset))
-	destHdr := (*reflect.SliceHeader)(unsafe.Pointer(&dest))
-	datasetHdr.Data = destHdr.Data
-	datasetHdr.Len = destHdr.Len * 4
-	datasetHdr.Cap = destHdr.Cap * 4
+	dataset := unsafe.Slice((*byte)(unsafe.Pointer(&dest[0])), len(dest)*4)
 
 	// Generate the dataset on many goroutines since it takes a while
 	threads := runtime.NumCPU()

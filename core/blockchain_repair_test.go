@@ -34,7 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
-	"github.com/ethereum/go-ethereum/trie"
+	"github.com/ethereum/go-ethereum/triedb"
 )
 
 // Tests a recovery for a short canonical chain where a recent block was already
@@ -1805,7 +1805,7 @@ func testRepairWithScheme(t *testing.T, tt *rewindTest, snapshots bool, scheme s
 	var sideblocks types.Blocks
 	if tt.sidechainBlocks > 0 {
 		mem := rawdb.NewMemoryDatabase()
-		genesisBlock := MustCommitGenesis(mem, trie.NewDatabase(mem, nil), gspec)
+		genesisBlock := MustCommitGenesis(mem, triedb.NewDatabase(mem, nil), gspec)
 		sideblocks, _ = GenerateChain(gspec.Config, genesisBlock, engine, rawdb.NewMemoryDatabase(), tt.sidechainBlocks, func(i int, b *BlockGen) {
 			b.SetCoinbase(common.Address{0x01})
 		})
@@ -1813,7 +1813,7 @@ func testRepairWithScheme(t *testing.T, tt *rewindTest, snapshots bool, scheme s
 			t.Fatalf("Failed to import side chain: %v", err)
 		}
 	}
-	genesisBlock := MustCommitGenesis(db, trie.NewDatabase(db, nil), gspec)
+	genesisBlock := MustCommitGenesis(db, triedb.NewDatabase(db, nil), gspec)
 	canonblocks, _ := GenerateChain(gspec.Config, genesisBlock, engine, rawdb.NewMemoryDatabase(), tt.canonicalBlocks, func(i int, b *BlockGen) {
 		b.SetCoinbase(common.Address{0x02})
 		b.SetDifficulty(big.NewInt(1000000))

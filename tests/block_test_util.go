@@ -36,12 +36,13 @@ import (
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/ethereum/go-ethereum/trie"
-	"github.com/ethereum/go-ethereum/trie/triedb/hashdb"
-	"github.com/ethereum/go-ethereum/trie/triedb/pathdb"
+	"github.com/ethereum/go-ethereum/triedb"
+	"github.com/ethereum/go-ethereum/triedb/hashdb"
+	"github.com/ethereum/go-ethereum/triedb/pathdb"
 )
 
 // A BlockTest checks handling of entire blocks.
@@ -109,7 +110,7 @@ type btHeaderMarshaling struct {
 	ExcessBlobGas *math.HexOrDecimal64
 }
 
-func (t *BlockTest) Run(snapshotter bool, scheme string, tracer vm.EVMLogger) error {
+func (t *BlockTest) Run(snapshotter bool, scheme string, tracer vm.EVMLogger, postCheck func(error, *core.BlockChain)) (result error) {
 	config, ok := Forks[t.json.Network]
 	if !ok {
 		return UnsupportedForkError{t.json.Network}
@@ -117,7 +118,9 @@ func (t *BlockTest) Run(snapshotter bool, scheme string, tracer vm.EVMLogger) er
 	// import pre accounts & construct test genesis block & state root
 	var (
 		db    = rawdb.NewMemoryDatabase()
-		tconf = &trie.Config{}
+		tconf = &triedb.Config{
+			Preimages: true,
+		}
 	)
 	if scheme == rawdb.PathScheme {
 		tconf.PathDB = pathdb.Defaults
@@ -126,7 +129,7 @@ func (t *BlockTest) Run(snapshotter bool, scheme string, tracer vm.EVMLogger) er
 	}
 	// Commit genesis state
 	gspec := t.genesis(config)
-	triedb := trie.NewDatabase(db, tconf)
+	triedb := triedb.NewDatabase(db, tconf)
 	gblock, err := core.CommitGenesis(gspec, db, triedb)
 	if err != nil {
 		return err
@@ -142,7 +145,7 @@ func (t *BlockTest) Run(snapshotter bool, scheme string, tracer vm.EVMLogger) er
 	// Wrap the original engine within the beacon-engine
 	engine := beacon.New(ethash.NewFaker())
 
-	cache := &core.CacheConfig{TrieCleanLimit: 0, StateScheme: scheme}
+	cache := &core.CacheConfig{TrieCleanLimit: 0, StateScheme: scheme, Preimages: true}
 	if snapshotter {
 		cache.SnapshotLimit = 1
 		cache.SnapshotWait = true
@@ -158,6 +161,11 @@ func (t *BlockTest) Run(snapshotter bool, scheme string, tracer vm.EVMLogger) er
 	validBlocks, err := t.insertBlocks(chain)
 	if err != nil {
 		return err
+	}
+	// Import succeeded: regardless of whether the _test_ succeeds or not, schedule
+	// the post-check to run
+	if postCheck != nil {
+		defer postCheck(result, chain)
 	}
 	cmlast := chain.CurrentBlock().Hash()
 	if common.Hash(t.json.BestBlock) != cmlast {
@@ -221,6 +229,7 @@ func (t *BlockTest) insertBlocks(blockchain *core.BlockChain) ([]btBlock, error)
 		cb, err := b.decode()
 		if err != nil {
 			if b.BlockHeader == nil {
+				log.Info("Block decoding failed", "index", bi, "err", err)
 				continue // OK - block is supposed to be invalid, continue with next block
 			} else {
 				return nil, fmt.Errorf("block RLP decoding failed when expected to succeed: %v", err)
@@ -323,7 +332,7 @@ func (t *BlockTest) validatePostState(statedb *state.StateDB) error {
 	for addr, acct := range t.json.Post {
 		// address is indirectly verified by the other fields, as it's the db key
 		code2 := statedb.GetCode(addr)
-		balance2 := statedb.GetBalance(addr)
+		balance2 := statedb.GetBalance(addr).ToBig()
 		nonce2 := statedb.GetNonce(addr)
 		if !bytes.Equal(code2, acct.Code) {
 			return fmt.Errorf("account code mismatch for addr: %s want: %v have: %s", addr, acct.Code, hex.EncodeToString(code2))
@@ -333,6 +342,12 @@ func (t *BlockTest) validatePostState(statedb *state.StateDB) error {
 		}
 		if nonce2 != acct.Nonce {
 			return fmt.Errorf("account nonce mismatch for addr: %s want: %d have: %d", addr, acct.Nonce, nonce2)
+		}
+		for k, v := range acct.Storage {
+			v2 := statedb.GetState(addr, k)
+			if v2 != v {
+				return fmt.Errorf("account storage mismatch for addr: %s, slot: %x, want: %x, have: %x", addr, k, v, v2)
+			}
 		}
 	}
 	return nil

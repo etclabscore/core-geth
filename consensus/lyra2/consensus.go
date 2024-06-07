@@ -18,6 +18,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/trie"
+	"github.com/holiman/uint256"
 	"golang.org/x/crypto/sha3"
 )
 
@@ -481,7 +482,7 @@ func accumulateRewards(config ctypes.ChainConfigurator, state *state.StateDB, he
 	minerReward := GetBlockWinnerRewardByEra(era)
 	uncleReward := getEraUncleBlockReward(minerReward)
 	for _, uncle := range uncles {
-		state.AddBalance(uncle.Coinbase, uncleReward)
+		state.AddBalance(uncle.Coinbase, uint256.MustFromBig(uncleReward))
 	}
-	state.AddBalance(header.Coinbase, minerReward)
+	state.AddBalance(header.Coinbase, uint256.MustFromBig(minerReward))
 }

@@ -51,6 +51,7 @@ type ChainConfigurator interface {
 }
 
 // ProtocolSpecifier defines protocol interfaces that are agnostic of consensus engine.
+// https://github.com/ethereum/execution-specs?tab=readme-ov-file
 type ProtocolSpecifier interface {
 	GetAccountStartNonce() *uint64
 	SetAccountStartNonce(n *uint64) error
@@ -148,58 +149,73 @@ type ProtocolSpecifier interface {
 	GetEIP2315Transition() *uint64
 	SetEIP2315Transition(n *uint64) error
 
-	// ModExp gas cost
+	// Berlin:
+
+	// GetEIP2565Transition implements EIP-2565: ModExp Gas Cost - https://eips.ethereum.org/EIPS/eip-2565
 	GetEIP2565Transition() *uint64
 	SetEIP2565Transition(n *uint64) error
 
-	// Gas cost increases for state access opcodes
+	// GetEIP2929Transition implements EIP-2929: Gas cost increases for state access opcodes - https://eips.ethereum.org/EIPS/eip-2929
 	GetEIP2929Transition() *uint64
 	SetEIP2929Transition(n *uint64) error
 
-	// Optional access lists
+	// GetEIP2930Transition implements EIP-2930: Optional access lists - https://eips.ethereum.org/EIPS/eip-2930
 	GetEIP2930Transition() *uint64
 	SetEIP2930Transition(n *uint64) error
 
-	// Typed transaction envelope
+	// GetEIP2718Transition implements EIP-2718: Typed transaction envelope - https://eips.ethereum.org/EIPS/eip-2718
 	GetEIP2718Transition() *uint64
 	SetEIP2718Transition(n *uint64) error
 
+	// London:
+
+	// GetEIP1559Transition implements EIP-1559: Fee market change for ETH 1.0 chain - https://eips.ethereum.org/EIPS/eip-1559
 	GetEIP1559Transition() *uint64
 	SetEIP1559Transition(n *uint64) error
 
+	// GetEIP3541Transition implements EIP-3541: Reject new contract code starting with the 0xEF byte - https://eips.ethereum.org/EIPS/eip-3541
 	GetEIP3541Transition() *uint64
 	SetEIP3541Transition(n *uint64) error
 
+	// GetEIP3529Transition implements EIP-3529: Reduction in refunds - https://eips.ethereum.org/EIPS/eip-3529
 	GetEIP3529Transition() *uint64
 	SetEIP3529Transition(n *uint64) error
 
+	// GetEIP3198Transition implements EIP-3198: BASEFEE opcode - https://eips.ethereum.org/EIPS/eip-3198
 	GetEIP3198Transition() *uint64
 	SetEIP3198Transition(n *uint64) error
 
-	// EIP4399 is the RANDOM opcode.
-	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4399.md
+	// Paris:
+	// EIP3675 - "Upgrade" consensus to Proof-of-Stake
+
+	// GetEIP4399Transition implements EIP-4399: Supplant DIFFICULTY opcode with PREVRANDAO - https://eips.ethereum.org/EIPS/eip-4399
 	GetEIP4399Transition() *uint64
 	SetEIP4399Transition(n *uint64) error
 
 	// Shanghai:
-	//
-	// EIP3651: Warm COINBASE
+
+	// GetEIP3651TransitionTime implements EIP3651: Warm COINBASE - https://eips.ethereum.org/EIPS/eip-3651
 	GetEIP3651TransitionTime() *uint64
 	SetEIP3651TransitionTime(n *uint64) error
-	// EIP3855: PUSH0 instruction
+
+	// GetEIP3855TransitionTime implements EIP3855: PUSH0 instruction - https://eips.ethereum.org/EIPS/eip-3855
 	GetEIP3855TransitionTime() *uint64
 	SetEIP3855TransitionTime(n *uint64) error
-	// EIP3860: Limit and meter initcode
+
+	// GetEIP3860TransitionTime implements EIP3860: Limit and meter initcode - https://eips.ethereum.org/EIPS/eip-3860
 	GetEIP3860TransitionTime() *uint64
 	SetEIP3860TransitionTime(n *uint64) error
-	// EIP4895: Beacon chain push withdrawals as operations
+
+	// GetEIP4895TransitionTime implements EIP4895: Beacon chain push WITHDRAWALS as operations - https://eips.ethereum.org/EIPS/eip-4895
 	GetEIP4895TransitionTime() *uint64
 	SetEIP4895TransitionTime(n *uint64) error
-	// EIP6049: Deprecate SELFDESTRUCT
+
+	// GetEIP6049TransitionTime implements EIP6049: Deprecate SELFDESTRUCT - https://eips.ethereum.org/EIPS/eip-6049
 	GetEIP6049TransitionTime() *uint64
 	SetEIP6049TransitionTime(n *uint64) error
 
 	// Shanghai expressed as block activation numbers:
+
 	GetEIP3651Transition() *uint64
 	SetEIP3651Transition(n *uint64) error
 	GetEIP3855Transition() *uint64
@@ -216,31 +232,33 @@ type ProtocolSpecifier interface {
 	SetMergeVirtualTransition(n *uint64) error
 
 	// Cancun:
-	// EIP4844 - Shard Blob Transactions - https://eips.ethereum.org/EIPS/eip-4844
+
+	// GetEIP4844TransitionTime implements EIP4844 - Shard Blob Transactions - https://eips.ethereum.org/EIPS/eip-4844
 	GetEIP4844TransitionTime() *uint64
 	SetEIP4844TransitionTime(n *uint64) error
 
-	// EIP7516 - Blob Base Fee Opcode - https://eips.ethereum.org/EIPS/eip-7516
+	// GetEIP7516TransitionTime implements EIP7516 - Blob Base Fee Opcode - https://eips.ethereum.org/EIPS/eip-7516
 	GetEIP7516TransitionTime() *uint64
 	SetEIP7516TransitionTime(n *uint64) error
 
-	// EIP1153 - Transient Storage opcodes - https://eips.ethereum.org/EIPS/eip-1153
+	// GetEIP1153TransitionTime implements EIP1153 - Transient Storage opcodes - https://eips.ethereum.org/EIPS/eip-1153
 	GetEIP1153TransitionTime() *uint64
 	SetEIP1153TransitionTime(n *uint64) error
 
-	// EIP5656 - MCOPY - Memory copying instruction - https://eips.ethereum.org/EIPS/eip-5656
+	// GetEIP5656TransitionTime implements EIP5656 - MCOPY - Memory copying instruction - https://eips.ethereum.org/EIPS/eip-5656
 	GetEIP5656TransitionTime() *uint64
 	SetEIP5656TransitionTime(n *uint64) error
 
-	// EIP6780 - SELFDESTRUCT only in same transaction - https://eips.ethereum.org/EIPS/eip-6780
+	// GetEIP6780TransitionTime implements EIP6780 - SELFDESTRUCT only in same transaction - https://eips.ethereum.org/EIPS/eip-6780
 	GetEIP6780TransitionTime() *uint64
 	SetEIP6780TransitionTime(n *uint64) error
 
-	// EIP4788 - Beacon block root in the EVM
+	// GetEIP4788TransitionTime implements EIP4788 - Beacon block root in the EVM - https://eips.ethereum.org/EIPS/eip-4788
 	GetEIP4788TransitionTime() *uint64
 	SetEIP4788TransitionTime(n *uint64) error
 
 	// Cancun expressed as block activation numbers:
+
 	GetEIP4844Transition() *uint64
 	SetEIP4844Transition(n *uint64) error
 	GetEIP7516Transition() *uint64
@@ -253,6 +271,13 @@ type ProtocolSpecifier interface {
 	SetEIP6780Transition(n *uint64) error
 	GetEIP4788Transition() *uint64
 	SetEIP4788Transition(n *uint64) error
+
+	// Verkle Trie
+
+	GetVerkleTransitionTime() *uint64
+	SetVerkleTransitionTime(n *uint64) error
+	GetVerkleTransition() *uint64
+	SetVerkleTransition(n *uint64) error
 }
 
 type Forker interface {
@@ -330,10 +355,10 @@ type EthashConfigurator interface {
 
 	IsTerminalPoWBlock(parentTotalDiff *big.Int, totalDiff *big.Int) bool
 
-	GetEthashDifficultyBombDelaySchedule() Uint64BigMapEncodesHex
-	SetEthashDifficultyBombDelaySchedule(m Uint64BigMapEncodesHex) error
-	GetEthashBlockRewardSchedule() Uint64BigMapEncodesHex
-	SetEthashBlockRewardSchedule(m Uint64BigMapEncodesHex) error
+	GetEthashDifficultyBombDelaySchedule() Uint64Uint256MapEncodesHex
+	SetEthashDifficultyBombDelaySchedule(m Uint64Uint256MapEncodesHex) error
+	GetEthashBlockRewardSchedule() Uint64Uint256MapEncodesHex
+	SetEthashBlockRewardSchedule(m Uint64Uint256MapEncodesHex) error
 }
 
 type CliqueConfigurator interface {

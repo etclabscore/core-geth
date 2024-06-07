@@ -767,6 +767,24 @@ func (c *ChainConfig) SetMergeVirtualTransition(n *uint64) error {
 	return nil
 }
 
+// Verkle Trie
+func (c *ChainConfig) GetVerkleTransitionTime() *uint64 {
+	return c.VerkleTime
+}
+
+func (c *ChainConfig) SetVerkleTransitionTime(n *uint64) error {
+	c.VerkleTime = n
+	return nil
+}
+
+func (c *ChainConfig) GetVerkleTransition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetVerkleTransition(n *uint64) error {
+	return ctypes.ErrUnsupportedConfigNoop
+}
+
 func (c *ChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {
@@ -1157,25 +1175,25 @@ func (c *ChainConfig) SetEthashEIP5133Transition(n *uint64) error {
 	return nil
 }
 
-func (c *ChainConfig) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {
+func (c *ChainConfig) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64Uint256MapEncodesHex {
 	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil
 	}
 	return nil
 }
 
-func (c *ChainConfig) SetEthashDifficultyBombDelaySchedule(m ctypes.Uint64BigMapEncodesHex) error {
+func (c *ChainConfig) SetEthashDifficultyBombDelaySchedule(m ctypes.Uint64Uint256MapEncodesHex) error {
 	return ctypes.ErrUnsupportedConfigNoop
 }
 
-func (c *ChainConfig) GetEthashBlockRewardSchedule() ctypes.Uint64BigMapEncodesHex {
+func (c *ChainConfig) GetEthashBlockRewardSchedule() ctypes.Uint64Uint256MapEncodesHex {
 	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil
 	}
 	return nil
 }
 
-func (c *ChainConfig) SetEthashBlockRewardSchedule(m ctypes.Uint64BigMapEncodesHex) error {
+func (c *ChainConfig) SetEthashBlockRewardSchedule(m ctypes.Uint64Uint256MapEncodesHex) error {
 	return ctypes.ErrUnsupportedConfigNoop
 }
 

@@ -279,6 +279,24 @@ func (ethash *Ethash) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 		// Verify the header's EIP-1559 attributes.
 		return err
 	}
+
+	// Shanghai
+	// EIP-4895: Beacon chain push withdrawals as operations
+	// Verify the non-existence of withdrawalsHash (EIP-4895: Beacon chain push withdrawals as operations).
+	eip4895Enabled := chain.Config().IsEnabledByTime(chain.Config().GetEIP4895TransitionTime, &header.Time) || chain.Config().IsEnabled(chain.Config().GetEIP4895Transition, header.Number)
+	if !eip4895Enabled {
+		if header.WithdrawalsHash != nil {
+			return fmt.Errorf("invalid withdrawalsHash: have %x, expected nil", header.WithdrawalsHash)
+		}
+	} else {
+		if header.WithdrawalsHash == nil {
+			return errors.New("header is missing withdrawalsHash")
+		}
+	}
+
+	// Cancun
+	// EIP-4844: Shard Blob Txes
+	// EIP-4788: Beacon block root in the EVM
 	eip4844Enabled := chain.Config().IsEnabledByTime(chain.Config().GetEIP4844TransitionTime, &header.Time) || chain.Config().IsEnabled(chain.Config().GetEIP4844Transition, header.Number)
 	if !eip4844Enabled {
 		switch {
@@ -292,6 +310,8 @@ func (ethash *Ethash) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 			return err
 		}
 	}
+
+	// EIP-4788: Beacon block root in the EVM
 	eip4788Enabled := chain.Config().IsEnabledByTime(chain.Config().GetEIP4788TransitionTime, &header.Time) || chain.Config().IsEnabled(chain.Config().GetEIP4788Transition, header.Number)
 	if !eip4788Enabled {
 		if header.ParentBeaconRoot != nil {
@@ -302,6 +322,11 @@ func (ethash *Ethash) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 			return errors.New("header is missing beaconRoot")
 		}
 	}
+
+	// // Add some fake checks for tests
+	// if ethash.fakeDelay != nil {
+	// 	time.Sleep(*ethash.fakeDelay)
+	// }
 
 	// Verify the engine specific seal securing the block
 	if seal {
@@ -413,14 +438,14 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 			if exPeriodRef.Cmp(big.NewInt(int64(activated))) < 0 {
 				continue
 			}
-			fakeBlockNumber.Sub(fakeBlockNumber, dur)
+			fakeBlockNumber.Sub(fakeBlockNumber, dur.ToBig())
 		}
 		exPeriodRef.Set(fakeBlockNumber)
 	} else if config.IsEnabled(config.GetEthashEIP5133Transition, next) {
 		// calcDifficultyEip4345 is the difficulty adjustment algorithm as specified by EIP 4345.
 		// It offsets the bomb a total of 10.7M blocks.
 		fakeBlockNumber := new(big.Int)
-		delayWithOffset := new(big.Int).Sub(vars.EIP5133DifficultyBombDelay, common.Big1)
+		delayWithOffset := new(big.Int).Sub(vars.EIP5133DifficultyBombDelay.ToBig(), common.Big1)
 		if parent.Number.Cmp(delayWithOffset) >= 0 {
 			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, delayWithOffset)
 		}
@@ -429,7 +454,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		// calcDifficultyEip4345 is the difficulty adjustment algorithm as specified by EIP 4345.
 		// It offsets the bomb a total of 10.7M blocks.
 		fakeBlockNumber := new(big.Int)
-		delayWithOffset := new(big.Int).Sub(vars.EIP4345DifficultyBombDelay, common.Big1)
+		delayWithOffset := new(big.Int).Sub(vars.EIP4345DifficultyBombDelay.ToBig(), common.Big1)
 		if parent.Number.Cmp(delayWithOffset) >= 0 {
 			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, delayWithOffset)
 		}
@@ -438,7 +463,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		// calcDifficultyEIP3554 is the difficulty adjustment algorithm for London (December 2021).
 		// The calculation uses the Byzantium rules, but with bomb offset 9.7M.
 		fakeBlockNumber := new(big.Int)
-		delayWithOffset := new(big.Int).Sub(vars.EIP3554DifficultyBombDelay, common.Big1)
+		delayWithOffset := new(big.Int).Sub(vars.EIP3554DifficultyBombDelay.ToBig(), common.Big1)
 		if parent.Number.Cmp(delayWithOffset) >= 0 {
 			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, delayWithOffset)
 		}
@@ -447,7 +472,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		// calcDifficultyEIP2384 is the difficulty adjustment algorithm for Muir Glacier.
 		// The calculation uses the Byzantium rules, but with bomb offset 9M.
 		fakeBlockNumber := new(big.Int)
-		delayWithOffset := new(big.Int).Sub(vars.EIP2384DifficultyBombDelay, common.Big1)
+		delayWithOffset := new(big.Int).Sub(vars.EIP2384DifficultyBombDelay.ToBig(), common.Big1)
 		if parent.Number.Cmp(delayWithOffset) >= 0 {
 			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, delayWithOffset)
 		}
@@ -462,7 +487,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		// calculate a fake block number for the ice-age delay
 		// Specification: https://eips.ethereum.org/EIPS/eip-1234
 		fakeBlockNumber := new(big.Int)
-		delayWithOffset := new(big.Int).Sub(vars.EIP1234DifficultyBombDelay, common.Big1)
+		delayWithOffset := new(big.Int).Sub(vars.EIP1234DifficultyBombDelay.ToBig(), common.Big1)
 		if parent.Number.Cmp(delayWithOffset) >= 0 {
 			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, delayWithOffset)
 		}
@@ -475,7 +500,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		// the block number. Thus we remove one from the delay given
 
 		fakeBlockNumber := new(big.Int)
-		delayWithOffset := new(big.Int).Sub(vars.EIP649DifficultyBombDelay, common.Big1)
+		delayWithOffset := new(big.Int).Sub(vars.EIP649DifficultyBombDelay.ToBig(), common.Big1)
 		if parent.Number.Cmp(delayWithOffset) >= 0 {
 			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, delayWithOffset)
 		}
@@ -490,8 +515,8 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 	//   2^(( periodRef // EDP) - 2)
 	//
 	x := new(big.Int)
-	x.Div(exPeriodRef, params.ExpDiffPeriod) // (periodRef // EDP)
-	if x.Cmp(big1) > 0 {                     // if result large enough (not in algo explicitly)
+	x.Div(exPeriodRef, params.ExpDiffPeriod.ToBig()) // (periodRef // EDP)
+	if x.Cmp(big1) > 0 {                             // if result large enough (not in algo explicitly)
 		x.Sub(x, big2)      // - 2
 		x.Exp(big2, x, nil) // 2^
 	} else {
@@ -637,6 +662,15 @@ func (ethash *Ethash) SealHash(header *types.Header) (hash common.Hash) {
 	}
 	if header.WithdrawalsHash != nil {
 		panic("withdrawal hash set on ethash")
+	}
+	if header.ExcessBlobGas != nil {
+		panic("excess blob gas set on ethash")
+	}
+	if header.BlobGasUsed != nil {
+		panic("blob gas used set on ethash")
+	}
+	if header.ParentBeaconRoot != nil {
+		panic("parent beacon root set on ethash")
 	}
 	rlp.Encode(hasher, enc)
 	hasher.Sum(hash[:0])

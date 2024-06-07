@@ -121,7 +121,7 @@ func newTestBackendWithGenerator(blocks int, shanghai bool, generator func(int, 
 	txconfig.Journal = "" // Don't litter the disk with test journals
 
 	pool := legacypool.New(txconfig, chain)
-	txpool, _ := txpool.New(new(big.Int).SetUint64(txconfig.PriceLimit), chain, []txpool.SubPool{pool})
+	txpool, _ := txpool.New(txconfig.PriceLimit, chain, []txpool.SubPool{pool})
 
 	return &testBackend{
 		db:     db,
@@ -154,7 +154,6 @@ func (b *testBackend) Handle(*Peer, Packet) error {
 }
 
 // Tests that block headers can be retrieved from a remote chain based on user queries.
-func TestGetBlockHeaders67(t *testing.T) { testGetBlockHeaders(t, ETH67) }
 func TestGetBlockHeaders68(t *testing.T) { testGetBlockHeaders(t, ETH68) }
 
 func testGetBlockHeaders(t *testing.T, protocol uint) {
@@ -340,7 +339,6 @@ func testGetBlockHeaders(t *testing.T, protocol uint) {
 }
 
 // Tests that block contents can be retrieved from a remote chain based on their hashes.
-func TestGetBlockBodies67(t *testing.T) { testGetBlockBodies(t, ETH67) }
 func TestGetBlockBodies68(t *testing.T) { testGetBlockBodies(t, ETH68) }
 
 func testGetBlockBodies(t *testing.T, protocol uint) {
@@ -435,7 +433,6 @@ func testGetBlockBodies(t *testing.T, protocol uint) {
 }
 
 // Tests that the transaction receipts can be retrieved based on hashes.
-func TestGetBlockReceipts67(t *testing.T) { testGetBlockReceipts(t, ETH67) }
 func TestGetBlockReceipts68(t *testing.T) { testGetBlockReceipts(t, ETH68) }
 
 func testGetBlockReceipts(t *testing.T, protocol uint) {

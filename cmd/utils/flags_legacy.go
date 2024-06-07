@@ -39,6 +39,14 @@ var DeprecatedFlags = []cli.Flag{
 	CacheTrieRejournalFlag,
 	LegacyDiscoveryV5Flag,
 	TxLookupLimitFlag,
+	LightServeFlag,
+	LightIngressFlag,
+	LightEgressFlag,
+	LightMaxPeersFlag,
+	LightNoPruneFlag,
+	LightNoSyncServeFlag,
+	LogBacktraceAtFlag,
+	LogDebugFlag,
 }
 
 var (
@@ -75,6 +83,18 @@ var (
 		Name:     "txlookuplimit",
 		Usage:    "Number of recent blocks to maintain transactions index for (default = about one year, 0 = entire chain) (deprecated, use history.transactions instead)",
 		Value:    ethconfig.Defaults.TransactionHistory,
+		Category: flags.DeprecatedCategory,
+	}
+	// Deprecated November 2023
+	LogBacktraceAtFlag = &cli.StringFlag{
+		Name:     "log.backtrace",
+		Usage:    "Request a stack trace at a specific logging statement (deprecated)",
+		Value:    "",
+		Category: flags.DeprecatedCategory,
+	}
+	LogDebugFlag = &cli.BoolFlag{
+		Name:     "log.debug",
+		Usage:    "Prepends log messages with call-site location (deprecated)",
 		Category: flags.DeprecatedCategory,
 	}
 )

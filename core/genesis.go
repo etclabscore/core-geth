@@ -35,15 +35,17 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/trie"
+	"github.com/ethereum/go-ethereum/triedb"
+	"github.com/ethereum/go-ethereum/triedb/pathdb"
+	"github.com/holiman/uint256"
 )
 
 var errGenesisNoConfig = errors.New("genesis has no chain configuration")
 
 // ChainOverrides contains the changes to chain config.
 type ChainOverrides struct {
-	OverrideShanghai *uint64
-	OverrideCancun   *uint64
-	OverrideVerkle   *uint64
+	OverrideCancun *uint64
+	OverrideVerkle *uint64
 }
 
 func ReadGenesis(db ethdb.Database) (*genesisT.Genesis, error) {
@@ -85,11 +87,11 @@ func ReadGenesis(db ethdb.Database) (*genesisT.Genesis, error) {
 }
 
 // SetupGenesisBlock wraps SetupGenesisBlockWithOverride, always using a nil value for the override.
-func SetupGenesisBlock(db ethdb.Database, triedb *trie.Database, genesis *genesisT.Genesis) (ctypes.ChainConfigurator, common.Hash, error) {
+func SetupGenesisBlock(db ethdb.Database, triedb *triedb.Database, genesis *genesisT.Genesis) (ctypes.ChainConfigurator, common.Hash, error) {
 	return SetupGenesisBlockWithOverride(db, triedb, genesis, nil)
 }
 
-func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, genesis *genesisT.Genesis, overrides *ChainOverrides) (ctypes.ChainConfigurator, common.Hash, error) {
+func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *triedb.Database, genesis *genesisT.Genesis, overrides *ChainOverrides) (ctypes.ChainConfigurator, common.Hash, error) {
 	if genesis != nil && confp.IsEmpty(genesis.Config) {
 		return params.AllEthashProtocolChanges, common.Hash{}, genesisT.ErrGenesisNoConfig
 	}
@@ -98,15 +100,13 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, gen
 		if config != nil {
 			// Block-based overrides are not provided because Shanghai is
 			// ETH-network specific and that protocol is defined exclusively in time-based forks.
-			if overrides != nil && overrides.OverrideShanghai != nil {
-				config.SetEIP3651TransitionTime(overrides.OverrideShanghai)
-				config.SetEIP3855TransitionTime(overrides.OverrideShanghai)
-				config.SetEIP3860TransitionTime(overrides.OverrideShanghai)
-				config.SetEIP4895TransitionTime(overrides.OverrideShanghai)
-				config.SetEIP6049TransitionTime(overrides.OverrideShanghai)
-			}
 			if overrides != nil && overrides.OverrideCancun != nil {
+				config.SetEIP1153TransitionTime(overrides.OverrideCancun)
+				config.SetEIP4788TransitionTime(overrides.OverrideCancun)
 				config.SetEIP4844TransitionTime(overrides.OverrideCancun)
+				config.SetEIP5656TransitionTime(overrides.OverrideCancun)
+				config.SetEIP6780TransitionTime(overrides.OverrideCancun)
+				config.SetEIP7516TransitionTime(overrides.OverrideCancun)
 			}
 			if overrides != nil && overrides.OverrideVerkle != nil {
 				log.Warn("Verkle-fork is not yet supported")
@@ -254,7 +254,7 @@ func LoadCliqueConfig(db ethdb.Database, genesis *genesisT.Genesis) (*ctypes.Cli
 		// external ancient chain segment), ensure the provided genesis
 		// is matched.
 		db := rawdb.NewMemoryDatabase()
-		genesisBlock := MustCommitGenesis(db, trie.NewDatabase(db, nil), genesis)
+		genesisBlock := MustCommitGenesis(db, triedb.NewDatabase(db, nil), genesis)
 		if stored != (common.Hash{}) && genesisBlock.Hash() != stored {
 			return nil, &genesisT.GenesisMismatchError{Stored: stored, New: genesisBlock.Hash()}
 		}
@@ -311,6 +311,10 @@ func configOrDefault(g *genesisT.Genesis, ghash common.Hash) ctypes.ChainConfigu
 		return g.Config
 	case ghash == params.MainnetGenesisHash:
 		return params.MainnetChainConfig
+	case ghash == params.HoleskyGenesisHash:
+		return params.HoleskyChainConfig
+	case ghash == params.SepoliaGenesisHash:
+		return params.SepoliaChainConfig
 	case ghash == params.GoerliGenesisHash:
 		return params.GoerliChainConfig
 	case ghash == params.MordorGenesisHash:
@@ -326,14 +330,14 @@ func configOrDefault(g *genesisT.Genesis, ghash common.Hash) ctypes.ChainConfigu
 
 // Flush adds allocated genesis accounts into a fresh new statedb and
 // commit the state changes into the given database handler.
-func gaFlush(ga *genesisT.GenesisAlloc, triedb *trie.Database, db ethdb.Database) error {
+func gaFlush(ga *genesisT.GenesisAlloc, triedb *triedb.Database, db ethdb.Database) error {
 	statedb, err := state.New(types.EmptyRootHash, state.NewDatabaseWithNodeDB(db, triedb), nil)
 	if err != nil {
 		return err
 	}
 	for addr, account := range *ga {
 		if account.Balance != nil {
-			statedb.AddBalance(addr, account.Balance)
+			statedb.AddBalance(addr, uint256.MustFromBig(account.Balance))
 		}
 		statedb.SetCode(addr, account.Code)
 		statedb.SetNonce(addr, account.Nonce)
@@ -361,17 +365,29 @@ func gaFlush(ga *genesisT.GenesisAlloc, triedb *trie.Database, db ethdb.Database
 	return nil
 }
 
-// gaDeriveHash computes the state root according to the genesis specification.
-func gaDeriveHash(ga *genesisT.GenesisAlloc) (common.Hash, error) {
+// gaHash computes the state root according to the genesis specification.
+func gaHash(ga *genesisT.GenesisAlloc, isVerkle bool) (common.Hash, error) {
+	// If a genesis-time verkle trie is requested, create a trie config
+	// with the verkle trie enabled so that the tree can be initialized
+	// as such.
+	var config *triedb.Config
+	if isVerkle {
+		config = &triedb.Config{
+			PathDB:   pathdb.Defaults,
+			IsVerkle: true,
+		}
+	}
 	// Create an ephemeral in-memory database for computing hash,
 	// all the derived states will be discarded to not pollute disk.
-	db := state.NewDatabase(rawdb.NewMemoryDatabase())
+	db := state.NewDatabaseWithConfig(rawdb.NewMemoryDatabase(), config)
 	statedb, err := state.New(types.EmptyRootHash, db, nil)
 	if err != nil {
 		return common.Hash{}, err
 	}
 	for addr, account := range *ga {
-		statedb.AddBalance(addr, account.Balance)
+		if account.Balance != nil {
+			statedb.AddBalance(addr, uint256.MustFromBig(account.Balance))
+		}
 		statedb.SetCode(addr, account.Code)
 		statedb.SetNonce(addr, account.Nonce)
 		for key, value := range account.Storage {
@@ -394,7 +410,7 @@ func gaWrite(ga *genesisT.GenesisAlloc, db ethdb.KeyValueWriter, hash common.Has
 
 // CommitGenesisState loads the stored genesis state with the given block
 // hash and commits them into the given database handler.
-func CommitGenesisState(db ethdb.Database, triedb *trie.Database, blockhash common.Hash) error {
+func CommitGenesisState(db ethdb.Database, triedb *triedb.Database, blockhash common.Hash) error {
 	var alloc genesisT.GenesisAlloc
 	blob := rawdb.ReadGenesisStateSpec(db, blockhash)
 	if len(blob) != 0 {
@@ -438,11 +454,11 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 	if db == nil {
 		db = rawdb.NewMemoryDatabase()
 	}
-	root, err := gaDeriveHash(&g.Alloc)
+	root, err := gaHash(&g.Alloc, g.IsVerkle())
 	if err != nil {
 		panic(err)
 	}
-	err = gaFlush(&g.Alloc, trie.NewDatabase(db, nil), db)
+	err = gaFlush(&g.Alloc, triedb.NewDatabase(db, nil), db)
 	if err != nil {
 		panic(err)
 	}
@@ -510,7 +526,7 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 
 // CommitGenesis writes the block and state of a genesis specification to the database.
 // The block is committed as the canonical head block.
-func CommitGenesis(g *genesisT.Genesis, db ethdb.Database, triedb *trie.Database) (*types.Block, error) {
+func CommitGenesis(g *genesisT.Genesis, db ethdb.Database, triedb *triedb.Database) (*types.Block, error) {
 	block := GenesisToBlock(g, db)
 	if block.Number().Sign() != 0 {
 		return nil, errors.New("can't commit genesis block with number > 0")
@@ -527,7 +543,7 @@ func CommitGenesis(g *genesisT.Genesis, db ethdb.Database, triedb *trie.Database
 	if config.GetConsensusEngineType().IsClique() && len(block.Extra()) == 0 {
 		return nil, errors.New("can't start clique chain without signers")
 	}
-	// All the checks has passed, flush the states derived from the genesis
+	// All the checks has passed, flushAlloc the states derived from the genesis
 	// specification as well as the specification itself into the provided
 	// database.
 	if err := gaWrite(&g.Alloc, db, block.Hash()); err != nil {
@@ -551,7 +567,7 @@ func CommitGenesis(g *genesisT.Genesis, db ethdb.Database, triedb *trie.Database
 // The block is committed as the canonical head block.
 // Note the state changes will be committed in hash-based scheme, use Commit
 // if path-scheme is preferred.
-func MustCommitGenesis(db ethdb.Database, triedb *trie.Database, g *genesisT.Genesis) *types.Block {
+func MustCommitGenesis(db ethdb.Database, triedb *triedb.Database, g *genesisT.Genesis) *types.Block {
 	block, err := CommitGenesis(g, db, triedb)
 	if err != nil {
 		panic(err)
@@ -565,5 +581,5 @@ func GenesisBlockForTesting(db ethdb.Database, addr common.Address, balance *big
 		Alloc:   genesisT.GenesisAlloc{addr: {Balance: balance}},
 		BaseFee: big.NewInt(vars.InitialBaseFee),
 	}
-	return MustCommitGenesis(db, trie.NewDatabase(db, nil), &g)
+	return MustCommitGenesis(db, triedb.NewDatabase(db, nil), &g)
 }

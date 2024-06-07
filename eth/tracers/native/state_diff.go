@@ -297,7 +297,7 @@ func (t *stateDiffTracer) GetResult() (json.RawMessage, error) {
 				markerBorn: hexutil.Uint64(t.env.StateDB.GetNonce(addr)),
 			}
 			accountDiff.Balance = map[stateDiffMarker]*hexutil.Big{
-				markerBorn: (*hexutil.Big)(t.env.StateDB.GetBalance(addr)),
+				markerBorn: (*hexutil.Big)(t.env.StateDB.GetBalance(addr).ToBig()),
 			}
 			accountDiff.Code = map[stateDiffMarker]hexutil.Bytes{
 				markerBorn: t.env.StateDB.GetCode(addr),
@@ -310,7 +310,7 @@ func (t *stateDiffTracer) GetResult() (json.RawMessage, error) {
 				markerDied: hexutil.Uint64(fromNonce),
 			}
 			accountDiff.Balance = map[stateDiffMarker]*hexutil.Big{
-				markerDied: (*hexutil.Big)(t.initialState.GetBalance(addr)),
+				markerDied: (*hexutil.Big)(t.initialState.GetBalance(addr).ToBig()),
 			}
 			accountDiff.Code = map[stateDiffMarker]hexutil.Bytes{
 				markerDied: t.initialState.GetCode(addr),
@@ -338,7 +338,7 @@ func (t *stateDiffTracer) GetResult() (json.RawMessage, error) {
 				accountDiff.Balance = markerSame
 			} else {
 				diff := make(map[stateDiffMarker]*StateDiffBalance)
-				diff[markerChanged] = &StateDiffBalance{From: (*hexutil.Big)(fromBalance), To: (*hexutil.Big)(toBalance)}
+				diff[markerChanged] = &StateDiffBalance{From: (*hexutil.Big)(fromBalance.ToBig()), To: (*hexutil.Big)(toBalance.ToBig())}
 				accountDiff.Balance = diff
 				allEqual = false
 			}

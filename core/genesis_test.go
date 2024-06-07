@@ -17,6 +17,7 @@
 package core
 
 import (
+	"bytes"
 	"encoding/json"
 	"math/big"
 	"reflect"
@@ -34,8 +35,8 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
-	"github.com/ethereum/go-ethereum/trie"
-	"github.com/ethereum/go-ethereum/trie/triedb/pathdb"
+	"github.com/ethereum/go-ethereum/triedb"
+	"github.com/ethereum/go-ethereum/triedb/pathdb"
 )
 
 func TestSetupGenesisBlock(t *testing.T) {
@@ -43,7 +44,7 @@ func TestSetupGenesisBlock(t *testing.T) {
 
 	defaultGenesisBlock := params.DefaultGenesisBlock()
 
-	config, hash, err := SetupGenesisBlock(db, trie.NewDatabase(db, nil), defaultGenesisBlock)
+	config, hash, err := SetupGenesisBlock(db, triedb.NewDatabase(db, nil), defaultGenesisBlock)
 	if err != nil {
 		t.Errorf("err: %v", err)
 	}
@@ -58,7 +59,7 @@ func TestSetupGenesisBlock(t *testing.T) {
 
 	classicGenesisBlock := params.DefaultClassicGenesisBlock()
 
-	clConfig, clHash, clErr := SetupGenesisBlock(db, trie.NewDatabase(db, nil), classicGenesisBlock)
+	clConfig, clHash, clErr := SetupGenesisBlock(db, triedb.NewDatabase(db, nil), classicGenesisBlock)
 	if clErr != nil {
 		t.Errorf("err: %v", clErr)
 	}
@@ -77,7 +78,7 @@ func TestInvalidCliqueConfig(t *testing.T) {
 	gspec := params.DefaultGoerliGenesisBlock()
 	gspec.ExtraData = []byte{}
 
-	if _, err := CommitGenesis(gspec, db, trie.NewDatabase(db, nil)); err == nil {
+	if _, err := CommitGenesis(gspec, db, triedb.NewDatabase(db, nil)); err == nil {
 		t.Fatal("Expected error on invalid clique config")
 	}
 }
@@ -109,7 +110,7 @@ func testSetupGenesis(t *testing.T, scheme string) {
 		{
 			name: "genesis without ChainConfig",
 			fn: func(db ethdb.Database) (ctypes.ChainConfigurator, common.Hash, error) {
-				return SetupGenesisBlock(db, trie.NewDatabase(db, newDbConfig(scheme)), new(genesisT.Genesis))
+				return SetupGenesisBlock(db, triedb.NewDatabase(db, newDbConfig(scheme)), new(genesisT.Genesis))
 			},
 			wantErr:    errGenesisNoConfig,
 			wantConfig: params.AllEthashProtocolChanges,
@@ -117,7 +118,7 @@ func testSetupGenesis(t *testing.T, scheme string) {
 		{
 			name: "no block in DB, genesis == nil",
 			fn: func(db ethdb.Database) (ctypes.ChainConfigurator, common.Hash, error) {
-				return SetupGenesisBlock(db, trie.NewDatabase(db, newDbConfig(scheme)), nil)
+				return SetupGenesisBlock(db, triedb.NewDatabase(db, newDbConfig(scheme)), nil)
 			},
 			wantHash:   params.MainnetGenesisHash,
 			wantConfig: params.MainnetChainConfig,
@@ -125,8 +126,8 @@ func testSetupGenesis(t *testing.T, scheme string) {
 		{
 			name: "mainnet block in DB, genesis == nil",
 			fn: func(db ethdb.Database) (ctypes.ChainConfigurator, common.Hash, error) {
-				MustCommitGenesis(db, trie.NewDatabase(db, nil), params.DefaultGenesisBlock())
-				return SetupGenesisBlock(db, trie.NewDatabase(db, newDbConfig(scheme)), nil)
+				MustCommitGenesis(db, triedb.NewDatabase(db, nil), params.DefaultGenesisBlock())
+				return SetupGenesisBlock(db, triedb.NewDatabase(db, newDbConfig(scheme)), nil)
 			},
 			wantHash:   params.MainnetGenesisHash,
 			wantConfig: params.MainnetChainConfig,
@@ -134,7 +135,7 @@ func testSetupGenesis(t *testing.T, scheme string) {
 		{
 			name: "custom block in DB, genesis == nil",
 			fn: func(db ethdb.Database) (ctypes.ChainConfigurator, common.Hash, error) {
-				tdb := trie.NewDatabase(db, newDbConfig(scheme))
+				tdb := triedb.NewDatabase(db, newDbConfig(scheme))
 				MustCommitGenesis(db, tdb, &customg)
 				return SetupGenesisBlock(db, tdb, nil)
 			},
@@ -144,7 +145,7 @@ func testSetupGenesis(t *testing.T, scheme string) {
 		{
 			name: "custom block in DB, genesis == goerli",
 			fn: func(db ethdb.Database) (ctypes.ChainConfigurator, common.Hash, error) {
-				tdb := trie.NewDatabase(db, newDbConfig(scheme))
+				tdb := triedb.NewDatabase(db, newDbConfig(scheme))
 				MustCommitGenesis(db, tdb, &customg)
 				return SetupGenesisBlock(db, tdb, params.DefaultGoerliGenesisBlock())
 			},
@@ -155,8 +156,8 @@ func testSetupGenesis(t *testing.T, scheme string) {
 		{
 			name: "compatible config in DB",
 			fn: func(db ethdb.Database) (ctypes.ChainConfigurator, common.Hash, error) {
-				tdb := trie.NewDatabase(db, newDbConfig(scheme))
-				MustCommitGenesis(db, trie.NewDatabase(db, nil), &oldcustomg)
+				tdb := triedb.NewDatabase(db, newDbConfig(scheme))
+				MustCommitGenesis(db, triedb.NewDatabase(db, nil), &oldcustomg)
 				return SetupGenesisBlock(db, tdb, &customg)
 			},
 			wantHash:   customghash,
@@ -167,7 +168,7 @@ func testSetupGenesis(t *testing.T, scheme string) {
 			fn: func(db ethdb.Database) (ctypes.ChainConfigurator, common.Hash, error) {
 				// Commit the 'old' genesis block with Homestead transition at #2.
 				// Advance to block #4, past the homestead transition block of customg.
-				tdb := trie.NewDatabase(db, newDbConfig(scheme))
+				tdb := triedb.NewDatabase(db, newDbConfig(scheme))
 				MustCommitGenesis(db, tdb, &oldcustomg)
 
 				bc, _ := NewBlockChain(db, DefaultCacheConfigWithScheme(scheme), &oldcustomg, nil, ethash.NewFullFaker(), vm.Config{}, nil, nil)
@@ -226,7 +227,7 @@ func TestGenesisHashes(t *testing.T) {
 	} {
 		// Test via MustCommit
 		db := rawdb.NewMemoryDatabase()
-		if have := MustCommitGenesis(rawdb.NewMemoryDatabase(), trie.NewDatabase(db, trie.HashDefaults), c.genesis).Hash(); have != c.want {
+		if have := MustCommitGenesis(rawdb.NewMemoryDatabase(), triedb.NewDatabase(db, triedb.HashDefaults), c.genesis).Hash(); have != c.want {
 			t.Errorf("case: %d a), want: %s, got: %s", i, c.want.Hex(), have.Hex())
 		}
 		// TODO(meowsbits): go-ethereum has an additional Test via ToBlock. Is there a comparable method that we should also test here?
@@ -241,7 +242,7 @@ func TestGenesis_Commit(t *testing.T) {
 	}
 
 	db := rawdb.NewMemoryDatabase()
-	genesisBlock := MustCommitGenesis(db, trie.NewDatabase(db, trie.HashDefaults), genesis)
+	genesisBlock := MustCommitGenesis(db, triedb.NewDatabase(db, triedb.HashDefaults), genesis)
 
 	if genesis.Difficulty != nil {
 		t.Fatalf("assumption wrong")
@@ -267,7 +268,7 @@ func TestReadWriteGenesisAlloc(t *testing.T) {
 			{1}: {Balance: big.NewInt(1), Storage: map[common.Hash]common.Hash{{1}: {1}}},
 			{2}: {Balance: big.NewInt(2), Storage: map[common.Hash]common.Hash{{2}: {2}}},
 		}
-		hash, _ = gaDeriveHash(alloc)
+		hash, _ = gaHash(alloc, false)
 	)
 	blob, _ := json.Marshal(alloc)
 	rawdb.WriteGenesisStateSpec(db, hash, blob)
@@ -291,9 +292,74 @@ func TestReadWriteGenesisAlloc(t *testing.T) {
 	}
 }
 
-func newDbConfig(scheme string) *trie.Config {
+func newDbConfig(scheme string) *triedb.Config {
 	if scheme == rawdb.HashScheme {
-		return trie.HashDefaults
+		return triedb.HashDefaults
 	}
-	return &trie.Config{PathDB: pathdb.Defaults}
+	return &triedb.Config{PathDB: pathdb.Defaults}
+}
+
+func TestVerkleGenesisCommit(t *testing.T) {
+	var verkleTime uint64 = 0
+	verkleConfig := &goethereum.ChainConfig{
+		ChainID:                       big.NewInt(1),
+		HomesteadBlock:                big.NewInt(0),
+		DAOForkBlock:                  nil,
+		DAOForkSupport:                false,
+		EIP150Block:                   big.NewInt(0),
+		EIP155Block:                   big.NewInt(0),
+		EIP158Block:                   big.NewInt(0),
+		ByzantiumBlock:                big.NewInt(0),
+		ConstantinopleBlock:           big.NewInt(0),
+		PetersburgBlock:               big.NewInt(0),
+		IstanbulBlock:                 big.NewInt(0),
+		MuirGlacierBlock:              big.NewInt(0),
+		BerlinBlock:                   big.NewInt(0),
+		LondonBlock:                   big.NewInt(0),
+		ArrowGlacierBlock:             big.NewInt(0),
+		GrayGlacierBlock:              big.NewInt(0),
+		MergeNetsplitBlock:            nil,
+		ShanghaiTime:                  &verkleTime,
+		CancunTime:                    &verkleTime,
+		PragueTime:                    &verkleTime,
+		VerkleTime:                    &verkleTime,
+		TerminalTotalDifficulty:       big.NewInt(0),
+		TerminalTotalDifficultyPassed: true,
+		Ethash:                        nil,
+		Clique:                        nil,
+	}
+
+	genesis := &genesisT.Genesis{
+		BaseFee:    big.NewInt(vars.InitialBaseFee),
+		Config:     verkleConfig,
+		Timestamp:  verkleTime,
+		Difficulty: big.NewInt(0),
+		Alloc: genesisT.GenesisAlloc{
+			{1}: {Balance: big.NewInt(1), Storage: map[common.Hash]common.Hash{{1}: {1}}},
+		},
+	}
+
+	db := rawdb.NewMemoryDatabase()
+
+	expected := common.Hex2Bytes("14398d42be3394ff8d50681816a4b7bf8d8283306f577faba2d5bc57498de23b")
+	genesisBlock := MustCommitGenesis(db, triedb.NewDatabase(db, triedb.HashDefaults), genesis)
+	got := genesisBlock.Root().Bytes()
+	if !bytes.Equal(got, expected) {
+		t.Fatalf("invalid genesis state root, expected %x, got %x", expected, got)
+	}
+
+	triedb := triedb.NewDatabase(db, &triedb.Config{IsVerkle: true, PathDB: pathdb.Defaults})
+	block := MustCommitGenesis(db, triedb, genesis)
+	if !bytes.Equal(block.Root().Bytes(), expected) {
+		t.Fatalf("invalid genesis state root, expected %x, got %x", expected, got)
+	}
+
+	// Test that the trie is verkle
+	if !triedb.IsVerkle() {
+		t.Fatalf("expected trie to be verkle")
+	}
+
+	if !rawdb.ExistsAccountTrieNode(db, nil) {
+		t.Fatal("could not find node")
+	}
 }

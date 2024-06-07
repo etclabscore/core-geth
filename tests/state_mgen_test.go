@@ -31,8 +31,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/state"
-	"github.com/ethereum/go-ethereum/core/state/snapshot"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/internal/build"
@@ -317,7 +315,7 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 				Index: s.Index,
 			}
 
-			_, _, statedb, root, err := test.RunNoVerifyWithPost(targetSubtest, vmConfig, false, rawdb.HashScheme, stPost)
+			state, root, err := test.RunNoVerifyWithPost(targetSubtest, vmConfig, false, rawdb.HashScheme, stPost)
 			if err != nil {
 				// Our runner has returned an error.
 				// This can either be an intentional error (testing for the error), or an "unexpected" error,
@@ -348,9 +346,9 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 					// We overwrite the expected error to a zero value, because it didn't fail under our target configuration.
 					stPost.ExpectException = ""
 				}
-				// If no error was returned, we can safely expect the root and statedb value to exist for us.
+				// If no error was returned, we can safely expect the root and state value to exist for us.
 				stPost.Root = common.UnprefixedHash(root)
-				stPost.Logs = common.UnprefixedHash(rlpHash(statedb.Logs()))
+				stPost.Logs = common.UnprefixedHash(rlpHash(state.StateDB.Logs()))
 			}
 
 			targets[targetFork][s.Index] = stPost
@@ -403,7 +401,7 @@ func (tm *testMatcherGen) stateTestRunner(t *testing.T, name string, test *State
 			// vmConfig is constructed using global variables for possible EVM and EWASM interpreters.
 			// These interpreters are configured with environment variables and are assigned in an init() function.
 			vmConfig := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
-			test.Run(st, vmConfig, false, rawdb.HashScheme, func(err error, snaps *snapshot.Tree, state *state.StateDB) {
+			test.Run(st, vmConfig, false, rawdb.HashScheme, func(err error, state *StateTestState) {
 				if err != nil && len(test.json.Post[st.Fork][st.Index].ExpectException) > 0 {
 					// Ignore expected errors (TODO MariusVanDerWijden check error string)
 					return

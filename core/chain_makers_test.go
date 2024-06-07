@@ -34,7 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
-	"github.com/ethereum/go-ethereum/trie"
+	"github.com/ethereum/go-ethereum/triedb"
 )
 
 func TestGeneratePOSChain(t *testing.T) {
@@ -84,7 +84,7 @@ func TestGeneratePOSChain(t *testing.T) {
 		Storage: storage,
 		Code:    common.Hex2Bytes("600154600354"),
 	}
-	genesis := MustCommitGenesis(gendb, trie.NewDatabase(gendb, trie.HashDefaults), gspec)
+	genesis := MustCommitGenesis(gendb, triedb.NewDatabase(gendb, triedb.HashDefaults), gspec)
 
 	genchain, genreceipts := GenerateChain(gspec.Config, genesis, beacon.NewFaker(), gendb, 4, func(i int, gen *BlockGen) {
 		gen.SetParentBeaconRoot(common.Hash{byte(i + 1)})
@@ -207,7 +207,7 @@ func ExampleGenerateChain() {
 		Config: &goethereum.ChainConfig{HomesteadBlock: new(big.Int)},
 		Alloc:  genesisT.GenesisAlloc{addr1: {Balance: big.NewInt(1000000)}},
 	}
-	genesis := MustCommitGenesis(genDb, trie.NewDatabase(genDb, trie.HashDefaults), gspec)
+	genesis := MustCommitGenesis(genDb, triedb.NewDatabase(genDb, triedb.HashDefaults), gspec)
 
 	// This call generates a chain of 5 blocks. The function runs for
 	// each block and adds different features to gen based on the

@@ -20,9 +20,10 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/params/vars"
+	"github.com/holiman/uint256"
 )
 
-func EthashBlockReward(c ChainConfigurator, n *big.Int) *big.Int {
+func EthashBlockReward(c ChainConfigurator, n *big.Int) *uint256.Int {
 	// Select the correct block reward based on chain progression
 	blockReward := vars.FrontierBlockReward
 	if c == nil || n == nil {

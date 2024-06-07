@@ -22,18 +22,19 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/holiman/uint256"
 )
 
 // Some weird constants to avoid constant memory allocs for them.
 var (
-	big8  = big.NewInt(8)
-	big32 = big.NewInt(32)
+	big8  = uint256.NewInt(8)
+	big32 = uint256.NewInt(32)
 )
 
 // GetRewards calculates the mining reward.
 // The total reward consists of the static block reward and rewards for
 // included uncles. The coinbase of each uncle block is also calculated.
-func GetRewards(config ctypes.ChainConfigurator, header *types.Header, uncles []*types.Header) (*big.Int, []*big.Int) {
+func GetRewards(config ctypes.ChainConfigurator, header *types.Header, uncles []*types.Header) (*uint256.Int, []*uint256.Int) {
 	if config.IsEnabled(config.GetEthashECIP1017Transition, header.Number) {
 		return ecip1017BlockReward(config, header, uncles)
 	}
@@ -41,16 +42,16 @@ func GetRewards(config ctypes.ChainConfigurator, header *types.Header, uncles []
 	blockReward := ctypes.EthashBlockReward(config, header.Number)
 
 	// Accumulate the rewards for the miner and any included uncles
-	uncleRewards := make([]*big.Int, len(uncles))
-	reward := new(big.Int).Set(blockReward)
-	r := new(big.Int)
+	uncleRewards := make([]*uint256.Int, len(uncles))
+	reward := new(uint256.Int).Set(blockReward)
+	r := new(uint256.Int)
 	for i, uncle := range uncles {
-		r.Add(uncle.Number, big8)
-		r.Sub(r, header.Number)
+		r.Add(uint256.MustFromBig(uncle.Number), big8)
+		r.Sub(r, uint256.MustFromBig(header.Number))
 		r.Mul(r, blockReward)
 		r.Div(r, big8)
 
-		ur := new(big.Int).Set(r)
+		ur := new(uint256.Int).Set(r)
 		uncleRewards[i] = ur
 
 		r.Div(blockReward, big32)
@@ -72,20 +73,20 @@ func AccumulateRewards(config ctypes.ChainConfigurator, state *state.StateDB, he
 
 // As of "Era 2" (zero-index era 1), uncle miners and winners are rewarded equally for each included block.
 // So they share this function.
-func getEraUncleBlockReward(era *big.Int, blockReward *big.Int) *big.Int {
-	return new(big.Int).Div(GetBlockWinnerRewardByEra(era, blockReward), big32)
+func getEraUncleBlockReward(era *big.Int, blockReward *uint256.Int) *uint256.Int {
+	return new(uint256.Int).Div(GetBlockWinnerRewardByEra(era, blockReward), big32)
 }
 
 // GetBlockUncleRewardByEra gets called _for each uncle miner_ associated with a winner block's uncles.
-func GetBlockUncleRewardByEra(era *big.Int, header, uncle *types.Header, blockReward *big.Int) *big.Int {
+func GetBlockUncleRewardByEra(era *big.Int, header, uncle *types.Header, blockReward *uint256.Int) *uint256.Int {
 	// Era 1 (index 0):
 	//   An extra reward to the winning miner for including uncles as part of the block, in the form of an extra 1/32 (0.15625ETC) per uncle included, up to a maximum of two (2) uncles.
 	if era.Cmp(big.NewInt(0)) == 0 {
-		r := new(big.Int)
-		r.Add(uncle.Number, big8) // 2,534,998 + 8              = 2,535,006
-		r.Sub(r, header.Number)   // 2,535,006 - 2,534,999        = 7
-		r.Mul(r, blockReward)     // 7 * 5e+18               = 35e+18
-		r.Div(r, big8)            // 35e+18 / 8                            = 7/8 * 5e+18
+		r := new(uint256.Int)
+		r.Add(uint256.MustFromBig(uncle.Number), big8) // 2,534,998 + 8              = 2,535,006
+		r.Sub(r, uint256.MustFromBig(header.Number))   // 2,535,006 - 2,534,999        = 7
+		r.Mul(r, blockReward)                          // 7 * 5e+18               = 35e+18
+		r.Div(r, big8)                                 // 35e+18 / 8                            = 7/8 * 5e+18
 
 		return r
 	}
@@ -94,8 +95,8 @@ func GetBlockUncleRewardByEra(era *big.Int, header, uncle *types.Header, blockRe
 
 // GetBlockWinnerRewardForUnclesByEra gets called _per winner_, and accumulates rewards for each included uncle.
 // Assumes uncles have been validated and limited (@ func (v *BlockValidator) VerifyUncles).
-func GetBlockWinnerRewardForUnclesByEra(era *big.Int, uncles []*types.Header, blockReward *big.Int) *big.Int {
-	r := big.NewInt(0)
+func GetBlockWinnerRewardForUnclesByEra(era *big.Int, uncles []*types.Header, blockReward *uint256.Int) *uint256.Int {
+	r := uint256.NewInt(0)
 
 	for range uncles {
 		r.Add(r, getEraUncleBlockReward(era, blockReward)) // can reuse this, since 1/32 for winner's uncles remain unchanged from "Era 1"
@@ -105,18 +106,20 @@ func GetBlockWinnerRewardForUnclesByEra(era *big.Int, uncles []*types.Header, bl
 
 // GetRewardByEra gets a block reward at disinflation rate.
 // Constants MaxBlockReward, DisinflationRateQuotient, and DisinflationRateDivisor assumed.
-func GetBlockWinnerRewardByEra(era *big.Int, blockReward *big.Int) *big.Int {
+func GetBlockWinnerRewardByEra(era *big.Int, blockReward *uint256.Int) *uint256.Int {
 	if era.Cmp(big.NewInt(0)) == 0 {
-		return new(big.Int).Set(blockReward)
+		return new(uint256.Int).Set(blockReward)
 	}
 
 	// MaxBlockReward _r_ * (4/5)**era == MaxBlockReward * (4**era) / (5**era)
 	// since (q/d)**n == q**n / d**n
 	// qed
-	var q, d, r *big.Int = new(big.Int), new(big.Int), new(big.Int)
+	var q, d, r *uint256.Int = new(uint256.Int), new(uint256.Int), new(uint256.Int)
 
-	q.Exp(params.DisinflationRateQuotient, era, nil)
-	d.Exp(params.DisinflationRateDivisor, era, nil)
+	// Era values are relatively small and never nil,
+	// so we can be confident that these conversions will not panic.
+	q.Exp(params.DisinflationRateQuotient, uint256.MustFromBig(era))
+	d.Exp(params.DisinflationRateDivisor, uint256.MustFromBig(era))
 
 	r.Mul(blockReward, q)
 	r.Div(r, d)

@@ -36,7 +36,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
-	"github.com/ethereum/go-ethereum/trie"
+	"github.com/ethereum/go-ethereum/triedb"
 )
 
 func makeReceipt(addr common.Address) *types.Receipt {
@@ -88,7 +88,7 @@ func BenchmarkFilters(b *testing.B) {
 	// The test txs are not properly signed, can't simply create a chain
 	// and then import blocks. TODO(rjl493456442) try to get rid of the
 	// manual database writes.
-	core.MustCommitGenesis(db, trie.NewDatabase(db, trie.HashDefaults), gspec)
+	core.MustCommitGenesis(db, triedb.NewDatabase(db, triedb.HashDefaults), gspec)
 
 	for i, block := range chain {
 		rawdb.WriteBlock(db, block)
@@ -101,6 +101,7 @@ func BenchmarkFilters(b *testing.B) {
 	filter := sys.NewRangeFilter(0, -1, []common.Address{addr1, addr2, addr3, addr4}, nil)
 
 	for i := 0; i < b.N; i++ {
+		filter.begin = 0
 		logs, _ := filter.Logs(context.Background())
 		if len(logs) != 4 {
 			b.Fatal("expected 4 logs, got", len(logs))
@@ -182,7 +183,7 @@ func TestFilters(t *testing.T) {
 
 	// Hack: GenerateChainWithGenesis creates a new db.
 	// Commit the genesis manually and use GenerateChain.
-	g, err := core.CommitGenesis(gspec, db, trie.NewDatabase(db, nil))
+	g, err := core.CommitGenesis(gspec, db, triedb.NewDatabase(db, nil))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -355,7 +356,7 @@ func TestFilters(t *testing.T) {
 		},
 		{
 			f:   sys.NewRangeFilter(int64(rpc.PendingBlockNumber), int64(rpc.LatestBlockNumber), nil, nil),
-			err: "invalid block range",
+			err: errInvalidBlockRange.Error(),
 		},
 	} {
 		logs, err := tc.f.Logs(context.Background())

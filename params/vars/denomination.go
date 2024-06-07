@@ -19,7 +19,7 @@ package vars
 // These are the multipliers for ether denominations.
 // Example: To get the wei value of an amount in 'gwei', use
 //
-//	new(big.Int).Mul(value, big.NewInt(params.GWei))
+//	new(big.Int).Mul(value, big.NewInt(vars.GWei))
 const (
 	Wei   = 1
 	GWei  = 1e9

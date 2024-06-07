@@ -46,7 +46,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
-	"github.com/ethereum/go-ethereum/trie"
+	"github.com/ethereum/go-ethereum/triedb"
 	meta_schema "github.com/open-rpc/meta-schema"
 )
 
@@ -251,6 +251,13 @@ func newTestBackend(t *testing.T) (*node.Node, []*types.Block) {
 	if _, err := ethservice.BlockChain().InsertChain(blocks[1:]); err != nil {
 		t.Fatalf("can't import test blocks: %v", err)
 	}
+	// Ensure the tx indexing is fully generated
+	for ; ; time.Sleep(time.Millisecond * 100) {
+		progress, err := ethservice.BlockChain().TxIndexProgress()
+		if err == nil && progress.Done() {
+			break
+		}
+	}
 	return n, blocks
 }
 
@@ -267,7 +274,7 @@ func generateTestChain() []*types.Block {
 	}
 	_, blocks, _ := core.GenerateChainWithGenesis(genesis, ethash.NewFaker(), 2, generate)
 	mem := rawdb.NewMemoryDatabase()
-	genesisBlock := core.MustCommitGenesis(mem, trie.NewDatabase(mem, nil), genesis)
+	genesisBlock := core.MustCommitGenesis(mem, triedb.NewDatabase(mem, nil), genesis)
 	return append([]*types.Block{genesisBlock}, blocks...)
 }
 
@@ -287,7 +294,7 @@ func TestEthClient(t *testing.T) {
 			func(t *testing.T) { testBalanceAt(t, client) },
 		},
 		"TxInBlockInterrupted": {
-			func(t *testing.T) { testTransactionInBlockInterrupted(t, client) },
+			func(t *testing.T) { testTransactionInBlock(t, client) },
 		},
 		"ChainID": {
 			func(t *testing.T) { testChainID(t, client) },
@@ -352,7 +359,7 @@ func testHeader(t *testing.T, chain []*types.Block, client *rpc.Client) {
 				got.Number = big.NewInt(0) // hack to make DeepEqual work
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Fatalf("HeaderByNumber(%v)\n   = %v\nwant %v", tt.block, got, tt.want)
+				t.Fatalf("HeaderByNumber(%v) got = %v, want %v", tt.block, got, tt.want)
 			}
 		})
 	}
@@ -442,7 +449,7 @@ func TestHeader_TxesUnclesNotEmpty(t *testing.T) {
 	}
 }
 
-func testTransactionInBlockInterrupted(t *testing.T, client *rpc.Client) {
+func testTransactionInBlock(t *testing.T, client *rpc.Client) {
 	ec := NewClient(client)
 
 	// Get current block by number.
@@ -451,21 +458,26 @@ func testTransactionInBlockInterrupted(t *testing.T, client *rpc.Client) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	// Test tx in block interrupted.
-	ctx, cancel := context.WithCancel(context.Background())
-	cancel()
-	<-ctx.Done() // Ensure the close of the Done channel
-	tx, err := ec.TransactionInBlock(ctx, block.Hash(), 0)
-	if tx != nil {
-		t.Fatal("transaction should be nil")
-	}
-	if err == nil || err == ethereum.NotFound {
-		t.Fatal("error should not be nil/notfound")
-	}
-
 	// Test tx in block not found.
 	if _, err := ec.TransactionInBlock(context.Background(), block.Hash(), 20); err != ethereum.NotFound {
 		t.Fatal("error should be ethereum.NotFound")
+	}
+
+	// Test tx in block found.
+	tx, err := ec.TransactionInBlock(context.Background(), block.Hash(), 0)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if tx.Hash() != testTx1.Hash() {
+		t.Fatalf("unexpected transaction: %v", tx)
+	}
+
+	tx, err = ec.TransactionInBlock(context.Background(), block.Hash(), 1)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if tx.Hash() != testTx2.Hash() {
+		t.Fatalf("unexpected transaction: %v", tx)
 	}
 }
 
@@ -855,7 +867,7 @@ func TestRPCDiscover(t *testing.T) {
 
 			responseDocument, _ := json.MarshalIndent(r, "", "    ")
 			t.Logf(`Response Document:
-			
+
 %s`, string(responseDocument))
 			t.Fatalf(`OVER (methods which do not appear in the current API, but exist in the hardcoded response document):):
 %v
@@ -1150,7 +1162,6 @@ var allRPCMethods = []string{
 	"admin_stopRPC",
 	"admin_stopWS",
 	"debug_accountRange",
-	"debug_backtraceAt",
 	"debug_blockProfile",
 	"debug_chaindbCompact",
 	"debug_chaindbProperty",
@@ -1158,6 +1169,7 @@ var allRPCMethods = []string{
 	"debug_dbAncient",
 	"debug_dbAncients",
 	"debug_dbGet",
+	"debug_discoveryV4Table",
 	"debug_dumpBlock",
 	"debug_freeOSMemory",
 	"debug_gcStats",

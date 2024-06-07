@@ -13,30 +13,31 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/holiman/uint256"
 )
 
 var (
 	defaultEraLength   *big.Int = big.NewInt(5000000)
-	MaximumBlockReward          = big.NewInt(5e+18)
+	MaximumBlockReward          = uint256.NewInt(5e+18)
 	WinnerCoinbase              = common.HexToAddress("0000000000000000000000000000000000000001")
 	Uncle1Coinbase              = common.HexToAddress("0000000000000000000000000000000000000002")
 	Uncle2Coinbase              = common.HexToAddress("0000000000000000000000000000000000000003")
 
-	Era1WinnerReward      = big.NewInt(5e+18)               // base block reward
-	Era1WinnerUncleReward = big.NewInt(156250000000000000)  // uncle inclusion reward (base block reward / 32)
-	Era1UncleReward       = big.NewInt(4375000000000000000) // uncle reward (depth 1) (block reward * (7/8))
+	Era1WinnerReward      = uint256.NewInt(5e+18)               // base block reward
+	Era1WinnerUncleReward = uint256.NewInt(156250000000000000)  // uncle inclusion reward (base block reward / 32)
+	Era1UncleReward       = uint256.NewInt(4375000000000000000) // uncle reward (depth 1) (block reward * (7/8))
 
-	Era2WinnerReward      = big.NewInt(4e+18)
-	Era2WinnerUncleReward = new(big.Int).Div(big.NewInt(4e+18), big32)
-	Era2UncleReward       = new(big.Int).Div(big.NewInt(4e+18), big32)
+	Era2WinnerReward      = uint256.NewInt(4e+18)
+	Era2WinnerUncleReward = new(uint256.Int).Div(uint256.NewInt(4e+18), big32)
+	Era2UncleReward       = new(uint256.Int).Div(uint256.NewInt(4e+18), big32)
 
-	Era3WinnerReward      = new(big.Int).Mul(new(big.Int).Div(Era2WinnerReward, big.NewInt(5)), big.NewInt(4))
-	Era3WinnerUncleReward = new(big.Int).Div(new(big.Int).Mul(new(big.Int).Div(Era2WinnerReward, big.NewInt(5)), big.NewInt(4)), big32)
-	Era3UncleReward       = new(big.Int).Div(new(big.Int).Mul(new(big.Int).Div(Era2WinnerReward, big.NewInt(5)), big.NewInt(4)), big32)
+	Era3WinnerReward      = new(uint256.Int).Mul(new(uint256.Int).Div(Era2WinnerReward, uint256.NewInt(5)), uint256.NewInt(4))
+	Era3WinnerUncleReward = new(uint256.Int).Div(new(uint256.Int).Mul(new(uint256.Int).Div(Era2WinnerReward, uint256.NewInt(5)), uint256.NewInt(4)), big32)
+	Era3UncleReward       = new(uint256.Int).Div(new(uint256.Int).Mul(new(uint256.Int).Div(Era2WinnerReward, uint256.NewInt(5)), uint256.NewInt(4)), big32)
 
-	Era4WinnerReward      = new(big.Int).Mul(new(big.Int).Div(Era3WinnerReward, big.NewInt(5)), big.NewInt(4))
-	Era4WinnerUncleReward = new(big.Int).Div(new(big.Int).Mul(new(big.Int).Div(Era3WinnerReward, big.NewInt(5)), big.NewInt(4)), big32)
-	Era4UncleReward       = new(big.Int).Div(new(big.Int).Mul(new(big.Int).Div(Era3WinnerReward, big.NewInt(5)), big.NewInt(4)), big32)
+	Era4WinnerReward      = new(uint256.Int).Mul(new(uint256.Int).Div(Era3WinnerReward, uint256.NewInt(5)), uint256.NewInt(4))
+	Era4WinnerUncleReward = new(uint256.Int).Div(new(uint256.Int).Mul(new(uint256.Int).Div(Era3WinnerReward, uint256.NewInt(5)), uint256.NewInt(4)), big32)
+	Era4UncleReward       = new(uint256.Int).Div(new(uint256.Int).Mul(new(uint256.Int).Div(Era3WinnerReward, uint256.NewInt(5)), uint256.NewInt(4)), big32)
 )
 
 func TestGetBlockEra1(t *testing.T) {
@@ -94,18 +95,18 @@ func TestGetBlockEra2(t *testing.T) {
 }
 
 func TestGetBlockWinnerRewardByEra(t *testing.T) {
-	cases := map[*big.Int]*big.Int{
+	cases := map[*big.Int]*uint256.Int{
 		big.NewInt(0):        MaximumBlockReward,
 		big.NewInt(1):        MaximumBlockReward,
 		big.NewInt(4999999):  MaximumBlockReward,
 		big.NewInt(5000000):  MaximumBlockReward,
-		big.NewInt(5000001):  big.NewInt(4e+18),
-		big.NewInt(9999999):  big.NewInt(4e+18),
-		big.NewInt(10000000): big.NewInt(4e+18),
-		big.NewInt(10000001): big.NewInt(3.2e+18),
-		big.NewInt(14999999): big.NewInt(3.2e+18),
-		big.NewInt(15000000): big.NewInt(3.2e+18),
-		big.NewInt(15000001): big.NewInt(2.56e+18),
+		big.NewInt(5000001):  uint256.NewInt(4e+18),
+		big.NewInt(9999999):  uint256.NewInt(4e+18),
+		big.NewInt(10000000): uint256.NewInt(4e+18),
+		big.NewInt(10000001): uint256.NewInt(3.2e+18),
+		big.NewInt(14999999): uint256.NewInt(3.2e+18),
+		big.NewInt(15000000): uint256.NewInt(3.2e+18),
+		big.NewInt(15000001): uint256.NewInt(2.56e+18),
 	}
 
 	for bn, expectedReward := range cases {
@@ -113,7 +114,7 @@ func TestGetBlockWinnerRewardByEra(t *testing.T) {
 		if gotReward.Cmp(expectedReward) != 0 {
 			t.Errorf("@ %v, got: %v, want: %v", bn, gotReward, expectedReward)
 		}
-		if gotReward.Cmp(big.NewInt(0)) <= 0 {
+		if gotReward.Cmp(uint256.NewInt(0)) <= 0 {
 			t.Errorf("@ %v, got: %v, want: %v", bn, gotReward, expectedReward)
 		}
 		if gotReward.Cmp(MaximumBlockReward) > 0 {
@@ -123,14 +124,14 @@ func TestGetBlockWinnerRewardByEra(t *testing.T) {
 }
 
 func TestGetBlockUncleRewardByEra(t *testing.T) {
-	var we1, we2, we3, we4 *big.Int = new(big.Int), new(big.Int), new(big.Int), new(big.Int)
+	var we1, we2, we3, we4 *uint256.Int = new(uint256.Int), new(uint256.Int), new(uint256.Int), new(uint256.Int)
 
 	// manually divide maxblockreward/32 to compare to got
-	we2.Div(GetBlockWinnerRewardByEra(GetBlockEra(big.NewInt(5000001), defaultEraLength), MaximumBlockReward), big.NewInt(32))
-	we3.Div(GetBlockWinnerRewardByEra(GetBlockEra(big.NewInt(10000001), defaultEraLength), MaximumBlockReward), big.NewInt(32))
-	we4.Div(GetBlockWinnerRewardByEra(GetBlockEra(big.NewInt(15000001), defaultEraLength), MaximumBlockReward), big.NewInt(32))
+	we2.Div(GetBlockWinnerRewardByEra(GetBlockEra(big.NewInt(5000001), defaultEraLength), MaximumBlockReward), uint256.NewInt(32))
+	we3.Div(GetBlockWinnerRewardByEra(GetBlockEra(big.NewInt(10000001), defaultEraLength), MaximumBlockReward), uint256.NewInt(32))
+	we4.Div(GetBlockWinnerRewardByEra(GetBlockEra(big.NewInt(15000001), defaultEraLength), MaximumBlockReward), uint256.NewInt(32))
 
-	cases := map[*big.Int]*big.Int{
+	cases := map[*big.Int]*uint256.Int{
 		big.NewInt(0):        nil,
 		big.NewInt(1):        nil,
 		big.NewInt(4999999):  nil,
@@ -156,10 +157,10 @@ func TestGetBlockUncleRewardByEra(t *testing.T) {
 
 		// "Era 1"
 		if want == nil {
-			we1.Add(uncle.Number, big8)      // 2,534,998 + 8              = 2,535,006
-			we1.Sub(we1, header.Number)      // 2,535,006 - 2,534,999        = 7
-			we1.Mul(we1, MaximumBlockReward) // 7 * 5e+18               = 35e+18
-			we1.Div(we1, big8)               // 35e+18 / 8                            = 7/8 * 5e+18
+			we1.Add(uint256.MustFromBig(uncle.Number), big8) // 2,534,998 + 8              = 2,535,006
+			we1.Sub(we1, uint256.MustFromBig(header.Number)) // 2,535,006 - 2,534,999        = 7
+			we1.Mul(we1, MaximumBlockReward)                 // 7 * 5e+18               = 35e+18
+			we1.Div(we1, big8)                               // 35e+18 / 8                            = 7/8 * 5e+18
 
 			if got.Cmp(we1) != 0 {
 				t.Errorf("@ %v, want: %v, got: %v", bn, we1, got)
@@ -174,13 +175,13 @@ func TestGetBlockUncleRewardByEra(t *testing.T) {
 
 func TestGetBlockWinnerRewardForUnclesByEra(t *testing.T) {
 	// "want era 1", "want era 2", ...
-	var we1, we2, we3, we4 *big.Int = new(big.Int), new(big.Int), new(big.Int), new(big.Int)
-	we1.Div(MaximumBlockReward, big.NewInt(32))
-	we2.Div(GetBlockWinnerRewardByEra(big.NewInt(1), MaximumBlockReward), big.NewInt(32))
-	we3.Div(GetBlockWinnerRewardByEra(big.NewInt(2), MaximumBlockReward), big.NewInt(32))
-	we4.Div(GetBlockWinnerRewardByEra(big.NewInt(3), MaximumBlockReward), big.NewInt(32))
+	var we1, we2, we3, we4 *uint256.Int = new(uint256.Int), new(uint256.Int), new(uint256.Int), new(uint256.Int)
+	we1.Div(MaximumBlockReward, uint256.NewInt(32))
+	we2.Div(GetBlockWinnerRewardByEra(big.NewInt(1), MaximumBlockReward), uint256.NewInt(32))
+	we3.Div(GetBlockWinnerRewardByEra(big.NewInt(2), MaximumBlockReward), uint256.NewInt(32))
+	we4.Div(GetBlockWinnerRewardByEra(big.NewInt(3), MaximumBlockReward), uint256.NewInt(32))
 
-	cases := map[*big.Int]*big.Int{
+	cases := map[*big.Int]*uint256.Int{
 		big.NewInt(0):        we1,
 		big.NewInt(1):        we1,
 		big.NewInt(4999999):  we1,
@@ -205,8 +206,8 @@ func TestGetBlockWinnerRewardForUnclesByEra(t *testing.T) {
 
 		// test double uncle
 		got = GetBlockWinnerRewardForUnclesByEra(GetBlockEra(bn, defaultEraLength), uncleDouble, MaximumBlockReward)
-		dub := new(big.Int)
-		if got.Cmp(dub.Mul(want, big.NewInt(2))) != 0 {
+		dub := new(uint256.Int)
+		if got.Cmp(dub.Mul(want, uint256.NewInt(2))) != 0 {
 			t.Errorf("@ %v: want: %v, got: %v", bn, want, got)
 		}
 	}
@@ -236,12 +237,12 @@ const (
 	era4 = 4
 )
 
-type expectedRewards map[common.Address]*big.Int
+type expectedRewards map[common.Address]*uint256.Int
 
 func calculateExpectedEraRewards(era *big.Int, numUncles int) expectedRewards {
-	wr := new(big.Int)
-	wur := new(big.Int)
-	ur := new(big.Int)
+	wr := new(uint256.Int)
+	wur := new(uint256.Int)
+	ur := new(uint256.Int)
 	uera := era.Int64()
 	switch uera {
 	case era1:
@@ -262,7 +263,7 @@ func calculateExpectedEraRewards(era *big.Int, numUncles int) expectedRewards {
 		ur = Era4UncleReward
 	}
 	return expectedRewards{
-		WinnerCoinbase: new(big.Int).Add(wr, new(big.Int).Mul(wur, big.NewInt(int64(numUncles)))),
+		WinnerCoinbase: new(uint256.Int).Add(wr, new(uint256.Int).Mul(wur, uint256.NewInt(uint64(numUncles)))),
 		Uncle1Coinbase: ur,
 		Uncle2Coinbase: ur,
 	}
@@ -399,7 +400,7 @@ func TestAccumulateRewards(t *testing.T) {
 		}
 
 		// Manual tallies for reward accumulation.
-		totalB := new(big.Int)
+		totalB := new(uint256.Int)
 
 		blockWinner := *stateDB.GetBalance(header.Coinbase) // start balance. 0
 		uncleMiner1 := *stateDB.GetBalance(uncles[0].Coinbase)
@@ -410,7 +411,7 @@ func TestAccumulateRewards(t *testing.T) {
 		totalB.Add(totalB, &uncleMiner2)
 
 		// make sure we are starting clean (everything is 0)
-		if totalB.Cmp(big.NewInt(0)) != 0 {
+		if !totalB.IsZero() {
 			t.Errorf("unexpected: %v", totalB)
 		}
 		for _, c := range cases[i] {
@@ -483,54 +484,54 @@ func TestGetBlockEra(t *testing.T) {
 }
 
 func TestGetBlockWinnerRewardByEra2(t *testing.T) {
-	baseReward := big.NewInt(5000000000000000000)
+	baseReward := uint256.NewInt(5000000000000000000)
 	era := big.NewInt(0)
 	blockReward := GetBlockWinnerRewardByEra(era, baseReward)
-	if blockReward.Cmp(big.NewInt(5000000000000000000)) != 0 {
+	if blockReward.Cmp(uint256.NewInt(5000000000000000000)) != 0 {
 		t.Error("Should return blockReward 5000000000000000000", "reward", blockReward)
 	}
 	era = big.NewInt(1)
 	blockReward = GetBlockWinnerRewardByEra(era, baseReward)
-	if blockReward.Cmp(big.NewInt(4000000000000000000)) != 0 {
+	if blockReward.Cmp(uint256.NewInt(4000000000000000000)) != 0 {
 		t.Error("Should return blockReward 4000000000000000000", "reward", blockReward)
 	}
 	era = big.NewInt(2)
 	blockReward = GetBlockWinnerRewardByEra(era, baseReward)
-	if blockReward.Cmp(big.NewInt(3200000000000000000)) != 0 {
+	if blockReward.Cmp(uint256.NewInt(3200000000000000000)) != 0 {
 		t.Error("Should return blockReward 3200000000000000000", "reward", blockReward)
 	}
 	era = big.NewInt(3)
 	blockReward = GetBlockWinnerRewardByEra(era, baseReward)
-	if blockReward.Cmp(big.NewInt(2560000000000000000)) != 0 {
+	if blockReward.Cmp(uint256.NewInt(2560000000000000000)) != 0 {
 		t.Error("Should return blockReward 2560000000000000000", "reward", blockReward)
 	}
 	era = big.NewInt(4)
 	blockReward = GetBlockWinnerRewardByEra(era, baseReward)
-	if blockReward.Cmp(big.NewInt(2048000000000000000)) != 0 {
+	if blockReward.Cmp(uint256.NewInt(2048000000000000000)) != 0 {
 		t.Error("Should return blockReward 2048000000000000000", "reward", blockReward)
 	}
 }
 
 func TestGetRewardForUncle(t *testing.T) {
-	baseReward := big.NewInt(4000000000000000000)
+	baseReward := uint256.NewInt(4000000000000000000)
 	era := big.NewInt(0)
 	uncleReward := getEraUncleBlockReward(era, baseReward)
-	if uncleReward.Cmp(big.NewInt(125000000000000000)) != 0 {
+	if uncleReward.Cmp(uint256.NewInt(125000000000000000)) != 0 {
 		t.Error("Should return uncleReward 125000000000000000", "reward", uncleReward)
 	}
-	baseReward = big.NewInt(3200000000000000000)
+	baseReward = uint256.NewInt(3200000000000000000)
 	uncleReward = getEraUncleBlockReward(era, baseReward)
-	if uncleReward.Cmp(big.NewInt(100000000000000000)) != 0 {
+	if uncleReward.Cmp(uint256.NewInt(100000000000000000)) != 0 {
 		t.Error("Should return uncleReward 100000000000000000", "reward", uncleReward)
 	}
-	baseReward = big.NewInt(2560000000000000000)
+	baseReward = uint256.NewInt(2560000000000000000)
 	uncleReward = getEraUncleBlockReward(era, baseReward)
-	if uncleReward.Cmp(big.NewInt(80000000000000000)) != 0 {
+	if uncleReward.Cmp(uint256.NewInt(80000000000000000)) != 0 {
 		t.Error("Should return uncleReward 80000000000000000", "reward", uncleReward)
 	}
-	baseReward = big.NewInt(2048000000000000000)
+	baseReward = uint256.NewInt(2048000000000000000)
 	uncleReward = getEraUncleBlockReward(era, baseReward)
-	if uncleReward.Cmp(big.NewInt(64000000000000000)) != 0 {
+	if uncleReward.Cmp(uint256.NewInt(64000000000000000)) != 0 {
 		t.Error("Should return uncleReward 64000000000000000", "reward", uncleReward)
 	}
 }

@@ -113,7 +113,7 @@ type Ethereum struct {
 func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 	// Ensure configuration values are compatible and sane
 	if config.SyncMode == downloader.LightSync {
-		return nil, errors.New("can't run eth.Ethereum in light sync mode, use les.LightEthereum")
+		return nil, errors.New("can't run eth.Ethereum in light sync mode, light mode has been deprecated")
 	}
 	if !config.SyncMode.IsValid() {
 		return nil, fmt.Errorf("invalid sync mode %d", config.SyncMode)
@@ -231,9 +231,6 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 	)
 	// Override the chain config with provided settings.
 	var overrides core.ChainOverrides
-	if config.OverrideShanghai != nil {
-		overrides.OverrideShanghai = config.OverrideShanghai
-	}
 	if config.OverrideCancun != nil {
 		overrides.OverrideCancun = config.OverrideCancun
 	}
@@ -273,7 +270,7 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 	}
 	legacyPool := legacypool.New(config.TxPool, eth.blockchain)
 
-	eth.txPool, err = txpool.New(new(big.Int).SetUint64(config.TxPool.PriceLimit), eth.blockchain, []txpool.SubPool{legacyPool, blobPool})
+	eth.txPool, err = txpool.New(config.TxPool.PriceLimit, eth.blockchain, []txpool.SubPool{legacyPool, blobPool})
 	if err != nil {
 		return nil, err
 	}
@@ -375,7 +372,7 @@ func (s *Ethereum) APIs() []rpc.API {
 			Service:   NewMinerAPI(s),
 		}, {
 			Namespace: "eth",
-			Service:   downloader.NewDownloaderAPI(s.handler.downloader, s.eventMux),
+			Service:   downloader.NewDownloaderAPI(s.handler.downloader, s.blockchain, s.eventMux),
 		}, {
 			Namespace: "admin",
 			Service:   NewAdminAPI(s),

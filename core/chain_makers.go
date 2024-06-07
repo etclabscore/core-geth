@@ -35,7 +35,8 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
-	"github.com/ethereum/go-ethereum/trie"
+	"github.com/ethereum/go-ethereum/triedb"
+	"github.com/holiman/uint256"
 )
 
 // BlockGen creates blocks for testing.
@@ -86,7 +87,7 @@ func (b *BlockGen) SetDifficulty(diff *big.Int) {
 	b.header.Difficulty = diff
 }
 
-// SetPos makes the header a PoS-header (0 difficulty)
+// SetPoS makes the header a PoS-header (0 difficulty)
 func (b *BlockGen) SetPoS() {
 	b.header.Difficulty = new(big.Int)
 }
@@ -161,7 +162,7 @@ func (b *BlockGen) AddTxWithVMConfig(tx *types.Transaction, config vm.Config) {
 }
 
 // GetBalance returns the balance of the given address at the generated block.
-func (b *BlockGen) GetBalance(addr common.Address) *big.Int {
+func (b *BlockGen) GetBalance(addr common.Address) *uint256.Int {
 	return b.statedb.GetBalance(addr)
 }
 
@@ -315,7 +316,7 @@ func GenerateChain(config ctypes.ChainConfigurator, parent *types.Block, engine 
 	}
 	cm := newChainMaker(parent, config, engine)
 
-	genblock := func(i int, parent *types.Block, triedb *trie.Database, statedb *state.StateDB) (*types.Block, types.Receipts) {
+	genblock := func(i int, parent *types.Block, triedb *triedb.Database, statedb *state.StateDB) (*types.Block, types.Receipts) {
 		b := &BlockGen{i: i, cm: cm, parent: parent, statedb: statedb, engine: engine}
 		b.header = cm.makeHeader(parent, statedb, b.engine)
 
@@ -365,7 +366,7 @@ func GenerateChain(config ctypes.ChainConfigurator, parent *types.Block, engine 
 	}
 
 	// Forcibly use hash-based state scheme for retaining all nodes in disk.
-	triedb := trie.NewDatabase(db, trie.HashDefaults)
+	triedb := triedb.NewDatabase(db, triedb.HashDefaults)
 	defer triedb.Close()
 
 	for i := 0; i < n; i++ {
@@ -387,10 +388,15 @@ func GenerateChain(config ctypes.ChainConfigurator, parent *types.Block, engine 
 		} else if len(receipts) < len(txs) {
 			txs = txs[:len(receipts)]
 		}
+
 		var blobGasPrice *big.Int
-		if block.ExcessBlobGas() != nil {
-			blobGasPrice = eip4844.CalcBlobFee(*block.ExcessBlobGas())
+		blockTime := block.Time()
+		if config.IsEnabledByTime(config.GetEIP4844TransitionTime, &blockTime) || config.IsEnabled(config.GetEIP4844Transition, block.Number()) {
+			if block.ExcessBlobGas() != nil {
+				blobGasPrice = eip4844.CalcBlobFee(*block.ExcessBlobGas())
+			}
 		}
+
 		if err := receipts.DeriveFields(config, block.Hash(), block.NumberU64(), block.Time(), block.BaseFee(), blobGasPrice, txs); err != nil {
 			panic(err)
 		}
@@ -410,7 +416,7 @@ func GenerateChain(config ctypes.ChainConfigurator, parent *types.Block, engine 
 // then generate chain on top.
 func GenerateChainWithGenesis(genesis *genesisT.Genesis, engine consensus.Engine, n int, gen func(int, *BlockGen)) (ethdb.Database, []*types.Block, []types.Receipts) {
 	db := rawdb.NewMemoryDatabase()
-	triedb := trie.NewDatabase(db, trie.HashDefaults)
+	triedb := triedb.NewDatabase(db, triedb.HashDefaults)
 	defer triedb.Close()
 	genesisBlock, err := CommitGenesis(genesis, db, triedb)
 	if err != nil {

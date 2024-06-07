@@ -62,8 +62,6 @@ import (
 	"github.com/ethereum/go-ethereum/graphql"
 	"github.com/ethereum/go-ethereum/internal/ethapi"
 	"github.com/ethereum/go-ethereum/internal/flags"
-	"github.com/ethereum/go-ethereum/les"
-	lescatalyst "github.com/ethereum/go-ethereum/les/catalyst"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethereum/go-ethereum/metrics/exp"
@@ -78,9 +76,9 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
-	"github.com/ethereum/go-ethereum/trie"
-	"github.com/ethereum/go-ethereum/trie/triedb/hashdb"
-	"github.com/ethereum/go-ethereum/trie/triedb/pathdb"
+	"github.com/ethereum/go-ethereum/triedb"
+	"github.com/ethereum/go-ethereum/triedb/hashdb"
+	"github.com/ethereum/go-ethereum/triedb/pathdb"
 	pcsclite "github.com/gballet/go-libpcsclite"
 	gopsutil "github.com/shirou/gopsutil/mem"
 	"github.com/urfave/cli/v2"
@@ -308,7 +306,7 @@ var (
 	}
 	SyncModeFlag = &flags.TextMarshalerFlag{
 		Name:     "syncmode",
-		Usage:    `Blockchain sync mode ("snap", "full" or "light")`,
+		Usage:    `Blockchain sync mode ("snap" or "full")`,
 		Value:    &defaultSyncMode,
 		Category: flags.StateCategory,
 	}
@@ -1314,8 +1312,10 @@ func SplitAndTrim(input string) (ret []string) {
 // setHTTP creates the HTTP RPC listener interface string from the set
 // command line flags, returning empty if the HTTP endpoint is disabled.
 func setHTTP(ctx *cli.Context, cfg *node.Config) {
-	if ctx.Bool(HTTPEnabledFlag.Name) && cfg.HTTPHost == "" {
-		cfg.HTTPHost = "127.0.0.1"
+	if ctx.Bool(HTTPEnabledFlag.Name) {
+		if cfg.HTTPHost == "" {
+			cfg.HTTPHost = "127.0.0.1"
+		}
 		if ctx.IsSet(HTTPListenAddrFlag.Name) {
 			cfg.HTTPHost = ctx.String(HTTPListenAddrFlag.Name)
 		}
@@ -1379,8 +1379,10 @@ func setGraphQL(ctx *cli.Context, cfg *node.Config) {
 // setWS creates the WebSocket RPC listener interface string from the set
 // command line flags, returning empty if the HTTP endpoint is disabled.
 func setWS(ctx *cli.Context, cfg *node.Config) {
-	if ctx.Bool(WSEnabledFlag.Name) && cfg.WSHost == "" {
-		cfg.WSHost = "127.0.0.1"
+	if ctx.Bool(WSEnabledFlag.Name) {
+		if cfg.WSHost == "" {
+			cfg.WSHost = "127.0.0.1"
+		}
 		if ctx.IsSet(WSListenAddrFlag.Name) {
 			cfg.WSHost = ctx.String(WSListenAddrFlag.Name)
 		}
@@ -1414,19 +1416,19 @@ func setIPC(ctx *cli.Context, cfg *node.Config) {
 	}
 }
 
-// setLes configures the les server and ultra light client settings from the command line flags.
+// setLes shows the deprecation warnings for LES flags.
 func setLes(ctx *cli.Context, cfg *ethconfig.Config) {
 	if ctx.IsSet(LightServeFlag.Name) {
-		cfg.LightServ = ctx.Int(LightServeFlag.Name)
+		log.Warn("The light server has been deprecated, please remove this flag", "flag", LightServeFlag.Name)
 	}
 	if ctx.IsSet(LightIngressFlag.Name) {
-		cfg.LightIngress = ctx.Int(LightIngressFlag.Name)
+		log.Warn("The light server has been deprecated, please remove this flag", "flag", LightIngressFlag.Name)
 	}
 	if ctx.IsSet(LightEgressFlag.Name) {
-		cfg.LightEgress = ctx.Int(LightEgressFlag.Name)
+		log.Warn("The light server has been deprecated, please remove this flag", "flag", LightEgressFlag.Name)
 	}
 	if ctx.IsSet(LightMaxPeersFlag.Name) {
-		cfg.LightPeers = ctx.Int(LightMaxPeersFlag.Name)
+		log.Warn("The light server has been deprecated, please remove this flag", "flag", LightMaxPeersFlag.Name)
 	}
 	if ctx.IsSet(UltraLightServersFlag.Name) {
 		cfg.UltraLightServers = strings.Split(ctx.String(UltraLightServersFlag.Name), ",")
@@ -1442,10 +1444,10 @@ func setLes(ctx *cli.Context, cfg *ethconfig.Config) {
 		cfg.UltraLightOnlyAnnounce = ctx.Bool(UltraLightOnlyAnnounceFlag.Name)
 	}
 	if ctx.IsSet(LightNoPruneFlag.Name) {
-		cfg.LightNoPrune = ctx.Bool(LightNoPruneFlag.Name)
+		log.Warn("The light server has been deprecated, please remove this flag", "flag", LightNoPruneFlag.Name)
 	}
 	if ctx.IsSet(LightNoSyncServeFlag.Name) {
-		cfg.LightNoSyncServe = ctx.Bool(LightNoSyncServeFlag.Name)
+		log.Warn("The light server has been deprecated, please remove this flag", "flag", LightNoSyncServeFlag.Name)
 	}
 }
 
@@ -1543,57 +1545,23 @@ func SetP2PConfig(ctx *cli.Context, cfg *p2p.Config) {
 	setBootstrapNodes(ctx, cfg)
 	setBootstrapNodesV5(ctx, cfg)
 
-	lightClient := ctx.String(SyncModeFlag.Name) == "light"
-	lightServer := (ctx.Int(LightServeFlag.Name) != 0)
-
-	lightPeers := ctx.Int(LightMaxPeersFlag.Name)
-	if lightClient && !ctx.IsSet(LightMaxPeersFlag.Name) {
-		// dynamic default - for clients we use 1/10th of the default for servers
-		lightPeers /= 10
-	}
-
 	if ctx.IsSet(MaxPeersFlag.Name) {
 		cfg.MaxPeers = ctx.Int(MaxPeersFlag.Name)
-		if lightServer && !ctx.IsSet(LightMaxPeersFlag.Name) {
-			cfg.MaxPeers += lightPeers
-		}
-	} else {
-		if lightServer {
-			cfg.MaxPeers += lightPeers
-		}
-		if lightClient && ctx.IsSet(LightMaxPeersFlag.Name) && cfg.MaxPeers < lightPeers {
-			cfg.MaxPeers = lightPeers
-		}
 	}
-	if !(lightClient || lightServer) {
-		lightPeers = 0
-	}
-	ethPeers := cfg.MaxPeers - lightPeers
-	if lightClient {
-		ethPeers = 0
-	}
-	log.Info("Maximum peer count", "ETH", ethPeers, "LES", lightPeers, "total", cfg.MaxPeers)
+	ethPeers := cfg.MaxPeers
+	log.Info("Maximum peer count", "ETH", ethPeers, "total", cfg.MaxPeers)
 
 	if ctx.IsSet(MaxPendingPeersFlag.Name) {
 		cfg.MaxPendingPeers = ctx.Int(MaxPendingPeersFlag.Name)
 	}
-	if ctx.IsSet(NoDiscoverFlag.Name) || lightClient {
+	if ctx.IsSet(NoDiscoverFlag.Name) {
 		cfg.NoDiscovery = true
 	}
 
-	// Disallow --nodiscover when used in conjunction with light mode.
-	if (lightClient || lightServer) && ctx.Bool(NoDiscoverFlag.Name) {
-		Fatalf("Cannot use --" + NoDiscoverFlag.Name + " in light client or light server mode")
-	}
 	CheckExclusive(ctx, DiscoveryV4Flag, NoDiscoverFlag)
 	CheckExclusive(ctx, DiscoveryV5Flag, NoDiscoverFlag)
 	cfg.DiscoveryV4 = ctx.Bool(DiscoveryV4Flag.Name)
 	cfg.DiscoveryV5 = ctx.Bool(DiscoveryV5Flag.Name)
-
-	// If we're running a light client or server, force enable the v5 peer discovery.
-	if lightClient || lightServer {
-		cfg.DiscoveryV5 = true
-	}
 
 	if netrestrict := ctx.String(NetrestrictFlag.Name); netrestrict != "" {
 		list, err := netutil.ParseNetlist(netrestrict)
@@ -1696,6 +1664,13 @@ func SetNodeConfig(ctx *cli.Context, cfg *node.Config) {
 		log.Info(fmt.Sprintf("Using %s as db engine", dbEngine))
 		cfg.DBEngine = dbEngine
 	}
+	// deprecation notice for log debug flags (TODO: find a more appropriate place to put these?)
+	if ctx.IsSet(LogBacktraceAtFlag.Name) {
+		log.Warn("log.backtrace flag is deprecated")
+	}
+	if ctx.IsSet(LogDebugFlag.Name) {
+		log.Warn("log.debug flag is deprecated")
+	}
 }
 
 func setSmartCard(ctx *cli.Context, cfg *node.Config) {
@@ -1749,12 +1724,7 @@ func SetDataDir(ctx *cli.Context, cfg *node.Config) {
 	}
 }
 
-func setGPO(ctx *cli.Context, cfg *gasprice.Config, light bool) {
-	// If we are running the light client, apply another group
-	// settings for gas oracle.
-	if light {
-		*cfg = ethconfig.LightClientGPO
-	}
+func setGPO(ctx *cli.Context, cfg *gasprice.Config) {
 	if ctx.IsSet(GpoBlocksFlag.Name) {
 		cfg.Blocks = ctx.Int(GpoBlocksFlag.Name)
 	}
@@ -1992,7 +1962,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, ExternalSignerFlag) // Can't use both ephemeral unlocked and external signer
 
 	setEtherbase(ctx, cfg)
-	setGPO(ctx, &cfg.GPO, ctx.String(SyncModeFlag.Name) == "light")
+	setGPO(ctx, &cfg.GPO)
 	setTxPool(ctx, &cfg.TxPool)
 	setEthash(ctx, cfg)
 	setMiner(ctx, &cfg.Miner)
@@ -2070,9 +2040,6 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		cfg.TransactionHistory = 0
 		log.Warn("Disabled transaction unindexing for archive node")
 	}
-	if ctx.IsSet(LightServeFlag.Name) && cfg.TransactionHistory != 0 {
-		log.Warn("LES server cannot serve old transaction status and cannot connect below les/4 protocol version if transaction lookup index is limited")
-	}
 	if ctx.IsSet(CacheFlag.Name) || ctx.IsSet(CacheTrieFlag.Name) {
 		cfg.TrieCleanCache = ctx.Int(CacheFlag.Name) * ctx.Int(CacheTrieFlag.Name) / 100
 	}
@@ -2085,10 +2052,16 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	if ctx.IsSet(CacheLogSizeFlag.Name) {
 		cfg.FilterLogCacheSize = ctx.Int(CacheLogSizeFlag.Name)
 	}
-	if !ctx.Bool(SnapshotFlag.Name) {
+	if !ctx.Bool(SnapshotFlag.Name) || cfg.SnapshotCache == 0 {
 		// If snap-sync is requested, this flag is also required
 		if cfg.SyncMode == downloader.SnapSync {
-			log.Info("Snap sync requested, enabling --snapshot")
+			if !ctx.Bool(SnapshotFlag.Name) {
+				log.Warn("Snap sync requested, enabling --snapshot")
+			}
+			if cfg.SnapshotCache == 0 {
+				log.Warn("Snap sync requested, resetting --cache.snapshot")
+				cfg.SnapshotCache = ctx.Int(CacheFlag.Name) * CacheSnapshotFlag.Value / 100
+			}
 		} else {
 			cfg.TrieCleanCache += cfg.SnapshotCache
 			cfg.SnapshotCache = 0 // Disabled
@@ -2277,11 +2250,26 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		log.Info("Using developer account", "address", developer.Address)
 
 		// Create a new developer genesis block or reuse existing one
-		cfg.Genesis = params.DeveloperGenesisBlock(ctx.Uint64(DeveloperGasLimitFlag.Name), developer.Address, ctx.Bool(DeveloperPoWFlag.Name))
+		cfg.Genesis = params.DeveloperGenesisBlock(ctx.Uint64(DeveloperGasLimitFlag.Name), &developer.Address, ctx.Bool(DeveloperPoWFlag.Name))
 		if ctx.IsSet(DataDirFlag.Name) {
 			chaindb := tryMakeReadOnlyDatabase(ctx, stack)
 			if rawdb.ReadCanonicalHash(chaindb, 0) != (common.Hash{}) {
 				cfg.Genesis = nil // fallback to db content
+
+				// validate genesis has PoS enabled in block 0
+				genesis, err := core.ReadGenesis(chaindb)
+				if err != nil {
+					Fatalf("Could not read genesis from database: %v", err)
+				}
+				if !genesis.Config.GetEthashTerminalTotalDifficultyPassed() {
+					Fatalf("Bad developer-mode genesis configuration: terminalTotalDifficultyPassed must be true in developer mode")
+				}
+				if genesis.Config.GetEthashTerminalTotalDifficulty() == nil {
+					Fatalf("Bad developer-mode genesis configuration: terminalTotalDifficulty must be specified.")
+				}
+				if genesis.Difficulty.Cmp(genesis.Config.GetEthashTerminalTotalDifficulty()) != 1 {
+					Fatalf("Bad developer-mode genesis configuration: genesis block difficulty must be > terminalTotalDifficulty")
+				}
 			}
 			chaindb.Close()
 		}
@@ -2318,9 +2306,6 @@ func SetDNSDiscoveryDefaults(cfg *ethconfig.Config, genesis common.Hash) {
 		return // already set through flags/config
 	}
 	protocol := "all"
-	if cfg.SyncMode == downloader.LightSync {
-		protocol = "les"
-	}
 	if url := params.KnownDNSNetwork(genesis, protocol); url != "" {
 		cfg.EthDiscoveryURLs = []string{url}
 		cfg.SnapDiscoveryURLs = cfg.EthDiscoveryURLs
@@ -2328,29 +2313,11 @@ func SetDNSDiscoveryDefaults(cfg *ethconfig.Config, genesis common.Hash) {
 }
 
 // RegisterEthService adds an Ethereum client to the stack.
-// The second return value is the full node instance, which may be nil if the
-// node is running as a light client.
+// The second return value is the full node instance.
 func RegisterEthService(stack *node.Node, cfg *ethconfig.Config) (ethapi.Backend, *eth.Ethereum) {
-	if cfg.SyncMode == downloader.LightSync {
-		backend, err := les.New(stack, cfg)
-		if err != nil {
-			Fatalf("Failed to register the Ethereum service: %v", err)
-		}
-		stack.RegisterAPIs(tracers.APIs(backend.ApiBackend))
-		if err := lescatalyst.Register(stack, backend); err != nil {
-			Fatalf("Failed to register the Engine API service: %v", err)
-		}
-		return backend.ApiBackend, nil
-	}
 	backend, err := eth.New(stack, cfg)
 	if err != nil {
 		Fatalf("Failed to register the Ethereum service: %v", err)
-	}
-	if cfg.LightServ > 0 {
-		_, err := les.NewLesServer(stack, backend, cfg)
-		if err != nil {
-			Fatalf("Failed to create the LES server: %v", err)
-		}
 	}
 	stack.RegisterAPIs(tracers.APIs(backend.APIBackend))
 	return backend.APIBackend, backend
@@ -2373,13 +2340,12 @@ func RegisterGraphQLService(stack *node.Node, backend ethapi.Backend, filterSyst
 
 // RegisterFilterAPI adds the eth log filtering RPC API to the node.
 func RegisterFilterAPI(stack *node.Node, backend ethapi.Backend, ethcfg *ethconfig.Config) *filters.FilterSystem {
-	isLightClient := ethcfg.SyncMode == downloader.LightSync
 	filterSystem := filters.NewFilterSystem(backend, filters.Config{
 		LogCacheSize: ethcfg.FilterLogCacheSize,
 	})
 	stack.RegisterAPIs([]rpc.API{{
 		Namespace: "eth",
-		Service:   filters.NewFilterAPI(filterSystem, isLightClient),
+		Service:   filters.NewFilterAPI(filterSystem, false),
 	}})
 	return filterSystem
 }
@@ -2668,9 +2634,10 @@ func MakeConsolePreloads(ctx *cli.Context) []string {
 }
 
 // MakeTrieDatabase constructs a trie database based on the configured scheme.
-func MakeTrieDatabase(ctx *cli.Context, disk ethdb.Database, preimage bool, readOnly bool) *trie.Database {
-	config := &trie.Config{
+func MakeTrieDatabase(ctx *cli.Context, disk ethdb.Database, preimage bool, readOnly bool, isVerkle bool) *triedb.Database {
+	config := &triedb.Config{
 		Preimages: preimage,
+		IsVerkle:  isVerkle,
 	}
 	scheme, err := rawdb.ParseStateScheme(ctx.String(StateSchemeFlag.Name), disk)
 	if err != nil {
@@ -2681,12 +2648,12 @@ func MakeTrieDatabase(ctx *cli.Context, disk ethdb.Database, preimage bool, read
 		// ignore the parameter silently. TODO(rjl493456442)
 		// please config it if read mode is implemented.
 		config.HashDB = hashdb.Defaults
-		return trie.NewDatabase(disk, config)
+		return triedb.NewDatabase(disk, config)
 	}
 	if readOnly {
 		config.PathDB = pathdb.ReadOnly
 	} else {
 		config.PathDB = pathdb.Defaults
 	}
-	return trie.NewDatabase(disk, config)
+	return triedb.NewDatabase(disk, config)
 }

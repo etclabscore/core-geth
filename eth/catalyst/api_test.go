@@ -46,6 +46,7 @@ import (
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
@@ -213,6 +214,7 @@ func TestEth2PrepareAndGetPayload(t *testing.T) {
 		FeeRecipient: blockParams.SuggestedFeeRecipient,
 		Random:       blockParams.Random,
 		BeaconRoot:   blockParams.BeaconRoot,
+		Version:      engine.PayloadV1,
 	}).Id()
 	execData, err := api.GetPayloadV1(payloadID)
 	if err != nil {
@@ -264,11 +266,8 @@ func TestInvalidPayloadTimestamp(t *testing.T) {
 		{0, true},
 		{parent.Time, true},
 		{parent.Time - 1, true},
-
-		// TODO (MariusVanDerWijden) following tests are currently broken,
-		// fixed in upcoming merge-kiln-v2 pr
-		// {parent.Time() + 1, false},
-		// {uint64(time.Now().Unix()) + uint64(time.Minute), false},
+		{parent.Time + 1, false},
+		{uint64(time.Now().Unix()) + uint64(time.Minute), false},
 	}
 
 	for i, test := range tests {
@@ -1079,6 +1078,7 @@ func TestWithdrawals(t *testing.T) {
 		Random:       blockParams.Random,
 		Withdrawals:  blockParams.Withdrawals,
 		BeaconRoot:   blockParams.BeaconRoot,
+		Version:      engine.PayloadV2,
 	}).Id()
 	execData, err := api.GetPayloadV2(payloadID)
 	if err != nil {
@@ -1127,6 +1127,7 @@ func TestWithdrawals(t *testing.T) {
 		Random:       blockParams.Random,
 		Withdrawals:  blockParams.Withdrawals,
 		BeaconRoot:   blockParams.BeaconRoot,
+		Version:      engine.PayloadV2,
 	}).Id()
 	execData, err = api.GetPayloadV2(payloadID)
 	if err != nil {
@@ -1240,7 +1241,20 @@ func TestNilWithdrawals(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		_, err := api.ForkchoiceUpdatedV2(fcState, &test.blockParams)
+		var (
+			err            error
+			payloadVersion engine.PayloadVersion
+			// Use EIP4895 as an indicator features for Shanghai.
+			shanghai = genesis.Config.IsEnabledByTime(genesis.Config.GetEIP4895TransitionTime, &test.blockParams.Timestamp) ||
+				genesis.Config.IsEnabled(genesis.Config.GetEIP4895Transition, confp.Uint64Ptr2Big(test.blockParams.Number))
+		)
+		if !shanghai {
+			payloadVersion = engine.PayloadV1
+			_, err = api.ForkchoiceUpdatedV1(fcState, &test.blockParams)
+		} else {
+			payloadVersion = engine.PayloadV2
+			_, err = api.ForkchoiceUpdatedV2(fcState, &test.blockParams)
+		}
 		if test.wantErr {
 			if err == nil {
 				t.Fatal("wanted error on fcuv2 with invalid withdrawals")
@@ -1257,14 +1271,20 @@ func TestNilWithdrawals(t *testing.T) {
 			Timestamp:    test.blockParams.Timestamp,
 			FeeRecipient: test.blockParams.SuggestedFeeRecipient,
 			Random:       test.blockParams.Random,
-			BeaconRoot:   test.blockParams.BeaconRoot,
+			Version:      payloadVersion,
 		}).Id()
 		execData, err := api.GetPayloadV2(payloadID)
 		if err != nil {
 			t.Fatalf("error getting payload, err=%v", err)
 		}
-		if status, err := api.NewPayloadV2(*execData.ExecutionPayload); err != nil {
-			t.Fatalf("error validating payload: %v", err)
+		var status engine.PayloadStatusV1
+		if !shanghai {
+			status, err = api.NewPayloadV1(*execData.ExecutionPayload)
+		} else {
+			status, err = api.NewPayloadV2(*execData.ExecutionPayload)
+		}
+		if err != nil {
+			t.Fatalf("error validating payload: %v", err.(*engine.EngineAPIError).ErrorData())
 		} else if status.Status != engine.VALID {
 			t.Fatalf("invalid payload")
 		}
@@ -1570,7 +1590,7 @@ func TestBlockToPayloadWithBlobs(t *testing.T) {
 
 // This checks that beaconRoot is applied to the state from the engine API.
 func TestParentBeaconBlockRoot(t *testing.T) {
-	log.Root().SetHandler(log.LvlFilterHandler(log.LvlTrace, log.StreamHandler(colorable.NewColorableStderr(), log.TerminalFormat(true))))
+	log.SetDefault(log.NewLogger(log.NewTerminalHandlerWithLevel(colorable.NewColorableStderr(), log.LevelTrace, true)))
 
 	genesis, blocks := generateMergeChain(10, true)
 
@@ -1595,7 +1615,7 @@ func TestParentBeaconBlockRoot(t *testing.T) {
 	fcState := engine.ForkchoiceStateV1{
 		HeadBlockHash: parent.Hash(),
 	}
-	resp, err := api.ForkchoiceUpdatedV2(fcState, &blockParams)
+	resp, err := api.ForkchoiceUpdatedV3(fcState, &blockParams)
 	if err != nil {
 		t.Fatalf("error preparing payload, err=%v", err.(*engine.EngineAPIError).ErrorData())
 	}
@@ -1611,6 +1631,7 @@ func TestParentBeaconBlockRoot(t *testing.T) {
 		Random:       blockParams.Random,
 		Withdrawals:  blockParams.Withdrawals,
 		BeaconRoot:   blockParams.BeaconRoot,
+		Version:      engine.PayloadV3,
 	}).Id()
 	execData, err := api.GetPayloadV3(payloadID)
 	if err != nil {
@@ -1648,5 +1669,28 @@ func TestParentBeaconBlockRoot(t *testing.T) {
 	}
 	if root := db.GetState(vars.BeaconRootsStorageAddress, rootIdx); root != *blockParams.BeaconRoot {
 		t.Fatalf("incorrect root stored: want %s, got %s", *blockParams.BeaconRoot, root)
+	}
+}
+
+// TestGetClientVersion verifies the expected version info is returned.
+func TestGetClientVersion(t *testing.T) {
+	genesis, preMergeBlocks := generateMergeChain(10, false)
+	n, ethservice := startEthService(t, genesis, preMergeBlocks)
+	defer n.Close()
+
+	api := NewConsensusAPI(ethservice)
+	info := engine.ClientVersionV1{
+		Code:    "TT",
+		Name:    "test",
+		Version: "1.1.1",
+		Commit:  "0x12345678",
+	}
+	infos := api.GetClientVersionV1(info)
+	if len(infos) != 1 {
+		t.Fatalf("expected only one returned client version, got %d", len(infos))
+	}
+	info = infos[0]
+	if info.Code != engine.ClientCode || info.Name != engine.ClientName || info.Version != params.VersionWithMeta {
+		t.Fatalf("client info does match expected, got %s", info.String())
 	}
 }

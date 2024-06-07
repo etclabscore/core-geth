@@ -18,7 +18,6 @@ package miner
 
 import (
 	"crypto/rand"
-	"errors"
 	"math/big"
 	"sync/atomic"
 	"testing"
@@ -31,7 +30,6 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/txpool"
 	"github.com/ethereum/go-ethereum/core/txpool/legacypool"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -44,6 +42,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
+	"github.com/holiman/uint256"
 )
 
 const (
@@ -142,7 +141,7 @@ func newTestWorkerBackend(t *testing.T, chainConfig ctypes.ChainConfigurator, en
 		t.Fatalf("core.NewBlockChain failed: %v", err)
 	}
 	pool := legacypool.New(testTxPoolConfig, chain)
-	txpool, _ := txpool.New(new(big.Int).SetUint64(testTxPoolConfig.PriceLimit), chain, []txpool.SubPool{pool})
+	txpool, _ := txpool.New(testTxPoolConfig.PriceLimit, chain, []txpool.SubPool{pool})
 
 	// Generate a small n-block chain and an uncle block for it
 	var uncle *types.Block
@@ -175,9 +174,6 @@ func newTestWorkerBackend(t *testing.T, chainConfig ctypes.ChainConfigurator, en
 
 func (b *testWorkerBackend) BlockChain() *core.BlockChain { return b.chain }
 func (b *testWorkerBackend) TxPool() *txpool.TxPool       { return b.txPool }
-func (b *testWorkerBackend) StateAtBlock(block *types.Block, reexec uint64, base *state.StateDB, checkLive bool, preferDisk bool) (statedb *state.StateDB, err error) {
-	return nil, errors.New("not supported")
-}
 
 func (b *testWorkerBackend) newRandomUncle() *types.Block {
 	var parent *types.Block
@@ -223,6 +219,7 @@ func TestGenerateBlockAndImportClique(t *testing.T) {
 }
 
 func testGenerateBlockAndImport(t *testing.T, isClique bool) {
+	t.Parallel()
 	var (
 		engine      consensus.Engine
 		chainConfig ctypes.ChainConfigurator
@@ -278,9 +275,11 @@ func testGenerateBlockAndImport(t *testing.T, isClique bool) {
 }
 
 func TestEmptyWorkEthash(t *testing.T) {
+	t.Parallel()
 	testEmptyWork(t, ethashChainConfig, ethash.NewFaker())
 }
 func TestEmptyWorkClique(t *testing.T) {
+	t.Parallel()
 	testEmptyWork(t, cliqueChainConfig, clique.New(&ctypes.CliqueConfig{
 		Period: cliqueChainConfig.GetCliquePeriod(),
 		Epoch:  cliqueChainConfig.GetCliqueEpoch(),
@@ -299,10 +298,10 @@ func testEmptyWork(t *testing.T, chainConfig ctypes.ChainConfigurator, engine co
 	)
 	checkEqual := func(t *testing.T, task *task, index int) {
 		// The first empty work without any txs included
-		receiptLen, balance := 0, big.NewInt(0)
+		receiptLen, balance := 0, uint256.NewInt(0)
 		if index == 1 {
 			// The second full work with 1 tx included
-			receiptLen, balance = 1, big.NewInt(1000)
+			receiptLen, balance = 1, uint256.NewInt(1000)
 		}
 		if len(task.receipts) != receiptLen {
 			t.Fatalf("receipt number mismatch: have %d, want %d", len(task.receipts), receiptLen)
@@ -408,7 +407,7 @@ func testRegenerateMiningBlock(t *testing.T, chainConfig ctypes.ChainConfigurato
 			// The first task is an empty task, the second
 			// one has 1 pending tx, the third one has 2 txs
 			if taskIndex == 2 {
-				receiptLen, balance := 2, big.NewInt(2000)
+				receiptLen, balance := 2, uint256.NewInt(2000)
 				if len(task.receipts) != receiptLen {
 					t.Errorf("receipt number mismatch: have %d, want %d", len(task.receipts), receiptLen)
 				}
@@ -447,10 +446,12 @@ func testRegenerateMiningBlock(t *testing.T, chainConfig ctypes.ChainConfigurato
 }
 
 func TestAdjustIntervalEthash(t *testing.T) {
+	t.Parallel()
 	testAdjustInterval(t, ethashChainConfig, ethash.NewFaker())
 }
 
 func TestAdjustIntervalClique(t *testing.T) {
+	t.Parallel()
 	testAdjustInterval(t, cliqueChainConfig, clique.New(&ctypes.CliqueConfig{
 		Period: cliqueChainConfig.GetCliquePeriod(),
 		Epoch:  cliqueChainConfig.GetCliqueEpoch(),
@@ -544,10 +545,12 @@ func testAdjustInterval(t *testing.T, chainConfig ctypes.ChainConfigurator, engi
 }
 
 func TestGetSealingWorkEthash(t *testing.T) {
+	t.Parallel()
 	testGetSealingWork(t, ethashChainConfig, ethash.NewFaker())
 }
 
 func TestGetSealingWorkClique(t *testing.T) {
+	t.Parallel()
 	testGetSealingWork(t, cliqueChainConfig, clique.New(&ctypes.CliqueConfig{
 		Period: cliqueChainConfig.GetCliquePeriod(),
 		Epoch:  cliqueChainConfig.GetCliqueEpoch(),
@@ -555,6 +558,7 @@ func TestGetSealingWorkClique(t *testing.T) {
 }
 
 func TestGetSealingWorkPostMerge(t *testing.T) {
+	t.Parallel()
 	local := (ctypes.ChainConfigurator)(new(goethereum.ChainConfig))
 	local.SetEthashTerminalTotalDifficulty(big.NewInt(0))
 	testGetSealingWork(t, local, ethash.NewFaker())

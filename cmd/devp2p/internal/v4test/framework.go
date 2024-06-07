@@ -53,10 +53,12 @@ func newTestEnv(remote string, listen1, listen2 string) *testenv {
 	if err != nil {
 		panic(err)
 	}
-	if node.IP() == nil || node.UDP() == 0 {
+	if !node.IPAddr().IsValid() || node.UDP() == 0 {
 		var ip net.IP
 		var tcpPort, udpPort int
-		if ip = node.IP(); ip == nil {
+		if node.IPAddr().IsValid() {
+			ip = node.IPAddr().AsSlice()
+		} else {
 			ip = net.ParseIP("127.0.0.1")
 		}
 		if tcpPort = node.TCP(); tcpPort == 0 {
@@ -110,7 +112,7 @@ func (te *testenv) localEndpoint(c net.PacketConn) v4wire.Endpoint {
 }
 
 func (te *testenv) remoteEndpoint() v4wire.Endpoint {
-	return v4wire.NewEndpoint(te.remoteAddr, 0)
+	return v4wire.NewEndpoint(te.remoteAddr.AddrPort(), 0)
 }
 
 func contains(ns []v4wire.Node, key v4wire.Pubkey) bool {

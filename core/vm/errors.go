@@ -71,3 +71,7 @@ type ErrInvalidOpCode struct {
 }
 
 func (e *ErrInvalidOpCode) Error() string { return fmt.Sprintf("invalid opcode: %s", e.opcode) }
+
+func NewErrInvalidOpCode(opcode OpCode) error {
+	return &ErrInvalidOpCode{opcode}
+}

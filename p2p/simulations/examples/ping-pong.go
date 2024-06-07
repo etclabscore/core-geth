@@ -33,7 +33,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/simulations/adapters"
 )
 
-var adapterType = flag.String("adapter", "sim", `node adapter to use (one of "sim", "exec" or "docker")`)
+var adapterType = flag.String("adapter", "sim", `node adapter to use (one of "sim" or "exec")`)
 
 // main() starts a simulation network which contains nodes running a simple
 // ping-pong protocol
@@ -41,7 +41,7 @@ func main() {
 	flag.Parse()
 
 	// set the log level to Trace
-	log.Root().SetHandler(log.LvlFilterHandler(log.LvlTrace, log.StreamHandler(os.Stderr, log.TerminalFormat(false))))
+	log.SetDefault(log.NewLogger(log.NewTerminalHandlerWithLevel(os.Stderr, log.LevelTrace, false)))
 
 	// register a single ping-pong service
 	services := map[string]adapters.LifecycleConstructor{

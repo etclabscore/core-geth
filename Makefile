@@ -9,14 +9,17 @@ GO ?= latest
 GORUN = go run
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
+#? geth: Build geth
 geth:
 	$(GORUN) build/ci.go install ./cmd/geth
 	@echo "Done building."
 	@echo "Run \"$(GOBIN)/geth\" to launch geth."
 
+#? all: Build all packages and executables
 all:
 	$(GORUN) build/ci.go install
 
+#? test: Run the tests
 test: all
 	$(GORUN) build/ci.go test -timeout 20m
 
@@ -91,10 +94,12 @@ tests-generate-difficulty: ## Generate difficulty tests.
 	mv ./tests/testdata_generated/DifficultyTests ./tests/testdata-etc/DifficultyTests
 	rm -rf ./tests/testdata_generated
 
+#? lint: Run certain pre-selected linters
 lint: ## Run linters.
 	$(GORUN) build/ci.go lint
 
-clean: clean-evmc
+#? clean: Clean go cache, built executables, and the auto generated folder
+clean:
 	go clean -cache
 	rm -fr build/_workspace/pkg/ $(GOBIN)/*
 
@@ -107,6 +112,7 @@ docs-generate: ## Generate JSON RPC API documentation from the OpenRPC service d
 # The devtools target installs tools required for 'go generate'.
 # You need to put $GOBIN (or $GOPATH/bin) in your PATH to use 'go generate'.
 
+#? devtools: Install recommended developer tools
 devtools:
 	env GOBIN= go install golang.org/x/tools/cmd/stringer@latest
 	env GOBIN= go install github.com/fjl/gencodec@latest
@@ -114,3 +120,9 @@ devtools:
 	env GOBIN= go install ./cmd/abigen
 	@type "solc" 2> /dev/null || echo 'Please install solc'
 	@type "protoc" 2> /dev/null || echo 'Please install protoc'
+
+#? help: Get more info on make commands.
+help: Makefile
+	@echo " Choose a command run in go-ethereum:"
+	@sed -n 's/^#?//p' $< | column -t -s ':' |  sort | sed -e 's/^/ /'
+.PHONY: help

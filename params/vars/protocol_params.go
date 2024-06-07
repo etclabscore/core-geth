@@ -20,32 +20,33 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/holiman/uint256"
 )
 
 var (
-	FrontierBlockReward = big.NewInt(5e+18) // Block reward in wei for successfully mining a block
-	EIP649FBlockReward  = big.NewInt(3e+18) // Block reward in wei for successfully mining a block upward from Byzantium
-	EIP1234FBlockReward = big.NewInt(2e+18) // Block reward in wei for successfully mining a block upward from Constantinople
+	FrontierBlockReward = uint256.NewInt(5e+18) // Block reward in wei for successfully mining a block
+	EIP649FBlockReward  = uint256.NewInt(3e+18) // Block reward in wei for successfully mining a block upward from Byzantium
+	EIP1234FBlockReward = uint256.NewInt(2e+18) // Block reward in wei for successfully mining a block upward from Constantinople
 
 	// Values represent TOTAL delays, per specs
 	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-649.md
-	EIP649DifficultyBombDelay = big.NewInt(3000000)
+	EIP649DifficultyBombDelay = uint256.NewInt(3000000)
 	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1234.md
-	EIP1234DifficultyBombDelay = big.NewInt(5000000)
+	EIP1234DifficultyBombDelay = uint256.NewInt(5000000)
 
-	EIP2384DifficultyBombDelay = big.NewInt(9000000)
+	EIP2384DifficultyBombDelay = uint256.NewInt(9000000)
 	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3554.md
-	EIP3554DifficultyBombDelay = big.NewInt(9700000)
+	EIP3554DifficultyBombDelay = uint256.NewInt(9700000)
 	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4345.md
-	EIP4345DifficultyBombDelay = big.NewInt(10700000)
+	EIP4345DifficultyBombDelay = uint256.NewInt(10700000)
 	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-5133.md
-	EIP5133DifficultyBombDelay = big.NewInt(11_400_000)
+	EIP5133DifficultyBombDelay = uint256.NewInt(11_400_000)
 )
 
 var (
 	// SupportedProtocolVersions are the supported versions of the `eth` protocol (first
 	// is primary).
-	SupportedProtocolVersions = []uint{68, 67, 66}
+	SupportedProtocolVersions = []uint{68}
 
 	// DefaultProtocolVersions are the protocol version defaults.
 	DefaultProtocolVersions = SupportedProtocolVersions
@@ -198,7 +199,6 @@ const (
 
 	BlobTxBytesPerFieldElement         = 32      // Size in bytes of a field element
 	BlobTxFieldElementsPerBlob         = 4096    // Number of field elements stored in a single data blob
-	BlobTxHashVersion                  = 0x01    // Version byte of the commitment hash
 	BlobTxBlobGasPerBlob               = 1 << 17 // Gas consumption of a single data blob (== blob byte size)
 	BlobTxMinBlobGasprice              = 1       // Minimum gas price for data blobs
 	BlobTxBlobGaspriceUpdateFraction   = 3338477 // Controls the maximum rate of change for blob gas price

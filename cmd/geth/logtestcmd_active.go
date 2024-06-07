@@ -19,6 +19,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"math/big"
@@ -39,10 +40,16 @@ var logTestCommand = &cli.Command{
 This command is only meant for testing.
 `}
 
+type customQuotedStringer struct {
+}
+
+func (c customQuotedStringer) String() string {
+	return "output with 'quotes'"
+}
+
 // logTest is an entry point which spits out some logs. This is used by testing
 // to verify expected outputs
 func logTest(ctx *cli.Context) error {
-	log.ResetGlobalState()
 	{ // big.Int
 		ba, _ := new(big.Int).SetString("111222333444555678999", 10)    // "111,222,333,444,555,678,999"
 		bb, _ := new(big.Int).SetString("-111222333444555678999", 10)   // "-111,222,333,444,555,678,999"
@@ -83,12 +90,13 @@ func logTest(ctx *cli.Context) error {
 
 		colored := fmt.Sprintf("\u001B[%dmColored\u001B[0m[", 35)
 		log.Info(colored, colored, colored)
+		err := errors.New("this is an 'error'")
+		log.Info("an error message with quotes", "error", err)
 	}
 	{ // Custom Stringer() - type
 		log.Info("Custom Stringer value", "2562047h47m16.854s", common.PrettyDuration(time.Duration(9223372036854775807)))
-	}
-	{ // Lazy eval
-		log.Info("Lazy evaluation of value", "key", log.Lazy{Fn: func() interface{} { return "lazy value" }})
+		var c customQuotedStringer
+		log.Info("a custom stringer that emits quoted text", "output", c)
 	}
 	{ // Multi-line message
 		log.Info("A message with wonky \U0001F4A9 characters")
@@ -149,6 +157,10 @@ func logTest(ctx *cli.Context) error {
 	}
 	{ // Logging with 'reserved' keys
 		log.Info("Using keys 't', 'lvl', 'time', 'level' and 'msg'", "t", "t", "time", "time", "lvl", "lvl", "level", "level", "msg", "msg")
+	}
+	{ // Logging with wrong attr-value pairs
+		log.Info("Odd pair (1 attr)", "key")
+		log.Info("Odd pair (3 attr)", "key", "value", "key2")
 	}
 	return nil
 }

@@ -43,7 +43,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
-	"github.com/ethereum/go-ethereum/trie"
+	"github.com/ethereum/go-ethereum/triedb"
 )
 
 type testBackend struct {
@@ -263,11 +263,14 @@ func TestSideBlockSubscription(t *testing.T) {
 	t.Parallel()
 
 	var (
-		db              = rawdb.NewMemoryDatabase()
-		backend, sys    = newTestFilterSystem(t, db, Config{})
-		api             = NewFilterAPI(sys, false)
-		gspec           = &genesisT.Genesis{BaseFee: big.NewInt(vars.InitialBaseFee)}
-		genesis         = core.MustCommitGenesis(db, trie.NewDatabase(db, nil), gspec)
+		db           = rawdb.NewMemoryDatabase()
+		backend, sys = newTestFilterSystem(t, db, Config{})
+		api          = NewFilterAPI(sys, false)
+		gspec        = &genesisT.Genesis{
+			Config:  params.TestChainConfig,
+			BaseFee: big.NewInt(vars.InitialBaseFee),
+		}
+		genesis         = core.MustCommitGenesis(db, triedb.NewDatabase(db, nil), gspec)
 		chain, _        = core.GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), db, 10, func(i int, gen *core.BlockGen) {})
 		chainSideEvents = []core.ChainSideEvent{}
 	)

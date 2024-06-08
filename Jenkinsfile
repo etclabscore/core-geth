@@ -23,7 +23,6 @@ pipeline {
                     steps {
                         sh "curl -L -O https://go.dev/dl/go1.22.4.linux-amd64.tar.gz"
                         sh "sudo rm -rf /usr/bin/go && sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.22.4.linux-amd64.tar.gz"
-                        sh "sudo cp /usr/local/go/bin/go /usr/bin/go"
                         sh "sudo cp /usr/local/go/bin/gofmt /usr/bin/gofmt"
                         sh "export GOROOT=/usr/local/go"
                         sh "go version"
@@ -44,7 +43,6 @@ pipeline {
                     steps {
                         sh "curl -L -O https://go.dev/dl/go1.22.4.linux-amd64.tar.gz"
                         sh "sudo rm -rf /usr/bin/go && sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.22.4.linux-amd64.tar.gz"
-                        sh "sudo cp /usr/local/go/bin/go /usr/bin/go"
                         sh "sudo cp /usr/local/go/bin/gofmt /usr/bin/gofmt"
                         sh "export GOROOT=/usr/local/go"
                         sh "go version"

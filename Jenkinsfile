@@ -23,14 +23,14 @@ pipeline {
                     steps {
                         sh "curl -L -O https://go.dev/dl/go1.22.4.linux-amd64.tar.gz"
                         sh "sudo rm -rf /usr/bin/go && sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.22.4.linux-amd64.tar.gz"
-                        sh "sudo cp /usr/local/go/bin/go /usr/bin/go"
-                        sh "sudo cp /usr/local/go/bin/gofmt /usr/bin/gofmt"
                         sh "export GOROOT=/usr/local/go"
-                        sh "go version"
-                        sh "make geth && ./build/bin/geth version"
+                        sh "/usr/local/go/bin/go version"
+                        sh "mkdir -p ./build/bin && /usr/local/go/bin/go build -o ./build/bin/geth ./cmd/geth && sudo chmod +x ./build/bin/geth"
+                        sh "sudo cp ./build/bin/geth /usr/bin/ && which geth"
+                        sh "geth version"
                         sh "rm -rf ${GETH_DATADIR}-mordor"
                         sh "shasum -a 256 -c ./tests/regression/shasums/mordor.0-1686858.rlp.gz.sha256"
-                        sh "./build/bin/geth --mordor --fakepow --cache=2048 --nocompaction --nousb --txlookuplimit=1 --datadir=${GETH_DATADIR}-mordor import ${GETH_EXPORTS}/mordor.0-1686858.rlp.gz"
+                        sh "geth --mordor --fakepow --cache=2048 --nocompaction --nousb --txlookuplimit=1 --datadir=${GETH_DATADIR}-mordor import ${GETH_EXPORTS}/mordor.0-1686858.rlp.gz"
                         sh "rm -rf ${GETH_DATADIR}"
                     }
                     post {
@@ -44,14 +44,14 @@ pipeline {
                     steps {
                         sh "curl -L -O https://go.dev/dl/go1.22.4.linux-amd64.tar.gz"
                         sh "sudo rm -rf /usr/bin/go && sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.22.4.linux-amd64.tar.gz"
-                        sh "sudo cp /usr/local/go/bin/go /usr/bin/go"
-                        sh "sudo cp /usr/local/go/bin/gofmt /usr/bin/gofmt"
                         sh "export GOROOT=/usr/local/go"
-                        sh "go version"
-                        sh "make geth && ./build/bin/geth version"
+                        sh "/usr/local/go/bin/go version"
+                        sh "mkdir -p ./build/bin && /usr/local/go/bin/go build -o ./build/bin/geth ./cmd/geth && sudo chmod +x ./build/bin/geth"
+                        sh "sudo cp ./build/bin/geth /usr/bin/ && which geth"
+                        sh "geth version"
                         sh "rm -rf ${GETH_DATADIR}-goerli"
                         sh "shasum -a 256 -c ./tests/regression/shasums/goerli.0-2000000.rlp.gz.sha256"
-                        sh "./build/bin/geth --goerli --cache=2048 --nocompaction --nousb --txlookuplimit=1 --datadir=${GETH_DATADIR}-goerli import ${GETH_EXPORTS}/goerli.0-2000000.rlp.gz"
+                        sh "geth --goerli --cache=2048 --nocompaction --nousb --txlookuplimit=1 --datadir=${GETH_DATADIR}-goerli import ${GETH_EXPORTS}/goerli.0-2000000.rlp.gz"
                     }
                     post {
                         always { sh "rm -rf ${GETH_DATADIR}-goerli" }

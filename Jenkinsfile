@@ -29,7 +29,7 @@ pipeline {
                         sh "sudo cp ./build/bin/geth /usr/bin/ && which geth"
                         sh "geth version"
                         sh "rm -rf ${GETH_DATADIR}-mordor"
-                        sh "ls ${GETH_DATADIR}-mordor"
+                        sh "test ! -f ${GETH_DATADIR}-mordor"
                         sh "shasum -a 256 -c ./tests/regression/shasums/mordor.0-1686858.rlp.gz.sha256"
                         sh "geth --mordor --fakepow --cache=2048 --nocompaction --nousb --txlookuplimit=1 --datadir=${GETH_DATADIR}-mordor import ${GETH_EXPORTS}/mordor.0-1686858.rlp.gz"
                         sh "rm -rf ${GETH_DATADIR}"

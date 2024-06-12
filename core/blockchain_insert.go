@@ -179,3 +179,8 @@ func (it *insertIterator) first() *types.Block {
 func (it *insertIterator) remaining() int {
 	return len(it.chain) - it.index
 }
+
+// processed returns the number of processed blocks.
+func (it *insertIterator) processed() int {
+	return it.index + 1
+}

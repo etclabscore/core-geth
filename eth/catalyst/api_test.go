@@ -863,6 +863,7 @@ func TestTrickRemoteBlockCache(t *testing.T) {
 func TestInvalidBloom(t *testing.T) {
 	genesis, preMergeBlocks := generateMergeChain(10, false)
 	n, ethservice := startEthService(t, genesis, preMergeBlocks)
+	ethservice.Merger().ReachTTD()
 	defer n.Close()
 
 	commonAncestor := ethservice.BlockChain().CurrentBlock()
@@ -1044,6 +1045,7 @@ func TestWithdrawals(t *testing.T) {
 	genesis.Config.ShanghaiTime = &time
 
 	n, ethservice := startEthService(t, genesis, blocks)
+	ethservice.Merger().ReachTTD()
 	defer n.Close()
 
 	api := NewConsensusAPI(ethservice)
@@ -1161,6 +1163,7 @@ func TestNilWithdrawals(t *testing.T) {
 	genesis.Config.ShanghaiTime = &time
 
 	n, ethservice := startEthService(t, genesis, blocks)
+	ethservice.Merger().ReachTTD()
 	defer n.Close()
 
 	api := NewConsensusAPI(ethservice)
@@ -1587,6 +1590,7 @@ func TestParentBeaconBlockRoot(t *testing.T) {
 	genesis.Config.CancunTime = &time
 
 	n, ethservice := startEthService(t, genesis, blocks)
+	ethservice.Merger().ReachTTD()
 	defer n.Close()
 
 	api := NewConsensusAPI(ethservice)

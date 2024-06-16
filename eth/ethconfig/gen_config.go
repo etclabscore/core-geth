@@ -7,6 +7,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
+	"github.com/ethereum/go-ethereum/consensus/ethashb3"
 	"github.com/ethereum/go-ethereum/core/txpool/blobpool"
 	"github.com/ethereum/go-ethereum/core/txpool/legacypool"
 	"github.com/ethereum/go-ethereum/eth/downloader"
@@ -55,6 +56,7 @@ func (c Config) MarshalTOML() (interface{}, error) {
 		FilterLogCacheSize         int
 		Miner                      miner.Config
 		Ethash                     ethash.Config
+		EthashB3                   ethashb3.Config
 		TxPool                     legacypool.Config
 		BlobPool                   blobpool.Config
 		GPO                        gasprice.Config
@@ -111,6 +113,7 @@ func (c Config) MarshalTOML() (interface{}, error) {
 	enc.FilterLogCacheSize = c.FilterLogCacheSize
 	enc.Miner = c.Miner
 	enc.Ethash = c.Ethash
+	enc.EthashB3 = c.EthashB3
 	enc.TxPool = c.TxPool
 	enc.BlobPool = c.BlobPool
 	enc.GPO = c.GPO
@@ -171,6 +174,7 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 		FilterLogCacheSize         *int
 		Miner                      *miner.Config
 		Ethash                     *ethash.Config
+		EthashB3                   *ethashb3.Config
 		TxPool                     *legacypool.Config
 		BlobPool                   *blobpool.Config
 		GPO                        *gasprice.Config
@@ -301,6 +305,9 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 	}
 	if dec.Ethash != nil {
 		c.Ethash = *dec.Ethash
+	}
+	if dec.EthashB3 != nil {
+		c.EthashB3 = *dec.EthashB3
 	}
 	if dec.TxPool != nil {
 		c.TxPool = *dec.TxPool

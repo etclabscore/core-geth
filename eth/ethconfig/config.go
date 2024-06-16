@@ -310,7 +310,6 @@ type Config struct {
 // }
 
 func CreateConsensusEngine(stack *node.Node, config *Config, db ethdb.Database) consensus.Engine {
-    // If proof-of-authority is requested, set it up
     var engine consensus.Engine
     engineType := config.Genesis.Config.GetConsensusEngineType()
     if engineType == ctypes.ConsensusEngineT_Clique {
@@ -321,6 +320,7 @@ func CreateConsensusEngine(stack *node.Node, config *Config, db ethdb.Database) 
     } else if engineType == ctypes.ConsensusEngineT_EthashB3 {
         engine = CreateConsensusEngineEthashB3(stack, &config.EthashB3, config.Miner.Notify, config.Miner.Noverify)
     } else {
+        // If no engine type is found, default to ethash - Beacon chain
         engine = CreateConsensusEngineEthash(stack, &config.Ethash, config.Miner.Notify, config.Miner.Noverify)
     }
 

@@ -217,7 +217,6 @@ func NewEventSystem(sys *FilterSystem) *EventSystem {
 	m := &EventSystem{
 		sys:           sys,
 		backend:       sys.backend,
-		lightMode:     lightMode,
 		install:       make(chan *subscription),
 		uninstall:     make(chan *subscription),
 		txsCh:         make(chan core.NewTxsEvent, txChanSize),

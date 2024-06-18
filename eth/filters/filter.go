@@ -348,16 +348,6 @@ func (f *Filter) pendingLogs() []*types.Log {
 	return nil
 }
 
-// includes returns true if the element is present in the list.
-func includes[T comparable](things []T, element T) bool {
-	for _, thing := range things {
-		if thing == element {
-			return true
-		}
-	}
-	return false
-}
-
 // filterLogs creates a slice of logs matching the given criteria.
 func filterLogs(logs []*types.Log, fromBlock, toBlock *big.Int, addresses []common.Address, topics [][]common.Hash) []*types.Log {
 	var check = func(log *types.Log) bool {

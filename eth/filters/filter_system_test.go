@@ -33,6 +33,7 @@ import (
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/bloombits"
 	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethdb"
@@ -125,8 +126,8 @@ func (b *testBackend) GetLogs(ctx context.Context, hash common.Hash, number uint
 	return logs, nil
 }
 
-func (b *testBackend) PendingBlockAndReceipts() (*types.Block, types.Receipts) {
-	return b.pendingBlock, b.pendingReceipts
+func (b *testBackend) Pending() (*types.Block, types.Receipts, *state.StateDB) {
+	return b.pendingBlock, b.pendingReceipts, nil
 }
 
 func (b *testBackend) SubscribeNewTxsEvent(ch chan<- core.NewTxsEvent) event.Subscription {
@@ -180,6 +181,20 @@ func (b *testBackend) ServiceFilter(ctx context.Context, session *bloombits.Matc
 	}()
 }
 
+func (b *testBackend) setPending(block *types.Block, receipts types.Receipts) {
+	b.pendingBlock = block
+	b.pendingReceipts = receipts
+}
+
+func (b *testBackend) notifyPending(logs []*types.Log) {
+	genesis := &core.Genesis{
+		Config: params.TestChainConfig,
+	}
+	_, blocks, _ := core.GenerateChainWithGenesis(genesis, ethash.NewFaker(), 2, func(i int, b *core.BlockGen) {})
+	b.setPending(blocks[1], []*types.Receipt{{Logs: logs}})
+	b.chainFeed.Send(core.ChainEvent{Block: blocks[0]})
+}
+
 func newTestFilterSystem(t testing.TB, db ethdb.Database, cfg Config) (*testBackend, *FilterSystem) {
 	backend := &testBackend{db: db}
 	sys := NewFilterSystem(backend, cfg)
@@ -197,7 +212,7 @@ func TestBlockSubscription(t *testing.T) {
 	var (
 		db           = rawdb.NewMemoryDatabase()
 		backend, sys = newTestFilterSystem(t, db, Config{})
-		api          = NewFilterAPI(sys)
+		api          = NewFilterAPI(sys, false)
 		genesis      = &core.Genesis{
 			Config:  params.TestChainConfig,
 			BaseFee: big.NewInt(params.InitialBaseFee),
@@ -252,7 +267,7 @@ func TestPendingTxFilter(t *testing.T) {
 	var (
 		db           = rawdb.NewMemoryDatabase()
 		backend, sys = newTestFilterSystem(t, db, Config{})
-		api          = NewFilterAPI(sys)
+		api          = NewFilterAPI(sys, false)
 
 		transactions = []*types.Transaction{
 			types.NewTransaction(0, common.HexToAddress("0xb794f5ea0ba39494ce83a213fffba74279579268"), new(big.Int), 0, new(big.Int), nil),
@@ -308,7 +323,7 @@ func TestPendingTxFilterFullTx(t *testing.T) {
 	var (
 		db           = rawdb.NewMemoryDatabase()
 		backend, sys = newTestFilterSystem(t, db, Config{})
-		api          = NewFilterAPI(sys)
+		api          = NewFilterAPI(sys, false)
 
 		transactions = []*types.Transaction{
 			types.NewTransaction(0, common.HexToAddress("0xb794f5ea0ba39494ce83a213fffba74279579268"), new(big.Int), 0, new(big.Int), nil),
@@ -364,7 +379,7 @@ func TestLogFilterCreation(t *testing.T) {
 	var (
 		db     = rawdb.NewMemoryDatabase()
 		_, sys = newTestFilterSystem(t, db, Config{})
-		api    = NewFilterAPI(sys)
+		api    = NewFilterAPI(sys, false)
 
 		testCases = []struct {
 			crit    FilterCriteria
@@ -376,6 +391,8 @@ func TestLogFilterCreation(t *testing.T) {
 			{FilterCriteria{FromBlock: big.NewInt(1), ToBlock: big.NewInt(2)}, true},
 			// "mined" block range to pending
 			{FilterCriteria{FromBlock: big.NewInt(1), ToBlock: big.NewInt(rpc.LatestBlockNumber.Int64())}, true},
+			// new mined and pending blocks
+			{FilterCriteria{FromBlock: big.NewInt(rpc.LatestBlockNumber.Int64()), ToBlock: big.NewInt(rpc.PendingBlockNumber.Int64())}, true},
 			// from block "higher" than to block
 			{FilterCriteria{FromBlock: big.NewInt(2), ToBlock: big.NewInt(1)}, false},
 			// from block "higher" than to block
@@ -411,7 +428,7 @@ func TestInvalidLogFilterCreation(t *testing.T) {
 	var (
 		db     = rawdb.NewMemoryDatabase()
 		_, sys = newTestFilterSystem(t, db, Config{})
-		api    = NewFilterAPI(sys)
+		api    = NewFilterAPI(sys, false)
 	)
 
 	// different situations where log filter creation should fail.
@@ -437,7 +454,7 @@ func TestInvalidGetLogsRequest(t *testing.T) {
 	var (
 		db        = rawdb.NewMemoryDatabase()
 		_, sys    = newTestFilterSystem(t, db, Config{})
-		api       = NewFilterAPI(sys)
+		api       = NewFilterAPI(sys, false)
 		blockHash = common.HexToHash("0x1111111111111111111111111111111111111111111111111111111111111111")
 	)
 
@@ -463,7 +480,7 @@ func TestInvalidGetRangeLogsRequest(t *testing.T) {
 	var (
 		db     = rawdb.NewMemoryDatabase()
 		_, sys = newTestFilterSystem(t, db, Config{})
-		api    = NewFilterAPI(sys)
+		api    = NewFilterAPI(sys, false)
 	)
 
 	if _, err := api.GetLogs(context.Background(), FilterCriteria{FromBlock: big.NewInt(2), ToBlock: big.NewInt(1)}); err != errInvalidBlockRange {
@@ -478,7 +495,7 @@ func TestLogFilter(t *testing.T) {
 	var (
 		db           = rawdb.NewMemoryDatabase()
 		backend, sys = newTestFilterSystem(t, db, Config{})
-		api          = NewFilterAPI(sys)
+		api          = NewFilterAPI(sys, false)
 
 		firstAddr      = common.HexToAddress("0x1111111111111111111111111111111111111111")
 		secondAddr     = common.HexToAddress("0x2222222222222222222222222222222222222222")
@@ -497,6 +514,9 @@ func TestLogFilter(t *testing.T) {
 			{Address: thirdAddress, Topics: []common.Hash{secondTopic}, BlockNumber: 3},
 		}
 
+		expectedCase7  = []*types.Log{allLogs[3], allLogs[4], allLogs[0], allLogs[1], allLogs[2], allLogs[3], allLogs[4]}
+		expectedCase11 = []*types.Log{allLogs[1], allLogs[2], allLogs[1], allLogs[2]}
+
 		testCases = []struct {
 			crit     FilterCriteria
 			expected []*types.Log
@@ -514,14 +534,20 @@ func TestLogFilter(t *testing.T) {
 			4: {FilterCriteria{Addresses: []common.Address{thirdAddress}, Topics: [][]common.Hash{{firstTopic, secondTopic}}}, allLogs[3:5], ""},
 			// match logs based on multiple addresses and "or" topics
 			5: {FilterCriteria{Addresses: []common.Address{secondAddr, thirdAddress}, Topics: [][]common.Hash{{firstTopic, secondTopic}}}, allLogs[2:5], ""},
+			// logs in the pending block
+			6: {FilterCriteria{Addresses: []common.Address{firstAddr}, FromBlock: big.NewInt(rpc.PendingBlockNumber.Int64()), ToBlock: big.NewInt(rpc.PendingBlockNumber.Int64())}, allLogs[:2], ""},
+			// mined logs with block num >= 2 or pending logs
+			7: {FilterCriteria{FromBlock: big.NewInt(2), ToBlock: big.NewInt(rpc.PendingBlockNumber.Int64())}, expectedCase7, ""},
 			// all "mined" logs with block num >= 2
-			6: {FilterCriteria{FromBlock: big.NewInt(2), ToBlock: big.NewInt(rpc.LatestBlockNumber.Int64())}, allLogs[3:], ""},
+			8: {FilterCriteria{FromBlock: big.NewInt(2), ToBlock: big.NewInt(rpc.LatestBlockNumber.Int64())}, allLogs[3:], ""},
 			// all "mined" logs
-			7: {FilterCriteria{ToBlock: big.NewInt(rpc.LatestBlockNumber.Int64())}, allLogs, ""},
+			9: {FilterCriteria{ToBlock: big.NewInt(rpc.LatestBlockNumber.Int64())}, allLogs, ""},
 			// all "mined" logs with 1>= block num <=2 and topic secondTopic
-			8: {FilterCriteria{FromBlock: big.NewInt(1), ToBlock: big.NewInt(2), Topics: [][]common.Hash{{secondTopic}}}, allLogs[3:4], ""},
+			10: {FilterCriteria{FromBlock: big.NewInt(1), ToBlock: big.NewInt(2), Topics: [][]common.Hash{{secondTopic}}}, allLogs[3:4], ""},
+			// all "mined" and pending logs with topic firstTopic
+			11: {FilterCriteria{FromBlock: big.NewInt(rpc.LatestBlockNumber.Int64()), ToBlock: big.NewInt(rpc.PendingBlockNumber.Int64()), Topics: [][]common.Hash{{firstTopic}}}, expectedCase11, ""},
 			// match all logs due to wildcard topic
-			9: {FilterCriteria{Topics: [][]common.Hash{nil}}, allLogs[1:], ""},
+			12: {FilterCriteria{Topics: [][]common.Hash{nil}}, allLogs[1:], ""},
 		}
 	)
 
@@ -539,13 +565,16 @@ func TestLogFilter(t *testing.T) {
 		t.Fatal("Pending logs event not delivered")
 	}
 
+	// set pending logs
+	backend.notifyPending(allLogs)
+
 	for i, tt := range testCases {
 		var fetched []*types.Log
 		timeout := time.Now().Add(1 * time.Second)
 		for { // fetch all expected logs
 			results, err := api.GetFilterChanges(tt.id)
 			if err != nil {
-				t.Fatalf("test %d: unable to fetch logs: %v", i, err)
+				t.Fatalf("Unable to fetch logs: %v", err)
 			}
 
 			fetched = append(fetched, results.([]*types.Log)...)
@@ -743,10 +772,12 @@ func TestPendingLogsSubscription(t *testing.T) {
 		}()
 	}
 
-	// raise events
-	for _, ev := range allLogs {
-		backend.pendingLogsFeed.Send(ev)
+	// set pending logs
+	var flattenLogs []*types.Log
+	for _, logs := range allLogs {
+		flattenLogs = append(flattenLogs, logs...)
 	}
+	backend.notifyPending(flattenLogs)
 
 	for i := range testCases {
 		err := <-testCases[i].err
@@ -904,7 +935,7 @@ func TestPendingTxFilterDeadlock(t *testing.T) {
 	var (
 		db           = rawdb.NewMemoryDatabase()
 		backend, sys = newTestFilterSystem(t, db, Config{Timeout: timeout})
-		api          = NewFilterAPI(sys)
+		api          = NewFilterAPI(sys, false)
 		done         = make(chan struct{})
 	)
 
@@ -955,4 +986,12 @@ func TestPendingTxFilterDeadlock(t *testing.T) {
 			t.Fatalf("Filter timeout is hanging")
 		}
 	}
+}
+
+func flattenLogs(pl [][]*types.Log) []*types.Log {
+	var logs []*types.Log
+	for _, l := range pl {
+		logs = append(logs, l...)
+	}
+	return logs
 }

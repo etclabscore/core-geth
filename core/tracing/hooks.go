@@ -21,7 +21,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/holiman/uint256"
 )
 
@@ -54,7 +54,7 @@ type VMContext struct {
 	Random      *common.Hash
 	// Effective tx gas price
 	GasPrice    *big.Int
-	ChainConfig *params.ChainConfig
+	ChainConfig ctypes.ChainConfigurator
 	StateDB     StateDB
 }
 
@@ -105,7 +105,7 @@ type (
 	*/
 
 	// BlockchainInitHook is called when the blockchain is initialized.
-	BlockchainInitHook = func(chainConfig *params.ChainConfig)
+	BlockchainInitHook = func(chainConfig ctypes.ChainConfigurator)
 
 	// CloseHook is called when the blockchain closes.
 	CloseHook = func()

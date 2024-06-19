@@ -17,6 +17,7 @@
 package core
 
 import (
+	crand "crypto/rand"
 	"errors"
 	"fmt"
 	"math/big"

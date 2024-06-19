@@ -132,9 +132,6 @@ func runStateTest(fname string, cfg vm.Config, dump bool) error {
 	results := make([]StatetestResult, 0, len(testsByName))
 	for key, test := range testsByName {
 		for _, st := range test.Subtests(nil) {
-			if testFork != "" && testFork != st.Fork {
-				continue
-			}
 			// Run the test and aggregate the result
 			result := &StatetestResult{Name: key, Fork: st.Fork, Pass: true}
 			test.Run(st, cfg, false, rawdb.HashScheme, func(err error, tstate *tests.StateTestState) {

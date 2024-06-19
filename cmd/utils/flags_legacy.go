@@ -18,6 +18,7 @@ package utils
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/eth/ethconfig"
 	"github.com/ethereum/go-ethereum/internal/flags"
@@ -108,6 +109,23 @@ var (
 		Name:     "light.maxpeers",
 		Usage:    "Maximum number of light clients to serve, or light servers to attach to (deprecated)",
 		Value:    ethconfig.Defaults.LightPeers,
+		Category: flags.DeprecatedCategory,
+	}
+	UltraLightServersFlag = &cli.StringFlag{
+		Name:     "ulc.servers",
+		Usage:    "List of trusted ultra-light servers",
+		Value:    strings.Join(ethconfig.Defaults.UltraLightServers, ","),
+		Category: flags.DeprecatedCategory,
+	}
+	UltraLightFractionFlag = &cli.IntFlag{
+		Name:     "ulc.fraction",
+		Usage:    "Minimum % of trusted ultra-light servers required to announce a new head",
+		Value:    ethconfig.Defaults.UltraLightFraction,
+		Category: flags.DeprecatedCategory,
+	}
+	UltraLightOnlyAnnounceFlag = &cli.BoolFlag{
+		Name:     "ulc.onlyannounce",
+		Usage:    "Ultra light server sends announcements only",
 		Category: flags.DeprecatedCategory,
 	}
 	LightNoPruneFlag = &cli.BoolFlag{

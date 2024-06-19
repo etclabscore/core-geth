@@ -140,7 +140,7 @@ func Execute(code, input []byte, cfg *Config) ([]byte, *state.StateDB, error) {
 	// Execute the preparatory steps for state transition which includes:
 	// - prepare accessList(post-berlin)
 	// - reset transient storage(eip 1153)
-	cfg.State.Prepare(eip2930f, eip3651f, cfg.Origin, cfg.Coinbase, &address, vmenv.ActivePrecompiles(), nil)
+	cfg.State.Prepare(eip2930f, eip3651f, cfg.Origin, cfg.Coinbase, &address, vm.ActivePrecompiles(vmenv.ChainConfig(), vmenv.Context.BlockNumber, &vmenv.Context.Time), nil)
 	cfg.State.CreateAccount(address)
 	// set the receiver's (the executing contract) code for execution.
 	cfg.State.SetCode(address, code)

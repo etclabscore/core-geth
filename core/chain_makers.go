@@ -428,7 +428,7 @@ func GenerateChainWithGenesis(genesis *genesisT.Genesis, engine consensus.Engine
 	return db, blocks, receipts
 }
 
-func GenerateVerkleChain(config *params.ChainConfig, parent *types.Block, engine consensus.Engine, db ethdb.Database, trdb *triedb.Database, n int, gen func(int, *BlockGen)) ([]*types.Block, []types.Receipts, []*verkle.VerkleProof, []verkle.StateDiff) {
+func GenerateVerkleChain(config ctypes.ChainConfigurator, parent *types.Block, engine consensus.Engine, db ethdb.Database, trdb *triedb.Database, n int, gen func(int, *BlockGen)) ([]*types.Block, []types.Receipts, []*verkle.VerkleProof, []verkle.StateDiff) {
 	if config == nil {
 		config = params.TestChainConfig
 	}

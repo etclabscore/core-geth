@@ -265,50 +265,24 @@ type Config struct {
 }
 
 // CreateConsensusEngine creates a consensus engine for the given chain configuration.
-// func CreateConsensusEngine(stack *node.Node, ethashConfig *ethash.Config, ethashb3Config *ethashb3.Config, cliqueConfig *ctypes.CliqueConfig, lyra2Config *lyra2.Config, notify []string, noverify bool, db ethdb.Database) consensus.Engine {
-// 	// If proof-of-authority is requested, set it up
-// 	var engine consensus.Engine
-// 	if cliqueConfig != nil {
-// 		engine = clique.New(cliqueConfig, db)
-// 	} else if lyra2Config != nil {
-// 		engine = lyra2.New(lyra2Config, notify, noverify)
-// 	} else if ethashb3Config != nil {
-// 		engine = CreateConsensusEngineEthashB3(stack, ethashb3Config, notify, noverify)
-// 	} else {
-// 		switch ethashConfig.PowMode {
-// 		case ethash.ModeFake:
-// 			log.Warn("Ethash used in fake mode")
-// 			engine = ethash.NewFaker()
-// 		case ethash.ModeTest:
-// 			log.Warn("Ethash used in test mode")
-// 			engine = ethash.NewTester(nil, noverify)
-// 		case ethash.ModeShared:
-// 			log.Warn("Ethash used in shared mode")
-// 			engine = ethash.NewShared()
-// 		case ethash.ModePoissonFake:
-// 			log.Warn("Ethash used in fake Poisson mode")
-// 			engine = ethash.NewPoissonFaker()
-// 		default:
-// 			engine = ethash.New(ethash.Config{
-// 				PowMode:          ethashConfig.PowMode,
-// 				CacheDir:         stack.ResolvePath(ethashConfig.CacheDir),
-// 				CachesInMem:      ethashConfig.CachesInMem,
-// 				CachesOnDisk:     ethashConfig.CachesOnDisk,
-// 				CachesLockMmap:   ethashConfig.CachesLockMmap,
-// 				DatasetDir:       ethashConfig.DatasetDir,
-// 				DatasetsInMem:    ethashConfig.DatasetsInMem,
-// 				DatasetsOnDisk:   ethashConfig.DatasetsOnDisk,
-// 				DatasetsLockMmap: ethashConfig.DatasetsLockMmap,
-// 				NotifyFull:       ethashConfig.NotifyFull,
-// 				ECIP1099Block:    ethashConfig.ECIP1099Block,
-// 			}, notify, noverify)
-// 			engine.(*ethash.Ethash).SetThreads(-1) // Disable CPU mining
-// 		}
-// 	}
+// Option for simplifying this would be the following code, but would require changed to each consensus engine to accept a config struct.
+// ```
+// type EngineCreator func(*node.Node, *Config, ethdb.Database) consensus.Engine
 //
-// 	return beacon.New(engine)
+// var engineCreators = map[ctypes.ConsensusEngineT]EngineCreator{
+//     ctypes.ConsensusEngineT_Clique:   CreateConsensusEngineClique,
+//     ctypes.ConsensusEngineT_Lyra2:    CreateConsensusEngineLyra2,
+//     ctypes.ConsensusEngineT_EthashB3: CreateConsensusEngineEthashB3,
+//     ctypes.ConsensusEngineT_Ethash:   CreateConsensusEngineEthash,
 // }
-
+//
+// func CreateConsensusEngine(stack *node.Node, config *Config, db ethdb.Database) consensus.Engine {
+//     engineType := config.Genesis.Config.GetConsensusEngineType()
+//     if createEngine, ok := engineCreators[engineType]; ok {
+//         return createEngine(stack, config, db)
+//     }
+// }
+// ```
 func CreateConsensusEngine(stack *node.Node, config *Config, db ethdb.Database) consensus.Engine {
     var engine consensus.Engine
     engineType := config.Genesis.Config.GetConsensusEngineType()

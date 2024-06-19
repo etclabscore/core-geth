@@ -185,7 +185,8 @@ func Create(input []byte, cfg *Config) ([]byte, common.Address, uint64, error) {
 	// Execute the preparatory steps for state transition which includes:
 	// - prepare accessList(post-berlin)
 	// - reset transient storage(eip 1153)
-	cfg.State.Prepare(eip2930f, eip3651f, cfg.Origin, cfg.Coinbase, nil, vmenv.ActivePrecompiles(), nil)
+	precomps := vm.ActivePrecompiles(vmenv.ChainConfig(), vmenv.Context.BlockNumber, &vmenv.Context.Time)
+	cfg.State.Prepare(eip2930f, eip3651f, cfg.Origin, cfg.Coinbase, nil, precomps, nil)
 	// Call the code with the given configuration.
 	code, address, leftOverGas, err := vmenv.Create(
 		sender,
@@ -224,7 +225,8 @@ func Call(address common.Address, input []byte, cfg *Config) ([]byte, uint64, er
 	// Execute the preparatory steps for state transition which includes:
 	// - prepare accessList(post-berlin)
 	// - reset transient storage(eip 1153)
-	statedb.Prepare(eip2930f, eip3651f, cfg.Origin, cfg.Coinbase, &address, vmenv.ActivePrecompiles(), nil)
+	precomps := vm.ActivePrecompiles(vmenv.ChainConfig(), vmenv.Context.BlockNumber, &vmenv.Context.Time)
+	statedb.Prepare(eip2930f, eip3651f, cfg.Origin, cfg.Coinbase, &address, precomps, nil)
 
 	// Call the code with the given configuration.
 	ret, leftOverGas, err := vmenv.Call(

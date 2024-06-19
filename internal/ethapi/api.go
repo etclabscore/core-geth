@@ -1669,7 +1669,6 @@ func AccessList(ctx context.Context, b Backend, blockNrOrHash rpc.BlockNumberOrH
 			to = crypto.CreateAddress(args.from(), uint64(*args.Nonce))
 		}
 	}
-	isPostMerge := header.Difficulty.Sign() == 0
 	// Retrieve the precompiles since they don't need to be added to the access list
 	precompileMap := vm.PrecompiledContractsForConfig(b.ChainConfig(), header.Number, &header.Time)
 	precompiles := make([]common.Address, len(precompileMap))

@@ -208,7 +208,7 @@ func newTestBackend(t *testing.T, londonBlock *big.Int, cancunBlock *big.Int, pe
 			// put more blobs in each new block
 			for j := 0; j < i && j < 6; j++ {
 				blobTx := &types.BlobTx{
-					ChainID:    uint256.MustFromBig(gspec.Config.ChainID),
+					ChainID:    uint256.MustFromBig(gspec.Config.GetChainID()),
 					Nonce:      b.TxNonce(addr),
 					To:         common.Address{},
 					Gas:        30000,

@@ -12,6 +12,7 @@ import (
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/consensus/misc"
 	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params/mutations"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
@@ -482,7 +483,7 @@ func accumulateRewards(config ctypes.ChainConfigurator, state *state.StateDB, he
 	minerReward := GetBlockWinnerRewardByEra(era)
 	uncleReward := getEraUncleBlockReward(minerReward)
 	for _, uncle := range uncles {
-		state.AddBalance(uncle.Coinbase, uint256.MustFromBig(uncleReward))
+		state.AddBalance(uncle.Coinbase, uint256.MustFromBig(uncleReward), tracing.BalanceIncreaseRewardMineUncle)
 	}
-	state.AddBalance(header.Coinbase, uint256.MustFromBig(minerReward))
+	state.AddBalance(header.Coinbase, uint256.MustFromBig(minerReward), tracing.BalanceIncreaseRewardMineBlock)
 }

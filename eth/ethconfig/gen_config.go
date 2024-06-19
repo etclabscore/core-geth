@@ -59,9 +59,9 @@ func (c Config) MarshalTOML() (interface{}, error) {
 		BlobPool                   blobpool.Config
 		GPO                        gasprice.Config
 		EnablePreimageRecording    bool
-		VMTrace                 string
-		VMTraceJsonConfig       string
-		DocRoot                 string `toml:"-"`
+		VMTrace                    string
+		VMTraceJsonConfig          string
+		DocRoot                    string `toml:"-"`
 		EWASMInterpreter           string
 		EVMInterpreter             string
 		RPCGasCap                  uint64
@@ -179,9 +179,9 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 		BlobPool                   *blobpool.Config
 		GPO                        *gasprice.Config
 		EnablePreimageRecording    *bool
-		VMTrace                 *string
-		VMTraceJsonConfig       *string
-		DocRoot                 *string `toml:"-"`
+		VMTrace                    *string
+		VMTraceJsonConfig          *string
+		DocRoot                    *string `toml:"-"`
 		EWASMInterpreter           *string
 		EVMInterpreter             *string
 		RPCGasCap                  *uint64

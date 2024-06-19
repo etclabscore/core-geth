@@ -19,16 +19,13 @@ require (
 	github.com/crate-crypto/go-ipa v0.0.0-20231025140028-3c0104f4b233
 	github.com/crate-crypto/go-kzg-4844 v1.0.0
 	github.com/davecgh/go-spew v1.1.1
-	github.com/deckarep/golang-set/v2 v2.1.0
-	github.com/donovanhide/eventsource v0.0.0-20210830082556-c59027999da0
-	github.com/dop251/goja v0.0.0-20230605162241-28ee0ee714f3
-	github.com/ethereum/c-kzg-4844 v1.0.0
 	github.com/deckarep/golang-set v1.8.0
 	github.com/deckarep/golang-set/v2 v2.3.1
+	github.com/donovanhide/eventsource v0.0.0-20210830082556-c59027999da0
 	github.com/dop251/goja v0.0.0-20230806174421-c933cf95e127
 	github.com/edsrzf/mmap-go v1.1.0
 	github.com/etclabscore/go-openrpc-reflect v0.0.37
-	github.com/ethereum/c-kzg-4844 v0.4.0
+	github.com/ethereum/c-kzg-4844 v1.0.0
 	github.com/ethereum/evmc/v7 v7.5.0
 	github.com/fatih/color v1.13.0
 	github.com/ferranbt/fastssz v0.1.2
@@ -87,8 +84,6 @@ require (
 	golang.org/x/text v0.14.0
 	golang.org/x/time v0.5.0
 	golang.org/x/tools v0.20.0
-	golang.org/x/time v0.3.0
-	golang.org/x/tools v0.15.0
 	gonum.org/v1/gonum v0.14.0
 	gonum.org/v1/plot v0.14.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
@@ -151,7 +146,7 @@ require (
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
-	github.com/mailru/easyjson v0.7.6 // indirect
+	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
 	github.com/minio/sha256-simd v1.0.0 // indirect

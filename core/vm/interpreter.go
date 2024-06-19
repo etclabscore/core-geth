@@ -30,11 +30,11 @@ import (
 // Config are the configuration options for the Interpreter
 type Config struct {
 	Tracer                  *tracing.Hooks
-	NoBaseFee               bool  // Forces the EIP-1559 baseFee to 0 (needed for 0 price calls)
-	EnablePreimageRecording bool  // Enables recording of SHA3/keccak preimages
-	ExtraEips               []int // Additional EIPS that are to be enabled
-	EWASMInterpreter        string    // External EWASM interpreter options -- PTAL-meowsbits Is this the best place for these additional fields?
-	EVMInterpreter          string    // External EVM interpreter options
+	NoBaseFee               bool   // Forces the EIP-1559 baseFee to 0 (needed for 0 price calls)
+	EnablePreimageRecording bool   // Enables recording of SHA3/keccak preimages
+	ExtraEips               []int  // Additional EIPS that are to be enabled
+	EWASMInterpreter        string // External EWASM interpreter options -- PTAL-meowsbits Is this the best place for these additional fields?
+	EVMInterpreter          string // External EVM interpreter options
 }
 
 // Interpreter is used to run Ethereum based contracts and will utilise the
@@ -58,7 +58,6 @@ type Interpreter interface {
 	// ```
 	CanRun([]byte) bool
 }
-
 
 // ScopeContext contains the things that are per-call, such as stack and memory,
 // but not transients like pc and gas

@@ -18,7 +18,6 @@ package era
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"math/big"
 

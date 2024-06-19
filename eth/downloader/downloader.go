@@ -1368,7 +1368,7 @@ func (d *Downloader) processHeaders(origin uint64, td, ttd *big.Int, beaconMode 
 		rollback    uint64 // Zero means no rollback (fine as you can't unroll the genesis)
 		rollbackErr error
 		mode        = d.getMode()
-		timer      = time.NewTimer(time.Second)
+		timer       = time.NewTimer(time.Second)
 	)
 	defer timer.Stop()
 

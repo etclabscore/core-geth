@@ -19,9 +19,8 @@ package discover
 import (
 	"crypto/ecdsa"
 	"fmt"
-	"net"
-	"slices"
 	"net/netip"
+	"slices"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/crypto"

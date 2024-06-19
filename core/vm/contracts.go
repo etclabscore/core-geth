@@ -113,6 +113,16 @@ func PrecompiledContractsForConfig(config ctypes.ChainConfigurator, bn *big.Int,
 	return precompileds
 }
 
+// ActivePrecompiles returns the precompiles enabled with the current configuration.
+func ActivePrecompiles(config ctypes.ChainConfigurator, bn *big.Int, bt *uint64) []common.Address {
+	precomps := PrecompiledContractsForConfig(config, bn, bt)
+	keys := make([]common.Address, len(precomps))
+	for k := range precomps {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
 // RunPrecompiledContract runs and evaluates the output of a precompiled contract.
 // It returns
 // - the returned bytes,

@@ -178,8 +178,7 @@ func (t *flatCallTracer) OnExit(depth int, output []byte, gasUsed uint64, err er
 func (t *flatCallTracer) OnTxStart(env *tracing.VMContext, tx *types.Transaction, from common.Address) {
 	t.tracer.OnTxStart(env, tx, from)
 	// Update list of precompiles based on current block
-	rules := env.ChainConfig.Rules(env.BlockNumber, env.Random != nil, env.Time)
-	t.activePrecompiles = vm.ActivePrecompiles(rules)
+	t.activePrecompiles = vm.ActivePrecompiles(env.ChainConfig, env.BlockNumber, &env.Time)
 }
 
 func (t *flatCallTracer) OnTxEnd(receipt *types.Receipt, err error) {

@@ -1116,7 +1116,7 @@ func doCall(ctx context.Context, b Backend, args TransactionArgs, state *state.S
 	if blockOverrides != nil {
 		blockOverrides.Apply(&blockCtx)
 	}
-	if err := args.CallDefaults(globalGasCap, blockCtx.BaseFee, b.ChainConfig().ChainID); err != nil {
+	if err := args.CallDefaults(globalGasCap, blockCtx.BaseFee, b.ChainConfig().GetChainID()); err != nil {
 		return nil, err
 	}
 	msg := args.ToMessage(blockCtx.BaseFee)
@@ -1200,7 +1200,7 @@ func DoEstimateGas(ctx context.Context, b Backend, args TransactionArgs, blockNr
 		State:      state,
 		ErrorRatio: estimateGasErrorRatio,
 	}
-	if err := args.CallDefaults(gasCap, header.BaseFee, b.ChainConfig().ChainID); err != nil {
+	if err := args.CallDefaults(gasCap, header.BaseFee, b.ChainConfig().GetChainID()); err != nil {
 		return 0, err
 	}
 	call := args.ToMessage(header.BaseFee)

@@ -583,7 +583,7 @@ func (evm *EVM) captureEnd(depth int, startGas uint64, leftOverGas uint64, ret [
 	if err != nil {
 		reverted = true
 	}
-	if !evm.chainRules.IsHomestead && errors.Is(err, ErrCodeStoreOutOfGas) {
+	if evm.ChainConfig().IsEnabled(evm.chainConfig.GetEIP7Transition, evm.Context.BlockNumber) && errors.Is(err, ErrCodeStoreOutOfGas) {
 		reverted = false
 	}
 	if tracer.OnExit != nil {

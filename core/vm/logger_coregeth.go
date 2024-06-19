@@ -21,7 +21,7 @@ package vm
 // *stateDiffTracer implements this interface, and really likes
 // being able to manage state (of state/) directly.
 // See api_parity.go.
-type EVMLogger_StateCapturer interface {
-	EVMLogger
-	CapturePreEVM(env *EVM)
-}
+// type EVMLogger_StateCapturer interface {
+// 	EVMLogger
+// 	CapturePreEVM(env *EVM)
+// }

@@ -49,6 +49,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/triedb"
 	"github.com/ethereum/go-ethereum/triedb/hashdb"
@@ -671,8 +672,8 @@ func (bc *BlockChain) rewindHashHead(head *types.Header, root common.Hash) (*typ
 	//   which is still acceptable.
 	if pivot != nil {
 		limit = *pivot
-	} else if head.Number.Uint64() > params.FullImmutabilityThreshold {
-		limit = head.Number.Uint64() - params.FullImmutabilityThreshold
+	} else if head.Number.Uint64() > vars.FullImmutabilityThreshold {
+		limit = head.Number.Uint64() - vars.FullImmutabilityThreshold
 	}
 	for {
 		logger := log.Trace

@@ -17,6 +17,7 @@
 package tracing
 
 import (
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -123,7 +124,7 @@ type (
 	SkippedBlockHook = func(event BlockEvent)
 
 	// GenesisBlockHook is called when the genesis block is being processed.
-	GenesisBlockHook = func(genesis *types.Block, alloc types.GenesisAlloc)
+	GenesisBlockHook = func(genesis *types.Block, alloc genesisT.GenesisAlloc)
 
 	/*
 		- State events -

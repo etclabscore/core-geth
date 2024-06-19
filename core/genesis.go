@@ -585,3 +585,40 @@ func GenesisBlockForTesting(db ethdb.Database, addr common.Address, balance *big
 	}
 	return MustCommitGenesis(db, triedb.NewDatabase(db, nil), &g)
 }
+
+func getGenesisState(db ethdb.Database, blockhash common.Hash) (alloc genesisT.GenesisAlloc, err error) {
+	blob := rawdb.ReadGenesisStateSpec(db, blockhash)
+	if len(blob) != 0 {
+		if err := alloc.UnmarshalJSON(blob); err != nil {
+			return nil, err
+		}
+
+		return alloc, nil
+	}
+
+	// Genesis allocation is missing and there are several possibilities:
+	// the node is legacy which doesn't persist the genesis allocation or
+	// the persisted allocation is just lost.
+	// - supported networks(mainnet, testnets), recover with defined allocations
+	// - private network, can't recover
+	var genesis *genesisT.Genesis
+	switch blockhash {
+	case params.MainnetGenesisHash:
+		genesis = params.DefaultGenesisBlock()
+	case params.GoerliGenesisHash:
+		genesis = params.DefaultGoerliGenesisBlock()
+	case params.SepoliaGenesisHash:
+		genesis = params.DefaultSepoliaGenesisBlock()
+	case params.HoleskyGenesisHash:
+		genesis = params.DefaultHoleskyGenesisBlock()
+	case params.MordorGenesisHash:
+		genesis = params.DefaultMordorGenesisBlock()
+	case params.MintMeGenesisHash:
+		genesis = params.DefaultMintMeGenesisBlock()
+	}
+	if genesis != nil {
+		return genesis.Alloc, nil
+	}
+
+	return nil, nil
+}

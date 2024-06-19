@@ -31,6 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/bloombits"
 	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/event"
@@ -62,7 +63,7 @@ type Backend interface {
 	GetBody(ctx context.Context, hash common.Hash, number rpc.BlockNumber) (*types.Body, error)
 	GetReceipts(ctx context.Context, blockHash common.Hash) (types.Receipts, error)
 	GetLogs(ctx context.Context, blockHash common.Hash, number uint64) ([][]*types.Log, error)
-	PendingBlockAndReceipts() (*types.Block, types.Receipts)
+	Pending() (*types.Block, types.Receipts, *state.StateDB)
 
 	CurrentHeader() *types.Header
 	ChainConfig() ctypes.ChainConfigurator
@@ -96,7 +97,7 @@ func NewFilterSystem(backend Backend, config Config) *FilterSystem {
 
 type logCacheElem struct {
 	logs []*types.Log
-	body atomic.Value
+	body atomic.Pointer[types.Body]
 }
 
 // cachedLogElem loads block logs from the backend and caches the result.
@@ -134,7 +135,7 @@ func (sys *FilterSystem) cachedLogElem(ctx context.Context, blockHash common.Has
 
 func (sys *FilterSystem) cachedGetBody(ctx context.Context, elem *logCacheElem, hash common.Hash, number uint64) (*types.Body, error) {
 	if body := elem.body.Load(); body != nil {
-		return body.(*types.Body), nil
+		return body, nil
 	}
 	body, err := sys.backend.GetBody(ctx, hash, rpc.BlockNumber(number))
 	if err != nil {
@@ -229,7 +230,6 @@ func NewEventSystem(sys *FilterSystem, lightMode bool) *EventSystem {
 	m := &EventSystem{
 		sys:           sys,
 		backend:       sys.backend,
-		lightMode:     lightMode,
 		install:       make(chan *subscription),
 		uninstall:     make(chan *subscription),
 		txsCh:         make(chan core.NewTxsEvent, txChanSize),
@@ -457,12 +457,12 @@ func (es *EventSystem) handleLogs(filters filterIndex, ev []*types.Log) {
 	}
 }
 
-func (es *EventSystem) handlePendingLogs(filters filterIndex, ev []*types.Log) {
-	if len(ev) == 0 {
+func (es *EventSystem) handlePendingLogs(filters filterIndex, logs []*types.Log) {
+	if len(logs) == 0 {
 		return
 	}
 	for _, f := range filters[PendingLogsSubscription] {
-		matchedLogs := filterLogs(ev, nil, f.logsCrit.ToBlock, f.logsCrit.Addresses, f.logsCrit.Topics)
+		matchedLogs := filterLogs(logs, nil, f.logsCrit.ToBlock, f.logsCrit.Addresses, f.logsCrit.Topics)
 		if len(matchedLogs) > 0 {
 			f.logs <- matchedLogs
 		}
@@ -618,6 +618,27 @@ func (es *EventSystem) eventLoop() {
 			es.handlePendingLogs(index, ev)
 		case ev := <-es.chainCh:
 			es.handleChainEvent(index, ev)
+			// If we have no pending log subscription,
+			// we don't need to collect any pending logs.
+			if len(index[PendingLogsSubscription]) == 0 {
+				continue
+			}
+
+			// Pull the pending logs if there is a new chain head.
+			pendingBlock, pendingReceipts, _ := es.backend.Pending()
+			if pendingBlock == nil || pendingReceipts == nil {
+				continue
+			}
+			if pendingBlock.ParentHash() != ev.Block.Hash() {
+				continue
+			}
+			var logs []*types.Log
+			for _, receipt := range pendingReceipts {
+				if len(receipt.Logs) > 0 {
+					logs = append(logs, receipt.Logs...)
+				}
+			}
+
 		case ev := <-es.chainSideCh:
 			es.handleChainSideEvent(index, ev)
 

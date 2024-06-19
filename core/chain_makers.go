@@ -520,13 +520,13 @@ func GenerateVerkleChain(config ctypes.ChainConfigurator, parent *types.Block, e
 	return cm.chain, cm.receipts, proofs, keyvals
 }
 
-func GenerateVerkleChainWithGenesis(genesis *Genesis, engine consensus.Engine, n int, gen func(int, *BlockGen)) (ethdb.Database, []*types.Block, []types.Receipts, []*verkle.VerkleProof, []verkle.StateDiff) {
+func GenerateVerkleChainWithGenesis(genesis *genesisT.Genesis, engine consensus.Engine, n int, gen func(int, *BlockGen)) (ethdb.Database, []*types.Block, []types.Receipts, []*verkle.VerkleProof, []verkle.StateDiff) {
 	db := rawdb.NewMemoryDatabase()
 	cacheConfig := DefaultCacheConfigWithScheme(rawdb.PathScheme)
 	cacheConfig.SnapshotLimit = 0
 	triedb := triedb.NewDatabase(db, cacheConfig.triedbConfig(true))
 	defer triedb.Close()
-	genesisBlock, err := genesis.Commit(db, triedb)
+	genesisBlock, err := CommitGenesis(genesis, db, triedb)
 	if err != nil {
 		panic(err)
 	}

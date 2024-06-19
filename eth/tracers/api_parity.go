@@ -60,28 +60,28 @@ type TraceRewardAction struct {
 	RewardType string          `json:"rewardType,omitempty"`
 }
 
-// setTraceConfigDefaultTracer sets the default tracer to "callTracerParity" if none set
+// setTraceConfigDefaultTracer sets the default tracer to "flatCallTracer" if none set
 func setTraceConfigDefaultTracer(config *TraceConfig) *TraceConfig {
 	if config == nil {
 		config = &TraceConfig{}
 	}
 
 	if config.Tracer == nil {
-		tracer := "callTracerParity"
+		tracer := "flatCallTracer"
 		config.Tracer = &tracer
 	}
 
 	return config
 }
 
-// setTraceCallConfigDefaultTracer sets the default tracer to "callTracerParity" if none set
+// setTraceCallConfigDefaultTracer sets the default tracer to "flatCallTracer" if none set
 func setTraceCallConfigDefaultTracer(config *TraceCallConfig) *TraceCallConfig {
 	if config == nil {
 		config = &TraceCallConfig{}
 	}
 
 	if config.Tracer == nil {
-		tracer := "callTracerParity"
+		tracer := "flatCallTracer"
 		config.Tracer = &tracer
 	}
 
@@ -125,7 +125,7 @@ func decorateResponse(res interface{}, config *TraceConfig) (interface{}, error)
 */
 func decorateNestedTraceResponse(res interface{}, tracer string) interface{} {
 	out := map[string]interface{}{}
-	if tracer == "callTracerParity" {
+	if tracer == "flatCallTracer" {
 		out["trace"] = res
 	} else if tracer == "stateDiffTracer" {
 		out["stateDiff"] = res

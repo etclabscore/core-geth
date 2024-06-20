@@ -21,6 +21,7 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/ebakus/go-ebakus/params"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/consensus"
@@ -512,7 +513,7 @@ var (
 
 func TestProcessVerkle(t *testing.T) {
 	var (
-		config = &params.ChainConfig{
+		config = &goethereum.ChainConfig{
 			ChainID:                       big.NewInt(1),
 			HomesteadBlock:                big.NewInt(0),
 			EIP150Block:                   big.NewInt(0),
@@ -537,10 +538,10 @@ func TestProcessVerkle(t *testing.T) {
 		testKey, _ = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 		bcdb       = rawdb.NewMemoryDatabase() // Database for the blockchain
 		coinbase   = common.HexToAddress("0x71562b71999873DB5b286dF957af199Ec94617F7")
-		gspec      = &Genesis{
+		gspec      = &genesisT.Genesis{
 			Config: config,
-			Alloc: GenesisAlloc{
-				coinbase: GenesisAccount{
+			Alloc: genesisT.GenesisAlloc{
+				coinbase: genesisT.GenesisAccount{
 					Balance: big.NewInt(1000000000000000000), // 1 ether
 					Nonce:   0,
 				},

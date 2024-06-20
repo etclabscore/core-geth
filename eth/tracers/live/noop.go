@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/eth/tracers"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 )
 
 func init() {
@@ -73,7 +74,7 @@ func (t *noop) OnSkippedBlock(ev tracing.BlockEvent) {}
 func (t *noop) OnBlockchainInit(chainConfig ctypes.ChainConfigurator) {
 }
 
-func (t *noop) OnGenesisBlock(b *types.Block, alloc types.GenesisAlloc) {
+func (t *noop) OnGenesisBlock(b *types.Block, alloc genesisT.GenesisAlloc) {
 }
 
 func (t *noop) OnBalanceChange(a common.Address, prev, new *big.Int, reason tracing.BalanceChangeReason) {

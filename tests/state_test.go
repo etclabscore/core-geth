@@ -374,7 +374,8 @@ func runBenchmark(b *testing.B, t *StateTest) {
 			b.ResetTimer()
 			for n := 0; n < b.N; n++ {
 				snapshot := state.StateDB.Snapshot()
-				state.StateDB.Prepare(eip2930f, eip3651f, msg.From, context.Coinbase, msg.To, evm.ActivePrecompiles(), msg.AccessList)
+				precomps := vm.ActivePrecompiles(evm.ChainConfig(), evm.Context.BlockNumber, &evm.Context.Time)
+				state.StateDB.Prepare(eip2930f, eip3651f, msg.From, context.Coinbase, msg.To, precomps, msg.AccessList)
 				b.StartTimer()
 				start := time.Now()
 

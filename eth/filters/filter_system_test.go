@@ -195,7 +195,7 @@ func (b *testBackend) setPending(block *types.Block, receipts types.Receipts) {
 }
 
 func (b *testBackend) notifyPending(logs []*types.Log) {
-	genesis := &core.Genesis{
+	genesis := &genesisT.Genesis{
 		Config: params.TestChainConfig,
 	}
 	_, blocks, _ := core.GenerateChainWithGenesis(genesis, ethash.NewFaker(), 2, func(i int, b *core.BlockGen) {})

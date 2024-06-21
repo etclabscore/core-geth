@@ -1,6 +1,7 @@
 package tracetest
 
 import (
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"math/big"
 	"strings"
 	"unicode"
@@ -34,7 +35,7 @@ type callContext struct {
 	BaseFee    *math.HexOrDecimal256 `json:"baseFeePerGas"`
 }
 
-func (c *callContext) toBlockContext(genesis *core.Genesis) vm.BlockContext {
+func (c *callContext) toBlockContext(genesis *genesisT.Genesis) vm.BlockContext {
 	context := vm.BlockContext{
 		CanTransfer: core.CanTransfer,
 		Transfer:    core.Transfer,
@@ -44,7 +45,7 @@ func (c *callContext) toBlockContext(genesis *core.Genesis) vm.BlockContext {
 		Difficulty:  (*big.Int)(c.Difficulty),
 		GasLimit:    uint64(c.GasLimit),
 	}
-	if genesis.Config.IsLondon(context.BlockNumber) {
+	if genesis.Config.IsEnabled(genesis.Config.GetEIP1559Transition, context.BlockNumber) {
 		context.BaseFee = (*big.Int)(c.BaseFee)
 	}
 	if genesis.ExcessBlobGas != nil && genesis.BlobGasUsed != nil {

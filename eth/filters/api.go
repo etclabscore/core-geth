@@ -302,9 +302,6 @@ func (api *FilterAPI) NewSideHeads(ctx context.Context) (*rpc.Subscription, erro
 			case <-rpcSub.Err():
 				headersSub.Unsubscribe()
 				return
-			case <-notifier.Closed():
-				headersSub.Unsubscribe()
-				return
 			}
 		}
 	}()

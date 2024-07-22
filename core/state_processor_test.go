@@ -32,7 +32,6 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
@@ -526,7 +525,7 @@ func TestProcessVerkle(t *testing.T) {
 			MuirGlacierBlock:              big.NewInt(0),
 			BerlinBlock:                   big.NewInt(0),
 			LondonBlock:                   big.NewInt(0),
-			Ethash:                        new(params.EthashConfig),
+			Ethash:                        new(ctypes.EthashConfig),
 			ShanghaiTime:                  u64(0),
 			VerkleTime:                    u64(0),
 			TerminalTotalDifficulty:       common.Big0,
@@ -556,8 +555,8 @@ func TestProcessVerkle(t *testing.T) {
 	blockchain, _ := NewBlockChain(bcdb, cacheConfig, gspec, nil, beacon.New(ethash.NewFaker()), vm.Config{}, nil, nil)
 	defer blockchain.Stop()
 
-	txCost1 := params.TxGas
-	txCost2 := params.TxGas
+	txCost1 := vars.TxGas
+	txCost2 := vars.TxGas
 	contractCreationCost := intrinsicContractCreationGas + uint64(2039 /* execution costs */)
 	codeWithExtCodeCopyGas := intrinsicCodeWithExtCodeCopyGas + uint64(293644 /* execution costs */)
 	blockGasUsagesExpected := []uint64{

@@ -2,6 +2,8 @@ package tracetest
 
 import (
 	"encoding/json"
+	"fmt"
+	"math/big"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -9,8 +11,14 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/core/vm"
+	"github.com/ethereum/go-ethereum/eth/tracers"
 	"github.com/ethereum/go-ethereum/internal/ethapi"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/tests"
 	// Force-load the native, to trigger registration
 )
 
@@ -22,26 +30,26 @@ type stateDiffAccount struct {
 }
 
 type stateDiffTest struct {
-	Genesis        *genesisT.Genesis       `json:"genesis"`
-	Context        *callContext            `json:"context"`
-	Input          *ethapi.TransactionArgs `json:"input"`
+	Genesis        *genesisT.Genesis `json:"genesis"`
+	Context        *callContext      `json:"context"`
+	Input          string            `json:"input"`
 	StateOverrides *ethapi.StateOverride
 	TracerConfig   json.RawMessage                       `json:"tracerConfig"`
 	Result         *map[common.Address]*stateDiffAccount `json:"result"`
 }
 
 func stateDiffTracerTestRunner(tracerName string, filename string, dirPath string, t testing.TB) error {
-	// // Call tracer test found, read if from disk
-	// blob, err := os.ReadFile(filepath.Join("testdata", dirPath, filename))
-	// if err != nil {
-	// 	return fmt.Errorf("failed to read testcase: %v", err)
-	// }
-	// test := new(stateDiffTest)
-	// if err := json.Unmarshal(blob, test); err != nil {
-	// 	return fmt.Errorf("failed to parse testcase: %v", err)
-	// }
+	// Call tracer test found, read if from disk
+	blob, err := os.ReadFile(filepath.Join("testdata", dirPath, filename))
+	if err != nil {
+		return fmt.Errorf("failed to read testcase: %v", err)
+	}
+	test := new(stateDiffTest)
+	if err := json.Unmarshal(blob, test); err != nil {
+		return fmt.Errorf("failed to parse testcase: %v", err)
+	}
 
-	// // Configure a blockchain with the given prestate
+	// Configure a blockchain with the given prestate
 	// msg, err := test.Input.ToMessage(uint64(test.Context.GasLimit), nil)
 	// if err != nil {
 	// 	return fmt.Errorf("failed to create transaction: %v", err)
@@ -86,15 +94,54 @@ func stateDiffTracerTestRunner(tracerName string, filename string, dirPath strin
 	// 	return fmt.Errorf("failed to execute transaction: %v", err)
 	// }
 
-	// // Retrieve the trace result and compare against the etalon
-	// res, err := tracer.GetResult()
-	// if err != nil {
-	// 	return fmt.Errorf("failed to retrieve trace result: %v", err)
+	// Configure a blockchain with the given prestate
+	// tx := test.Input.ToTransaction()
+	// fmt.Printf("tx: %+v\n", tx)
+
+	tx := new(types.Transaction)
+	if err := tx.UnmarshalBinary(common.FromHex(test.Input)); err != nil {
+		t.Fatalf("failed to parse testcase input: %v", err)
+	}
+	// if err := rlp.DecodeBytes(common.FromHex(test.Input), tx); err != nil {
+	// 	return fmt.Errorf("failed to parse testcase input: %v", err)
 	// }
-	// ret := new(map[common.Address]*stateDiffAccount)
-	// if err := json.Unmarshal(res, ret); err != nil {
-	// 	return fmt.Errorf("failed to unmarshal trace result: %v", err)
-	// }
+	signer := types.MakeSigner(test.Genesis.Config, new(big.Int).SetUint64(uint64(test.Context.Number)), uint64(test.Context.Time))
+	context := test.Context.toBlockContext(test.Genesis)
+	state := tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false, rawdb.HashScheme)
+	defer state.Close()
+
+	// Create the tracer, the EVM environment and run it
+	tracer, err := tracers.DefaultDirectory.New(tracerName, new(tracers.Context), test.TracerConfig)
+	if err != nil {
+		return fmt.Errorf("failed to create call tracer: %v", err)
+	}
+
+	state.StateDB.SetLogger(tracer.Hooks)
+	msg, err := core.TransactionToMessage(tx, signer, context.BaseFee)
+	if err != nil {
+		return fmt.Errorf("failed to prepare transaction for tracing: %v", err)
+	}
+	evm := vm.NewEVM(context, core.NewEVMTxContext(msg), state.StateDB, test.Genesis.Config, vm.Config{Tracer: tracer.Hooks})
+	tracer.OnTxStart(evm.GetVMContext(), tx, msg.From)
+	vmRet, err := core.ApplyMessage(evm, msg, new(core.GasPool).AddGas(tx.Gas()))
+	if err != nil {
+		return fmt.Errorf("failed to execute transaction: %v", err)
+	}
+	tracer.OnTxEnd(&types.Receipt{GasUsed: vmRet.UsedGas}, nil)
+
+	// Retrieve the trace result and compare against the etalon
+	res, err := tracer.GetResult()
+	// fmt.Println("res:", string(res))
+	if err != nil {
+		return fmt.Errorf("failed to retrieve trace result: %v", err)
+	}
+	// var ret prestateTrace
+	ret := new(map[common.Address]*stateDiffAccount)
+	if err := json.Unmarshal(res, ret); err != nil {
+		return fmt.Errorf("failed to unmarshal trace result: %v", err)
+	}
+	have, _ := json.MarshalIndent(ret, "", " ")
+	fmt.Printf("have: %+v", string(have))
 
 	// if !jsonEqualStateDiff(ret, test.Result) {
 	// 	t.Logf("tracer name: %s", tracerName)
@@ -112,6 +159,7 @@ func stateDiffTracerTestRunner(tracerName string, filename string, dirPath strin
 
 	// 	t.Fatalf("trace mismatch: \nhave %+v\nwant %+v", ret, test.Result)
 	// }
+	t.FailNow()
 	return nil
 }
 
@@ -130,7 +178,7 @@ func testStateDiffTracer(tracerName string, dirPath string, t *testing.T) {
 	}
 	for _, file := range files {
 		// if !strings.HasSuffix(file.Name(), "errInsufficientFundsForTransfer_and_gas_cost.json") {
-		if !strings.HasSuffix(file.Name(), ".json") {
+		if !strings.HasSuffix(file.Name(), "test.json") {
 			continue
 		}
 		file := file // capture range variable

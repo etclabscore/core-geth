@@ -17,8 +17,9 @@
 package tracing
 
 import (
-	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"math/big"
+
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"

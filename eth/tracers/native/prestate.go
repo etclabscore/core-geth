@@ -75,18 +75,9 @@ type prestateTracerConfig struct {
 }
 
 func newPrestateTracer(ctx *tracers.Context, cfg json.RawMessage) (*tracers.Tracer, error) {
-	var config prestateTracerConfig
-	if cfg != nil {
-		if err := json.Unmarshal(cfg, &config); err != nil {
-			return nil, err
-		}
-	}
-	t := &prestateTracer{
-		pre:     stateMap{},
-		post:    stateMap{},
-		config:  config,
-		created: make(map[common.Address]bool),
-		deleted: make(map[common.Address]bool),
+	t, err := newPrestateTracerObject(ctx, cfg)
+	if err != nil {
+		return nil, err
 	}
 	return &tracers.Tracer{
 		Hooks: &tracing.Hooks{
@@ -96,6 +87,22 @@ func newPrestateTracer(ctx *tracers.Context, cfg json.RawMessage) (*tracers.Trac
 		},
 		GetResult: t.GetResult,
 		Stop:      t.Stop,
+	}, nil
+}
+
+func newPrestateTracerObject(ctx *tracers.Context, cfg json.RawMessage) (*prestateTracer, error) {
+	var config prestateTracerConfig
+	if cfg != nil {
+		if err := json.Unmarshal(cfg, &config); err != nil {
+			return nil, err
+		}
+	}
+	return &prestateTracer{
+		pre:     stateMap{},
+		post:    stateMap{},
+		config:  config,
+		created: make(map[common.Address]bool),
+		deleted: make(map[common.Address]bool),
 	}, nil
 }
 

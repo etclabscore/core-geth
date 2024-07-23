@@ -968,9 +968,7 @@ func (api *API) TraceCall(ctx context.Context, args ethapi.TransactionArgs, bloc
 		traceConfig *TraceConfig
 	)
 	if config != nil {
-		if err := config.StateOverrides.Apply(statedb); err != nil {
-			return nil, err
-		}
+		traceConfig = &config.TraceConfig
 	}
 	return api.traceTx(ctx, tx, msg, new(Context), vmctx, statedb, traceConfig)
 }

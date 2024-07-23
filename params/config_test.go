@@ -17,6 +17,7 @@
 package params
 
 import (
+	"github.com/ethereum/go-ethereum/core/tracing"
 	"math/big"
 	"testing"
 	"time"
@@ -316,7 +317,7 @@ func genesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 	statedb, _ := state.New(common.Hash{}, state.NewDatabase(db), nil)
 	for addr, account := range g.Alloc {
 		if account.Balance != nil {
-			statedb.AddBalance(addr, uint256.MustFromBig(account.Balance))
+			statedb.AddBalance(addr, uint256.MustFromBig(account.Balance), tracing.BalanceIncreaseGenesisBalance)
 		}
 		statedb.SetCode(addr, account.Code)
 		statedb.SetNonce(addr, account.Nonce)

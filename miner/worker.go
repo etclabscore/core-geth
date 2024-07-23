@@ -1277,7 +1277,7 @@ func (w *worker) generateWork(params *generateParams) *newPayloadResult {
 			log.Warn("Block building is interrupted", "allowance", common.PrettyDuration(w.newpayloadTimeout))
 		}
 	}
-	body := types.Body{Transactions: work.txs, Withdrawals: params.withdrawals}
+	body := types.Body{Transactions: work.txs, Withdrawals: params.withdrawals, Uncles: work.unclelist()}
 	block, err := w.engine.FinalizeAndAssemble(w.chain, work.header, work.state, &body, work.receipts)
 	if err != nil {
 		return &newPayloadResult{err: err}
@@ -1372,7 +1372,7 @@ func (w *worker) commit(env *environment, interval func(), update bool, start ti
 		// https://github.com/ethereum/go-ethereum/issues/24299
 		env := env.copy()
 		// Withdrawals are set to nil here, because this is only called in PoW.
-		body := types.Body{Transactions: env.txs}
+		body := types.Body{Transactions: env.txs, Uncles: env.unclelist()}
 		block, err := w.engine.FinalizeAndAssemble(w.chain, env.header, env.state, &body, env.receipts)
 		if err != nil {
 			return err

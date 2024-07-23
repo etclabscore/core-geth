@@ -148,61 +148,153 @@ func (t *stateDiffTracer) GetResult() (json.RawMessage, error) {
 
 	// out, err := t.tracer.GetResult()
 
-	for addr, accountState := range t.tracer.pre {
-		if accountState.Balance != nil {
-			t.stateDiff[addr] = &stateDiffAccount{}
+	// prestate tracer makes the following assumptions:
+	//
+	// - Deletion (i.e. account selfdestruct, or storage clearing) will be signified by inclusion in pre and omission in post.
+	// - Insertion (i.e. account creation or new slots) will be signified by omission in pre and inclusion in post.
+	//
+	// For this reason we will handle all items existing in post state, as we don't care for deleted accounts
 
-			// fmt.Println("accountState:", accountState.Balance)
-			diff := make(map[stateDiffMarker]*StateDiffBalance)
-			diff[markerChanged] = &StateDiffBalance{From: (*hexutil.Big)(accountState.Balance)} //  To: (*hexutil.Big)(toBalance.ToBig())
+	// collect keys from t.tracer.pre and t.tracer.post as common.Address
+	allAccounts := []common.Address{}
+	for addr := range t.tracer.pre {
+		allAccounts = append(allAccounts, addr)
+	}
+	for addr := range t.tracer.post {
+		allAccounts = append(allAccounts, addr)
+	}
 
-			if t.tracer.post[addr] != nil && t.tracer.post[addr].Balance != nil {
-				diff[markerChanged].To = (*hexutil.Big)(t.tracer.post[addr].Balance)
-				fmt.Println("diff:", diff[markerChanged].To)
+	// preAccounts := reflect.ValueOf(t.tracer.pre).MapKeys()
+	// postAccounts := reflect.ValueOf(t.tracer.post).MapKeys()
+
+	// // TODO: newer go version has maps.Keys() method
+	// // postAccounts := maps.Keys(t.tracer.post)
+
+	// // concatenate two slices
+	// var allAccounts common.Address = append(preAccounts, postAccounts...)
+
+	for _, addr := range allAccounts {
+		marker := markerChanged
+
+		prestate, preExists := t.tracer.pre[addr]
+		if !preExists {
+			marker = markerDied
+		}
+
+		poststate, postExists := t.tracer.post[addr]
+		if !postExists {
+			marker = markerBorn
+		}
+
+		// t.stateDiff[addr] = &stateDiffAccount{}
+		accountDiff := &stateDiffAccount{
+			Storage: make(map[common.Hash]map[stateDiffMarker]interface{}),
+		}
+
+		if marker == markerBorn {
+			toNonce := poststate.Nonce
+			accountDiff.Nonce = map[stateDiffMarker]hexutil.Uint64{
+				markerBorn: hexutil.Uint64(toNonce),
 			}
-
-			t.stateDiff[addr].Balance = diff
-
-			fromNonce := accountState.Nonce
-			toNonce := t.tracer.post[addr].Nonce
-			if toNonce == 0 {
-				t.stateDiff[addr].Nonce = markerSame
+			toBalance := poststate.Balance
+			accountDiff.Balance = map[stateDiffMarker]*hexutil.Big{
+				markerBorn: (*hexutil.Big)(toBalance),
+			}
+			toCode := poststate.Code
+			accountDiff.Code = map[stateDiffMarker]hexutil.Bytes{
+				markerBorn: toCode,
+			}
+		} else if marker == markerDied {
+			fromNonce := prestate.Nonce
+			accountDiff.Nonce = map[stateDiffMarker]hexutil.Uint64{
+				markerDied: hexutil.Uint64(fromNonce),
+			}
+			fromBalance := prestate.Balance
+			accountDiff.Balance = map[stateDiffMarker]*hexutil.Big{
+				markerDied: (*hexutil.Big)(fromBalance),
+			}
+			fromCode := prestate.Code
+			accountDiff.Code = map[stateDiffMarker]hexutil.Bytes{
+				markerDied: fromCode,
+			}
+		} else {
+			fromNonce := prestate.Nonce
+			toNonce := poststate.Nonce
+			if fromNonce == toNonce || toNonce == 0 {
+				accountDiff.Nonce = markerSame
 			} else {
-				diffNonce := make(map[stateDiffMarker]*StateDiffNonce)
-				diffNonce[markerChanged] = &StateDiffNonce{
+				diff := make(map[stateDiffMarker]*StateDiffNonce)
+				diff[markerChanged] = &StateDiffNonce{
 					From: hexutil.Uint64(fromNonce),
 					To:   hexutil.Uint64(toNonce),
 				}
-
-				// if t.tracer.post[addr] != nil && t.tracer.post[addr].Nonce > 0 {
-				// 	diffNonce[markerChanged].To = hexutil.Uint64(t.tracer.post[addr].Nonce)
-				// }
-
-				t.stateDiff[addr].Nonce = diffNonce
+				accountDiff.Nonce = diff
 			}
 
-			fromCode := accountState.Code
-			toCode := t.tracer.post[addr].Code
-			if bytes.Equal(fromCode, toCode) {
-				t.stateDiff[addr].Code = markerSame
+			fromBalance := prestate.Balance
+			toBalance := poststate.Balance
+			if fromBalance.Cmp(toBalance) == 0 {
+				accountDiff.Balance = markerSame
 			} else {
-				diffCode := make(map[stateDiffMarker]*StateDiffCode)
-				diffCode[markerChanged] = &StateDiffCode{
-					From: fromCode,
-					To:   toCode,
-				}
+				diff := make(map[stateDiffMarker]*StateDiffBalance)
+				diff[markerChanged] = &StateDiffBalance{From: (*hexutil.Big)(fromBalance), To: (*hexutil.Big)(toBalance)}
+				accountDiff.Balance = diff
+			}
 
-				// if t.tracer.post[addr] != nil && t.tracer.post[addr].Code > 0 {
-				// 	diffCode[markerChanged].To = hexutil.Uint64(t.tracer.post[addr].Code)
-				// }
-
-				t.stateDiff[addr].Code = diffCode
+			fromCode := prestate.Code
+			toCode := poststate.Code
+			if bytes.Equal(fromCode, toCode) {
+				accountDiff.Code = markerSame
+			} else {
+				diff := make(map[stateDiffMarker]*StateDiffCode)
+				diff[markerChanged] = &StateDiffCode{From: fromCode, To: toCode}
+				accountDiff.Code = diff
 			}
 		}
-		// t.stateDiff[addr].Nonce = accountState.Nonce
-		// t.stateDiff[addr].Nonce = accountState.Nonce
-		// t.stateDiff[addr].Storage = accountState.Storage
 
+		// fill storage
+		allStorageKeys := []common.Hash{}
+		if marker == markerDied {
+			for key := range t.tracer.pre[addr].Storage {
+				allStorageKeys = append(allStorageKeys, key)
+			}
+		}
+		if marker == markerBorn {
+			for key := range t.tracer.post[addr].Storage {
+				allStorageKeys = append(allStorageKeys, key)
+			}
+		}
+
+		for _, key := range allStorageKeys {
+			accountDiff.Storage[key] = make(map[stateDiffMarker]interface{})
+
+			// if changedKeys, ok := t.changedStorageKeys[addr]; ok {
+			// 	if changed, ok := changedKeys[key]; ok && changed {
+			// 		hasChanged = true
+			// 	}
+			// }
+
+			fromStorage, fromExists := t.tracer.pre[addr].Storage[key]
+			toStorage, toExists := t.tracer.post[addr].Storage[key]
+
+			if fromExists && toExists {
+				// skip unchanged storage items
+				if fromStorage == toStorage || (fromStorage == (common.Hash{}) && toStorage == (common.Hash{})) {
+					continue
+				} else {
+					accountDiff.Storage[key][markerChanged] = &StateDiffStorage{
+						From: fromStorage,
+						To:   toStorage,
+					}
+				}
+			} else if toExists {
+				accountDiff.Storage[key][markerBorn] = toStorage
+			} else if fromExists {
+				accountDiff.Storage[key][markerDied] = fromStorage
+			}
+		}
+
+		t.stateDiff[addr] = accountDiff
 	}
 
 	// t.initAccount(t.env.Context.Coinbase, nil)

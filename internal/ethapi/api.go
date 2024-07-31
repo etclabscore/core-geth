@@ -1288,6 +1288,9 @@ type RPCMarshalHeaderT struct {
 	ReceiptsRoot     common.Hash       `json:"receiptsRoot"`
 	BaseFee          *hexutil.Big      `json:"baseFeePerGas,omitempty"`
 	WithdrawalsHash  *common.Hash      `json:"withdrawalsRoot,omitempty"`
+	BlobGasUsed      *hexutil.Uint64   `json:"blobGasUsed,omitempty"`
+	ExcessBlobGas    *hexutil.Uint64   `json:"excessBlobGas,omitempty"`
+	ParentBeaconRoot *common.Hash      `json:"parentBeaconBlockRoot,omitempty"`
 }
 
 // NewRPCMarshalHeaderTFromHeader constructs a new RPCMarshalHeaderT struct from a given header.
@@ -1323,6 +1326,18 @@ func NewRPCMarshalHeaderTFromHeader(header *types.Header) *RPCMarshalHeaderT {
 
 	if header.WithdrawalsHash != nil {
 		head.WithdrawalsHash = header.WithdrawalsHash
+	}
+
+	if header.BlobGasUsed != nil {
+		head.BlobGasUsed = (*hexutil.Uint64)(header.BlobGasUsed)
+	}
+
+	if header.ExcessBlobGas != nil {
+		head.ExcessBlobGas = (*hexutil.Uint64)(header.ExcessBlobGas)
+	}
+
+	if header.ParentBeaconRoot != nil {
+		head.ParentBeaconRoot = header.ParentBeaconRoot
 	}
 
 	return head

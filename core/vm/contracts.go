@@ -55,15 +55,15 @@ var basePrecompiledContracts = map[common.Address]PrecompiledContract{
 }
 
 var PrecompiledContractsBLS = map[common.Address]PrecompiledContract{
-	common.BytesToAddress([]byte{11}): &bls12381G1Add{},
-	common.BytesToAddress([]byte{12}): &bls12381G1Mul{},
-	common.BytesToAddress([]byte{13}): &bls12381G1MultiExp{},
-	common.BytesToAddress([]byte{14}): &bls12381G2Add{},
-	common.BytesToAddress([]byte{15}): &bls12381G2Mul{},
-	common.BytesToAddress([]byte{16}): &bls12381G2MultiExp{},
-	common.BytesToAddress([]byte{17}): &bls12381Pairing{},
-	common.BytesToAddress([]byte{18}): &bls12381MapG1{},
-	common.BytesToAddress([]byte{19}): &bls12381MapG2{},
+	common.BytesToAddress([]byte{0x0b}): &bls12381G1Add{},
+	common.BytesToAddress([]byte{0x0c}): &bls12381G1Mul{},
+	common.BytesToAddress([]byte{0x0d}): &bls12381G1MultiExp{},
+	common.BytesToAddress([]byte{0x0e}): &bls12381G2Add{},
+	common.BytesToAddress([]byte{0x0f}): &bls12381G2Mul{},
+	common.BytesToAddress([]byte{0x10}): &bls12381G2MultiExp{},
+	common.BytesToAddress([]byte{0x11}): &bls12381Pairing{},
+	common.BytesToAddress([]byte{0x12}): &bls12381MapG1{},
+	common.BytesToAddress([]byte{0x13}): &bls12381MapG2{},
 }
 
 func mergeContracts(base, target map[common.Address]PrecompiledContract) {

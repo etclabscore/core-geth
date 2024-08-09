@@ -677,7 +677,7 @@ func (c *CoreGethChainConfig) SetEIP6780TransitionTime(n *uint64) error {
 	return nil
 }
 
-// GetEIP6780TransitionTime EIP4788: Beacon block root in the EVM
+// GetEIP4788TransitionTime EIP4788: Beacon block root in the EVM
 func (c *CoreGethChainConfig) GetEIP4788TransitionTime() *uint64 {
 	return c.EIP4788FTime
 }
@@ -738,7 +738,7 @@ func (c *CoreGethChainConfig) SetEIP6780Transition(n *uint64) error {
 	return nil
 }
 
-// GetEIP6780Transition EIP4788: Beacon block root in the EVM
+// GetEIP4788Transition EIP4788: Beacon block root in the EVM
 func (c *CoreGethChainConfig) GetEIP4788Transition() *uint64 {
 	return bigNewU64(c.EIP4788FBlock)
 }

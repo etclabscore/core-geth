@@ -24,6 +24,8 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/ethereum/go-ethereum/consensus/beacon"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core"
@@ -164,16 +166,14 @@ func newTestBackend(t *testing.T, londonBlock *big.Int, cancunBlock *big.Int, pe
 	}
 
 	// TODO(meowsbits): Set transitions for Cancun.
-	/*
-		if cancunBlock != nil {
-			ts := gspec.Timestamp + cancunBlock.Uint64()*10 // fixed 10 sec block time in blockgen
-			config.ShanghaiTime = &ts
-			config.CancunTime = &ts
-			signer = types.LatestSigner(gspec.Config)
-		}
-	*/
+	if cancunBlock != nil {
+		ts := gspec.Timestamp + cancunBlock.Uint64()*10 // fixed 10 sec block time in blockgen
+		config.ShanghaiTime = &ts
+		config.CancunTime = &ts
+		signer = types.LatestSigner(gspec.Config)
+	}
 
-	engine := ethash.NewFaker()
+	engine := beacon.New(ethash.NewFaker())
 	td := vars.GenesisDifficulty.Uint64()
 
 	// Generate testing blocks

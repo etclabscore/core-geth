@@ -46,6 +46,7 @@ import (
 	"github.com/ethereum/go-ethereum/triedb"
 )
 
+// testBackend satisfies the Backend interface.
 type testBackend struct {
 	db              ethdb.Database
 	sections        uint64
@@ -192,15 +193,6 @@ func (b *testBackend) ServiceFilter(ctx context.Context, session *bloombits.Matc
 func (b *testBackend) setPending(block *types.Block, receipts types.Receipts) {
 	b.pendingBlock = block
 	b.pendingReceipts = receipts
-}
-
-func (b *testBackend) notifyPending(logs []*types.Log) {
-	genesis := &genesisT.Genesis{
-		Config: params.TestChainConfig,
-	}
-	_, blocks, _ := core.GenerateChainWithGenesis(genesis, ethash.NewFaker(), 2, func(i int, b *core.BlockGen) {})
-	b.setPending(blocks[1], []*types.Receipt{{Logs: logs}})
-	b.chainFeed.Send(core.ChainEvent{Block: blocks[0]})
 }
 
 func newTestFilterSystem(t testing.TB, db ethdb.Database, cfg Config) (*testBackend, *FilterSystem) {
@@ -634,7 +626,7 @@ func TestLogFilter(t *testing.T) {
 	}
 
 	// set pending logs
-	backend.notifyPending(allLogs)
+	//backend.notifyPending(allLogs)
 
 	for i, tt := range testCases {
 		var fetched []*types.Log
@@ -674,6 +666,7 @@ func TestLogFilter(t *testing.T) {
 }
 
 // TestPendingLogsSubscription tests if a subscription receives the correct pending logs that are posted to the event feed.
+// This test is core-geth specific as of upstream v1.14.0.
 func TestPendingLogsSubscription(t *testing.T) {
 	t.Parallel()
 
@@ -845,12 +838,12 @@ func TestPendingLogsSubscription(t *testing.T) {
 	for _, logs := range allLogs {
 		flattenLogs = append(flattenLogs, logs...)
 	}
-	backend.notifyPending(flattenLogs)
+	backend.pendingLogsFeed.Send(flattenLogs)
 
 	for i := range testCases {
 		err := <-testCases[i].err
 		if err != nil {
-			t.Fatalf("test %d failed: %v", i, err)
+			t.Errorf("test %d failed: %v", i, err)
 		}
 		<-testCases[i].sub.Err()
 	}

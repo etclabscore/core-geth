@@ -279,8 +279,8 @@ func TestFilters(t *testing.T) {
 		}), signer, key1)
 		gen.AddTx(tx)
 	})
-	sys.backend.(*testBackend).pendingBlock = pchain[0]
-	sys.backend.(*testBackend).pendingReceipts = preceipts[0]
+
+	sys.backend.(*testBackend).setPending(pchain[0], preceipts[0])
 
 	for i, tc := range []struct {
 		f    *Filter

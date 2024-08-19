@@ -6,7 +6,6 @@ import (
 	"math/big"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strings"
 	"testing"
 
@@ -191,22 +190,4 @@ func testStateDiffTracer(tracerName string, dirPath string, t *testing.T) {
 			}
 		})
 	}
-}
-
-// jsonEqual is similar to reflect.DeepEqual, but does a 'bounce' via json prior to
-// comparison
-func jsonEqualStateDiff(x, y interface{}) bool {
-	xTrace := new(map[common.Address]*stateDiffAccount)
-	yTrace := new(map[common.Address]*stateDiffAccount)
-	if xj, err := json.Marshal(x); err == nil {
-		json.Unmarshal(xj, xTrace)
-	} else {
-		return false
-	}
-	if yj, err := json.Marshal(y); err == nil {
-		json.Unmarshal(yj, yTrace)
-	} else {
-		return false
-	}
-	return reflect.DeepEqual(xTrace, yTrace)
 }

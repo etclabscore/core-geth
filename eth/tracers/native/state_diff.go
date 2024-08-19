@@ -22,10 +22,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/eth/tracers"
 )
 
@@ -44,8 +42,6 @@ const (
 
 type stateDiff = map[common.Address]*stateDiffAccount
 type stateDiffAccount struct {
-	marker  *stateDiffMarker                                `json:"-"`
-	err     error                                           `json:"-"`
 	Balance interface{}                                     `json:"balance"`
 	Nonce   interface{}                                     `json:"nonce"`
 	Code    interface{}                                     `json:"code"`
@@ -76,15 +72,8 @@ type stateDiffTracer struct {
 	tracer *prestateTracer
 	ctx    *tracers.Context // Holds tracer context data
 
-	env                *vm.EVM
-	stateDiff          stateDiff
-	initialState       *state.StateDB
-	create             bool
-	to                 common.Address
-	accountsToRemove   []common.Address
-	changedStorageKeys map[common.Address]map[common.Hash]bool
-	interrupt          uint32 // Atomic flag to signal execution interruption
-	reason             error  // Textual reason for the interruption
+	stateDiff stateDiff
+	reason    error // Textual reason for the interruption
 }
 
 func (t *stateDiffTracer) CaptureTxStart(gasLimit uint64) {}

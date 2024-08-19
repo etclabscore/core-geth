@@ -638,6 +638,7 @@ func (es *EventSystem) eventLoop() {
 					logs = append(logs, receipt.Logs...)
 				}
 			}
+			es.handlePendingLogs(index, logs)
 
 		case ev := <-es.chainSideCh:
 			es.handleChainSideEvent(index, ev)

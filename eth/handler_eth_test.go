@@ -397,7 +397,7 @@ func testTransactionPropagation(t *testing.T, protocol uint) {
 	}
 	// Interconnect all the sink handlers with the source handler
 	for i, sink := range sinks {
-		sink := sink // Closure for gorotuine below
+		sink := sink // Closure for goroutine below
 
 		sourcePipe, sinkPipe := p2p.MsgPipe()
 		defer sourcePipe.Close()
@@ -619,7 +619,7 @@ func testBroadcastBlock(t *testing.T, peers, bcasts int) {
 		td      = source.chain.GetTd(genesis.Hash(), genesis.NumberU64())
 	)
 	for i, sink := range sinks {
-		sink := sink // Closure for gorotuine below
+		sink := sink // Closure for goroutine below
 
 		sourcePipe, sinkPipe := p2p.MsgPipe()
 		defer sourcePipe.Close()

@@ -134,10 +134,13 @@ func Execute(code, input []byte, cfg *Config) ([]byte, *state.StateDB, error) {
 		eip3651f = cfg.ChainConfig.IsEnabledByTime(cfg.ChainConfig.GetEIP3651TransitionTime, &vmenv.Context.Time) ||
 			cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP3651Transition, vmenv.Context.BlockNumber)
 	)
+	if cfg.EVMConfig.Tracer != nil && cfg.EVMConfig.Tracer.OnTxStart != nil {
+		cfg.EVMConfig.Tracer.OnTxStart(vmenv.GetVMContext(), types.NewTx(&types.LegacyTx{To: &address, Data: input, Value: cfg.Value, Gas: cfg.GasLimit}), cfg.Origin)
+	}
 	// Execute the preparatory steps for state transition which includes:
 	// - prepare accessList(post-berlin)
 	// - reset transient storage(eip 1153)
-	cfg.State.Prepare(eip2930f, eip3651f, cfg.Origin, cfg.Coinbase, &address, vmenv.ActivePrecompiles(), nil)
+	cfg.State.Prepare(eip2930f, eip3651f, cfg.Origin, cfg.Coinbase, &address, vm.ActivePrecompiles(vmenv.ChainConfig(), vmenv.Context.BlockNumber, &vmenv.Context.Time), nil)
 	cfg.State.CreateAccount(address)
 	// set the receiver's (the executing contract) code for execution.
 	cfg.State.SetCode(address, code)
@@ -176,10 +179,14 @@ func Create(input []byte, cfg *Config) ([]byte, common.Address, uint64, error) {
 		eip3651f = cfg.ChainConfig.IsEnabledByTime(cfg.ChainConfig.GetEIP3651TransitionTime, &vmenv.Context.Time) ||
 			cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP3651Transition, vmenv.Context.BlockNumber)
 	)
+	if cfg.EVMConfig.Tracer != nil && cfg.EVMConfig.Tracer.OnTxStart != nil {
+		cfg.EVMConfig.Tracer.OnTxStart(vmenv.GetVMContext(), types.NewTx(&types.LegacyTx{Data: input, Value: cfg.Value, Gas: cfg.GasLimit}), cfg.Origin)
+	}
 	// Execute the preparatory steps for state transition which includes:
 	// - prepare accessList(post-berlin)
 	// - reset transient storage(eip 1153)
-	cfg.State.Prepare(eip2930f, eip3651f, cfg.Origin, cfg.Coinbase, nil, vmenv.ActivePrecompiles(), nil)
+	precomps := vm.ActivePrecompiles(vmenv.ChainConfig(), vmenv.Context.BlockNumber, &vmenv.Context.Time)
+	cfg.State.Prepare(eip2930f, eip3651f, cfg.Origin, cfg.Coinbase, nil, precomps, nil)
 	// Call the code with the given configuration.
 	code, address, leftOverGas, err := vmenv.Create(
 		sender,
@@ -212,10 +219,14 @@ func Call(address common.Address, input []byte, cfg *Config) ([]byte, uint64, er
 		eip3651f = cfg.ChainConfig.IsEnabledByTime(cfg.ChainConfig.GetEIP3651TransitionTime, &vmenv.Context.Time) ||
 			cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP3651Transition, vmenv.Context.BlockNumber)
 	)
+	if cfg.EVMConfig.Tracer != nil && cfg.EVMConfig.Tracer.OnTxStart != nil {
+		cfg.EVMConfig.Tracer.OnTxStart(vmenv.GetVMContext(), types.NewTx(&types.LegacyTx{To: &address, Data: input, Value: cfg.Value, Gas: cfg.GasLimit}), cfg.Origin)
+	}
 	// Execute the preparatory steps for state transition which includes:
 	// - prepare accessList(post-berlin)
 	// - reset transient storage(eip 1153)
-	statedb.Prepare(eip2930f, eip3651f, cfg.Origin, cfg.Coinbase, &address, vmenv.ActivePrecompiles(), nil)
+	precomps := vm.ActivePrecompiles(vmenv.ChainConfig(), vmenv.Context.BlockNumber, &vmenv.Context.Time)
+	statedb.Prepare(eip2930f, eip3651f, cfg.Origin, cfg.Coinbase, &address, precomps, nil)
 
 	// Call the code with the given configuration.
 	ret, leftOverGas, err := vmenv.Call(

@@ -66,6 +66,12 @@ var (
 		EIP2028FBlock: big.NewInt(0),
 		EIP2200FBlock: big.NewInt(0), // RePetersburg (== re-1283)
 
+		// Shangai
+		EIP3855FBlock: big.NewInt(8784700),
+
+		// Cancun
+		EIP5656FBlock: big.NewInt(8784700),
+
 		ECIP1099FBlock: nil, // Etchash
 
 		DisposalBlock:      big.NewInt(0), // Dispose difficulty bomb

@@ -226,7 +226,8 @@ func TestCreation(t *testing.T) {
 			core.GenesisToBlock(params.DefaultMintMeGenesisBlock(), nil),
 			[]testcase{
 				{0, 0, ID{Hash: checksumToBytes(0x02bf4180), Next: 252500}},
-				{252500, 0, ID{Hash: checksumToBytes(0x50aed09f), Next: 0}},
+				{252500, 0, ID{Hash: checksumToBytes(0x50aed09f), Next: 8_784_700}},
+				{8_784_700, 0, ID{Hash: checksumToBytes(0x0a67075a), Next: 0}},
 			},
 		},
 	}
@@ -529,7 +530,7 @@ func TestGatherForks(t *testing.T) {
 		{
 			"mintme",
 			params.MintMeChainConfig,
-			[]uint64{252_500},
+			[]uint64{252_500, 8_784_700},
 			[]uint64{},
 		},
 	}

@@ -491,7 +491,7 @@ func makeBlockChain(chainConfig ctypes.ChainConfigurator, parent *types.Block, n
 	return blocks
 }
 
-// makeBlockChain creates a deterministic chain of blocks from genesis
+// makeBlockChainWithGenesis creates a deterministic chain of blocks from genesis
 func makeBlockChainWithGenesis(genesis *genesisT.Genesis, n int, engine consensus.Engine, seed int) (ethdb.Database, []*types.Block) {
 	db, blocks, _ := GenerateChainWithGenesis(genesis, engine, n, func(i int, b *BlockGen) {
 		b.SetCoinbase(common.Address{0: byte(seed), 19: byte(i)})

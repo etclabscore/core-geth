@@ -359,10 +359,6 @@ func TestGenesisHashes(t *testing.T) {
 			genesis: DefaultClassicGenesisBlock(),
 			hash:    MainnetGenesisHash,
 		},
-		{
-			genesis: DefaultGoerliGenesisBlock(),
-			hash:    GoerliGenesisHash,
-		},
 	}
 	for i, c := range cases {
 		b := genesisToBlock(c.genesis, rawdb.NewMemoryDatabase())

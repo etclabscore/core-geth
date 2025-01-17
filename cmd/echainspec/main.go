@@ -44,7 +44,6 @@ var defaultChainspecValues = map[string]ctypes.Configurator{
 	"mordor":  params.DefaultMordorGenesisBlock(),
 
 	"foundation": params.DefaultGenesisBlock(),
-	"goerli":     params.DefaultGoerliGenesisBlock(),
 	"sepolia":    params.DefaultSepoliaGenesisBlock(),
 
 	"mintme": params.DefaultMintMeGenesisBlock(),

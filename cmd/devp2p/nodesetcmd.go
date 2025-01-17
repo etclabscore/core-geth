@@ -231,9 +231,6 @@ func ethFilter(args []string) (nodeFilter, error) {
 	case "mainnet":
 		gb := core.GenesisToBlock(params.DefaultGenesisBlock(), nil)
 		filter = forkid.NewStaticFilter(params.MainnetChainConfig, gb)
-	case "goerli":
-		gb := core.GenesisToBlock(params.DefaultGoerliGenesisBlock(), nil)
-		filter = forkid.NewStaticFilter(params.GoerliChainConfig, gb)
 	case "sepolia":
 		gb := core.GenesisToBlock(params.DefaultSepoliaGenesisBlock(), nil)
 		filter = forkid.NewStaticFilter(params.SepoliaChainConfig, gb)

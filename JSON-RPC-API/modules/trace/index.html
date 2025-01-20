@@ -1,0 +1,2913 @@
+<!doctype html><html lang=en class=no-js> <head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="Documentation for CoreGeth Ethereum Protocol Provider"><meta name=author content="CoreGeth Team"><link href=https://etclabscore.github.io/core-geth/JSON-RPC-API/modules/trace/ rel=canonical><link rel=icon href=../../../img/favicon.png><meta name=generator content="mkdocs-1.3.0, mkdocs-material-7.0.6"><title>Trace - CoreGeth Documentation</title><link rel=stylesheet href=../../../assets/stylesheets/main.2c0c5eaf.min.css><link rel=stylesheet href=../../../assets/stylesheets/palette.7fa14f5b.min.css><meta name=theme-color content=#000000><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback"><style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style><link rel=stylesheet href=../../../css/timeago.css><link rel=stylesheet href=../../../assets/css/extra.css></head> <body dir=ltr data-md-color-scheme=slate data-md-color-primary=black data-md-color-accent=green> <input class=md-toggle data-md-toggle=drawer type=checkbox id=__drawer autocomplete=off> <input class=md-toggle data-md-toggle=search type=checkbox id=__search autocomplete=off> <label class=md-overlay for=__drawer></label> <div data-md-component=skip> <a href=#trace_block class=md-skip> Skip to content </a> </div> <div data-md-component=announce> </div> <header class=md-header data-md-component=header> <nav class="md-header__inner md-grid" aria-label=Header> <a href=../../.. title="CoreGeth Documentation" class="md-header__button md-logo" aria-label="CoreGeth Documentation" data-md-component=logo> <img src=../../../img/favicon.png alt=logo> </a> <label class="md-header__button md-icon" for=__drawer> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg> </label> <div class=md-header__title data-md-component=header-title> <div class=md-header__ellipsis> <div class=md-header__topic> <span class=md-ellipsis> CoreGeth Documentation </span> </div> <div class=md-header__topic data-md-component=header-topic> <span class=md-ellipsis> Trace </span> </div> </div> </div> <div class=md-header__options> </div> <label class="md-header__button md-icon" for=__search> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg> </label> <div class=md-search data-md-component=search role=dialog> <label class=md-search__overlay for=__search></label> <div class=md-search__inner role=search> <form class=md-search__form name=search> <input type=text class=md-search__input name=query aria-label=Search placeholder=Search autocapitalize=off autocorrect=off autocomplete=off spellcheck=false data-md-component=search-query data-md-state=active required> <label class="md-search__icon md-icon" for=__search> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg> </label> <button type=reset class="md-search__icon md-icon" aria-label=Clear tabindex=-1> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg> </button> </form> <div class=md-search__output> <div class=md-search__scrollwrap data-md-scrollfix> <div class=md-search-result data-md-component=search-result> <div class=md-search-result__meta> Initializing search </div> <ol class=md-search-result__list></ol> </div> </div> </div> </div> </div> <div class=md-header__source> <a href=https://github.com/etclabscore/core-geth title="Go to repository" class=md-source data-md-component=source> <div class="md-source__icon md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg> </div> <div class=md-source__repository> etclabscore/core-geth </div> </a> </div> </nav> </header> <div class=md-container data-md-component=container> <nav class=md-tabs aria-label=Tabs data-md-component=tabs> <div class="md-tabs__inner md-grid"> <ul class=md-tabs__list> <li class=md-tabs__item> <a href=../../.. class=md-tabs__link> CoreGeth </a> </li> <li class=md-tabs__item> <a href=../../ class="md-tabs__link md-tabs__link--active"> JSON RPC API </a> </li> <li class=md-tabs__item> <a href=../../../core/ class=md-tabs__link> Core </a> </li> <li class=md-tabs__item> <a href=../../../developers/add-network/ class=md-tabs__link> Developers </a> </li> <li class=md-tabs__item> <a href=../../../getting-started/installation/ class=md-tabs__link> Getting started </a> </li> <li class=md-tabs__item> <a href=../../../postmortems/2021-08-22-split-postmortem/ class=md-tabs__link> Postmortems </a> </li> <li class=md-tabs__item> <a href=../../../tutorials/private-network/ class=md-tabs__link> Tutorials </a> </li> </ul> </div> </nav> <main class=md-main data-md-component=main> <div class="md-main__inner md-grid"> <div class="md-sidebar md-sidebar--primary" data-md-component=sidebar data-md-type=navigation> <div class=md-sidebar__scrollwrap> <div class=md-sidebar__inner> <nav class="md-nav md-nav--primary md-nav--lifted" aria-label=Navigation data-md-level=0> <label class=md-nav__title for=__drawer> <a href=../../.. title="CoreGeth Documentation" class="md-nav__button md-logo" aria-label="CoreGeth Documentation" data-md-component=logo> <img src=../../../img/favicon.png alt=logo> </a> CoreGeth Documentation </label> <div class=md-nav__source> <a href=https://github.com/etclabscore/core-geth title="Go to repository" class=md-source data-md-component=source> <div class="md-source__icon md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg> </div> <div class=md-source__repository> etclabscore/core-geth </div> </a> </div> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../.. class=md-nav__link> CoreGeth </a> </li> <li class="md-nav__item md-nav__item--active md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_2 type=checkbox id=__nav_2 checked> <label class=md-nav__link for=__nav_2> JSON RPC API <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label="JSON RPC API" data-md-level=1> <label class=md-nav__title for=__nav_2> <span class="md-nav__icon md-icon"></span> JSON RPC API </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../ class=md-nav__link> Using JSON-RPC APIs </a> </li> <li class=md-nav__item> <a href=../../openrpc/ class=md-nav__link> OpenRPC Discovery </a> </li> <li class=md-nav__item> <a href=../../trace-module-overview/ class=md-nav__link> "trace" Module Overview </a> </li> <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_2_4 type=checkbox id=__nav_2_4 checked> <label class=md-nav__link for=__nav_2_4> Modules <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label=Modules data-md-level=2> <label class=md-nav__title for=__nav_2_4> <span class="md-nav__icon md-icon"></span> Modules </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../admin/ class=md-nav__link> Admin </a> </li> <li class=md-nav__item> <a href=../debug/ class=md-nav__link> Debug </a> </li> <li class=md-nav__item> <a href=../eth/ class=md-nav__link> Eth </a> </li> <li class=md-nav__item> <a href=../ethash/ class=md-nav__link> Ethash </a> </li> <li class=md-nav__item> <a href=../miner/ class=md-nav__link> Miner </a> </li> <li class=md-nav__item> <a href=../net/ class=md-nav__link> Net </a> </li> <li class=md-nav__item> <a href=../personal/ class=md-nav__link> Personal </a> </li> <li class="md-nav__item md-nav__item--active"> <input class="md-nav__toggle md-toggle" data-md-toggle=toc type=checkbox id=__toc> <label class="md-nav__link md-nav__link--active" for=__toc> Trace <span class="md-nav__icon md-icon"></span> </label> <a href=./ class="md-nav__link md-nav__link--active"> Trace </a> <nav class="md-nav md-nav--secondary" aria-label="Table of contents"> <label class=md-nav__title for=__toc> <span class="md-nav__icon md-icon"></span> Table of contents </label> <ul class=md-nav__list data-md-component=toc data-md-scrollfix> <li class=md-nav__item> <a href=#trace_block class=md-nav__link> trace_block </a> <nav class=md-nav aria-label=trace_block> <ul class=md-nav__list> <li class=md-nav__item> <a href=#params-2 class=md-nav__link> Params (2) </a> </li> <li class=md-nav__item> <a href=#result class=md-nav__link> Result </a> </li> <li class=md-nav__item> <a href=#client-method-invocation-examples class=md-nav__link> Client Method Invocation Examples </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#trace_call class=md-nav__link> trace_call </a> <nav class=md-nav aria-label=trace_call> <ul class=md-nav__list> <li class=md-nav__item> <a href=#params-3 class=md-nav__link> Params (3) </a> </li> <li class=md-nav__item> <a href=#result_1 class=md-nav__link> Result </a> </li> <li class=md-nav__item> <a href=#client-method-invocation-examples_1 class=md-nav__link> Client Method Invocation Examples </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#trace_callmany class=md-nav__link> trace_callMany </a> <nav class=md-nav aria-label=trace_callMany> <ul class=md-nav__list> <li class=md-nav__item> <a href=#params-3_1 class=md-nav__link> Params (3) </a> </li> <li class=md-nav__item> <a href=#result_2 class=md-nav__link> Result </a> </li> <li class=md-nav__item> <a href=#client-method-invocation-examples_2 class=md-nav__link> Client Method Invocation Examples </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#trace_filter class=md-nav__link> trace_filter </a> <nav class=md-nav aria-label=trace_filter> <ul class=md-nav__list> <li class=md-nav__item> <a href=#params-2_1 class=md-nav__link> Params (2) </a> </li> <li class=md-nav__item> <a href=#result_3 class=md-nav__link> Result </a> </li> <li class=md-nav__item> <a href=#client-method-invocation-examples_3 class=md-nav__link> Client Method Invocation Examples </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#trace_subscribe class=md-nav__link> trace_subscribe </a> <nav class=md-nav aria-label=trace_subscribe> <ul class=md-nav__list> <li class=md-nav__item> <a href=#params-2_2 class=md-nav__link> Params (2) </a> </li> <li class=md-nav__item> <a href=#result_4 class=md-nav__link> Result </a> </li> <li class=md-nav__item> <a href=#client-method-invocation-examples_4 class=md-nav__link> Client Method Invocation Examples </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#trace_transaction class=md-nav__link> trace_transaction </a> <nav class=md-nav aria-label=trace_transaction> <ul class=md-nav__list> <li class=md-nav__item> <a href=#params-2_3 class=md-nav__link> Params (2) </a> </li> <li class=md-nav__item> <a href=#result_5 class=md-nav__link> Result </a> </li> <li class=md-nav__item> <a href=#client-method-invocation-examples_5 class=md-nav__link> Client Method Invocation Examples </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#trace_unsubscribe class=md-nav__link> trace_unsubscribe </a> <nav class=md-nav aria-label=trace_unsubscribe> <ul class=md-nav__list> <li class=md-nav__item> <a href=#params-1 class=md-nav__link> Params (1) </a> </li> <li class=md-nav__item> <a href=#result_6 class=md-nav__link> Result </a> </li> <li class=md-nav__item> <a href=#client-method-invocation-examples_6 class=md-nav__link> Client Method Invocation Examples </a> </li> </ul> </nav> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../txpool/ class=md-nav__link> Txpool </a> </li> <li class=md-nav__item> <a href=../web3/ class=md-nav__link> Web3 </a> </li> </ul> </nav> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_3 data-md-state=indeterminate type=checkbox id=__nav_3 checked> <label class=md-nav__link for=__nav_3> Core <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label=Core data-md-level=1> <label class=md-nav__title for=__nav_3> <span class="md-nav__icon md-icon"></span> Core </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../../core/ class=md-nav__link> About </a> </li> <li class=md-nav__item> <a href=../../../core/alltools/ class=md-nav__link> Included Tools </a> </li> <li class=md-nav__item> <a href=../../../core/evmc/ class=md-nav__link> Running Geth with an External VM </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_4 data-md-state=indeterminate type=checkbox id=__nav_4 checked> <label class=md-nav__link for=__nav_4> Developers <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label=Developers data-md-level=1> <label class=md-nav__title for=__nav_4> <span class="md-nav__icon md-icon"></span> Developers </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../../developers/add-network/ class=md-nav__link> Adding a Network to Core-Geth </a> </li> <li class=md-nav__item> <a href=../../../developers/build-from-source/ class=md-nav__link> Build from Source </a> </li> <li class=md-nav__item> <a href=../../../developers/create-new-release/ class=md-nav__link> Publishing a Release </a> </li> <li class=md-nav__item> <a href=../../../developers/documentation/ class=md-nav__link> Documentation </a> </li> <li class=md-nav__item> <a href=../../../developers/testing/ class=md-nav__link> Testing </a> </li> <li class=md-nav__item> <a href=../../../developers/versioning/ class=md-nav__link> Versioning </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_5 data-md-state=indeterminate type=checkbox id=__nav_5 checked> <label class=md-nav__link for=__nav_5> Getting started <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label="Getting started" data-md-level=1> <label class=md-nav__title for=__nav_5> <span class="md-nav__icon md-icon"></span> Getting started </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../../getting-started/installation/ class=md-nav__link> Installation </a> </li> <li class=md-nav__item> <a href=../../../getting-started/run-cli/ class=md-nav__link> Command Line Interface (CLI) </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_6 data-md-state=indeterminate type=checkbox id=__nav_6 checked> <label class=md-nav__link for=__nav_6> Postmortems <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label=Postmortems data-md-level=1> <label class=md-nav__title for=__nav_6> <span class="md-nav__icon md-icon"></span> Postmortems </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../../postmortems/2021-08-22-split-postmortem/ class=md-nav__link> Minority split 2021-08-27 post mortem </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_7 data-md-state=indeterminate type=checkbox id=__nav_7 checked> <label class=md-nav__link for=__nav_7> Tutorials <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label=Tutorials data-md-level=1> <label class=md-nav__title for=__nav_7> <span class="md-nav__icon md-icon"></span> Tutorials </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../../tutorials/private-network/ class=md-nav__link> Tutorial: Operating a Private Network </a> </li> </ul> </nav> </li> </ul> </nav> </div> </div> </div> <div class="md-sidebar md-sidebar--secondary" data-md-component=sidebar data-md-type=toc> <div class=md-sidebar__scrollwrap> <div class=md-sidebar__inner> <nav class="md-nav md-nav--secondary" aria-label="Table of contents"> <label class=md-nav__title for=__toc> <span class="md-nav__icon md-icon"></span> Table of contents </label> <ul class=md-nav__list data-md-component=toc data-md-scrollfix> <li class=md-nav__item> <a href=#trace_block class=md-nav__link> trace_block </a> <nav class=md-nav aria-label=trace_block> <ul class=md-nav__list> <li class=md-nav__item> <a href=#params-2 class=md-nav__link> Params (2) </a> </li> <li class=md-nav__item> <a href=#result class=md-nav__link> Result </a> </li> <li class=md-nav__item> <a href=#client-method-invocation-examples class=md-nav__link> Client Method Invocation Examples </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#trace_call class=md-nav__link> trace_call </a> <nav class=md-nav aria-label=trace_call> <ul class=md-nav__list> <li class=md-nav__item> <a href=#params-3 class=md-nav__link> Params (3) </a> </li> <li class=md-nav__item> <a href=#result_1 class=md-nav__link> Result </a> </li> <li class=md-nav__item> <a href=#client-method-invocation-examples_1 class=md-nav__link> Client Method Invocation Examples </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#trace_callmany class=md-nav__link> trace_callMany </a> <nav class=md-nav aria-label=trace_callMany> <ul class=md-nav__list> <li class=md-nav__item> <a href=#params-3_1 class=md-nav__link> Params (3) </a> </li> <li class=md-nav__item> <a href=#result_2 class=md-nav__link> Result </a> </li> <li class=md-nav__item> <a href=#client-method-invocation-examples_2 class=md-nav__link> Client Method Invocation Examples </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#trace_filter class=md-nav__link> trace_filter </a> <nav class=md-nav aria-label=trace_filter> <ul class=md-nav__list> <li class=md-nav__item> <a href=#params-2_1 class=md-nav__link> Params (2) </a> </li> <li class=md-nav__item> <a href=#result_3 class=md-nav__link> Result </a> </li> <li class=md-nav__item> <a href=#client-method-invocation-examples_3 class=md-nav__link> Client Method Invocation Examples </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#trace_subscribe class=md-nav__link> trace_subscribe </a> <nav class=md-nav aria-label=trace_subscribe> <ul class=md-nav__list> <li class=md-nav__item> <a href=#params-2_2 class=md-nav__link> Params (2) </a> </li> <li class=md-nav__item> <a href=#result_4 class=md-nav__link> Result </a> </li> <li class=md-nav__item> <a href=#client-method-invocation-examples_4 class=md-nav__link> Client Method Invocation Examples </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#trace_transaction class=md-nav__link> trace_transaction </a> <nav class=md-nav aria-label=trace_transaction> <ul class=md-nav__list> <li class=md-nav__item> <a href=#params-2_3 class=md-nav__link> Params (2) </a> </li> <li class=md-nav__item> <a href=#result_5 class=md-nav__link> Result </a> </li> <li class=md-nav__item> <a href=#client-method-invocation-examples_5 class=md-nav__link> Client Method Invocation Examples </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#trace_unsubscribe class=md-nav__link> trace_unsubscribe </a> <nav class=md-nav aria-label=trace_unsubscribe> <ul class=md-nav__list> <li class=md-nav__item> <a href=#params-1 class=md-nav__link> Params (1) </a> </li> <li class=md-nav__item> <a href=#result_6 class=md-nav__link> Result </a> </li> <li class=md-nav__item> <a href=#client-method-invocation-examples_6 class=md-nav__link> Client Method Invocation Examples </a> </li> </ul> </nav> </li> </ul> </nav> </div> </div> </div> <div class=md-content data-md-component=content> <article class="md-content__inner md-typeset"> <a href=https://github.com/etclabscore/core-geth/edit/master/docs/JSON-RPC-API/modules/trace.md title="Edit this page" class="md-content__button md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg> </a> <h1>Trace</h1> <table> <thead> <tr> <th>Entity</th> <th>Version</th> </tr> </thead> <tbody> <tr> <td>Source</td> <td><code>1.12.14-unstable/generated-at:2023-09-04T08:02:34-06:00</code></td> </tr> <tr> <td>OpenRPC</td> <td><code>1.2.6</code></td> </tr> </tbody> </table> <hr> <h3 id=trace_block>trace_block<a class=headerlink href=#trace_block title="Permanent link">&para;</a></h3> <p>Block returns the structured logs created during the execution of EVM and returns them as a JSON object. The correct name will be TraceBlockByNumber, though we want to be compatible with Parity trace module.</p> <h4 id=params-2>Params (2)<a class=headerlink href=#params-2 title="Permanent link">&para;</a></h4> <p>Parameters must be given <em>by position</em>.</p> <p><strong>1:</strong> number <code>rpc.BlockNumber</code> </p> <ul> <li>Required: ✓ Yes</li> </ul> <div class=tabbed-set data-tabs=1:2><input checked=checked id=__tabbed_1_1 name=__tabbed_1 type=radio><label for=__tabbed_1_1>Schema</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 1</span>
+<span class=normal> 2</span>
+<span class=normal> 3</span>
+<span class=normal> 4</span>
+<span class=normal> 5</span>
+<span class=normal> 6</span>
+<span class=normal> 7</span>
+<span class=normal> 8</span>
+<span class=normal> 9</span>
+<span class=normal>10</span>
+<span class=normal>11</span>
+<span class=normal>12</span>
+<span class=normal>13</span>
+<span class=normal>14</span>
+<span class=normal>15</span></pre></div></td><td class=code><div><pre><span></span><code>- oneOf: 
+
+        - description: `The block height description`
+        - enum: earliest, latest, pending
+        - title: `blockNumberTag`
+        - type: string
+
+
+        - description: `Hex representation of a uint64`
+        - pattern: `^0x([a-fA-F\d])+$`
+        - title: `uint64`
+        - type: string
+
+
+- title: `blockNumberIdentifier`
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_1_2 name=__tabbed_1 type=radio><label for=__tabbed_1_2>Raw</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 1</span>
+<span class=normal> 2</span>
+<span class=normal> 3</span>
+<span class=normal> 4</span>
+<span class=normal> 5</span>
+<span class=normal> 6</span>
+<span class=normal> 7</span>
+<span class=normal> 8</span>
+<span class=normal> 9</span>
+<span class=normal>10</span>
+<span class=normal>11</span>
+<span class=normal>12</span>
+<span class=normal>13</span>
+<span class=normal>14</span>
+<span class=normal>15</span>
+<span class=normal>16</span>
+<span class=normal>17</span>
+<span class=normal>18</span>
+<span class=normal>19</span>
+<span class=normal>20</span>
+<span class=normal>21</span>
+<span class=normal>22</span>
+<span class=normal>23</span>
+<span class=normal>24</span>
+<span class=normal>25</span></pre></div></td><td class=code><div><pre><span></span><code>{
+    &quot;oneOf&quot;: [
+        {
+            &quot;description&quot;: &quot;The block height description&quot;,
+            &quot;enum&quot;: [
+                &quot;earliest&quot;,
+                &quot;latest&quot;,
+                &quot;pending&quot;
+            ],
+            &quot;title&quot;: &quot;blockNumberTag&quot;,
+            &quot;type&quot;: [
+                &quot;string&quot;
+            ]
+        },
+        {
+            &quot;description&quot;: &quot;Hex representation of a uint64&quot;,
+            &quot;pattern&quot;: &quot;^0x([a-fA-F\\d])+$&quot;,
+            &quot;title&quot;: &quot;uint64&quot;,
+            &quot;type&quot;: [
+                &quot;string&quot;
+            ]
+        }
+    ],
+    &quot;title&quot;: &quot;blockNumberIdentifier&quot;
+}
+</code></pre></div></td></tr></table></div> </div> </div> <p><strong>2:</strong> config <code>*TraceConfig</code> </p> <ul> <li>Required: ✓ Yes</li> </ul> <div class=tabbed-set data-tabs=2:2><input checked=checked id=__tabbed_2_1 name=__tabbed_2 type=radio><label for=__tabbed_2_1>Schema</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 1</span>
+<span class=normal> 2</span>
+<span class=normal> 3</span>
+<span class=normal> 4</span>
+<span class=normal> 5</span>
+<span class=normal> 6</span>
+<span class=normal> 7</span>
+<span class=normal> 8</span>
+<span class=normal> 9</span>
+<span class=normal>10</span>
+<span class=normal>11</span>
+<span class=normal>12</span>
+<span class=normal>13</span>
+<span class=normal>14</span>
+<span class=normal>15</span>
+<span class=normal>16</span>
+<span class=normal>17</span>
+<span class=normal>18</span>
+<span class=normal>19</span>
+<span class=normal>20</span>
+<span class=normal>21</span>
+<span class=normal>22</span>
+<span class=normal>23</span>
+<span class=normal>24</span>
+<span class=normal>25</span>
+<span class=normal>26</span>
+<span class=normal>27</span>
+<span class=normal>28</span>
+<span class=normal>29</span>
+<span class=normal>30</span>
+<span class=normal>31</span>
+<span class=normal>32</span>
+<span class=normal>33</span>
+<span class=normal>34</span>
+<span class=normal>35</span>
+<span class=normal>36</span>
+<span class=normal>37</span>
+<span class=normal>38</span>
+<span class=normal>39</span>
+<span class=normal>40</span>
+<span class=normal>41</span>
+<span class=normal>42</span>
+<span class=normal>43</span>
+<span class=normal>44</span>
+<span class=normal>45</span>
+<span class=normal>46</span>
+<span class=normal>47</span></pre></div></td><td class=code><div><pre><span></span><code>- additionalProperties: `false`
+- properties: 
+    - Debug: 
+        - type: `boolean`
+
+    - DisableStack: 
+        - type: `boolean`
+
+    - DisableStorage: 
+        - type: `boolean`
+
+    - EnableMemory: 
+        - type: `boolean`
+
+    - EnableReturnData: 
+        - type: `boolean`
+
+    - Limit: 
+        - pattern: `^0x[a-fA-F0-9]+$`
+        - title: `integer`
+        - type: `string`
+
+    - NestedTraceOutput: 
+        - type: `boolean`
+
+    - Reexec: 
+        - pattern: `^0x[a-fA-F0-9]+$`
+        - title: `integer`
+        - type: `string`
+
+    - Timeout: 
+        - type: `string`
+
+    - Tracer: 
+        - type: `string`
+
+    - TracerConfig: 
+        - media: 
+            - binaryEncoding: `base64`
+
+        - type: `string`
+
+    - overrides: 
+        - additionalProperties: `true`
+
+
+- type: object
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_2_2 name=__tabbed_2 type=radio><label for=__tabbed_2_2>Raw</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 1</span>
+<span class=normal> 2</span>
+<span class=normal> 3</span>
+<span class=normal> 4</span>
+<span class=normal> 5</span>
+<span class=normal> 6</span>
+<span class=normal> 7</span>
+<span class=normal> 8</span>
+<span class=normal> 9</span>
+<span class=normal>10</span>
+<span class=normal>11</span>
+<span class=normal>12</span>
+<span class=normal>13</span>
+<span class=normal>14</span>
+<span class=normal>15</span>
+<span class=normal>16</span>
+<span class=normal>17</span>
+<span class=normal>18</span>
+<span class=normal>19</span>
+<span class=normal>20</span>
+<span class=normal>21</span>
+<span class=normal>22</span>
+<span class=normal>23</span>
+<span class=normal>24</span>
+<span class=normal>25</span>
+<span class=normal>26</span>
+<span class=normal>27</span>
+<span class=normal>28</span>
+<span class=normal>29</span>
+<span class=normal>30</span>
+<span class=normal>31</span>
+<span class=normal>32</span>
+<span class=normal>33</span>
+<span class=normal>34</span>
+<span class=normal>35</span>
+<span class=normal>36</span>
+<span class=normal>37</span>
+<span class=normal>38</span>
+<span class=normal>39</span>
+<span class=normal>40</span>
+<span class=normal>41</span>
+<span class=normal>42</span>
+<span class=normal>43</span>
+<span class=normal>44</span>
+<span class=normal>45</span>
+<span class=normal>46</span>
+<span class=normal>47</span>
+<span class=normal>48</span>
+<span class=normal>49</span>
+<span class=normal>50</span>
+<span class=normal>51</span></pre></div></td><td class=code><div><pre><span></span><code>{
+    &quot;additionalProperties&quot;: false,
+    &quot;properties&quot;: {
+        &quot;Debug&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;DisableStack&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;DisableStorage&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;EnableMemory&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;EnableReturnData&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;Limit&quot;: {
+            &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+            &quot;title&quot;: &quot;integer&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;NestedTraceOutput&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;Reexec&quot;: {
+            &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+            &quot;title&quot;: &quot;integer&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;Timeout&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;Tracer&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;TracerConfig&quot;: {
+            &quot;media&quot;: {
+                &quot;binaryEncoding&quot;: &quot;base64&quot;
+            },
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;overrides&quot;: {
+            &quot;additionalProperties&quot;: true
+        }
+    },
+    &quot;type&quot;: [
+        &quot;object&quot;
+    ]
+}
+</code></pre></div></td></tr></table></div> </div> </div> <h4 id=result>Result<a class=headerlink href=#result title="Permanent link">&para;</a></h4> <p>interface <code>[]interface{}</code> </p> <ul> <li>Required: ✓ Yes</li> </ul> <div class=tabbed-set data-tabs=3:2><input checked=checked id=__tabbed_3_1 name=__tabbed_3 type=radio><label for=__tabbed_3_1>Schema</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span>
+<span class=normal>2</span>
+<span class=normal>3</span>
+<span class=normal>4</span>
+<span class=normal>5</span>
+<span class=normal>6</span></pre></div></td><td class=code><div><pre><span></span><code>- items: 
+
+        - additionalProperties: `true`
+
+
+- type: array
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_3_2 name=__tabbed_3 type=radio><label for=__tabbed_3_2>Raw</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 1</span>
+<span class=normal> 2</span>
+<span class=normal> 3</span>
+<span class=normal> 4</span>
+<span class=normal> 5</span>
+<span class=normal> 6</span>
+<span class=normal> 7</span>
+<span class=normal> 8</span>
+<span class=normal> 9</span>
+<span class=normal>10</span></pre></div></td><td class=code><div><pre><span></span><code>{
+    &quot;items&quot;: [
+        {
+            &quot;additionalProperties&quot;: true
+        }
+    ],
+    &quot;type&quot;: [
+        &quot;array&quot;
+    ]
+}
+</code></pre></div></td></tr></table></div> </div> </div> <h4 id=client-method-invocation-examples>Client Method Invocation Examples<a class=headerlink href=#client-method-invocation-examples title="Permanent link">&para;</a></h4> <div class=tabbed-set data-tabs=4:3><input checked=checked id=__tabbed_4_1 name=__tabbed_4 type=radio><label for=__tabbed_4_1>Shell HTTP</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code>curl<span class=w> </span>-X<span class=w> </span>POST<span class=w> </span>-H<span class=w> </span><span class=s2>&quot;Content-Type: application/json&quot;</span><span class=w> </span>http://localhost:8545<span class=w> </span>--data<span class=w> </span><span class=s1>&#39;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: 42, &quot;method&quot;: &quot;trace_block&quot;, &quot;params&quot;: [&lt;number&gt;, &lt;config&gt;]}&#39;</span>
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_4_2 name=__tabbed_4 type=radio><label for=__tabbed_4_2>Shell WebSocket</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code>wscat<span class=w> </span>-c<span class=w> </span>ws://localhost:8546<span class=w> </span>-x<span class=w> </span><span class=s1>&#39;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: 1, &quot;method&quot;: &quot;trace_block&quot;, &quot;params&quot;: [&lt;number&gt;, &lt;config&gt;]}&#39;</span>
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_4_3 name=__tabbed_4 type=radio><label for=__tabbed_4_3>Javascript Console</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code><span class=nx>trace</span><span class=p>.</span><span class=nx>block</span><span class=p>(</span><span class=nx>number</span><span class=p>,</span><span class=nx>config</span><span class=p>);</span>
+</code></pre></div></td></tr></table></div> </div> </div> <details><summary>Source code</summary> <p> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 1</span>
+<span class=normal> 2</span>
+<span class=normal> 3</span>
+<span class=normal> 4</span>
+<span class=normal> 5</span>
+<span class=normal> 6</span>
+<span class=normal> 7</span>
+<span class=normal> 8</span>
+<span class=normal> 9</span>
+<span class=normal>10</span>
+<span class=normal>11</span>
+<span class=normal>12</span>
+<span class=normal>13</span>
+<span class=normal>14</span>
+<span class=normal>15</span>
+<span class=normal>16</span>
+<span class=normal>17</span>
+<span class=normal>18</span>
+<span class=normal>19</span>
+<span class=normal>20</span>
+<span class=normal>21</span>
+<span class=normal>22</span>
+<span class=normal>23</span>
+<span class=normal>24</span>
+<span class=normal>25</span>
+<span class=normal>26</span>
+<span class=normal>27</span>
+<span class=normal>28</span>
+<span class=normal>29</span>
+<span class=normal>30</span>
+<span class=normal>31</span>
+<span class=normal>32</span>
+<span class=normal>33</span>
+<span class=normal>34</span>
+<span class=normal>35</span>
+<span class=normal>36</span>
+<span class=normal>37</span>
+<span class=normal>38</span>
+<span class=normal>39</span>
+<span class=normal>40</span>
+<span class=normal>41</span>
+<span class=normal>42</span></pre></div></td><td class=code><div><pre><span></span><code><span class=kd>func</span><span class=w> </span><span class=p>(</span><span class=nx>api</span><span class=w> </span><span class=o>*</span><span class=nx>TraceAPI</span><span class=p>)</span><span class=w> </span><span class=nx>Block</span><span class=p>(</span><span class=nx>ctx</span><span class=w> </span><span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span><span class=w> </span><span class=nx>number</span><span class=w> </span><span class=nx>rpc</span><span class=p>.</span><span class=nx>BlockNumber</span><span class=p>,</span><span class=w> </span><span class=nx>config</span><span class=w> </span><span class=o>*</span><span class=nx>TraceConfig</span><span class=p>)</span><span class=w> </span><span class=p>([</span><span class=w> </span><span class=c1>// Block returns the structured logs created during the execution of</span>
+<span class=c1>// EVM and returns them as a JSON object.</span>
+<span class=c1>// The correct name will be TraceBlockByNumber, though we want to be compatible with Parity trace module.</span>
+<span class=p>]</span><span class=kd>interface</span><span class=p>{},</span><span class=w> </span><span class=kt>error</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>    </span><span class=nx>config</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=nx>setTraceConfigDefaultTracer</span><span class=p>(</span><span class=nx>config</span><span class=p>)</span>
+<span class=w>    </span><span class=nx>block</span><span class=p>,</span><span class=w> </span><span class=nx>err</span><span class=w> </span><span class=o>:=</span><span class=w> </span><span class=nx>api</span><span class=p>.</span><span class=nx>debugAPI</span><span class=p>.</span><span class=nx>blockByNumber</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span><span class=w> </span><span class=nx>number</span><span class=p>)</span>
+<span class=w>    </span><span class=k>if</span><span class=w> </span><span class=nx>err</span><span class=w> </span><span class=o>!=</span><span class=w> </span><span class=kc>nil</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=k>return</span><span class=w> </span><span class=kc>nil</span><span class=p>,</span><span class=w> </span><span class=nx>err</span>
+<span class=w>    </span><span class=p>}</span>
+<span class=w>    </span><span class=nx>traceResults</span><span class=p>,</span><span class=w> </span><span class=nx>err</span><span class=w> </span><span class=o>:=</span><span class=w> </span><span class=nx>api</span><span class=p>.</span><span class=nx>debugAPI</span><span class=p>.</span><span class=nx>traceBlock</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span><span class=w> </span><span class=nx>block</span><span class=p>,</span><span class=w> </span><span class=nx>config</span><span class=p>)</span>
+<span class=w>    </span><span class=k>if</span><span class=w> </span><span class=nx>err</span><span class=w> </span><span class=o>!=</span><span class=w> </span><span class=kc>nil</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=k>return</span><span class=w> </span><span class=kc>nil</span><span class=p>,</span><span class=w> </span><span class=nx>err</span>
+<span class=w>    </span><span class=p>}</span>
+<span class=w>    </span><span class=nx>traceReward</span><span class=p>,</span><span class=w> </span><span class=nx>err</span><span class=w> </span><span class=o>:=</span><span class=w> </span><span class=nx>api</span><span class=p>.</span><span class=nx>traceBlockReward</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span><span class=w> </span><span class=nx>block</span><span class=p>,</span><span class=w> </span><span class=nx>config</span><span class=p>)</span>
+<span class=w>    </span><span class=k>if</span><span class=w> </span><span class=nx>err</span><span class=w> </span><span class=o>!=</span><span class=w> </span><span class=kc>nil</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=k>return</span><span class=w> </span><span class=kc>nil</span><span class=p>,</span><span class=w> </span><span class=nx>err</span>
+<span class=w>    </span><span class=p>}</span>
+<span class=w>    </span><span class=nx>traceUncleRewards</span><span class=p>,</span><span class=w> </span><span class=nx>err</span><span class=w> </span><span class=o>:=</span><span class=w> </span><span class=nx>api</span><span class=p>.</span><span class=nx>traceBlockUncleRewards</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span><span class=w> </span><span class=nx>block</span><span class=p>,</span><span class=w> </span><span class=nx>config</span><span class=p>)</span>
+<span class=w>    </span><span class=k>if</span><span class=w> </span><span class=nx>err</span><span class=w> </span><span class=o>!=</span><span class=w> </span><span class=kc>nil</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=k>return</span><span class=w> </span><span class=kc>nil</span><span class=p>,</span><span class=w> </span><span class=nx>err</span>
+<span class=w>    </span><span class=p>}</span>
+<span class=w>    </span><span class=nx>results</span><span class=w> </span><span class=o>:=</span><span class=w> </span><span class=p>[]</span><span class=kd>interface</span><span class=p>{}{}</span>
+<span class=w>    </span><span class=k>for</span><span class=w> </span><span class=nx>_</span><span class=p>,</span><span class=w> </span><span class=nx>result</span><span class=w> </span><span class=o>:=</span><span class=w> </span><span class=k>range</span><span class=w> </span><span class=nx>traceResults</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=k>if</span><span class=w> </span><span class=nx>result</span><span class=p>.</span><span class=nx>Error</span><span class=w> </span><span class=o>!=</span><span class=w> </span><span class=s>&quot;&quot;</span><span class=w> </span><span class=p>{</span>
+<span class=w>            </span><span class=k>return</span><span class=w> </span><span class=kc>nil</span><span class=p>,</span><span class=w> </span><span class=nx>errors</span><span class=p>.</span><span class=nx>New</span><span class=p>(</span><span class=nx>result</span><span class=p>.</span><span class=nx>Error</span><span class=p>)</span>
+<span class=w>        </span><span class=p>}</span>
+<span class=w>        </span><span class=kd>var</span><span class=w> </span><span class=nx>tmp</span><span class=w> </span><span class=kd>interface</span><span class=p>{}</span>
+<span class=w>        </span><span class=k>if</span><span class=w> </span><span class=nx>err</span><span class=w> </span><span class=o>:=</span><span class=w> </span><span class=nx>json</span><span class=p>.</span><span class=nx>Unmarshal</span><span class=p>(</span><span class=nx>result</span><span class=p>.</span><span class=nx>Result</span><span class=p>.(</span><span class=nx>json</span><span class=p>.</span><span class=nx>RawMessage</span><span class=p>),</span><span class=w> </span><span class=o>&amp;</span><span class=nx>tmp</span><span class=p>);</span><span class=w> </span><span class=nx>err</span><span class=w> </span><span class=o>!=</span><span class=w> </span><span class=kc>nil</span><span class=w> </span><span class=p>{</span>
+<span class=w>            </span><span class=k>return</span><span class=w> </span><span class=kc>nil</span><span class=p>,</span><span class=w> </span><span class=nx>err</span>
+<span class=w>        </span><span class=p>}</span>
+<span class=w>        </span><span class=k>if</span><span class=w> </span><span class=o>*</span><span class=nx>config</span><span class=p>.</span><span class=nx>Tracer</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=s>&quot;stateDiffTracer&quot;</span><span class=w> </span><span class=p>{</span>
+<span class=w>            </span><span class=nx>results</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=nb>append</span><span class=p>(</span><span class=nx>results</span><span class=p>,</span><span class=w> </span><span class=nx>tmp</span><span class=p>)</span>
+<span class=w>        </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=p>{</span>
+<span class=w>            </span><span class=nx>results</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=nb>append</span><span class=p>(</span><span class=nx>results</span><span class=p>,</span><span class=w> </span><span class=nx>tmp</span><span class=p>.([]</span><span class=kd>interface</span><span class=p>{})</span><span class=o>...</span><span class=p>)</span>
+<span class=w>        </span><span class=p>}</span>
+<span class=w>    </span><span class=p>}</span>
+<span class=w>    </span><span class=nx>results</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=nb>append</span><span class=p>(</span><span class=nx>results</span><span class=p>,</span><span class=w> </span><span class=nx>traceReward</span><span class=p>)</span>
+<span class=w>    </span><span class=k>for</span><span class=w> </span><span class=nx>_</span><span class=p>,</span><span class=w> </span><span class=nx>uncleReward</span><span class=w> </span><span class=o>:=</span><span class=w> </span><span class=k>range</span><span class=w> </span><span class=nx>traceUncleRewards</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=nx>results</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=nb>append</span><span class=p>(</span><span class=nx>results</span><span class=p>,</span><span class=w> </span><span class=nx>uncleReward</span><span class=p>)</span>
+<span class=w>    </span><span class=p>}</span>
+<span class=w>    </span><span class=k>return</span><span class=w> </span><span class=nx>results</span><span class=p>,</span><span class=w> </span><span class=kc>nil</span>
+<span class=p>}</span>
+</code></pre></div></td></tr></table></div> <a href=https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api_parity.go#L190 target=_>View on GitHub →</a> </p> </details> <hr> <h3 id=trace_call>trace_call<a class=headerlink href=#trace_call title="Permanent link">&para;</a></h3> <p>Call lets you trace a given eth_call. It collects the structured logs created during the execution of EVM if the given transaction was added on top of the provided block and returns them as a JSON object. You can provide -2 as a block number to trace on top of the pending block.</p> <h4 id=params-3>Params (3)<a class=headerlink href=#params-3 title="Permanent link">&para;</a></h4> <p>Parameters must be given <em>by position</em>.</p> <p><strong>1:</strong> args <code>ethapi.TransactionArgs</code> </p> <ul> <li>Required: ✓ Yes</li> </ul> <div class=tabbed-set data-tabs=5:2><input checked=checked id=__tabbed_5_1 name=__tabbed_5 type=radio><label for=__tabbed_5_1>Schema</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 1</span>
+<span class=normal> 2</span>
+<span class=normal> 3</span>
+<span class=normal> 4</span>
+<span class=normal> 5</span>
+<span class=normal> 6</span>
+<span class=normal> 7</span>
+<span class=normal> 8</span>
+<span class=normal> 9</span>
+<span class=normal>10</span>
+<span class=normal>11</span>
+<span class=normal>12</span>
+<span class=normal>13</span>
+<span class=normal>14</span>
+<span class=normal>15</span>
+<span class=normal>16</span>
+<span class=normal>17</span>
+<span class=normal>18</span>
+<span class=normal>19</span>
+<span class=normal>20</span>
+<span class=normal>21</span>
+<span class=normal>22</span>
+<span class=normal>23</span>
+<span class=normal>24</span>
+<span class=normal>25</span>
+<span class=normal>26</span>
+<span class=normal>27</span>
+<span class=normal>28</span>
+<span class=normal>29</span>
+<span class=normal>30</span>
+<span class=normal>31</span>
+<span class=normal>32</span>
+<span class=normal>33</span>
+<span class=normal>34</span>
+<span class=normal>35</span>
+<span class=normal>36</span>
+<span class=normal>37</span>
+<span class=normal>38</span>
+<span class=normal>39</span>
+<span class=normal>40</span>
+<span class=normal>41</span>
+<span class=normal>42</span>
+<span class=normal>43</span>
+<span class=normal>44</span>
+<span class=normal>45</span>
+<span class=normal>46</span>
+<span class=normal>47</span>
+<span class=normal>48</span>
+<span class=normal>49</span>
+<span class=normal>50</span>
+<span class=normal>51</span>
+<span class=normal>52</span>
+<span class=normal>53</span>
+<span class=normal>54</span>
+<span class=normal>55</span>
+<span class=normal>56</span>
+<span class=normal>57</span>
+<span class=normal>58</span>
+<span class=normal>59</span>
+<span class=normal>60</span>
+<span class=normal>61</span>
+<span class=normal>62</span>
+<span class=normal>63</span>
+<span class=normal>64</span>
+<span class=normal>65</span>
+<span class=normal>66</span>
+<span class=normal>67</span>
+<span class=normal>68</span>
+<span class=normal>69</span>
+<span class=normal>70</span>
+<span class=normal>71</span>
+<span class=normal>72</span>
+<span class=normal>73</span>
+<span class=normal>74</span>
+<span class=normal>75</span>
+<span class=normal>76</span>
+<span class=normal>77</span>
+<span class=normal>78</span>
+<span class=normal>79</span>
+<span class=normal>80</span>
+<span class=normal>81</span>
+<span class=normal>82</span></pre></div></td><td class=code><div><pre><span></span><code>- additionalProperties: `false`
+- properties: 
+    - accessList: 
+        - items: 
+            - additionalProperties: `false`
+            - properties: 
+                - address: 
+                    - pattern: `^0x[a-fA-F\d]{64}$`
+                    - title: `keccak`
+                    - type: `string`
+
+                - storageKeys: 
+                    - items: 
+                        - description: `Hex representation of a Keccak 256 hash`
+                        - pattern: `^0x[a-fA-F\d]{64}$`
+                        - title: `keccak`
+                        - type: `string`
+
+                    - type: `array`
+
+
+            - type: `object`
+
+        - type: `array`
+
+    - chainId: 
+        - pattern: `^0x[a-fA-F0-9]+$`
+        - title: `integer`
+        - type: `string`
+
+    - data: 
+        - pattern: `^0x([a-fA-F\d])+$`
+        - title: `dataWord`
+        - type: `string`
+
+    - from: 
+        - pattern: `^0x[a-fA-F\d]{64}$`
+        - title: `keccak`
+        - type: `string`
+
+    - gas: 
+        - pattern: `^0x([a-fA-F\d])+$`
+        - title: `uint64`
+        - type: `string`
+
+    - gasPrice: 
+        - pattern: `^0x[a-fA-F0-9]+$`
+        - title: `integer`
+        - type: `string`
+
+    - input: 
+        - pattern: `^0x([a-fA-F\d])+$`
+        - title: `dataWord`
+        - type: `string`
+
+    - maxFeePerGas: 
+        - pattern: `^0x[a-fA-F0-9]+$`
+        - title: `integer`
+        - type: `string`
+
+    - maxPriorityFeePerGas: 
+        - pattern: `^0x[a-fA-F0-9]+$`
+        - title: `integer`
+        - type: `string`
+
+    - nonce: 
+        - pattern: `^0x([a-fA-F\d])+$`
+        - title: `uint64`
+        - type: `string`
+
+    - to: 
+        - pattern: `^0x[a-fA-F\d]{64}$`
+        - title: `keccak`
+        - type: `string`
+
+    - value: 
+        - pattern: `^0x[a-fA-F0-9]+$`
+        - title: `integer`
+        - type: `string`
+
+
+- type: object
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_5_2 name=__tabbed_5 type=radio><label for=__tabbed_5_2>Raw</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 1</span>
+<span class=normal> 2</span>
+<span class=normal> 3</span>
+<span class=normal> 4</span>
+<span class=normal> 5</span>
+<span class=normal> 6</span>
+<span class=normal> 7</span>
+<span class=normal> 8</span>
+<span class=normal> 9</span>
+<span class=normal>10</span>
+<span class=normal>11</span>
+<span class=normal>12</span>
+<span class=normal>13</span>
+<span class=normal>14</span>
+<span class=normal>15</span>
+<span class=normal>16</span>
+<span class=normal>17</span>
+<span class=normal>18</span>
+<span class=normal>19</span>
+<span class=normal>20</span>
+<span class=normal>21</span>
+<span class=normal>22</span>
+<span class=normal>23</span>
+<span class=normal>24</span>
+<span class=normal>25</span>
+<span class=normal>26</span>
+<span class=normal>27</span>
+<span class=normal>28</span>
+<span class=normal>29</span>
+<span class=normal>30</span>
+<span class=normal>31</span>
+<span class=normal>32</span>
+<span class=normal>33</span>
+<span class=normal>34</span>
+<span class=normal>35</span>
+<span class=normal>36</span>
+<span class=normal>37</span>
+<span class=normal>38</span>
+<span class=normal>39</span>
+<span class=normal>40</span>
+<span class=normal>41</span>
+<span class=normal>42</span>
+<span class=normal>43</span>
+<span class=normal>44</span>
+<span class=normal>45</span>
+<span class=normal>46</span>
+<span class=normal>47</span>
+<span class=normal>48</span>
+<span class=normal>49</span>
+<span class=normal>50</span>
+<span class=normal>51</span>
+<span class=normal>52</span>
+<span class=normal>53</span>
+<span class=normal>54</span>
+<span class=normal>55</span>
+<span class=normal>56</span>
+<span class=normal>57</span>
+<span class=normal>58</span>
+<span class=normal>59</span>
+<span class=normal>60</span>
+<span class=normal>61</span>
+<span class=normal>62</span>
+<span class=normal>63</span>
+<span class=normal>64</span>
+<span class=normal>65</span>
+<span class=normal>66</span>
+<span class=normal>67</span>
+<span class=normal>68</span>
+<span class=normal>69</span>
+<span class=normal>70</span>
+<span class=normal>71</span>
+<span class=normal>72</span>
+<span class=normal>73</span>
+<span class=normal>74</span>
+<span class=normal>75</span>
+<span class=normal>76</span>
+<span class=normal>77</span>
+<span class=normal>78</span>
+<span class=normal>79</span>
+<span class=normal>80</span>
+<span class=normal>81</span>
+<span class=normal>82</span>
+<span class=normal>83</span>
+<span class=normal>84</span>
+<span class=normal>85</span>
+<span class=normal>86</span></pre></div></td><td class=code><div><pre><span></span><code>{
+    &quot;additionalProperties&quot;: false,
+    &quot;properties&quot;: {
+        &quot;accessList&quot;: {
+            &quot;items&quot;: {
+                &quot;additionalProperties&quot;: false,
+                &quot;properties&quot;: {
+                    &quot;address&quot;: {
+                        &quot;pattern&quot;: &quot;^0x[a-fA-F\\d]{64}$&quot;,
+                        &quot;title&quot;: &quot;keccak&quot;,
+                        &quot;type&quot;: &quot;string&quot;
+                    },
+                    &quot;storageKeys&quot;: {
+                        &quot;items&quot;: {
+                            &quot;description&quot;: &quot;Hex representation of a Keccak 256 hash&quot;,
+                            &quot;pattern&quot;: &quot;^0x[a-fA-F\\d]{64}$&quot;,
+                            &quot;title&quot;: &quot;keccak&quot;,
+                            &quot;type&quot;: &quot;string&quot;
+                        },
+                        &quot;type&quot;: &quot;array&quot;
+                    }
+                },
+                &quot;type&quot;: &quot;object&quot;
+            },
+            &quot;type&quot;: &quot;array&quot;
+        },
+        &quot;chainId&quot;: {
+            &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+            &quot;title&quot;: &quot;integer&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;data&quot;: {
+            &quot;pattern&quot;: &quot;^0x([a-fA-F\\d])+$&quot;,
+            &quot;title&quot;: &quot;dataWord&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;from&quot;: {
+            &quot;pattern&quot;: &quot;^0x[a-fA-F\\d]{64}$&quot;,
+            &quot;title&quot;: &quot;keccak&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;gas&quot;: {
+            &quot;pattern&quot;: &quot;^0x([a-fA-F\\d])+$&quot;,
+            &quot;title&quot;: &quot;uint64&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;gasPrice&quot;: {
+            &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+            &quot;title&quot;: &quot;integer&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;input&quot;: {
+            &quot;pattern&quot;: &quot;^0x([a-fA-F\\d])+$&quot;,
+            &quot;title&quot;: &quot;dataWord&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;maxFeePerGas&quot;: {
+            &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+            &quot;title&quot;: &quot;integer&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;maxPriorityFeePerGas&quot;: {
+            &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+            &quot;title&quot;: &quot;integer&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;nonce&quot;: {
+            &quot;pattern&quot;: &quot;^0x([a-fA-F\\d])+$&quot;,
+            &quot;title&quot;: &quot;uint64&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;to&quot;: {
+            &quot;pattern&quot;: &quot;^0x[a-fA-F\\d]{64}$&quot;,
+            &quot;title&quot;: &quot;keccak&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;value&quot;: {
+            &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+            &quot;title&quot;: &quot;integer&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        }
+    },
+    &quot;type&quot;: [
+        &quot;object&quot;
+    ]
+}
+</code></pre></div></td></tr></table></div> </div> </div> <p><strong>2:</strong> blockNrOrHash <code>rpc.BlockNumberOrHash</code> </p> <ul> <li>Required: ✓ Yes</li> </ul> <p><strong>3:</strong> config <code>*TraceCallConfig</code> </p> <ul> <li>Required: ✓ Yes</li> </ul> <div class=tabbed-set data-tabs=6:2><input checked=checked id=__tabbed_6_1 name=__tabbed_6 type=radio><label for=__tabbed_6_1>Schema</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>  1</span>
+<span class=normal>  2</span>
+<span class=normal>  3</span>
+<span class=normal>  4</span>
+<span class=normal>  5</span>
+<span class=normal>  6</span>
+<span class=normal>  7</span>
+<span class=normal>  8</span>
+<span class=normal>  9</span>
+<span class=normal> 10</span>
+<span class=normal> 11</span>
+<span class=normal> 12</span>
+<span class=normal> 13</span>
+<span class=normal> 14</span>
+<span class=normal> 15</span>
+<span class=normal> 16</span>
+<span class=normal> 17</span>
+<span class=normal> 18</span>
+<span class=normal> 19</span>
+<span class=normal> 20</span>
+<span class=normal> 21</span>
+<span class=normal> 22</span>
+<span class=normal> 23</span>
+<span class=normal> 24</span>
+<span class=normal> 25</span>
+<span class=normal> 26</span>
+<span class=normal> 27</span>
+<span class=normal> 28</span>
+<span class=normal> 29</span>
+<span class=normal> 30</span>
+<span class=normal> 31</span>
+<span class=normal> 32</span>
+<span class=normal> 33</span>
+<span class=normal> 34</span>
+<span class=normal> 35</span>
+<span class=normal> 36</span>
+<span class=normal> 37</span>
+<span class=normal> 38</span>
+<span class=normal> 39</span>
+<span class=normal> 40</span>
+<span class=normal> 41</span>
+<span class=normal> 42</span>
+<span class=normal> 43</span>
+<span class=normal> 44</span>
+<span class=normal> 45</span>
+<span class=normal> 46</span>
+<span class=normal> 47</span>
+<span class=normal> 48</span>
+<span class=normal> 49</span>
+<span class=normal> 50</span>
+<span class=normal> 51</span>
+<span class=normal> 52</span>
+<span class=normal> 53</span>
+<span class=normal> 54</span>
+<span class=normal> 55</span>
+<span class=normal> 56</span>
+<span class=normal> 57</span>
+<span class=normal> 58</span>
+<span class=normal> 59</span>
+<span class=normal> 60</span>
+<span class=normal> 61</span>
+<span class=normal> 62</span>
+<span class=normal> 63</span>
+<span class=normal> 64</span>
+<span class=normal> 65</span>
+<span class=normal> 66</span>
+<span class=normal> 67</span>
+<span class=normal> 68</span>
+<span class=normal> 69</span>
+<span class=normal> 70</span>
+<span class=normal> 71</span>
+<span class=normal> 72</span>
+<span class=normal> 73</span>
+<span class=normal> 74</span>
+<span class=normal> 75</span>
+<span class=normal> 76</span>
+<span class=normal> 77</span>
+<span class=normal> 78</span>
+<span class=normal> 79</span>
+<span class=normal> 80</span>
+<span class=normal> 81</span>
+<span class=normal> 82</span>
+<span class=normal> 83</span>
+<span class=normal> 84</span>
+<span class=normal> 85</span>
+<span class=normal> 86</span>
+<span class=normal> 87</span>
+<span class=normal> 88</span>
+<span class=normal> 89</span>
+<span class=normal> 90</span>
+<span class=normal> 91</span>
+<span class=normal> 92</span>
+<span class=normal> 93</span>
+<span class=normal> 94</span>
+<span class=normal> 95</span>
+<span class=normal> 96</span>
+<span class=normal> 97</span>
+<span class=normal> 98</span>
+<span class=normal> 99</span>
+<span class=normal>100</span>
+<span class=normal>101</span>
+<span class=normal>102</span>
+<span class=normal>103</span>
+<span class=normal>104</span>
+<span class=normal>105</span>
+<span class=normal>106</span>
+<span class=normal>107</span>
+<span class=normal>108</span>
+<span class=normal>109</span>
+<span class=normal>110</span>
+<span class=normal>111</span>
+<span class=normal>112</span>
+<span class=normal>113</span>
+<span class=normal>114</span>
+<span class=normal>115</span>
+<span class=normal>116</span>
+<span class=normal>117</span>
+<span class=normal>118</span>
+<span class=normal>119</span>
+<span class=normal>120</span>
+<span class=normal>121</span>
+<span class=normal>122</span>
+<span class=normal>123</span>
+<span class=normal>124</span>
+<span class=normal>125</span>
+<span class=normal>126</span>
+<span class=normal>127</span>
+<span class=normal>128</span>
+<span class=normal>129</span>
+<span class=normal>130</span>
+<span class=normal>131</span>
+<span class=normal>132</span>
+<span class=normal>133</span>
+<span class=normal>134</span>
+<span class=normal>135</span>
+<span class=normal>136</span></pre></div></td><td class=code><div><pre><span></span><code>- additionalProperties: `false`
+- properties: 
+    - BlockOverrides: 
+        - additionalProperties: `false`
+        - properties: 
+            - BaseFee: 
+                - pattern: `^0x[a-fA-F0-9]+$`
+                - title: `integer`
+                - type: `string`
+
+            - Coinbase: 
+                - pattern: `^0x[a-fA-F\d]{64}$`
+                - title: `keccak`
+                - type: `string`
+
+            - Difficulty: 
+                - pattern: `^0x[a-fA-F0-9]+$`
+                - title: `integer`
+                - type: `string`
+
+            - GasLimit: 
+                - pattern: `^0x([a-fA-F\d])+$`
+                - title: `uint64`
+                - type: `string`
+
+            - Number: 
+                - pattern: `^0x[a-fA-F0-9]+$`
+                - title: `integer`
+                - type: `string`
+
+            - Random: 
+                - pattern: `^0x[a-fA-F\d]{64}$`
+                - title: `keccak`
+                - type: `string`
+
+            - Time: 
+                - pattern: `^0x([a-fA-F\d])+$`
+                - title: `uint64`
+                - type: `string`
+
+
+        - type: `object`
+
+    - Debug: 
+        - type: `boolean`
+
+    - DisableStack: 
+        - type: `boolean`
+
+    - DisableStorage: 
+        - type: `boolean`
+
+    - EnableMemory: 
+        - type: `boolean`
+
+    - EnableReturnData: 
+        - type: `boolean`
+
+    - Limit: 
+        - pattern: `^0x[a-fA-F0-9]+$`
+        - title: `integer`
+        - type: `string`
+
+    - NestedTraceOutput: 
+        - type: `boolean`
+
+    - Reexec: 
+        - pattern: `^0x[a-fA-F0-9]+$`
+        - title: `integer`
+        - type: `string`
+
+    - StateOverrides: 
+        - patternProperties: 
+            - .*: 
+                - additionalProperties: `false`
+                - properties: 
+                    - balance: 
+                        - pattern: `^0x[a-fA-F0-9]+$`
+                        - title: `integer`
+                        - type: `string`
+
+                    - code: 
+                        - pattern: `^0x([a-fA-F\d])+$`
+                        - title: `dataWord`
+                        - type: `string`
+
+                    - nonce: 
+                        - pattern: `^0x([a-fA-F\d])+$`
+                        - title: `uint64`
+                        - type: `string`
+
+                    - state: 
+                        - patternProperties: 
+                            - .*: 
+                                - description: `Hex representation of a Keccak 256 hash`
+                                - pattern: `^0x[a-fA-F\d]{64}$`
+                                - title: `keccak`
+                                - type: `string`
+
+
+                        - type: `object`
+
+                    - stateDiff: 
+                        - patternProperties: 
+                            - .*: 
+                                - description: `Hex representation of a Keccak 256 hash`
+                                - pattern: `^0x[a-fA-F\d]{64}$`
+                                - title: `keccak`
+                                - type: `string`
+
+
+                        - type: `object`
+
+
+                - type: `object`
+
+
+        - type: `object`
+
+    - Timeout: 
+        - type: `string`
+
+    - Tracer: 
+        - type: `string`
+
+    - TracerConfig: 
+        - media: 
+            - binaryEncoding: `base64`
+
+        - type: `string`
+
+    - overrides: 
+        - additionalProperties: `true`
+
+
+- type: object
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_6_2 name=__tabbed_6 type=radio><label for=__tabbed_6_2>Raw</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>  1</span>
+<span class=normal>  2</span>
+<span class=normal>  3</span>
+<span class=normal>  4</span>
+<span class=normal>  5</span>
+<span class=normal>  6</span>
+<span class=normal>  7</span>
+<span class=normal>  8</span>
+<span class=normal>  9</span>
+<span class=normal> 10</span>
+<span class=normal> 11</span>
+<span class=normal> 12</span>
+<span class=normal> 13</span>
+<span class=normal> 14</span>
+<span class=normal> 15</span>
+<span class=normal> 16</span>
+<span class=normal> 17</span>
+<span class=normal> 18</span>
+<span class=normal> 19</span>
+<span class=normal> 20</span>
+<span class=normal> 21</span>
+<span class=normal> 22</span>
+<span class=normal> 23</span>
+<span class=normal> 24</span>
+<span class=normal> 25</span>
+<span class=normal> 26</span>
+<span class=normal> 27</span>
+<span class=normal> 28</span>
+<span class=normal> 29</span>
+<span class=normal> 30</span>
+<span class=normal> 31</span>
+<span class=normal> 32</span>
+<span class=normal> 33</span>
+<span class=normal> 34</span>
+<span class=normal> 35</span>
+<span class=normal> 36</span>
+<span class=normal> 37</span>
+<span class=normal> 38</span>
+<span class=normal> 39</span>
+<span class=normal> 40</span>
+<span class=normal> 41</span>
+<span class=normal> 42</span>
+<span class=normal> 43</span>
+<span class=normal> 44</span>
+<span class=normal> 45</span>
+<span class=normal> 46</span>
+<span class=normal> 47</span>
+<span class=normal> 48</span>
+<span class=normal> 49</span>
+<span class=normal> 50</span>
+<span class=normal> 51</span>
+<span class=normal> 52</span>
+<span class=normal> 53</span>
+<span class=normal> 54</span>
+<span class=normal> 55</span>
+<span class=normal> 56</span>
+<span class=normal> 57</span>
+<span class=normal> 58</span>
+<span class=normal> 59</span>
+<span class=normal> 60</span>
+<span class=normal> 61</span>
+<span class=normal> 62</span>
+<span class=normal> 63</span>
+<span class=normal> 64</span>
+<span class=normal> 65</span>
+<span class=normal> 66</span>
+<span class=normal> 67</span>
+<span class=normal> 68</span>
+<span class=normal> 69</span>
+<span class=normal> 70</span>
+<span class=normal> 71</span>
+<span class=normal> 72</span>
+<span class=normal> 73</span>
+<span class=normal> 74</span>
+<span class=normal> 75</span>
+<span class=normal> 76</span>
+<span class=normal> 77</span>
+<span class=normal> 78</span>
+<span class=normal> 79</span>
+<span class=normal> 80</span>
+<span class=normal> 81</span>
+<span class=normal> 82</span>
+<span class=normal> 83</span>
+<span class=normal> 84</span>
+<span class=normal> 85</span>
+<span class=normal> 86</span>
+<span class=normal> 87</span>
+<span class=normal> 88</span>
+<span class=normal> 89</span>
+<span class=normal> 90</span>
+<span class=normal> 91</span>
+<span class=normal> 92</span>
+<span class=normal> 93</span>
+<span class=normal> 94</span>
+<span class=normal> 95</span>
+<span class=normal> 96</span>
+<span class=normal> 97</span>
+<span class=normal> 98</span>
+<span class=normal> 99</span>
+<span class=normal>100</span>
+<span class=normal>101</span>
+<span class=normal>102</span>
+<span class=normal>103</span>
+<span class=normal>104</span>
+<span class=normal>105</span>
+<span class=normal>106</span>
+<span class=normal>107</span>
+<span class=normal>108</span>
+<span class=normal>109</span>
+<span class=normal>110</span>
+<span class=normal>111</span>
+<span class=normal>112</span>
+<span class=normal>113</span>
+<span class=normal>114</span>
+<span class=normal>115</span>
+<span class=normal>116</span>
+<span class=normal>117</span>
+<span class=normal>118</span>
+<span class=normal>119</span>
+<span class=normal>120</span>
+<span class=normal>121</span>
+<span class=normal>122</span>
+<span class=normal>123</span>
+<span class=normal>124</span>
+<span class=normal>125</span>
+<span class=normal>126</span>
+<span class=normal>127</span>
+<span class=normal>128</span>
+<span class=normal>129</span>
+<span class=normal>130</span>
+<span class=normal>131</span>
+<span class=normal>132</span>
+<span class=normal>133</span>
+<span class=normal>134</span>
+<span class=normal>135</span>
+<span class=normal>136</span>
+<span class=normal>137</span>
+<span class=normal>138</span>
+<span class=normal>139</span>
+<span class=normal>140</span></pre></div></td><td class=code><div><pre><span></span><code>{
+    &quot;additionalProperties&quot;: false,
+    &quot;properties&quot;: {
+        &quot;BlockOverrides&quot;: {
+            &quot;additionalProperties&quot;: false,
+            &quot;properties&quot;: {
+                &quot;BaseFee&quot;: {
+                    &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+                    &quot;title&quot;: &quot;integer&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                },
+                &quot;Coinbase&quot;: {
+                    &quot;pattern&quot;: &quot;^0x[a-fA-F\\d]{64}$&quot;,
+                    &quot;title&quot;: &quot;keccak&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                },
+                &quot;Difficulty&quot;: {
+                    &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+                    &quot;title&quot;: &quot;integer&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                },
+                &quot;GasLimit&quot;: {
+                    &quot;pattern&quot;: &quot;^0x([a-fA-F\\d])+$&quot;,
+                    &quot;title&quot;: &quot;uint64&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                },
+                &quot;Number&quot;: {
+                    &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+                    &quot;title&quot;: &quot;integer&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                },
+                &quot;Random&quot;: {
+                    &quot;pattern&quot;: &quot;^0x[a-fA-F\\d]{64}$&quot;,
+                    &quot;title&quot;: &quot;keccak&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                },
+                &quot;Time&quot;: {
+                    &quot;pattern&quot;: &quot;^0x([a-fA-F\\d])+$&quot;,
+                    &quot;title&quot;: &quot;uint64&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                }
+            },
+            &quot;type&quot;: &quot;object&quot;
+        },
+        &quot;Debug&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;DisableStack&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;DisableStorage&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;EnableMemory&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;EnableReturnData&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;Limit&quot;: {
+            &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+            &quot;title&quot;: &quot;integer&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;NestedTraceOutput&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;Reexec&quot;: {
+            &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+            &quot;title&quot;: &quot;integer&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;StateOverrides&quot;: {
+            &quot;patternProperties&quot;: {
+                &quot;.*&quot;: {
+                    &quot;additionalProperties&quot;: false,
+                    &quot;properties&quot;: {
+                        &quot;balance&quot;: {
+                            &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+                            &quot;title&quot;: &quot;integer&quot;,
+                            &quot;type&quot;: &quot;string&quot;
+                        },
+                        &quot;code&quot;: {
+                            &quot;pattern&quot;: &quot;^0x([a-fA-F\\d])+$&quot;,
+                            &quot;title&quot;: &quot;dataWord&quot;,
+                            &quot;type&quot;: &quot;string&quot;
+                        },
+                        &quot;nonce&quot;: {
+                            &quot;pattern&quot;: &quot;^0x([a-fA-F\\d])+$&quot;,
+                            &quot;title&quot;: &quot;uint64&quot;,
+                            &quot;type&quot;: &quot;string&quot;
+                        },
+                        &quot;state&quot;: {
+                            &quot;patternProperties&quot;: {
+                                &quot;.*&quot;: {
+                                    &quot;description&quot;: &quot;Hex representation of a Keccak 256 hash&quot;,
+                                    &quot;pattern&quot;: &quot;^0x[a-fA-F\\d]{64}$&quot;,
+                                    &quot;title&quot;: &quot;keccak&quot;,
+                                    &quot;type&quot;: &quot;string&quot;
+                                }
+                            },
+                            &quot;type&quot;: &quot;object&quot;
+                        },
+                        &quot;stateDiff&quot;: {
+                            &quot;patternProperties&quot;: {
+                                &quot;.*&quot;: {
+                                    &quot;description&quot;: &quot;Hex representation of a Keccak 256 hash&quot;,
+                                    &quot;pattern&quot;: &quot;^0x[a-fA-F\\d]{64}$&quot;,
+                                    &quot;title&quot;: &quot;keccak&quot;,
+                                    &quot;type&quot;: &quot;string&quot;
+                                }
+                            },
+                            &quot;type&quot;: &quot;object&quot;
+                        }
+                    },
+                    &quot;type&quot;: &quot;object&quot;
+                }
+            },
+            &quot;type&quot;: &quot;object&quot;
+        },
+        &quot;Timeout&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;Tracer&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;TracerConfig&quot;: {
+            &quot;media&quot;: {
+                &quot;binaryEncoding&quot;: &quot;base64&quot;
+            },
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;overrides&quot;: {
+            &quot;additionalProperties&quot;: true
+        }
+    },
+    &quot;type&quot;: [
+        &quot;object&quot;
+    ]
+}
+</code></pre></div></td></tr></table></div> </div> </div> <h4 id=result_1>Result<a class=headerlink href=#result_1 title="Permanent link">&para;</a></h4> <p>interface <code>interface{}</code> </p> <ul> <li>Required: ✓ Yes</li> </ul> <h4 id=client-method-invocation-examples_1>Client Method Invocation Examples<a class=headerlink href=#client-method-invocation-examples_1 title="Permanent link">&para;</a></h4> <div class=tabbed-set data-tabs=7:3><input checked=checked id=__tabbed_7_1 name=__tabbed_7 type=radio><label for=__tabbed_7_1>Shell HTTP</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code>curl<span class=w> </span>-X<span class=w> </span>POST<span class=w> </span>-H<span class=w> </span><span class=s2>&quot;Content-Type: application/json&quot;</span><span class=w> </span>http://localhost:8545<span class=w> </span>--data<span class=w> </span><span class=s1>&#39;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: 42, &quot;method&quot;: &quot;trace_call&quot;, &quot;params&quot;: [&lt;args&gt;, &lt;blockNrOrHash&gt;, &lt;config&gt;]}&#39;</span>
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_7_2 name=__tabbed_7 type=radio><label for=__tabbed_7_2>Shell WebSocket</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code>wscat<span class=w> </span>-c<span class=w> </span>ws://localhost:8546<span class=w> </span>-x<span class=w> </span><span class=s1>&#39;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: 1, &quot;method&quot;: &quot;trace_call&quot;, &quot;params&quot;: [&lt;args&gt;, &lt;blockNrOrHash&gt;, &lt;config&gt;]}&#39;</span>
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_7_3 name=__tabbed_7 type=radio><label for=__tabbed_7_3>Javascript Console</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code><span class=nx>trace</span><span class=p>.</span><span class=nx>call</span><span class=p>(</span><span class=nx>args</span><span class=p>,</span><span class=nx>blockNrOrHash</span><span class=p>,</span><span class=nx>config</span><span class=p>);</span>
+</code></pre></div></td></tr></table></div> </div> </div> <details><summary>Source code</summary> <p> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 1</span>
+<span class=normal> 2</span>
+<span class=normal> 3</span>
+<span class=normal> 4</span>
+<span class=normal> 5</span>
+<span class=normal> 6</span>
+<span class=normal> 7</span>
+<span class=normal> 8</span>
+<span class=normal> 9</span>
+<span class=normal>10</span>
+<span class=normal>11</span></pre></div></td><td class=code><div><pre><span></span><code><span class=kd>func</span><span class=w> </span><span class=p>(</span><span class=nx>api</span><span class=w> </span><span class=o>*</span><span class=nx>TraceAPI</span><span class=p>)</span><span class=w> </span><span class=nx>Call</span><span class=p>(</span><span class=nx>ctx</span><span class=w> </span><span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span><span class=w> </span><span class=nx>args</span><span class=w> </span><span class=nx>ethapi</span><span class=p>.</span><span class=nx>TransactionArgs</span><span class=p>,</span><span class=w> </span><span class=nx>blockNrOrHash</span><span class=w> </span><span class=nx>rpc</span><span class=p>.</span><span class=nx>BlockNumberOrHash</span><span class=p>,</span><span class=w> </span><span class=nx>config</span><span class=w> </span><span class=o>*</span><span class=nx>TraceCallConfig</span><span class=p>)</span><span class=w> </span><span class=p>(</span><span class=kd>interface</span><span class=p>{},</span><span class=w> </span><span class=kt>error</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>    </span><span class=nx>config</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=nx>setTraceCallConfigDefaultTracer</span><span class=p>(</span><span class=nx>config</span><span class=p>)</span>
+<span class=w>    </span><span class=nx>res</span><span class=p>,</span><span class=w> </span><span class=nx>err</span><span class=w> </span><span class=o>:=</span><span class=w> </span><span class=nx>api</span><span class=p>.</span><span class=nx>debugAPI</span><span class=p>.</span><span class=nx>TraceCall</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span><span class=w> </span><span class=nx>args</span><span class=p>,</span><span class=w> </span><span class=nx>blockNrOrHash</span><span class=p>,</span><span class=w> </span><span class=nx>config</span><span class=p>)</span>
+<span class=w>    </span><span class=k>if</span><span class=w> </span><span class=nx>err</span><span class=w> </span><span class=o>!=</span><span class=w> </span><span class=kc>nil</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=k>return</span><span class=w> </span><span class=kc>nil</span><span class=p>,</span><span class=w> </span><span class=nx>err</span>
+<span class=w>    </span><span class=p>}</span>
+<span class=w>    </span><span class=nx>traceConfig</span><span class=w> </span><span class=o>:=</span><span class=w> </span><span class=nx>getTraceConfigFromTraceCallConfig</span><span class=p>(</span><span class=nx>config</span><span class=p>)</span>
+<span class=w>    </span><span class=k>return</span><span class=w> </span><span class=nx>decorateResponse</span><span class=p>(</span><span class=nx>res</span><span class=p>,</span><span class=w> </span><span class=nx>traceConfig</span><span class=p>)</span>
+<span class=p>}</span><span class=c1>// Call lets you trace a given eth_call. It collects the structured logs created during the execution of EVM</span>
+<span class=c1>// if the given transaction was added on top of the provided block and returns them as a JSON object.</span>
+<span class=c1>// You can provide -2 as a block number to trace on top of the pending block.</span>
+</code></pre></div></td></tr></table></div> <a href=https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api_parity.go#L262 target=_>View on GitHub →</a> </p> </details> <hr> <h3 id=trace_callmany>trace_callMany<a class=headerlink href=#trace_callmany title="Permanent link">&para;</a></h3> <p>CallMany lets you trace a given eth_call. It collects the structured logs created during the execution of EVM if the given transaction was added on top of the provided block and returns them as a JSON object. You can provide -2 as a block number to trace on top of the pending block.</p> <h4 id=params-3_1>Params (3)<a class=headerlink href=#params-3_1 title="Permanent link">&para;</a></h4> <p>Parameters must be given <em>by position</em>.</p> <p><strong>1:</strong> txs <code>[]ethapi.TransactionArgs</code> </p> <ul> <li>Required: ✓ Yes</li> </ul> <div class=tabbed-set data-tabs=8:2><input checked=checked id=__tabbed_8_1 name=__tabbed_8 type=radio><label for=__tabbed_8_1>Schema</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 1</span>
+<span class=normal> 2</span>
+<span class=normal> 3</span>
+<span class=normal> 4</span>
+<span class=normal> 5</span>
+<span class=normal> 6</span>
+<span class=normal> 7</span>
+<span class=normal> 8</span>
+<span class=normal> 9</span>
+<span class=normal>10</span>
+<span class=normal>11</span>
+<span class=normal>12</span>
+<span class=normal>13</span>
+<span class=normal>14</span>
+<span class=normal>15</span>
+<span class=normal>16</span>
+<span class=normal>17</span>
+<span class=normal>18</span>
+<span class=normal>19</span>
+<span class=normal>20</span>
+<span class=normal>21</span>
+<span class=normal>22</span>
+<span class=normal>23</span>
+<span class=normal>24</span>
+<span class=normal>25</span>
+<span class=normal>26</span>
+<span class=normal>27</span>
+<span class=normal>28</span>
+<span class=normal>29</span>
+<span class=normal>30</span>
+<span class=normal>31</span>
+<span class=normal>32</span>
+<span class=normal>33</span>
+<span class=normal>34</span>
+<span class=normal>35</span>
+<span class=normal>36</span>
+<span class=normal>37</span>
+<span class=normal>38</span>
+<span class=normal>39</span>
+<span class=normal>40</span>
+<span class=normal>41</span>
+<span class=normal>42</span>
+<span class=normal>43</span>
+<span class=normal>44</span>
+<span class=normal>45</span>
+<span class=normal>46</span>
+<span class=normal>47</span>
+<span class=normal>48</span>
+<span class=normal>49</span>
+<span class=normal>50</span>
+<span class=normal>51</span>
+<span class=normal>52</span>
+<span class=normal>53</span>
+<span class=normal>54</span>
+<span class=normal>55</span>
+<span class=normal>56</span>
+<span class=normal>57</span>
+<span class=normal>58</span>
+<span class=normal>59</span>
+<span class=normal>60</span>
+<span class=normal>61</span>
+<span class=normal>62</span>
+<span class=normal>63</span>
+<span class=normal>64</span>
+<span class=normal>65</span>
+<span class=normal>66</span>
+<span class=normal>67</span>
+<span class=normal>68</span>
+<span class=normal>69</span>
+<span class=normal>70</span>
+<span class=normal>71</span>
+<span class=normal>72</span>
+<span class=normal>73</span>
+<span class=normal>74</span>
+<span class=normal>75</span>
+<span class=normal>76</span>
+<span class=normal>77</span>
+<span class=normal>78</span>
+<span class=normal>79</span>
+<span class=normal>80</span>
+<span class=normal>81</span>
+<span class=normal>82</span>
+<span class=normal>83</span>
+<span class=normal>84</span>
+<span class=normal>85</span>
+<span class=normal>86</span>
+<span class=normal>87</span></pre></div></td><td class=code><div><pre><span></span><code>- items: 
+
+        - additionalProperties: `false`
+        - properties: 
+            - accessList: 
+                - items: 
+                    - additionalProperties: `false`
+                    - properties: 
+                        - address: 
+                            - pattern: `^0x[a-fA-F\d]{64}$`
+                            - title: `keccak`
+                            - type: `string`
+
+                        - storageKeys: 
+                            - items: 
+                                - description: `Hex representation of a Keccak 256 hash`
+                                - pattern: `^0x[a-fA-F\d]{64}$`
+                                - title: `keccak`
+                                - type: `string`
+
+                            - type: `array`
+
+
+                    - type: `object`
+
+                - type: `array`
+
+            - chainId: 
+                - pattern: `^0x[a-fA-F0-9]+$`
+                - title: `integer`
+                - type: `string`
+
+            - data: 
+                - pattern: `^0x([a-fA-F\d])+$`
+                - title: `dataWord`
+                - type: `string`
+
+            - from: 
+                - pattern: `^0x[a-fA-F\d]{64}$`
+                - title: `keccak`
+                - type: `string`
+
+            - gas: 
+                - pattern: `^0x([a-fA-F\d])+$`
+                - title: `uint64`
+                - type: `string`
+
+            - gasPrice: 
+                - pattern: `^0x[a-fA-F0-9]+$`
+                - title: `integer`
+                - type: `string`
+
+            - input: 
+                - pattern: `^0x([a-fA-F\d])+$`
+                - title: `dataWord`
+                - type: `string`
+
+            - maxFeePerGas: 
+                - pattern: `^0x[a-fA-F0-9]+$`
+                - title: `integer`
+                - type: `string`
+
+            - maxPriorityFeePerGas: 
+                - pattern: `^0x[a-fA-F0-9]+$`
+                - title: `integer`
+                - type: `string`
+
+            - nonce: 
+                - pattern: `^0x([a-fA-F\d])+$`
+                - title: `uint64`
+                - type: `string`
+
+            - to: 
+                - pattern: `^0x[a-fA-F\d]{64}$`
+                - title: `keccak`
+                - type: `string`
+
+            - value: 
+                - pattern: `^0x[a-fA-F0-9]+$`
+                - title: `integer`
+                - type: `string`
+
+
+        - type: object
+
+
+- type: array
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_8_2 name=__tabbed_8 type=radio><label for=__tabbed_8_2>Raw</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 1</span>
+<span class=normal> 2</span>
+<span class=normal> 3</span>
+<span class=normal> 4</span>
+<span class=normal> 5</span>
+<span class=normal> 6</span>
+<span class=normal> 7</span>
+<span class=normal> 8</span>
+<span class=normal> 9</span>
+<span class=normal>10</span>
+<span class=normal>11</span>
+<span class=normal>12</span>
+<span class=normal>13</span>
+<span class=normal>14</span>
+<span class=normal>15</span>
+<span class=normal>16</span>
+<span class=normal>17</span>
+<span class=normal>18</span>
+<span class=normal>19</span>
+<span class=normal>20</span>
+<span class=normal>21</span>
+<span class=normal>22</span>
+<span class=normal>23</span>
+<span class=normal>24</span>
+<span class=normal>25</span>
+<span class=normal>26</span>
+<span class=normal>27</span>
+<span class=normal>28</span>
+<span class=normal>29</span>
+<span class=normal>30</span>
+<span class=normal>31</span>
+<span class=normal>32</span>
+<span class=normal>33</span>
+<span class=normal>34</span>
+<span class=normal>35</span>
+<span class=normal>36</span>
+<span class=normal>37</span>
+<span class=normal>38</span>
+<span class=normal>39</span>
+<span class=normal>40</span>
+<span class=normal>41</span>
+<span class=normal>42</span>
+<span class=normal>43</span>
+<span class=normal>44</span>
+<span class=normal>45</span>
+<span class=normal>46</span>
+<span class=normal>47</span>
+<span class=normal>48</span>
+<span class=normal>49</span>
+<span class=normal>50</span>
+<span class=normal>51</span>
+<span class=normal>52</span>
+<span class=normal>53</span>
+<span class=normal>54</span>
+<span class=normal>55</span>
+<span class=normal>56</span>
+<span class=normal>57</span>
+<span class=normal>58</span>
+<span class=normal>59</span>
+<span class=normal>60</span>
+<span class=normal>61</span>
+<span class=normal>62</span>
+<span class=normal>63</span>
+<span class=normal>64</span>
+<span class=normal>65</span>
+<span class=normal>66</span>
+<span class=normal>67</span>
+<span class=normal>68</span>
+<span class=normal>69</span>
+<span class=normal>70</span>
+<span class=normal>71</span>
+<span class=normal>72</span>
+<span class=normal>73</span>
+<span class=normal>74</span>
+<span class=normal>75</span>
+<span class=normal>76</span>
+<span class=normal>77</span>
+<span class=normal>78</span>
+<span class=normal>79</span>
+<span class=normal>80</span>
+<span class=normal>81</span>
+<span class=normal>82</span>
+<span class=normal>83</span>
+<span class=normal>84</span>
+<span class=normal>85</span>
+<span class=normal>86</span>
+<span class=normal>87</span>
+<span class=normal>88</span>
+<span class=normal>89</span>
+<span class=normal>90</span>
+<span class=normal>91</span>
+<span class=normal>92</span>
+<span class=normal>93</span></pre></div></td><td class=code><div><pre><span></span><code>{
+    &quot;items&quot;: [
+        {
+            &quot;additionalProperties&quot;: false,
+            &quot;properties&quot;: {
+                &quot;accessList&quot;: {
+                    &quot;items&quot;: {
+                        &quot;additionalProperties&quot;: false,
+                        &quot;properties&quot;: {
+                            &quot;address&quot;: {
+                                &quot;pattern&quot;: &quot;^0x[a-fA-F\\d]{64}$&quot;,
+                                &quot;title&quot;: &quot;keccak&quot;,
+                                &quot;type&quot;: &quot;string&quot;
+                            },
+                            &quot;storageKeys&quot;: {
+                                &quot;items&quot;: {
+                                    &quot;description&quot;: &quot;Hex representation of a Keccak 256 hash&quot;,
+                                    &quot;pattern&quot;: &quot;^0x[a-fA-F\\d]{64}$&quot;,
+                                    &quot;title&quot;: &quot;keccak&quot;,
+                                    &quot;type&quot;: &quot;string&quot;
+                                },
+                                &quot;type&quot;: &quot;array&quot;
+                            }
+                        },
+                        &quot;type&quot;: &quot;object&quot;
+                    },
+                    &quot;type&quot;: &quot;array&quot;
+                },
+                &quot;chainId&quot;: {
+                    &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+                    &quot;title&quot;: &quot;integer&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                },
+                &quot;data&quot;: {
+                    &quot;pattern&quot;: &quot;^0x([a-fA-F\\d])+$&quot;,
+                    &quot;title&quot;: &quot;dataWord&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                },
+                &quot;from&quot;: {
+                    &quot;pattern&quot;: &quot;^0x[a-fA-F\\d]{64}$&quot;,
+                    &quot;title&quot;: &quot;keccak&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                },
+                &quot;gas&quot;: {
+                    &quot;pattern&quot;: &quot;^0x([a-fA-F\\d])+$&quot;,
+                    &quot;title&quot;: &quot;uint64&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                },
+                &quot;gasPrice&quot;: {
+                    &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+                    &quot;title&quot;: &quot;integer&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                },
+                &quot;input&quot;: {
+                    &quot;pattern&quot;: &quot;^0x([a-fA-F\\d])+$&quot;,
+                    &quot;title&quot;: &quot;dataWord&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                },
+                &quot;maxFeePerGas&quot;: {
+                    &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+                    &quot;title&quot;: &quot;integer&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                },
+                &quot;maxPriorityFeePerGas&quot;: {
+                    &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+                    &quot;title&quot;: &quot;integer&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                },
+                &quot;nonce&quot;: {
+                    &quot;pattern&quot;: &quot;^0x([a-fA-F\\d])+$&quot;,
+                    &quot;title&quot;: &quot;uint64&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                },
+                &quot;to&quot;: {
+                    &quot;pattern&quot;: &quot;^0x[a-fA-F\\d]{64}$&quot;,
+                    &quot;title&quot;: &quot;keccak&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                },
+                &quot;value&quot;: {
+                    &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+                    &quot;title&quot;: &quot;integer&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                }
+            },
+            &quot;type&quot;: [
+                &quot;object&quot;
+            ]
+        }
+    ],
+    &quot;type&quot;: [
+        &quot;array&quot;
+    ]
+}
+</code></pre></div></td></tr></table></div> </div> </div> <p><strong>2:</strong> blockNrOrHash <code>rpc.BlockNumberOrHash</code> </p> <ul> <li>Required: ✓ Yes</li> </ul> <p><strong>3:</strong> config <code>*TraceCallConfig</code> </p> <ul> <li>Required: ✓ Yes</li> </ul> <div class=tabbed-set data-tabs=9:2><input checked=checked id=__tabbed_9_1 name=__tabbed_9 type=radio><label for=__tabbed_9_1>Schema</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>  1</span>
+<span class=normal>  2</span>
+<span class=normal>  3</span>
+<span class=normal>  4</span>
+<span class=normal>  5</span>
+<span class=normal>  6</span>
+<span class=normal>  7</span>
+<span class=normal>  8</span>
+<span class=normal>  9</span>
+<span class=normal> 10</span>
+<span class=normal> 11</span>
+<span class=normal> 12</span>
+<span class=normal> 13</span>
+<span class=normal> 14</span>
+<span class=normal> 15</span>
+<span class=normal> 16</span>
+<span class=normal> 17</span>
+<span class=normal> 18</span>
+<span class=normal> 19</span>
+<span class=normal> 20</span>
+<span class=normal> 21</span>
+<span class=normal> 22</span>
+<span class=normal> 23</span>
+<span class=normal> 24</span>
+<span class=normal> 25</span>
+<span class=normal> 26</span>
+<span class=normal> 27</span>
+<span class=normal> 28</span>
+<span class=normal> 29</span>
+<span class=normal> 30</span>
+<span class=normal> 31</span>
+<span class=normal> 32</span>
+<span class=normal> 33</span>
+<span class=normal> 34</span>
+<span class=normal> 35</span>
+<span class=normal> 36</span>
+<span class=normal> 37</span>
+<span class=normal> 38</span>
+<span class=normal> 39</span>
+<span class=normal> 40</span>
+<span class=normal> 41</span>
+<span class=normal> 42</span>
+<span class=normal> 43</span>
+<span class=normal> 44</span>
+<span class=normal> 45</span>
+<span class=normal> 46</span>
+<span class=normal> 47</span>
+<span class=normal> 48</span>
+<span class=normal> 49</span>
+<span class=normal> 50</span>
+<span class=normal> 51</span>
+<span class=normal> 52</span>
+<span class=normal> 53</span>
+<span class=normal> 54</span>
+<span class=normal> 55</span>
+<span class=normal> 56</span>
+<span class=normal> 57</span>
+<span class=normal> 58</span>
+<span class=normal> 59</span>
+<span class=normal> 60</span>
+<span class=normal> 61</span>
+<span class=normal> 62</span>
+<span class=normal> 63</span>
+<span class=normal> 64</span>
+<span class=normal> 65</span>
+<span class=normal> 66</span>
+<span class=normal> 67</span>
+<span class=normal> 68</span>
+<span class=normal> 69</span>
+<span class=normal> 70</span>
+<span class=normal> 71</span>
+<span class=normal> 72</span>
+<span class=normal> 73</span>
+<span class=normal> 74</span>
+<span class=normal> 75</span>
+<span class=normal> 76</span>
+<span class=normal> 77</span>
+<span class=normal> 78</span>
+<span class=normal> 79</span>
+<span class=normal> 80</span>
+<span class=normal> 81</span>
+<span class=normal> 82</span>
+<span class=normal> 83</span>
+<span class=normal> 84</span>
+<span class=normal> 85</span>
+<span class=normal> 86</span>
+<span class=normal> 87</span>
+<span class=normal> 88</span>
+<span class=normal> 89</span>
+<span class=normal> 90</span>
+<span class=normal> 91</span>
+<span class=normal> 92</span>
+<span class=normal> 93</span>
+<span class=normal> 94</span>
+<span class=normal> 95</span>
+<span class=normal> 96</span>
+<span class=normal> 97</span>
+<span class=normal> 98</span>
+<span class=normal> 99</span>
+<span class=normal>100</span>
+<span class=normal>101</span>
+<span class=normal>102</span>
+<span class=normal>103</span>
+<span class=normal>104</span>
+<span class=normal>105</span>
+<span class=normal>106</span>
+<span class=normal>107</span>
+<span class=normal>108</span>
+<span class=normal>109</span>
+<span class=normal>110</span>
+<span class=normal>111</span>
+<span class=normal>112</span>
+<span class=normal>113</span>
+<span class=normal>114</span>
+<span class=normal>115</span>
+<span class=normal>116</span>
+<span class=normal>117</span>
+<span class=normal>118</span>
+<span class=normal>119</span>
+<span class=normal>120</span>
+<span class=normal>121</span>
+<span class=normal>122</span>
+<span class=normal>123</span>
+<span class=normal>124</span>
+<span class=normal>125</span>
+<span class=normal>126</span>
+<span class=normal>127</span>
+<span class=normal>128</span>
+<span class=normal>129</span>
+<span class=normal>130</span>
+<span class=normal>131</span>
+<span class=normal>132</span>
+<span class=normal>133</span>
+<span class=normal>134</span>
+<span class=normal>135</span>
+<span class=normal>136</span></pre></div></td><td class=code><div><pre><span></span><code>- additionalProperties: `false`
+- properties: 
+    - BlockOverrides: 
+        - additionalProperties: `false`
+        - properties: 
+            - BaseFee: 
+                - pattern: `^0x[a-fA-F0-9]+$`
+                - title: `integer`
+                - type: `string`
+
+            - Coinbase: 
+                - pattern: `^0x[a-fA-F\d]{64}$`
+                - title: `keccak`
+                - type: `string`
+
+            - Difficulty: 
+                - pattern: `^0x[a-fA-F0-9]+$`
+                - title: `integer`
+                - type: `string`
+
+            - GasLimit: 
+                - pattern: `^0x([a-fA-F\d])+$`
+                - title: `uint64`
+                - type: `string`
+
+            - Number: 
+                - pattern: `^0x[a-fA-F0-9]+$`
+                - title: `integer`
+                - type: `string`
+
+            - Random: 
+                - pattern: `^0x[a-fA-F\d]{64}$`
+                - title: `keccak`
+                - type: `string`
+
+            - Time: 
+                - pattern: `^0x([a-fA-F\d])+$`
+                - title: `uint64`
+                - type: `string`
+
+
+        - type: `object`
+
+    - Debug: 
+        - type: `boolean`
+
+    - DisableStack: 
+        - type: `boolean`
+
+    - DisableStorage: 
+        - type: `boolean`
+
+    - EnableMemory: 
+        - type: `boolean`
+
+    - EnableReturnData: 
+        - type: `boolean`
+
+    - Limit: 
+        - pattern: `^0x[a-fA-F0-9]+$`
+        - title: `integer`
+        - type: `string`
+
+    - NestedTraceOutput: 
+        - type: `boolean`
+
+    - Reexec: 
+        - pattern: `^0x[a-fA-F0-9]+$`
+        - title: `integer`
+        - type: `string`
+
+    - StateOverrides: 
+        - patternProperties: 
+            - .*: 
+                - additionalProperties: `false`
+                - properties: 
+                    - balance: 
+                        - pattern: `^0x[a-fA-F0-9]+$`
+                        - title: `integer`
+                        - type: `string`
+
+                    - code: 
+                        - pattern: `^0x([a-fA-F\d])+$`
+                        - title: `dataWord`
+                        - type: `string`
+
+                    - nonce: 
+                        - pattern: `^0x([a-fA-F\d])+$`
+                        - title: `uint64`
+                        - type: `string`
+
+                    - state: 
+                        - patternProperties: 
+                            - .*: 
+                                - description: `Hex representation of a Keccak 256 hash`
+                                - pattern: `^0x[a-fA-F\d]{64}$`
+                                - title: `keccak`
+                                - type: `string`
+
+
+                        - type: `object`
+
+                    - stateDiff: 
+                        - patternProperties: 
+                            - .*: 
+                                - description: `Hex representation of a Keccak 256 hash`
+                                - pattern: `^0x[a-fA-F\d]{64}$`
+                                - title: `keccak`
+                                - type: `string`
+
+
+                        - type: `object`
+
+
+                - type: `object`
+
+
+        - type: `object`
+
+    - Timeout: 
+        - type: `string`
+
+    - Tracer: 
+        - type: `string`
+
+    - TracerConfig: 
+        - media: 
+            - binaryEncoding: `base64`
+
+        - type: `string`
+
+    - overrides: 
+        - additionalProperties: `true`
+
+
+- type: object
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_9_2 name=__tabbed_9 type=radio><label for=__tabbed_9_2>Raw</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>  1</span>
+<span class=normal>  2</span>
+<span class=normal>  3</span>
+<span class=normal>  4</span>
+<span class=normal>  5</span>
+<span class=normal>  6</span>
+<span class=normal>  7</span>
+<span class=normal>  8</span>
+<span class=normal>  9</span>
+<span class=normal> 10</span>
+<span class=normal> 11</span>
+<span class=normal> 12</span>
+<span class=normal> 13</span>
+<span class=normal> 14</span>
+<span class=normal> 15</span>
+<span class=normal> 16</span>
+<span class=normal> 17</span>
+<span class=normal> 18</span>
+<span class=normal> 19</span>
+<span class=normal> 20</span>
+<span class=normal> 21</span>
+<span class=normal> 22</span>
+<span class=normal> 23</span>
+<span class=normal> 24</span>
+<span class=normal> 25</span>
+<span class=normal> 26</span>
+<span class=normal> 27</span>
+<span class=normal> 28</span>
+<span class=normal> 29</span>
+<span class=normal> 30</span>
+<span class=normal> 31</span>
+<span class=normal> 32</span>
+<span class=normal> 33</span>
+<span class=normal> 34</span>
+<span class=normal> 35</span>
+<span class=normal> 36</span>
+<span class=normal> 37</span>
+<span class=normal> 38</span>
+<span class=normal> 39</span>
+<span class=normal> 40</span>
+<span class=normal> 41</span>
+<span class=normal> 42</span>
+<span class=normal> 43</span>
+<span class=normal> 44</span>
+<span class=normal> 45</span>
+<span class=normal> 46</span>
+<span class=normal> 47</span>
+<span class=normal> 48</span>
+<span class=normal> 49</span>
+<span class=normal> 50</span>
+<span class=normal> 51</span>
+<span class=normal> 52</span>
+<span class=normal> 53</span>
+<span class=normal> 54</span>
+<span class=normal> 55</span>
+<span class=normal> 56</span>
+<span class=normal> 57</span>
+<span class=normal> 58</span>
+<span class=normal> 59</span>
+<span class=normal> 60</span>
+<span class=normal> 61</span>
+<span class=normal> 62</span>
+<span class=normal> 63</span>
+<span class=normal> 64</span>
+<span class=normal> 65</span>
+<span class=normal> 66</span>
+<span class=normal> 67</span>
+<span class=normal> 68</span>
+<span class=normal> 69</span>
+<span class=normal> 70</span>
+<span class=normal> 71</span>
+<span class=normal> 72</span>
+<span class=normal> 73</span>
+<span class=normal> 74</span>
+<span class=normal> 75</span>
+<span class=normal> 76</span>
+<span class=normal> 77</span>
+<span class=normal> 78</span>
+<span class=normal> 79</span>
+<span class=normal> 80</span>
+<span class=normal> 81</span>
+<span class=normal> 82</span>
+<span class=normal> 83</span>
+<span class=normal> 84</span>
+<span class=normal> 85</span>
+<span class=normal> 86</span>
+<span class=normal> 87</span>
+<span class=normal> 88</span>
+<span class=normal> 89</span>
+<span class=normal> 90</span>
+<span class=normal> 91</span>
+<span class=normal> 92</span>
+<span class=normal> 93</span>
+<span class=normal> 94</span>
+<span class=normal> 95</span>
+<span class=normal> 96</span>
+<span class=normal> 97</span>
+<span class=normal> 98</span>
+<span class=normal> 99</span>
+<span class=normal>100</span>
+<span class=normal>101</span>
+<span class=normal>102</span>
+<span class=normal>103</span>
+<span class=normal>104</span>
+<span class=normal>105</span>
+<span class=normal>106</span>
+<span class=normal>107</span>
+<span class=normal>108</span>
+<span class=normal>109</span>
+<span class=normal>110</span>
+<span class=normal>111</span>
+<span class=normal>112</span>
+<span class=normal>113</span>
+<span class=normal>114</span>
+<span class=normal>115</span>
+<span class=normal>116</span>
+<span class=normal>117</span>
+<span class=normal>118</span>
+<span class=normal>119</span>
+<span class=normal>120</span>
+<span class=normal>121</span>
+<span class=normal>122</span>
+<span class=normal>123</span>
+<span class=normal>124</span>
+<span class=normal>125</span>
+<span class=normal>126</span>
+<span class=normal>127</span>
+<span class=normal>128</span>
+<span class=normal>129</span>
+<span class=normal>130</span>
+<span class=normal>131</span>
+<span class=normal>132</span>
+<span class=normal>133</span>
+<span class=normal>134</span>
+<span class=normal>135</span>
+<span class=normal>136</span>
+<span class=normal>137</span>
+<span class=normal>138</span>
+<span class=normal>139</span>
+<span class=normal>140</span></pre></div></td><td class=code><div><pre><span></span><code>{
+    &quot;additionalProperties&quot;: false,
+    &quot;properties&quot;: {
+        &quot;BlockOverrides&quot;: {
+            &quot;additionalProperties&quot;: false,
+            &quot;properties&quot;: {
+                &quot;BaseFee&quot;: {
+                    &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+                    &quot;title&quot;: &quot;integer&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                },
+                &quot;Coinbase&quot;: {
+                    &quot;pattern&quot;: &quot;^0x[a-fA-F\\d]{64}$&quot;,
+                    &quot;title&quot;: &quot;keccak&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                },
+                &quot;Difficulty&quot;: {
+                    &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+                    &quot;title&quot;: &quot;integer&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                },
+                &quot;GasLimit&quot;: {
+                    &quot;pattern&quot;: &quot;^0x([a-fA-F\\d])+$&quot;,
+                    &quot;title&quot;: &quot;uint64&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                },
+                &quot;Number&quot;: {
+                    &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+                    &quot;title&quot;: &quot;integer&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                },
+                &quot;Random&quot;: {
+                    &quot;pattern&quot;: &quot;^0x[a-fA-F\\d]{64}$&quot;,
+                    &quot;title&quot;: &quot;keccak&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                },
+                &quot;Time&quot;: {
+                    &quot;pattern&quot;: &quot;^0x([a-fA-F\\d])+$&quot;,
+                    &quot;title&quot;: &quot;uint64&quot;,
+                    &quot;type&quot;: &quot;string&quot;
+                }
+            },
+            &quot;type&quot;: &quot;object&quot;
+        },
+        &quot;Debug&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;DisableStack&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;DisableStorage&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;EnableMemory&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;EnableReturnData&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;Limit&quot;: {
+            &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+            &quot;title&quot;: &quot;integer&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;NestedTraceOutput&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;Reexec&quot;: {
+            &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+            &quot;title&quot;: &quot;integer&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;StateOverrides&quot;: {
+            &quot;patternProperties&quot;: {
+                &quot;.*&quot;: {
+                    &quot;additionalProperties&quot;: false,
+                    &quot;properties&quot;: {
+                        &quot;balance&quot;: {
+                            &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+                            &quot;title&quot;: &quot;integer&quot;,
+                            &quot;type&quot;: &quot;string&quot;
+                        },
+                        &quot;code&quot;: {
+                            &quot;pattern&quot;: &quot;^0x([a-fA-F\\d])+$&quot;,
+                            &quot;title&quot;: &quot;dataWord&quot;,
+                            &quot;type&quot;: &quot;string&quot;
+                        },
+                        &quot;nonce&quot;: {
+                            &quot;pattern&quot;: &quot;^0x([a-fA-F\\d])+$&quot;,
+                            &quot;title&quot;: &quot;uint64&quot;,
+                            &quot;type&quot;: &quot;string&quot;
+                        },
+                        &quot;state&quot;: {
+                            &quot;patternProperties&quot;: {
+                                &quot;.*&quot;: {
+                                    &quot;description&quot;: &quot;Hex representation of a Keccak 256 hash&quot;,
+                                    &quot;pattern&quot;: &quot;^0x[a-fA-F\\d]{64}$&quot;,
+                                    &quot;title&quot;: &quot;keccak&quot;,
+                                    &quot;type&quot;: &quot;string&quot;
+                                }
+                            },
+                            &quot;type&quot;: &quot;object&quot;
+                        },
+                        &quot;stateDiff&quot;: {
+                            &quot;patternProperties&quot;: {
+                                &quot;.*&quot;: {
+                                    &quot;description&quot;: &quot;Hex representation of a Keccak 256 hash&quot;,
+                                    &quot;pattern&quot;: &quot;^0x[a-fA-F\\d]{64}$&quot;,
+                                    &quot;title&quot;: &quot;keccak&quot;,
+                                    &quot;type&quot;: &quot;string&quot;
+                                }
+                            },
+                            &quot;type&quot;: &quot;object&quot;
+                        }
+                    },
+                    &quot;type&quot;: &quot;object&quot;
+                }
+            },
+            &quot;type&quot;: &quot;object&quot;
+        },
+        &quot;Timeout&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;Tracer&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;TracerConfig&quot;: {
+            &quot;media&quot;: {
+                &quot;binaryEncoding&quot;: &quot;base64&quot;
+            },
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;overrides&quot;: {
+            &quot;additionalProperties&quot;: true
+        }
+    },
+    &quot;type&quot;: [
+        &quot;object&quot;
+    ]
+}
+</code></pre></div></td></tr></table></div> </div> </div> <h4 id=result_2>Result<a class=headerlink href=#result_2 title="Permanent link">&para;</a></h4> <p>interface <code>interface{}</code> </p> <ul> <li>Required: ✓ Yes</li> </ul> <h4 id=client-method-invocation-examples_2>Client Method Invocation Examples<a class=headerlink href=#client-method-invocation-examples_2 title="Permanent link">&para;</a></h4> <div class=tabbed-set data-tabs=10:3><input checked=checked id=__tabbed_10_1 name=__tabbed_10 type=radio><label for=__tabbed_10_1>Shell HTTP</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code>curl<span class=w> </span>-X<span class=w> </span>POST<span class=w> </span>-H<span class=w> </span><span class=s2>&quot;Content-Type: application/json&quot;</span><span class=w> </span>http://localhost:8545<span class=w> </span>--data<span class=w> </span><span class=s1>&#39;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: 42, &quot;method&quot;: &quot;trace_callMany&quot;, &quot;params&quot;: [&lt;txs&gt;, &lt;blockNrOrHash&gt;, &lt;config&gt;]}&#39;</span>
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_10_2 name=__tabbed_10 type=radio><label for=__tabbed_10_2>Shell WebSocket</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code>wscat<span class=w> </span>-c<span class=w> </span>ws://localhost:8546<span class=w> </span>-x<span class=w> </span><span class=s1>&#39;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: 1, &quot;method&quot;: &quot;trace_callMany&quot;, &quot;params&quot;: [&lt;txs&gt;, &lt;blockNrOrHash&gt;, &lt;config&gt;]}&#39;</span>
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_10_3 name=__tabbed_10 type=radio><label for=__tabbed_10_3>Javascript Console</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code><span class=nx>trace</span><span class=p>.</span><span class=nx>callMany</span><span class=p>(</span><span class=nx>txs</span><span class=p>,</span><span class=nx>blockNrOrHash</span><span class=p>,</span><span class=nx>config</span><span class=p>);</span>
+</code></pre></div></td></tr></table></div> </div> </div> <details><summary>Source code</summary> <p> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span>
+<span class=normal>2</span>
+<span class=normal>3</span>
+<span class=normal>4</span>
+<span class=normal>5</span>
+<span class=normal>6</span>
+<span class=normal>7</span></pre></div></td><td class=code><div><pre><span></span><code><span class=kd>func</span><span class=w> </span><span class=p>(</span><span class=nx>api</span><span class=w> </span><span class=o>*</span><span class=nx>TraceAPI</span><span class=p>)</span><span class=w> </span><span class=nx>CallMany</span><span class=p>(</span><span class=nx>ctx</span><span class=w> </span><span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span><span class=w> </span><span class=nx>txs</span><span class=w> </span><span class=p>[</span><span class=w> </span><span class=c1>// CallMany lets you trace a given eth_call. It collects the structured logs created during the execution of EVM</span>
+<span class=c1>// if the given transaction was added on top of the provided block and returns them as a JSON object.</span>
+<span class=c1>// You can provide -2 as a block number to trace on top of the pending block.</span>
+<span class=p>]</span><span class=nx>ethapi</span><span class=p>.</span><span class=nx>TransactionArgs</span><span class=p>,</span><span class=w> </span><span class=nx>blockNrOrHash</span><span class=w> </span><span class=nx>rpc</span><span class=p>.</span><span class=nx>BlockNumberOrHash</span><span class=p>,</span><span class=w> </span><span class=nx>config</span><span class=w> </span><span class=o>*</span><span class=nx>TraceCallConfig</span><span class=p>)</span><span class=w> </span><span class=p>(</span><span class=kd>interface</span><span class=p>{},</span><span class=w> </span><span class=kt>error</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>    </span><span class=nx>config</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=nx>setTraceCallConfigDefaultTracer</span><span class=p>(</span><span class=nx>config</span><span class=p>)</span>
+<span class=w>    </span><span class=k>return</span><span class=w> </span><span class=nx>api</span><span class=p>.</span><span class=nx>debugAPI</span><span class=p>.</span><span class=nx>TraceCallMany</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span><span class=w> </span><span class=nx>txs</span><span class=p>,</span><span class=w> </span><span class=nx>blockNrOrHash</span><span class=p>,</span><span class=w> </span><span class=nx>config</span><span class=p>)</span>
+<span class=p>}</span>
+</code></pre></div></td></tr></table></div> <a href=https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api_parity.go#L275 target=_>View on GitHub →</a> </p> </details> <hr> <h3 id=trace_filter>trace_filter<a class=headerlink href=#trace_filter title="Permanent link">&para;</a></h3> <p>Filter configures a new tracer according to the provided configuration, and executes all the transactions contained within. The return value will be one item per transaction, dependent on the requested tracer.</p> <h4 id=params-2_1>Params (2)<a class=headerlink href=#params-2_1 title="Permanent link">&para;</a></h4> <p>Parameters must be given <em>by position</em>.</p> <p><strong>1:</strong> args <code>TraceFilterArgs</code> </p> <ul> <li>Required: ✓ Yes</li> </ul> <div class=tabbed-set data-tabs=11:2><input checked=checked id=__tabbed_11_1 name=__tabbed_11 type=radio><label for=__tabbed_11_1>Schema</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 1</span>
+<span class=normal> 2</span>
+<span class=normal> 3</span>
+<span class=normal> 4</span>
+<span class=normal> 5</span>
+<span class=normal> 6</span>
+<span class=normal> 7</span>
+<span class=normal> 8</span>
+<span class=normal> 9</span>
+<span class=normal>10</span>
+<span class=normal>11</span>
+<span class=normal>12</span>
+<span class=normal>13</span>
+<span class=normal>14</span>
+<span class=normal>15</span>
+<span class=normal>16</span>
+<span class=normal>17</span>
+<span class=normal>18</span>
+<span class=normal>19</span>
+<span class=normal>20</span>
+<span class=normal>21</span>
+<span class=normal>22</span>
+<span class=normal>23</span>
+<span class=normal>24</span>
+<span class=normal>25</span>
+<span class=normal>26</span>
+<span class=normal>27</span>
+<span class=normal>28</span>
+<span class=normal>29</span>
+<span class=normal>30</span>
+<span class=normal>31</span>
+<span class=normal>32</span>
+<span class=normal>33</span>
+<span class=normal>34</span></pre></div></td><td class=code><div><pre><span></span><code>- additionalProperties: `false`
+- properties: 
+    - after: 
+        - pattern: `^0x[a-fA-F0-9]+$`
+        - title: `integer`
+        - type: `string`
+
+    - count: 
+        - pattern: `^0x[a-fA-F0-9]+$`
+        - title: `integer`
+        - type: `string`
+
+    - fromAddress: 
+        - pattern: `^0x[a-fA-F\d]{64}$`
+        - title: `keccak`
+        - type: `string`
+
+    - fromBlock: 
+        - pattern: `^0x([a-fA-F\d])+$`
+        - title: `uint64`
+        - type: `string`
+
+    - toAddress: 
+        - pattern: `^0x[a-fA-F\d]{64}$`
+        - title: `keccak`
+        - type: `string`
+
+    - toBlock: 
+        - pattern: `^0x([a-fA-F\d])+$`
+        - title: `uint64`
+        - type: `string`
+
+
+- type: object
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_11_2 name=__tabbed_11 type=radio><label for=__tabbed_11_2>Raw</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 1</span>
+<span class=normal> 2</span>
+<span class=normal> 3</span>
+<span class=normal> 4</span>
+<span class=normal> 5</span>
+<span class=normal> 6</span>
+<span class=normal> 7</span>
+<span class=normal> 8</span>
+<span class=normal> 9</span>
+<span class=normal>10</span>
+<span class=normal>11</span>
+<span class=normal>12</span>
+<span class=normal>13</span>
+<span class=normal>14</span>
+<span class=normal>15</span>
+<span class=normal>16</span>
+<span class=normal>17</span>
+<span class=normal>18</span>
+<span class=normal>19</span>
+<span class=normal>20</span>
+<span class=normal>21</span>
+<span class=normal>22</span>
+<span class=normal>23</span>
+<span class=normal>24</span>
+<span class=normal>25</span>
+<span class=normal>26</span>
+<span class=normal>27</span>
+<span class=normal>28</span>
+<span class=normal>29</span>
+<span class=normal>30</span>
+<span class=normal>31</span>
+<span class=normal>32</span>
+<span class=normal>33</span>
+<span class=normal>34</span>
+<span class=normal>35</span>
+<span class=normal>36</span>
+<span class=normal>37</span>
+<span class=normal>38</span></pre></div></td><td class=code><div><pre><span></span><code>{
+    &quot;additionalProperties&quot;: false,
+    &quot;properties&quot;: {
+        &quot;after&quot;: {
+            &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+            &quot;title&quot;: &quot;integer&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;count&quot;: {
+            &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+            &quot;title&quot;: &quot;integer&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;fromAddress&quot;: {
+            &quot;pattern&quot;: &quot;^0x[a-fA-F\\d]{64}$&quot;,
+            &quot;title&quot;: &quot;keccak&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;fromBlock&quot;: {
+            &quot;pattern&quot;: &quot;^0x([a-fA-F\\d])+$&quot;,
+            &quot;title&quot;: &quot;uint64&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;toAddress&quot;: {
+            &quot;pattern&quot;: &quot;^0x[a-fA-F\\d]{64}$&quot;,
+            &quot;title&quot;: &quot;keccak&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;toBlock&quot;: {
+            &quot;pattern&quot;: &quot;^0x([a-fA-F\\d])+$&quot;,
+            &quot;title&quot;: &quot;uint64&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        }
+    },
+    &quot;type&quot;: [
+        &quot;object&quot;
+    ]
+}
+</code></pre></div></td></tr></table></div> </div> </div> <p><strong>2:</strong> config <code>*TraceConfig</code> </p> <ul> <li>Required: ✓ Yes</li> </ul> <div class=tabbed-set data-tabs=12:2><input checked=checked id=__tabbed_12_1 name=__tabbed_12 type=radio><label for=__tabbed_12_1>Schema</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 1</span>
+<span class=normal> 2</span>
+<span class=normal> 3</span>
+<span class=normal> 4</span>
+<span class=normal> 5</span>
+<span class=normal> 6</span>
+<span class=normal> 7</span>
+<span class=normal> 8</span>
+<span class=normal> 9</span>
+<span class=normal>10</span>
+<span class=normal>11</span>
+<span class=normal>12</span>
+<span class=normal>13</span>
+<span class=normal>14</span>
+<span class=normal>15</span>
+<span class=normal>16</span>
+<span class=normal>17</span>
+<span class=normal>18</span>
+<span class=normal>19</span>
+<span class=normal>20</span>
+<span class=normal>21</span>
+<span class=normal>22</span>
+<span class=normal>23</span>
+<span class=normal>24</span>
+<span class=normal>25</span>
+<span class=normal>26</span>
+<span class=normal>27</span>
+<span class=normal>28</span>
+<span class=normal>29</span>
+<span class=normal>30</span>
+<span class=normal>31</span>
+<span class=normal>32</span>
+<span class=normal>33</span>
+<span class=normal>34</span>
+<span class=normal>35</span>
+<span class=normal>36</span>
+<span class=normal>37</span>
+<span class=normal>38</span>
+<span class=normal>39</span>
+<span class=normal>40</span>
+<span class=normal>41</span>
+<span class=normal>42</span>
+<span class=normal>43</span>
+<span class=normal>44</span>
+<span class=normal>45</span>
+<span class=normal>46</span>
+<span class=normal>47</span></pre></div></td><td class=code><div><pre><span></span><code>- additionalProperties: `false`
+- properties: 
+    - Debug: 
+        - type: `boolean`
+
+    - DisableStack: 
+        - type: `boolean`
+
+    - DisableStorage: 
+        - type: `boolean`
+
+    - EnableMemory: 
+        - type: `boolean`
+
+    - EnableReturnData: 
+        - type: `boolean`
+
+    - Limit: 
+        - pattern: `^0x[a-fA-F0-9]+$`
+        - title: `integer`
+        - type: `string`
+
+    - NestedTraceOutput: 
+        - type: `boolean`
+
+    - Reexec: 
+        - pattern: `^0x[a-fA-F0-9]+$`
+        - title: `integer`
+        - type: `string`
+
+    - Timeout: 
+        - type: `string`
+
+    - Tracer: 
+        - type: `string`
+
+    - TracerConfig: 
+        - media: 
+            - binaryEncoding: `base64`
+
+        - type: `string`
+
+    - overrides: 
+        - additionalProperties: `true`
+
+
+- type: object
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_12_2 name=__tabbed_12 type=radio><label for=__tabbed_12_2>Raw</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 1</span>
+<span class=normal> 2</span>
+<span class=normal> 3</span>
+<span class=normal> 4</span>
+<span class=normal> 5</span>
+<span class=normal> 6</span>
+<span class=normal> 7</span>
+<span class=normal> 8</span>
+<span class=normal> 9</span>
+<span class=normal>10</span>
+<span class=normal>11</span>
+<span class=normal>12</span>
+<span class=normal>13</span>
+<span class=normal>14</span>
+<span class=normal>15</span>
+<span class=normal>16</span>
+<span class=normal>17</span>
+<span class=normal>18</span>
+<span class=normal>19</span>
+<span class=normal>20</span>
+<span class=normal>21</span>
+<span class=normal>22</span>
+<span class=normal>23</span>
+<span class=normal>24</span>
+<span class=normal>25</span>
+<span class=normal>26</span>
+<span class=normal>27</span>
+<span class=normal>28</span>
+<span class=normal>29</span>
+<span class=normal>30</span>
+<span class=normal>31</span>
+<span class=normal>32</span>
+<span class=normal>33</span>
+<span class=normal>34</span>
+<span class=normal>35</span>
+<span class=normal>36</span>
+<span class=normal>37</span>
+<span class=normal>38</span>
+<span class=normal>39</span>
+<span class=normal>40</span>
+<span class=normal>41</span>
+<span class=normal>42</span>
+<span class=normal>43</span>
+<span class=normal>44</span>
+<span class=normal>45</span>
+<span class=normal>46</span>
+<span class=normal>47</span>
+<span class=normal>48</span>
+<span class=normal>49</span>
+<span class=normal>50</span>
+<span class=normal>51</span></pre></div></td><td class=code><div><pre><span></span><code>{
+    &quot;additionalProperties&quot;: false,
+    &quot;properties&quot;: {
+        &quot;Debug&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;DisableStack&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;DisableStorage&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;EnableMemory&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;EnableReturnData&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;Limit&quot;: {
+            &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+            &quot;title&quot;: &quot;integer&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;NestedTraceOutput&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;Reexec&quot;: {
+            &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+            &quot;title&quot;: &quot;integer&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;Timeout&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;Tracer&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;TracerConfig&quot;: {
+            &quot;media&quot;: {
+                &quot;binaryEncoding&quot;: &quot;base64&quot;
+            },
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;overrides&quot;: {
+            &quot;additionalProperties&quot;: true
+        }
+    },
+    &quot;type&quot;: [
+        &quot;object&quot;
+    ]
+}
+</code></pre></div></td></tr></table></div> </div> </div> <h4 id=result_3>Result<a class=headerlink href=#result_3 title="Permanent link">&para;</a></h4> <p><code>*rpc.Subscription</code> </p> <ul> <li>Required: ✓ Yes</li> </ul> <div class=tabbed-set data-tabs=13:2><input checked=checked id=__tabbed_13_1 name=__tabbed_13 type=radio><label for=__tabbed_13_1>Schema</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span>
+<span class=normal>2</span>
+<span class=normal>3</span></pre></div></td><td class=code><div><pre><span></span><code>- description: `Subscription identifier`
+- title: `subscriptionID`
+- type: string
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_13_2 name=__tabbed_13 type=radio><label for=__tabbed_13_2>Raw</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span>
+<span class=normal>2</span>
+<span class=normal>3</span>
+<span class=normal>4</span>
+<span class=normal>5</span>
+<span class=normal>6</span>
+<span class=normal>7</span></pre></div></td><td class=code><div><pre><span></span><code>{
+    &quot;description&quot;: &quot;Subscription identifier&quot;,
+    &quot;title&quot;: &quot;subscriptionID&quot;,
+    &quot;type&quot;: [
+        &quot;string&quot;
+    ]
+}
+</code></pre></div></td></tr></table></div> </div> </div> <h4 id=client-method-invocation-examples_3>Client Method Invocation Examples<a class=headerlink href=#client-method-invocation-examples_3 title="Permanent link">&para;</a></h4> <div class=tabbed-set data-tabs=14:1><input checked=checked id=__tabbed_14_1 name=__tabbed_14 type=radio><label for=__tabbed_14_1>Shell WebSocket</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code>wscat<span class=w> </span>-c<span class=w> </span>ws://localhost:8546<span class=w> </span>-x<span class=w> </span><span class=s1>&#39;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: 1, &quot;method&quot;: &quot;trace_subscribe&quot;, &quot;params&quot;: [&quot;filter&quot;, &lt;args&gt;, &lt;config&gt;]}&#39;</span>
+</code></pre></div></td></tr></table></div> </div> </div> <details><summary>Source code</summary> <p> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span>
+<span class=normal>2</span>
+<span class=normal>3</span>
+<span class=normal>4</span>
+<span class=normal>5</span>
+<span class=normal>6</span>
+<span class=normal>7</span>
+<span class=normal>8</span></pre></div></td><td class=code><div><pre><span></span><code><span class=kd>func</span><span class=w> </span><span class=p>(</span><span class=nx>api</span><span class=w> </span><span class=o>*</span><span class=nx>TraceAPI</span><span class=p>)</span><span class=w> </span><span class=nx>Filter</span><span class=p>(</span><span class=nx>ctx</span><span class=w> </span><span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span><span class=w> </span><span class=nx>args</span><span class=w> </span><span class=nx>TraceFilterArgs</span><span class=p>,</span><span class=w> </span><span class=nx>config</span><span class=w> </span><span class=o>*</span><span class=nx>TraceConfig</span><span class=p>)</span><span class=w> </span><span class=p>(</span><span class=o>*</span><span class=nx>rpc</span><span class=p>.</span><span class=nx>Subscription</span><span class=p>,</span><span class=w> </span><span class=kt>error</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>    </span><span class=nx>config</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=nx>setTraceConfigDefaultTracer</span><span class=p>(</span><span class=nx>config</span><span class=p>)</span>
+<span class=w>    </span><span class=nx>start</span><span class=w> </span><span class=o>:=</span><span class=w> </span><span class=nx>rpc</span><span class=p>.</span><span class=nx>BlockNumber</span><span class=p>(</span><span class=nx>args</span><span class=p>.</span><span class=nx>FromBlock</span><span class=p>)</span>
+<span class=w>    </span><span class=nx>end</span><span class=w> </span><span class=o>:=</span><span class=w> </span><span class=nx>rpc</span><span class=p>.</span><span class=nx>BlockNumber</span><span class=p>(</span><span class=nx>args</span><span class=p>.</span><span class=nx>ToBlock</span><span class=p>)</span>
+<span class=w>    </span><span class=k>return</span><span class=w> </span><span class=nx>api</span><span class=p>.</span><span class=nx>debugAPI</span><span class=p>.</span><span class=nx>TraceChain</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span><span class=w> </span><span class=nx>start</span><span class=p>,</span><span class=w> </span><span class=nx>end</span><span class=p>,</span><span class=w> </span><span class=nx>config</span><span class=p>)</span>
+<span class=p>}</span><span class=c1>// Filter configures a new tracer according to the provided configuration, and</span>
+<span class=c1>// executes all the transactions contained within. The return value will be one item</span>
+<span class=c1>// per transaction, dependent on the requested tracer.</span>
+</code></pre></div></td></tr></table></div> <a href=https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api_parity.go#L249 target=_>View on GitHub →</a> </p> </details> <hr> <h3 id=trace_subscribe>trace_subscribe<a class=headerlink href=#trace_subscribe title="Permanent link">&para;</a></h3> <p>Subscribe creates a subscription to an event channel. Subscriptions are not available over HTTP; they are only available over WS, IPC, and Process connections.</p> <h4 id=params-2_2>Params (2)<a class=headerlink href=#params-2_2 title="Permanent link">&para;</a></h4> <p>Parameters must be given <em>by position</em>.</p> <p><strong>1:</strong> subscriptionName <code>RPCTraceSubscriptionParamsName</code> </p> <ul> <li>Required: ✓ Yes</li> </ul> <div class=tabbed-set data-tabs=15:2><input checked=checked id=__tabbed_15_1 name=__tabbed_15 type=radio><label for=__tabbed_15_1>Schema</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span>
+<span class=normal>2</span>
+<span class=normal>3</span>
+<span class=normal>4</span>
+<span class=normal>5</span>
+<span class=normal>6</span>
+<span class=normal>7</span>
+<span class=normal>8</span></pre></div></td><td class=code><div><pre><span></span><code>- oneOf: 
+
+        - description: `Returns transaction traces for the filtered addresses within a range of blocks.`
+        - enum: filter
+        - type: string
+
+
+- title: `subscriptionName`
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_15_2 name=__tabbed_15 type=radio><label for=__tabbed_15_2>Raw</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 1</span>
+<span class=normal> 2</span>
+<span class=normal> 3</span>
+<span class=normal> 4</span>
+<span class=normal> 5</span>
+<span class=normal> 6</span>
+<span class=normal> 7</span>
+<span class=normal> 8</span>
+<span class=normal> 9</span>
+<span class=normal>10</span>
+<span class=normal>11</span>
+<span class=normal>12</span>
+<span class=normal>13</span>
+<span class=normal>14</span></pre></div></td><td class=code><div><pre><span></span><code>{
+    &quot;oneOf&quot;: [
+        {
+            &quot;description&quot;: &quot;Returns transaction traces for the filtered addresses within a range of blocks.&quot;,
+            &quot;enum&quot;: [
+                &quot;filter&quot;
+            ],
+            &quot;type&quot;: [
+                &quot;string&quot;
+            ]
+        }
+    ],
+    &quot;title&quot;: &quot;subscriptionName&quot;
+}
+</code></pre></div></td></tr></table></div> </div> </div> <p><strong>2:</strong> subscriptionOptions <code>interface{}</code> </p> <ul> <li>Required: No</li> </ul> <h4 id=result_4>Result<a class=headerlink href=#result_4 title="Permanent link">&para;</a></h4> <p>subscriptionID <code>rpc.ID</code> </p> <ul> <li>Required: ✓ Yes</li> </ul> <div class=tabbed-set data-tabs=16:2><input checked=checked id=__tabbed_16_1 name=__tabbed_16 type=radio><label for=__tabbed_16_1>Schema</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span>
+<span class=normal>2</span>
+<span class=normal>3</span></pre></div></td><td class=code><div><pre><span></span><code>- description: `Subscription identifier`
+- title: `subscriptionID`
+- type: string
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_16_2 name=__tabbed_16 type=radio><label for=__tabbed_16_2>Raw</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span>
+<span class=normal>2</span>
+<span class=normal>3</span>
+<span class=normal>4</span>
+<span class=normal>5</span>
+<span class=normal>6</span>
+<span class=normal>7</span></pre></div></td><td class=code><div><pre><span></span><code>{
+    &quot;description&quot;: &quot;Subscription identifier&quot;,
+    &quot;title&quot;: &quot;subscriptionID&quot;,
+    &quot;type&quot;: [
+        &quot;string&quot;
+    ]
+}
+</code></pre></div></td></tr></table></div> </div> </div> <h4 id=client-method-invocation-examples_4>Client Method Invocation Examples<a class=headerlink href=#client-method-invocation-examples_4 title="Permanent link">&para;</a></h4> <div class=tabbed-set data-tabs=17:1><input checked=checked id=__tabbed_17_1 name=__tabbed_17 type=radio><label for=__tabbed_17_1>Shell WebSocket</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code>wscat<span class=w> </span>-c<span class=w> </span>ws://localhost:8546<span class=w> </span>-x<span class=w> </span><span class=s1>&#39;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: 1, &quot;method&quot;: &quot;trace_subscribe&quot;, &quot;params&quot;: [&lt;subscriptionName&gt;, &lt;subscriptionOptions&gt;]}&#39;</span>
+</code></pre></div></td></tr></table></div> </div> </div> <details><summary>Source code</summary> <p> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span>
+<span class=normal>2</span>
+<span class=normal>3</span>
+<span class=normal>4</span></pre></div></td><td class=code><div><pre><span></span><code><span class=kd>func</span><span class=w> </span><span class=p>(</span><span class=nx>sub</span><span class=w> </span><span class=o>*</span><span class=nx>RPCTraceSubscription</span><span class=p>)</span><span class=w> </span><span class=nx>Subscribe</span><span class=p>(</span><span class=nx>subscriptionName</span><span class=w> </span><span class=nx>RPCTraceSubscriptionParamsName</span><span class=p>,</span><span class=w> </span><span class=nx>subscriptionOptions</span><span class=w> </span><span class=kd>interface</span><span class=p>{})</span><span class=w> </span><span class=p>(</span><span class=nx>subscriptionID</span><span class=w> </span><span class=nx>rpc</span><span class=p>.</span><span class=nx>ID</span><span class=p>,</span><span class=w> </span><span class=nx>err</span><span class=w> </span><span class=kt>error</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>    </span><span class=k>return</span>
+<span class=p>}</span><span class=c1>// Subscribe creates a subscription to an event channel.</span>
+<span class=c1>// Subscriptions are not available over HTTP; they are only available over WS, IPC, and Process connections.</span>
+</code></pre></div></td></tr></table></div> <a href=https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L267 target=_>View on GitHub →</a> </p> </details> <hr> <h3 id=trace_transaction>trace_transaction<a class=headerlink href=#trace_transaction title="Permanent link">&para;</a></h3> <p>Transaction returns the structured logs created during the execution of EVM and returns them as a JSON object.</p> <h4 id=params-2_3>Params (2)<a class=headerlink href=#params-2_3 title="Permanent link">&para;</a></h4> <p>Parameters must be given <em>by position</em>.</p> <p><strong>1:</strong> hash <code>common.Hash</code> </p> <ul> <li>Required: ✓ Yes</li> </ul> <div class=tabbed-set data-tabs=18:2><input checked=checked id=__tabbed_18_1 name=__tabbed_18 type=radio><label for=__tabbed_18_1>Schema</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span>
+<span class=normal>2</span>
+<span class=normal>3</span>
+<span class=normal>4</span></pre></div></td><td class=code><div><pre><span></span><code>- description: `Hex representation of a Keccak 256 hash`
+- pattern: `^0x[a-fA-F\d]{64}$`
+- title: `keccak`
+- type: string
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_18_2 name=__tabbed_18 type=radio><label for=__tabbed_18_2>Raw</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span>
+<span class=normal>2</span>
+<span class=normal>3</span>
+<span class=normal>4</span>
+<span class=normal>5</span>
+<span class=normal>6</span>
+<span class=normal>7</span>
+<span class=normal>8</span></pre></div></td><td class=code><div><pre><span></span><code>{
+    &quot;description&quot;: &quot;Hex representation of a Keccak 256 hash&quot;,
+    &quot;pattern&quot;: &quot;^0x[a-fA-F\\d]{64}$&quot;,
+    &quot;title&quot;: &quot;keccak&quot;,
+    &quot;type&quot;: [
+        &quot;string&quot;
+    ]
+}
+</code></pre></div></td></tr></table></div> </div> </div> <p><strong>2:</strong> config <code>*TraceConfig</code> </p> <ul> <li>Required: ✓ Yes</li> </ul> <div class=tabbed-set data-tabs=19:2><input checked=checked id=__tabbed_19_1 name=__tabbed_19 type=radio><label for=__tabbed_19_1>Schema</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 1</span>
+<span class=normal> 2</span>
+<span class=normal> 3</span>
+<span class=normal> 4</span>
+<span class=normal> 5</span>
+<span class=normal> 6</span>
+<span class=normal> 7</span>
+<span class=normal> 8</span>
+<span class=normal> 9</span>
+<span class=normal>10</span>
+<span class=normal>11</span>
+<span class=normal>12</span>
+<span class=normal>13</span>
+<span class=normal>14</span>
+<span class=normal>15</span>
+<span class=normal>16</span>
+<span class=normal>17</span>
+<span class=normal>18</span>
+<span class=normal>19</span>
+<span class=normal>20</span>
+<span class=normal>21</span>
+<span class=normal>22</span>
+<span class=normal>23</span>
+<span class=normal>24</span>
+<span class=normal>25</span>
+<span class=normal>26</span>
+<span class=normal>27</span>
+<span class=normal>28</span>
+<span class=normal>29</span>
+<span class=normal>30</span>
+<span class=normal>31</span>
+<span class=normal>32</span>
+<span class=normal>33</span>
+<span class=normal>34</span>
+<span class=normal>35</span>
+<span class=normal>36</span>
+<span class=normal>37</span>
+<span class=normal>38</span>
+<span class=normal>39</span>
+<span class=normal>40</span>
+<span class=normal>41</span>
+<span class=normal>42</span>
+<span class=normal>43</span>
+<span class=normal>44</span>
+<span class=normal>45</span>
+<span class=normal>46</span>
+<span class=normal>47</span></pre></div></td><td class=code><div><pre><span></span><code>- additionalProperties: `false`
+- properties: 
+    - Debug: 
+        - type: `boolean`
+
+    - DisableStack: 
+        - type: `boolean`
+
+    - DisableStorage: 
+        - type: `boolean`
+
+    - EnableMemory: 
+        - type: `boolean`
+
+    - EnableReturnData: 
+        - type: `boolean`
+
+    - Limit: 
+        - pattern: `^0x[a-fA-F0-9]+$`
+        - title: `integer`
+        - type: `string`
+
+    - NestedTraceOutput: 
+        - type: `boolean`
+
+    - Reexec: 
+        - pattern: `^0x[a-fA-F0-9]+$`
+        - title: `integer`
+        - type: `string`
+
+    - Timeout: 
+        - type: `string`
+
+    - Tracer: 
+        - type: `string`
+
+    - TracerConfig: 
+        - media: 
+            - binaryEncoding: `base64`
+
+        - type: `string`
+
+    - overrides: 
+        - additionalProperties: `true`
+
+
+- type: object
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_19_2 name=__tabbed_19 type=radio><label for=__tabbed_19_2>Raw</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 1</span>
+<span class=normal> 2</span>
+<span class=normal> 3</span>
+<span class=normal> 4</span>
+<span class=normal> 5</span>
+<span class=normal> 6</span>
+<span class=normal> 7</span>
+<span class=normal> 8</span>
+<span class=normal> 9</span>
+<span class=normal>10</span>
+<span class=normal>11</span>
+<span class=normal>12</span>
+<span class=normal>13</span>
+<span class=normal>14</span>
+<span class=normal>15</span>
+<span class=normal>16</span>
+<span class=normal>17</span>
+<span class=normal>18</span>
+<span class=normal>19</span>
+<span class=normal>20</span>
+<span class=normal>21</span>
+<span class=normal>22</span>
+<span class=normal>23</span>
+<span class=normal>24</span>
+<span class=normal>25</span>
+<span class=normal>26</span>
+<span class=normal>27</span>
+<span class=normal>28</span>
+<span class=normal>29</span>
+<span class=normal>30</span>
+<span class=normal>31</span>
+<span class=normal>32</span>
+<span class=normal>33</span>
+<span class=normal>34</span>
+<span class=normal>35</span>
+<span class=normal>36</span>
+<span class=normal>37</span>
+<span class=normal>38</span>
+<span class=normal>39</span>
+<span class=normal>40</span>
+<span class=normal>41</span>
+<span class=normal>42</span>
+<span class=normal>43</span>
+<span class=normal>44</span>
+<span class=normal>45</span>
+<span class=normal>46</span>
+<span class=normal>47</span>
+<span class=normal>48</span>
+<span class=normal>49</span>
+<span class=normal>50</span>
+<span class=normal>51</span></pre></div></td><td class=code><div><pre><span></span><code>{
+    &quot;additionalProperties&quot;: false,
+    &quot;properties&quot;: {
+        &quot;Debug&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;DisableStack&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;DisableStorage&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;EnableMemory&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;EnableReturnData&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;Limit&quot;: {
+            &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+            &quot;title&quot;: &quot;integer&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;NestedTraceOutput&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;Reexec&quot;: {
+            &quot;pattern&quot;: &quot;^0x[a-fA-F0-9]+$&quot;,
+            &quot;title&quot;: &quot;integer&quot;,
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;Timeout&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;Tracer&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;TracerConfig&quot;: {
+            &quot;media&quot;: {
+                &quot;binaryEncoding&quot;: &quot;base64&quot;
+            },
+            &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;overrides&quot;: {
+            &quot;additionalProperties&quot;: true
+        }
+    },
+    &quot;type&quot;: [
+        &quot;object&quot;
+    ]
+}
+</code></pre></div></td></tr></table></div> </div> </div> <h4 id=result_5>Result<a class=headerlink href=#result_5 title="Permanent link">&para;</a></h4> <p>interface <code>interface{}</code> </p> <ul> <li>Required: ✓ Yes</li> </ul> <h4 id=client-method-invocation-examples_5>Client Method Invocation Examples<a class=headerlink href=#client-method-invocation-examples_5 title="Permanent link">&para;</a></h4> <div class=tabbed-set data-tabs=20:3><input checked=checked id=__tabbed_20_1 name=__tabbed_20 type=radio><label for=__tabbed_20_1>Shell HTTP</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code>curl<span class=w> </span>-X<span class=w> </span>POST<span class=w> </span>-H<span class=w> </span><span class=s2>&quot;Content-Type: application/json&quot;</span><span class=w> </span>http://localhost:8545<span class=w> </span>--data<span class=w> </span><span class=s1>&#39;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: 42, &quot;method&quot;: &quot;trace_transaction&quot;, &quot;params&quot;: [&lt;hash&gt;, &lt;config&gt;]}&#39;</span>
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_20_2 name=__tabbed_20 type=radio><label for=__tabbed_20_2>Shell WebSocket</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code>wscat<span class=w> </span>-c<span class=w> </span>ws://localhost:8546<span class=w> </span>-x<span class=w> </span><span class=s1>&#39;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: 1, &quot;method&quot;: &quot;trace_transaction&quot;, &quot;params&quot;: [&lt;hash&gt;, &lt;config&gt;]}&#39;</span>
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_20_3 name=__tabbed_20 type=radio><label for=__tabbed_20_3>Javascript Console</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code><span class=nx>trace</span><span class=p>.</span><span class=nx>transaction</span><span class=p>(</span><span class=nx>hash</span><span class=p>,</span><span class=nx>config</span><span class=p>);</span>
+</code></pre></div></td></tr></table></div> </div> </div> <details><summary>Source code</summary> <p> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span>
+<span class=normal>2</span>
+<span class=normal>3</span>
+<span class=normal>4</span>
+<span class=normal>5</span></pre></div></td><td class=code><div><pre><span></span><code><span class=kd>func</span><span class=w> </span><span class=p>(</span><span class=nx>api</span><span class=w> </span><span class=o>*</span><span class=nx>TraceAPI</span><span class=p>)</span><span class=w> </span><span class=nx>Transaction</span><span class=p>(</span><span class=nx>ctx</span><span class=w> </span><span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span><span class=w> </span><span class=nx>hash</span><span class=w> </span><span class=nx>common</span><span class=p>.</span><span class=nx>Hash</span><span class=p>,</span><span class=w> </span><span class=nx>config</span><span class=w> </span><span class=o>*</span><span class=nx>TraceConfig</span><span class=p>)</span><span class=w> </span><span class=p>(</span><span class=kd>interface</span><span class=p>{},</span><span class=w> </span><span class=kt>error</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>    </span><span class=nx>config</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=nx>setTraceConfigDefaultTracer</span><span class=p>(</span><span class=nx>config</span><span class=p>)</span>
+<span class=w>    </span><span class=k>return</span><span class=w> </span><span class=nx>api</span><span class=p>.</span><span class=nx>debugAPI</span><span class=p>.</span><span class=nx>TraceTransaction</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span><span class=w> </span><span class=nx>hash</span><span class=p>,</span><span class=w> </span><span class=nx>config</span><span class=p>)</span>
+<span class=p>}</span><span class=c1>// Transaction returns the structured logs created during the execution of EVM</span>
+<span class=c1>// and returns them as a JSON object.</span>
+</code></pre></div></td></tr></table></div> <a href=https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api_parity.go#L241 target=_>View on GitHub →</a> </p> </details> <hr> <h3 id=trace_unsubscribe>trace_unsubscribe<a class=headerlink href=#trace_unsubscribe title="Permanent link">&para;</a></h3> <p>Unsubscribe terminates an existing subscription by ID.</p> <h4 id=params-1>Params (1)<a class=headerlink href=#params-1 title="Permanent link">&para;</a></h4> <p>Parameters must be given <em>by position</em>.</p> <p><strong>1:</strong> id <code>rpc.ID</code> </p> <ul> <li>Required: ✓ Yes</li> </ul> <div class=tabbed-set data-tabs=21:2><input checked=checked id=__tabbed_21_1 name=__tabbed_21 type=radio><label for=__tabbed_21_1>Schema</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span>
+<span class=normal>2</span>
+<span class=normal>3</span></pre></div></td><td class=code><div><pre><span></span><code>- description: `Subscription identifier`
+- title: `subscriptionID`
+- type: string
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_21_2 name=__tabbed_21 type=radio><label for=__tabbed_21_2>Raw</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span>
+<span class=normal>2</span>
+<span class=normal>3</span>
+<span class=normal>4</span>
+<span class=normal>5</span>
+<span class=normal>6</span>
+<span class=normal>7</span></pre></div></td><td class=code><div><pre><span></span><code>{
+    &quot;description&quot;: &quot;Subscription identifier&quot;,
+    &quot;title&quot;: &quot;subscriptionID&quot;,
+    &quot;type&quot;: [
+        &quot;string&quot;
+    ]
+}
+</code></pre></div></td></tr></table></div> </div> </div> <h4 id=result_6>Result<a class=headerlink href=#result_6 title="Permanent link">&para;</a></h4> <p><em>None</em></p> <h4 id=client-method-invocation-examples_6>Client Method Invocation Examples<a class=headerlink href=#client-method-invocation-examples_6 title="Permanent link">&para;</a></h4> <div class=tabbed-set data-tabs=22:3><input checked=checked id=__tabbed_22_1 name=__tabbed_22 type=radio><label for=__tabbed_22_1>Shell HTTP</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code>curl<span class=w> </span>-X<span class=w> </span>POST<span class=w> </span>-H<span class=w> </span><span class=s2>&quot;Content-Type: application/json&quot;</span><span class=w> </span>http://localhost:8545<span class=w> </span>--data<span class=w> </span><span class=s1>&#39;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: 42, &quot;method&quot;: &quot;trace_unsubscribe&quot;, &quot;params&quot;: [&lt;id&gt;]}&#39;</span>
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_22_2 name=__tabbed_22 type=radio><label for=__tabbed_22_2>Shell WebSocket</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code>wscat<span class=w> </span>-c<span class=w> </span>ws://localhost:8546<span class=w> </span>-x<span class=w> </span><span class=s1>&#39;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: 1, &quot;method&quot;: &quot;trace_unsubscribe&quot;, &quot;params&quot;: [&lt;id&gt;]}&#39;</span>
+</code></pre></div></td></tr></table></div> </div> <input id=__tabbed_22_3 name=__tabbed_22 type=radio><label for=__tabbed_22_3>Javascript Console</label><div class=tabbed-content> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code><span class=nx>trace</span><span class=p>.</span><span class=nx>unsubscribe</span><span class=p>(</span><span class=nx>id</span><span class=p>);</span>
+</code></pre></div></td></tr></table></div> </div> </div> <details><summary>Source code</summary> <p> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span>
+<span class=normal>2</span>
+<span class=normal>3</span></pre></div></td><td class=code><div><pre><span></span><code><span class=kd>func</span><span class=w> </span><span class=p>(</span><span class=nx>sub</span><span class=w> </span><span class=o>*</span><span class=nx>RPCTraceSubscription</span><span class=p>)</span><span class=w> </span><span class=nx>Unsubscribe</span><span class=p>(</span><span class=nx>id</span><span class=w> </span><span class=nx>rpc</span><span class=p>.</span><span class=nx>ID</span><span class=p>)</span><span class=w> </span><span class=kt>error</span><span class=w> </span><span class=p>{</span>
+<span class=w>    </span><span class=k>return</span><span class=w> </span><span class=kc>nil</span>
+<span class=p>}</span><span class=c1>// Unsubscribe terminates an existing subscription by ID.</span>
+</code></pre></div></td></tr></table></div> <a href=https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L258 target=_>View on GitHub →</a> </p> </details> <hr> <hr> <div class=md-source-date> <small> Last update: <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago"><span class=timeago datetime=2025-01-20T15:08:14+00:00 locale=en></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date">2025-01-20</span> </small> </div> </article> </div> </div> </main> <footer class=md-footer> <nav class="md-footer__inner md-grid" aria-label=Footer> <a href=../personal/ class="md-footer__link md-footer__link--prev" rel=prev> <div class="md-footer__button md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg> </div> <div class=md-footer__title> <div class=md-ellipsis> <span class=md-footer__direction> Previous </span> Personal </div> </div> </a> <a href=../txpool/ class="md-footer__link md-footer__link--next" rel=next> <div class=md-footer__title> <div class=md-ellipsis> <span class=md-footer__direction> Next </span> Txpool </div> </div> <div class="md-footer__button md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg> </div> </a> </nav> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright> <div class=md-footer-copyright__highlight> Copyright &copy; 2021 etclabscore/core-geth and ethereum/go-ethereum authors; see <a href=https://github.com/etclabscore/core-geth/tree/master/COPYING target=_>COPYING file</a> - All rights reserved </div> Made with <a href=https://squidfunk.github.io/mkdocs-material/ target=_blank rel=noopener> Material for MkDocs </a> </div> </div> </div> </footer> </div> <div class=md-dialog data-md-component=dialog> <div class="md-dialog__inner md-typeset"></div> </div> <script id=__config type=application/json>{"base": "../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.expand", "navigation.sections", "navigation.tracking", "navigation.top"], "search": "../../../assets/javascripts/workers/search.fb4a9340.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing"}, "version": null}</script> <script src=../../../assets/javascripts/bundle.a1c7c35e.min.js></script> <script src=../../../js/timeago.min.js></script> <script src=../../../js/timeago_mkdocs_material.js></script> </body> </html>

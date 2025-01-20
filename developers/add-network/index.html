@@ -1,0 +1,214 @@
+<!doctype html><html lang=en class=no-js> <head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="Documentation for CoreGeth Ethereum Protocol Provider"><meta name=author content="CoreGeth Team"><link href=https://etclabscore.github.io/core-geth/developers/add-network/ rel=canonical><link rel=icon href=../../img/favicon.png><meta name=generator content="mkdocs-1.3.0, mkdocs-material-7.0.6"><title>Adding a Network to Core-Geth - CoreGeth Documentation</title><link rel=stylesheet href=../../assets/stylesheets/main.2c0c5eaf.min.css><link rel=stylesheet href=../../assets/stylesheets/palette.7fa14f5b.min.css><meta name=theme-color content=#000000><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback"><style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style><link rel=stylesheet href=../../css/timeago.css><link rel=stylesheet href=../../assets/css/extra.css></head> <body dir=ltr data-md-color-scheme=slate data-md-color-primary=black data-md-color-accent=green> <input class=md-toggle data-md-toggle=drawer type=checkbox id=__drawer autocomplete=off> <input class=md-toggle data-md-toggle=search type=checkbox id=__search autocomplete=off> <label class=md-overlay for=__drawer></label> <div data-md-component=skip> <a href=#adding-a-network-to-core-geth class=md-skip> Skip to content </a> </div> <div data-md-component=announce> </div> <header class=md-header data-md-component=header> <nav class="md-header__inner md-grid" aria-label=Header> <a href=../.. title="CoreGeth Documentation" class="md-header__button md-logo" aria-label="CoreGeth Documentation" data-md-component=logo> <img src=../../img/favicon.png alt=logo> </a> <label class="md-header__button md-icon" for=__drawer> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg> </label> <div class=md-header__title data-md-component=header-title> <div class=md-header__ellipsis> <div class=md-header__topic> <span class=md-ellipsis> CoreGeth Documentation </span> </div> <div class=md-header__topic data-md-component=header-topic> <span class=md-ellipsis> Adding a Network to Core-Geth </span> </div> </div> </div> <div class=md-header__options> </div> <label class="md-header__button md-icon" for=__search> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg> </label> <div class=md-search data-md-component=search role=dialog> <label class=md-search__overlay for=__search></label> <div class=md-search__inner role=search> <form class=md-search__form name=search> <input type=text class=md-search__input name=query aria-label=Search placeholder=Search autocapitalize=off autocorrect=off autocomplete=off spellcheck=false data-md-component=search-query data-md-state=active required> <label class="md-search__icon md-icon" for=__search> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg> </label> <button type=reset class="md-search__icon md-icon" aria-label=Clear tabindex=-1> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg> </button> </form> <div class=md-search__output> <div class=md-search__scrollwrap data-md-scrollfix> <div class=md-search-result data-md-component=search-result> <div class=md-search-result__meta> Initializing search </div> <ol class=md-search-result__list></ol> </div> </div> </div> </div> </div> <div class=md-header__source> <a href=https://github.com/etclabscore/core-geth title="Go to repository" class=md-source data-md-component=source> <div class="md-source__icon md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg> </div> <div class=md-source__repository> etclabscore/core-geth </div> </a> </div> </nav> </header> <div class=md-container data-md-component=container> <nav class=md-tabs aria-label=Tabs data-md-component=tabs> <div class="md-tabs__inner md-grid"> <ul class=md-tabs__list> <li class=md-tabs__item> <a href=../.. class=md-tabs__link> CoreGeth </a> </li> <li class=md-tabs__item> <a href=../../JSON-RPC-API/ class=md-tabs__link> JSON RPC API </a> </li> <li class=md-tabs__item> <a href=../../core/ class=md-tabs__link> Core </a> </li> <li class=md-tabs__item> <a href=./ class="md-tabs__link md-tabs__link--active"> Developers </a> </li> <li class=md-tabs__item> <a href=../../getting-started/installation/ class=md-tabs__link> Getting started </a> </li> <li class=md-tabs__item> <a href=../../postmortems/2021-08-22-split-postmortem/ class=md-tabs__link> Postmortems </a> </li> <li class=md-tabs__item> <a href=../../tutorials/private-network/ class=md-tabs__link> Tutorials </a> </li> </ul> </div> </nav> <main class=md-main data-md-component=main> <div class="md-main__inner md-grid"> <div class="md-sidebar md-sidebar--primary" data-md-component=sidebar data-md-type=navigation> <div class=md-sidebar__scrollwrap> <div class=md-sidebar__inner> <nav class="md-nav md-nav--primary md-nav--lifted" aria-label=Navigation data-md-level=0> <label class=md-nav__title for=__drawer> <a href=../.. title="CoreGeth Documentation" class="md-nav__button md-logo" aria-label="CoreGeth Documentation" data-md-component=logo> <img src=../../img/favicon.png alt=logo> </a> CoreGeth Documentation </label> <div class=md-nav__source> <a href=https://github.com/etclabscore/core-geth title="Go to repository" class=md-source data-md-component=source> <div class="md-source__icon md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg> </div> <div class=md-source__repository> etclabscore/core-geth </div> </a> </div> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../.. class=md-nav__link> CoreGeth </a> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_2 data-md-state=indeterminate type=checkbox id=__nav_2 checked> <label class=md-nav__link for=__nav_2> JSON RPC API <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label="JSON RPC API" data-md-level=1> <label class=md-nav__title for=__nav_2> <span class="md-nav__icon md-icon"></span> JSON RPC API </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../JSON-RPC-API/ class=md-nav__link> Using JSON-RPC APIs </a> </li> <li class=md-nav__item> <a href=../../JSON-RPC-API/openrpc/ class=md-nav__link> OpenRPC Discovery </a> </li> <li class=md-nav__item> <a href=../../JSON-RPC-API/trace-module-overview/ class=md-nav__link> "trace" Module Overview </a> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_2_4 data-md-state=indeterminate type=checkbox id=__nav_2_4 checked> <label class=md-nav__link for=__nav_2_4> Modules <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label=Modules data-md-level=2> <label class=md-nav__title for=__nav_2_4> <span class="md-nav__icon md-icon"></span> Modules </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../JSON-RPC-API/modules/admin/ class=md-nav__link> Admin </a> </li> <li class=md-nav__item> <a href=../../JSON-RPC-API/modules/debug/ class=md-nav__link> Debug </a> </li> <li class=md-nav__item> <a href=../../JSON-RPC-API/modules/eth/ class=md-nav__link> Eth </a> </li> <li class=md-nav__item> <a href=../../JSON-RPC-API/modules/ethash/ class=md-nav__link> Ethash </a> </li> <li class=md-nav__item> <a href=../../JSON-RPC-API/modules/miner/ class=md-nav__link> Miner </a> </li> <li class=md-nav__item> <a href=../../JSON-RPC-API/modules/net/ class=md-nav__link> Net </a> </li> <li class=md-nav__item> <a href=../../JSON-RPC-API/modules/personal/ class=md-nav__link> Personal </a> </li> <li class=md-nav__item> <a href=../../JSON-RPC-API/modules/trace/ class=md-nav__link> Trace </a> </li> <li class=md-nav__item> <a href=../../JSON-RPC-API/modules/txpool/ class=md-nav__link> Txpool </a> </li> <li class=md-nav__item> <a href=../../JSON-RPC-API/modules/web3/ class=md-nav__link> Web3 </a> </li> </ul> </nav> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_3 data-md-state=indeterminate type=checkbox id=__nav_3 checked> <label class=md-nav__link for=__nav_3> Core <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label=Core data-md-level=1> <label class=md-nav__title for=__nav_3> <span class="md-nav__icon md-icon"></span> Core </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../core/ class=md-nav__link> About </a> </li> <li class=md-nav__item> <a href=../../core/alltools/ class=md-nav__link> Included Tools </a> </li> <li class=md-nav__item> <a href=../../core/evmc/ class=md-nav__link> Running Geth with an External VM </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--active md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_4 type=checkbox id=__nav_4 checked> <label class=md-nav__link for=__nav_4> Developers <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label=Developers data-md-level=1> <label class=md-nav__title for=__nav_4> <span class="md-nav__icon md-icon"></span> Developers </label> <ul class=md-nav__list data-md-scrollfix> <li class="md-nav__item md-nav__item--active"> <input class="md-nav__toggle md-toggle" data-md-toggle=toc type=checkbox id=__toc> <label class="md-nav__link md-nav__link--active" for=__toc> Adding a Network to Core-Geth <span class="md-nav__icon md-icon"></span> </label> <a href=./ class="md-nav__link md-nav__link--active"> Adding a Network to Core-Geth </a> <nav class="md-nav md-nav--secondary" aria-label="Table of contents"> <label class=md-nav__title for=__toc> <span class="md-nav__icon md-icon"></span> Table of contents </label> <ul class=md-nav__list data-md-component=toc data-md-scrollfix> <li class=md-nav__item> <a href=#define-the-configuration class=md-nav__link> Define the configuration. </a> <nav class=md-nav aria-label="Define the configuration."> <ul class=md-nav__list> <li class=md-nav__item> <a href=#initialize-geths-database-from-the-json-configuration class=md-nav__link> Initialize geth&rsquo;s database from the JSON configuration. </a> </li> <li class=md-nav__item> <a href=#establish-a-network class=md-nav__link> Establish a network. </a> <nav class=md-nav aria-label="Establish a network."> <ul class=md-nav__list> <li class=md-nav__item> <a href=#set-up-a-bootnode class=md-nav__link> Set up a bootnode. </a> </li> <li class=md-nav__item> <a href=#start-up-a-few-nodes class=md-nav__link> Start up a few nodes. </a> </li> </ul> </nav> </li> </ul> </nav> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../build-from-source/ class=md-nav__link> Build from Source </a> </li> <li class=md-nav__item> <a href=../create-new-release/ class=md-nav__link> Publishing a Release </a> </li> <li class=md-nav__item> <a href=../documentation/ class=md-nav__link> Documentation </a> </li> <li class=md-nav__item> <a href=../testing/ class=md-nav__link> Testing </a> </li> <li class=md-nav__item> <a href=../versioning/ class=md-nav__link> Versioning </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_5 data-md-state=indeterminate type=checkbox id=__nav_5 checked> <label class=md-nav__link for=__nav_5> Getting started <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label="Getting started" data-md-level=1> <label class=md-nav__title for=__nav_5> <span class="md-nav__icon md-icon"></span> Getting started </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../getting-started/installation/ class=md-nav__link> Installation </a> </li> <li class=md-nav__item> <a href=../../getting-started/run-cli/ class=md-nav__link> Command Line Interface (CLI) </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_6 data-md-state=indeterminate type=checkbox id=__nav_6 checked> <label class=md-nav__link for=__nav_6> Postmortems <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label=Postmortems data-md-level=1> <label class=md-nav__title for=__nav_6> <span class="md-nav__icon md-icon"></span> Postmortems </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../postmortems/2021-08-22-split-postmortem/ class=md-nav__link> Minority split 2021-08-27 post mortem </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_7 data-md-state=indeterminate type=checkbox id=__nav_7 checked> <label class=md-nav__link for=__nav_7> Tutorials <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label=Tutorials data-md-level=1> <label class=md-nav__title for=__nav_7> <span class="md-nav__icon md-icon"></span> Tutorials </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../tutorials/private-network/ class=md-nav__link> Tutorial: Operating a Private Network </a> </li> </ul> </nav> </li> </ul> </nav> </div> </div> </div> <div class="md-sidebar md-sidebar--secondary" data-md-component=sidebar data-md-type=toc> <div class=md-sidebar__scrollwrap> <div class=md-sidebar__inner> <nav class="md-nav md-nav--secondary" aria-label="Table of contents"> <label class=md-nav__title for=__toc> <span class="md-nav__icon md-icon"></span> Table of contents </label> <ul class=md-nav__list data-md-component=toc data-md-scrollfix> <li class=md-nav__item> <a href=#define-the-configuration class=md-nav__link> Define the configuration. </a> <nav class=md-nav aria-label="Define the configuration."> <ul class=md-nav__list> <li class=md-nav__item> <a href=#initialize-geths-database-from-the-json-configuration class=md-nav__link> Initialize geth&rsquo;s database from the JSON configuration. </a> </li> <li class=md-nav__item> <a href=#establish-a-network class=md-nav__link> Establish a network. </a> <nav class=md-nav aria-label="Establish a network."> <ul class=md-nav__list> <li class=md-nav__item> <a href=#set-up-a-bootnode class=md-nav__link> Set up a bootnode. </a> </li> <li class=md-nav__item> <a href=#start-up-a-few-nodes class=md-nav__link> Start up a few nodes. </a> </li> </ul> </nav> </li> </ul> </nav> </li> </ul> </nav> </div> </div> </div> <div class=md-content data-md-component=content> <article class="md-content__inner md-typeset"> <a href=https://github.com/etclabscore/core-geth/edit/master/docs/developers/add-network.md title="Edit this page" class="md-content__button md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg> </a> <h1 id=adding-a-network-to-core-geth>Adding a Network to Core-Geth<a class=headerlink href=#adding-a-network-to-core-geth title="Permanent link">&para;</a></h1> <p>CoreGeth currently supports a handful of networks out of the box, and can readily be configured to support others.</p> <p>This guide will show you how to add a network to CoreGeth.</p> <p>For the context of this tutorial, I&rsquo;m going to use <strong>AlphaBeta Coin</strong><img alt=®️ class=emojione src=https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.7/assets/png/00ae.png title=:registered:> as the name of my new network. - AlphaBeta Coin (ABC) will use Proof-of-Work for block issuance, namely ETHash. (Just like Ethereum.) - AlphaBeta Coin will have some arbitrary pre-mine funds allocated to a single address. - AlphaBeta Coin will have the &ldquo;Istanbul&rdquo; (aka &ldquo;ETC&rsquo;s Phoenix&rdquo;) protocol upgrades and EVM features activated from genesis (the very first block (number <code>0</code>)).</p> <h3 id=define-the-configuration>Define the configuration.<a class=headerlink href=#define-the-configuration title="Permanent link">&para;</a></h3> <p>A branch <a href=https://github.com/etclabscore/core-geth/tree/docs/_tutorial-add-network><code>docs/_tutorial-add-network</code></a> is provided to illustrate the code necessary to define implement basic core-geth support for a new network.</p> <p>A full diff comparing this branch against its base <code>v1.11.22</code> can be seen on the Github web UI <a href="https://github.com/etclabscore/core-geth/compare/v1.11.22...docs/_tutorial-add-network?expand=1">here</a>.</p> <p>Overall, the files touched include:</p> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span>
+<span class=normal>2</span>
+<span class=normal>3</span>
+<span class=normal>4</span>
+<span class=normal>5</span>
+<span class=normal>6</span></pre></div></td><td class=code><div><pre><span></span><code>&gt; git --no-pager diff --name-only v1.11.22
+params/bootnodes_abc.go
+params/config_abc.go
+params/config_abc_test.go
+params/example_abc_test.go
+params/genesis_abc.go
+</code></pre></div></td></tr></table></div> <hr> <p>Once the skeleton provided by <code>docs/_tutorial-add-network</code> is done it&rsquo;s time to put the configuration into action.</p> <p>We can now pursue two paths:</p> <ol> <li>Use the JSON configuration to initialize a chaindata database and start our node(s), and/or</li> <li>Expose the configuration as a core-geth default through <code>geth</code>&rsquo;s CLI flags via <code>--abc</code>.</li> </ol> <p>This tutorial won&rsquo;t cover (2) (yet). </p> <h4 id=initialize-geths-database-from-the-json-configuration>Initialize geth&rsquo;s database from the JSON configuration.<a class=headerlink href=#initialize-geths-database-from-the-json-configuration title="Permanent link">&para;</a></h4> <p>Build <code>geth</code>. <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code>&gt; make geth
+</code></pre></div></td></tr></table></div></p> <p>Create a file containing the JSON encoding of ABC network&rsquo;s configuration (JSON data taken from the example test above). <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 1</span>
+<span class=normal> 2</span>
+<span class=normal> 3</span>
+<span class=normal> 4</span>
+<span class=normal> 5</span>
+<span class=normal> 6</span>
+<span class=normal> 7</span>
+<span class=normal> 8</span>
+<span class=normal> 9</span>
+<span class=normal>10</span>
+<span class=normal>11</span>
+<span class=normal>12</span>
+<span class=normal>13</span>
+<span class=normal>14</span>
+<span class=normal>15</span>
+<span class=normal>16</span>
+<span class=normal>17</span>
+<span class=normal>18</span>
+<span class=normal>19</span>
+<span class=normal>20</span>
+<span class=normal>21</span>
+<span class=normal>22</span>
+<span class=normal>23</span>
+<span class=normal>24</span>
+<span class=normal>25</span>
+<span class=normal>26</span>
+<span class=normal>27</span>
+<span class=normal>28</span>
+<span class=normal>29</span>
+<span class=normal>30</span>
+<span class=normal>31</span>
+<span class=normal>32</span>
+<span class=normal>33</span>
+<span class=normal>34</span>
+<span class=normal>35</span>
+<span class=normal>36</span>
+<span class=normal>37</span>
+<span class=normal>38</span>
+<span class=normal>39</span>
+<span class=normal>40</span>
+<span class=normal>41</span>
+<span class=normal>42</span>
+<span class=normal>43</span>
+<span class=normal>44</span>
+<span class=normal>45</span>
+<span class=normal>46</span>
+<span class=normal>47</span>
+<span class=normal>48</span>
+<span class=normal>49</span>
+<span class=normal>50</span></pre></div></td><td class=code><div><pre><span></span><code>&gt; cat &lt;&lt;EOF &gt; abc_genesis.json
+{
+  &quot;config&quot;: {
+    &quot;networkId&quot;: 4269, 
+    &quot;chainId&quot;: 4269, 
+    &quot;eip2FBlock&quot;: 0, 
+    &quot;eip7FBlock&quot;: 0, 
+    &quot;eip150Block&quot;: 0, 
+    &quot;eip155Block&quot;: 0, 
+    &quot;eip160Block&quot;: 0, 
+    &quot;eip161FBlock&quot;: 0, 
+    &quot;eip170FBlock&quot;: 0, 
+    &quot;eip100FBlock&quot;: 0, 
+    &quot;eip140FBlock&quot;: 0, 
+    &quot;eip198FBlock&quot;: 0, 
+    &quot;eip211FBlock&quot;: 0, 
+    &quot;eip212FBlock&quot;: 0, 
+    &quot;eip213FBlock&quot;: 0, 
+    &quot;eip214FBlock&quot;: 0, 
+    &quot;eip658FBlock&quot;: 0, 
+    &quot;eip145FBlock&quot;: 0, 
+    &quot;eip1014FBlock&quot;: 0, 
+    &quot;eip1052FBlock&quot;: 0, 
+    &quot;eip152FBlock&quot;: 0, 
+    &quot;eip1108FBlock&quot;: 0, 
+    &quot;eip1344FBlock&quot;: 0, 
+    &quot;eip1884FBlock&quot;: 0, 
+    &quot;eip2028FBlock&quot;: 0, 
+    &quot;eip2200FBlock&quot;: 0, 
+    &quot;disposalBlock&quot;: 0, 
+    &quot;ethash&quot;: {}, 
+    &quot;requireBlockHashes&quot;: {}
+  }, 
+  &quot;nonce&quot;: &quot;0x0&quot;, 
+  &quot;timestamp&quot;: &quot;0x6048d57c&quot;, 
+  &quot;extraData&quot;: &quot;0x42&quot;, 
+  &quot;gasLimit&quot;: &quot;0x2fefd8&quot;, 
+  &quot;difficulty&quot;: &quot;0x20000&quot;, 
+  &quot;mixHash&quot;: &quot;0x0000000000000000000000000000000000000000000000000000000000000000&quot;, 
+  &quot;coinbase&quot;: &quot;0x0000000000000000000000000000000000000000&quot;, 
+  &quot;alloc&quot;: {
+    &quot;366ae7da62294427c764870bd2a460d7ded29d30&quot;: {
+      &quot;balance&quot;: &quot;0x2a&quot;
+    }
+  }, 
+  &quot;number&quot;: &quot;0x0&quot;, 
+  &quot;gasUsed&quot;: &quot;0x0&quot;, 
+  &quot;parentHash&quot;: &quot;0x0000000000000000000000000000000000000000000000000000000000000000&quot;
+}
+EOF
+</code></pre></div></td></tr></table></div></p> <p>Initialize geth with this configuration (using a custom data directory). <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 1</span>
+<span class=normal> 2</span>
+<span class=normal> 3</span>
+<span class=normal> 4</span>
+<span class=normal> 5</span>
+<span class=normal> 6</span>
+<span class=normal> 7</span>
+<span class=normal> 8</span>
+<span class=normal> 9</span>
+<span class=normal>10</span>
+<span class=normal>11</span>
+<span class=normal>12</span>
+<span class=normal>13</span>
+<span class=normal>14</span></pre></div></td><td class=code><div><pre><span></span><code>./build/bin/geth --datadir=./abc-datadir init abc_genesis.json 
+INFO [03-10|09:00:25.710] Maximum peer count                       ETH=50 LES=0 total=50
+INFO [03-10|09:00:25.710] Smartcard socket not found, disabling    err=&quot;stat /run/pcscd/pcscd.comm: no such file or directory&quot;
+INFO [03-10|09:00:25.711] Set global gas cap                       cap=25000000
+INFO [03-10|09:00:25.711] Allocated cache and file handles         database=/home/ia/go/src/github.com/ethereum/go-ethereum/abc-datadir/geth/chaindata cache=16.00MiB handles=16
+INFO [03-10|09:00:25.728] Writing custom genesis block 
+INFO [03-10|09:00:25.729] Persisted trie from memory database      nodes=1 size=139.00B time=&quot;178.942µs&quot; gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+INFO [03-10|09:00:25.729] Wrote custom genesis block OK            config=&quot;NetworkID: 4269, ChainID: 4269 Engine: ethash EIP1014: 0 EIP1052: 0 EIP1108: 0 EIP1344: 0 EIP140: 0 EIP145: 0 EIP150: 0 EIP152: 0 EIP155: 0 EIP160: 0 EIP161abc: 0 EIP161d: 0 EIP170: 0 EIP1884: 0 EIP198: 0 EIP2028: 0 EIP211: 0 EIP212: 0 EIP213: 0 EIP214: 0 EIP2200: 0 EIP2: 0 EIP658: 0 EIP7: 0 EthashECIP1041: 0 EthashEIP100B: 0 EthashHomestead: 0 &quot;
+INFO [03-10|09:00:25.730] Successfully wrote genesis state         database=chaindata hash=&quot;5f32ce…1fe582&quot;
+INFO [03-10|09:00:25.730] Allocated cache and file handles         database=/home/ia/go/src/github.com/ethereum/go-ethereum/abc-datadir/geth/lightchaindata cache=16.00MiB handles=16
+INFO [03-10|09:00:25.746] Writing custom genesis block 
+INFO [03-10|09:00:25.747] Persisted trie from memory database      nodes=1 size=139.00B time=&quot;91.084µs&quot;  gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+INFO [03-10|09:00:25.748] Wrote custom genesis block OK            config=&quot;NetworkID: 4269, ChainID: 4269 Engine: ethash EIP1014: 0 EIP1052: 0 EIP1108: 0 EIP1344: 0 EIP140: 0 EIP145: 0 EIP150: 0 EIP152: 0 EIP155: 0 EIP160: 0 EIP161abc: 0 EIP161d: 0 EIP170: 0 EIP1884: 0 EIP198: 0 EIP2028: 0 EIP211: 0 EIP212: 0 EIP213: 0 EIP214: 0 EIP2200: 0 EIP2: 0 EIP658: 0 EIP7: 0 EthashECIP1041: 0 EthashEIP100B: 0 EthashHomestead: 0 &quot;
+INFO [03-10|09:00:25.749] Successfully wrote genesis state         database=lightchaindata hash=&quot;5f32ce…1fe582&quot;
+</code></pre></div></td></tr></table></div></p> <p>Start geth, reusing our initialized database. Since geth won&rsquo;t have default bootnodes for this configuration (only available when using CLI flags), we&rsquo;ll need to use geth&rsquo;s <code>--bootnodes</code> flag. <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 1</span>
+<span class=normal> 2</span>
+<span class=normal> 3</span>
+<span class=normal> 4</span>
+<span class=normal> 5</span>
+<span class=normal> 6</span>
+<span class=normal> 7</span>
+<span class=normal> 8</span>
+<span class=normal> 9</span>
+<span class=normal>10</span>
+<span class=normal>11</span>
+<span class=normal>12</span>
+<span class=normal>13</span>
+<span class=normal>14</span>
+<span class=normal>15</span>
+<span class=normal>16</span>
+<span class=normal>17</span>
+<span class=normal>18</span>
+<span class=normal>19</span>
+<span class=normal>20</span>
+<span class=normal>21</span>
+<span class=normal>22</span>
+<span class=normal>23</span>
+<span class=normal>24</span>
+<span class=normal>25</span>
+<span class=normal>26</span>
+<span class=normal>27</span>
+<span class=normal>28</span>
+<span class=normal>29</span>
+<span class=normal>30</span></pre></div></td><td class=code><div><pre><span></span><code>./build/bin/geth --datadir=./abc-datadir --bootnodes=enode://3e12c4c633157ae52e7e05c168f4b1aa91685a36ba33a0901aa8a83cfeb84c3633226e3dd2eaf59bfc83492139e1d68918bf5b60ba93e2deaedb4e6a2ded5d32@42.152.120.98:30303
+INFO [03-10|09:07:52.762] Starting Geth on Ethereum mainnet... 
+INFO [03-10|09:07:52.762] Bumping default cache on mainnet         provided=1024 updated=4096
+INFO [03-10|09:07:52.763] Maximum peer count                       ETH=50 LES=0 total=50
+INFO [03-10|09:07:52.763] Smartcard socket not found, disabling    err=&quot;stat /run/pcscd/pcscd.comm: no such file or directory&quot;
+INFO [03-10|09:07:52.764] Set global gas cap                       cap=25000000
+INFO [03-10|09:07:52.764] Allocated trie memory caches             clean=1023.00MiB dirty=1024.00MiB
+INFO [03-10|09:07:52.765] Allocated cache and file handles         database=/home/ia/go/src/github.com/ethereum/go-ethereum/abc-datadir/geth/chaindata cache=2.00GiB handles=524288
+INFO [03-10|09:07:52.853] Opened ancient database                  database=/home/ia/go/src/github.com/ethereum/go-ethereum/abc-datadir/geth/chaindata/ancient
+INFO [03-10|09:07:52.854] Found stored genesis block               config=&quot;NetworkID: 4269, ChainID: 4269 Engine: ethash EIP1014: 0 EIP1052: 0 EIP1108: 0 EIP1344: 0 EIP140: 0 EIP145: 0 EIP150: 0 EIP152: 0 EIP155: 0 EIP160: 0 EIP161abc: 0 EIP161d: 0 EIP170: 0 EIP1884: 0 EIP198: 0 EIP2028: 0 EIP211: 0 EIP212: 0 EIP213: 0 EIP214: 0 EIP2200: 0 EIP2: 0 EIP658: 0 EIP7: 0 EthashECIP1041: 0 EthashEIP100B: 0 EthashHomestead: 0 &quot;
+INFO [03-10|09:07:52.854] Found non-defaulty stored config, using it. 
+INFO [03-10|09:07:52.854] Initialised chain configuration          config=&quot;NetworkID: 4269, ChainID: 4269 Engine: ethash EIP1014: 0 EIP1052: 0 EIP1108: 0 EIP1344: 0 EIP140: 0 EIP145: 0 EIP150: 0 EIP152: 0 EIP155: 0 EIP160: 0 EIP161abc: 0 EIP161d: 0 EIP170: 0 EIP1884: 0 EIP198: 0 EIP2028: 0 EIP211: 0 EIP212: 0 EIP213: 0 EIP214: 0 EIP2200: 0 EIP2: 0 EIP658: 0 EIP7: 0 EthashECIP1041: 0 EthashEIP100B: 0 EthashHomestead: 0 &quot;
+INFO [03-10|09:07:52.854] Disk storage enabled for ethash caches   dir=/home/ia/go/src/github.com/ethereum/go-ethereum/abc-datadir/geth/ethash count=3
+INFO [03-10|09:07:52.854] Disk storage enabled for ethash DAGs     dir=/home/ia/.ethash count=2
+INFO [03-10|09:07:52.854] Initialising Ethereum protocol           versions=&quot;[65 64 63]&quot; network=1 dbversion=8
+INFO [03-10|09:07:52.855] Loaded most recent local header          number=0 hash=&quot;5f32ce…1fe582&quot; td=131072 age=48m12s
+INFO [03-10|09:07:52.855] Loaded most recent local full block      number=0 hash=&quot;5f32ce…1fe582&quot; td=131072 age=48m12s
+INFO [03-10|09:07:52.855] Loaded most recent local fast block      number=0 hash=&quot;5f32ce…1fe582&quot; td=131072 age=48m12s
+INFO [03-10|09:07:52.855] Loaded local transaction journal         transactions=0 dropped=0
+INFO [03-10|09:07:52.856] Regenerated local transaction journal    transactions=0 accounts=0
+INFO [03-10|09:07:52.877] Allocated fast sync bloom                size=2.00GiB
+INFO [03-10|09:07:52.878] Initialized fast sync bloom              items=1 errorrate=0.000 elapsed=&quot;520.228µs&quot;
+INFO [03-10|09:07:52.879] Starting peer-to-peer node               instance=CoreGeth/v1.11.22-stable-72df266d/linux-amd64/go1.16
+INFO [03-10|09:07:52.898] New local node record                    seq=3 id=0a86440c3ab5e22c ip=127.0.0.1 udp=30303 tcp=30303
+INFO [03-10|09:07:52.899] Started P2P networking                   self=enode://5256dcfe7725a98f38cf15b702847fabcaf59bbaa733a6ae5ea68e1089fdd1d274192e17593dc20df00a45ea91372f7c1ca97c8d186fa9e779167240fde15338@127.0.0.1:30303
+INFO [03-10|09:07:52.900] IPC endpoint opened                      url=/home/ia/go/src/github.com/ethereum/go-ethereum/abc-datadir/geth.ipc
+INFO [03-10|09:07:52.905] Mapped network port                      proto=udp extport=30303 intport=30303 interface=NAT-PMP(192.168.86.1)
+INFO [03-10|09:07:52.909] Mapped network port                      proto=tcp extport=30303 intport=30303 interface=NAT-PMP(192.168.86.1)
+INFO [03-10|09:07:54.403] New local node record                    seq=4 id=0a86440c3ab5e22c ip=75.134.144.252 udp=30303 tcp=30303
+INFO [03-10|09:08:06.969] Looking for peers                        peercount=0 tried=5 static=0
+</code></pre></div></td></tr></table></div></p> <h4 id=establish-a-network>Establish a network.<a class=headerlink href=#establish-a-network title="Permanent link">&para;</a></h4> <p>In order to establish your network, you&rsquo;ll want to make sure you have a bootnode available that new nodes coming online can use to query for their peers.</p> <h5 id=set-up-a-bootnode>Set up a bootnode.<a class=headerlink href=#set-up-a-bootnode title="Permanent link">&para;</a></h5> <p>Initialize the bootnode&rsquo;s database and get its self-reported <code>enode</code> value. <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span>
+<span class=normal>2</span>
+<span class=normal>3</span>
+<span class=normal>4</span></pre></div></td><td class=code><div><pre><span></span><code>./build/bin/geth --datadir=./abc-datadir init abc_genesis.json
+
+2&gt;/dev/null ./build/bin/geth --datadir=./abc-datadir --exec &#39;admin.nodeInfo.enode&#39; console
+&quot;enode://5256dcfe7725a98f38cf15b702847fabcaf59bbaa733a6ae5ea68e1089fdd1d274192e17593dc20df00a45ea91372f7c1ca97c8d186fa9e779167240fde15338@75.134.144.252:30303&quot;
+</code></pre></div></td></tr></table></div></p> <p>This (<code>enode://5256dcfe7725a98f38cf15b702847fabcaf59bbaa733a6ae5ea68e1089fdd1d274192e17593dc20df00a45ea91372f7c1ca97c8d186fa9e779167240fde15338@75.134.144.252:30303</code>) will be the bootnode <code>enode</code> value for the other nodes.</p> <p>Then turn the bootnode on. <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code>./build/bin/geth --datadir=./abc-datadir
+</code></pre></div></td></tr></table></div></p> <h5 id=start-up-a-few-nodes>Start up a few nodes.<a class=headerlink href=#start-up-a-few-nodes title="Permanent link">&para;</a></h5> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span>
+<span class=normal>2</span>
+<span class=normal>3</span></pre></div></td><td class=code><div><pre><span></span><code>./build/bin/geth --datadir=./abc-datadir-1 init abc_genesis.json
+./build/bin/geth --datadir=./abc-datadir-2 init abc_genesis.json
+./build/bin/geth --datadir=./abc-datadir-3 init abc_genesis.json
+</code></pre></div></td></tr></table></div> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code>./build/bin/geth --datadir=./abc-datadir-1 --bootnodes=enode://5256dcfe7725a98f38cf15b702847fabcaf59bbaa733a6ae5ea68e1089fdd1d274192e17593dc20df00a45ea91372f7c1ca97c8d186fa9e779167240fde15338@75.134.144.252:30303
+</code></pre></div></td></tr></table></div> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code>./build/bin/geth --datadir=./abc-datadir-2 --bootnodes=enode://5256dcfe7725a98f38cf15b702847fabcaf59bbaa733a6ae5ea68e1089fdd1d274192e17593dc20df00a45ea91372f7c1ca97c8d186fa9e779167240fde15338@75.134.144.252:30303
+</code></pre></div></td></tr></table></div> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code>./build/bin/geth --datadir=./abc-datadir-3 --bootnodes=enode://5256dcfe7725a98f38cf15b702847fabcaf59bbaa733a6ae5ea68e1089fdd1d274192e17593dc20df00a45ea91372f7c1ca97c8d186fa9e779167240fde15338@75.134.144.252:30303
+</code></pre></div></td></tr></table></div> <hr> <div class=md-source-date> <small> Last update: <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago"><span class=timeago datetime=2025-01-20T15:08:14+00:00 locale=en></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date">2025-01-20</span> </small> </div> </article> </div> </div> </main> <footer class=md-footer> <nav class="md-footer__inner md-grid" aria-label=Footer> <a href=../../core/evmc/ class="md-footer__link md-footer__link--prev" rel=prev> <div class="md-footer__button md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg> </div> <div class=md-footer__title> <div class=md-ellipsis> <span class=md-footer__direction> Previous </span> Running Geth with an External VM </div> </div> </a> <a href=../build-from-source/ class="md-footer__link md-footer__link--next" rel=next> <div class=md-footer__title> <div class=md-ellipsis> <span class=md-footer__direction> Next </span> Build from Source </div> </div> <div class="md-footer__button md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg> </div> </a> </nav> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright> <div class=md-footer-copyright__highlight> Copyright &copy; 2021 etclabscore/core-geth and ethereum/go-ethereum authors; see <a href=https://github.com/etclabscore/core-geth/tree/master/COPYING target=_>COPYING file</a> - All rights reserved </div> Made with <a href=https://squidfunk.github.io/mkdocs-material/ target=_blank rel=noopener> Material for MkDocs </a> </div> </div> </div> </footer> </div> <div class=md-dialog data-md-component=dialog> <div class="md-dialog__inner md-typeset"></div> </div> <script id=__config type=application/json>{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.expand", "navigation.sections", "navigation.tracking", "navigation.top"], "search": "../../assets/javascripts/workers/search.fb4a9340.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing"}, "version": null}</script> <script src=../../assets/javascripts/bundle.a1c7c35e.min.js></script> <script src=../../js/timeago.min.js></script> <script src=../../js/timeago_mkdocs_material.js></script> </body> </html>

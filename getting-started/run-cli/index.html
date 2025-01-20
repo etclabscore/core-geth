@@ -1,0 +1,486 @@
+<!doctype html><html lang=en class=no-js> <head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="Documentation for CoreGeth Ethereum Protocol Provider"><meta name=author content="CoreGeth Team"><link href=https://etclabscore.github.io/core-geth/getting-started/run-cli/ rel=canonical><link rel=icon href=../../img/favicon.png><meta name=generator content="mkdocs-1.3.0, mkdocs-material-7.0.6"><title>Command Line Interface (CLI) - CoreGeth Documentation</title><link rel=stylesheet href=../../assets/stylesheets/main.2c0c5eaf.min.css><link rel=stylesheet href=../../assets/stylesheets/palette.7fa14f5b.min.css><meta name=theme-color content=#000000><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback"><style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style><link rel=stylesheet href=../../css/timeago.css><link rel=stylesheet href=../../assets/css/extra.css></head> <body dir=ltr data-md-color-scheme=slate data-md-color-primary=black data-md-color-accent=green> <input class=md-toggle data-md-toggle=drawer type=checkbox id=__drawer autocomplete=off> <input class=md-toggle data-md-toggle=search type=checkbox id=__search autocomplete=off> <label class=md-overlay for=__drawer></label> <div data-md-component=skip> <a href=#running-geth class=md-skip> Skip to content </a> </div> <div data-md-component=announce> </div> <header class=md-header data-md-component=header> <nav class="md-header__inner md-grid" aria-label=Header> <a href=../.. title="CoreGeth Documentation" class="md-header__button md-logo" aria-label="CoreGeth Documentation" data-md-component=logo> <img src=../../img/favicon.png alt=logo> </a> <label class="md-header__button md-icon" for=__drawer> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg> </label> <div class=md-header__title data-md-component=header-title> <div class=md-header__ellipsis> <div class=md-header__topic> <span class=md-ellipsis> CoreGeth Documentation </span> </div> <div class=md-header__topic data-md-component=header-topic> <span class=md-ellipsis> Command Line Interface (CLI) </span> </div> </div> </div> <div class=md-header__options> </div> <label class="md-header__button md-icon" for=__search> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg> </label> <div class=md-search data-md-component=search role=dialog> <label class=md-search__overlay for=__search></label> <div class=md-search__inner role=search> <form class=md-search__form name=search> <input type=text class=md-search__input name=query aria-label=Search placeholder=Search autocapitalize=off autocorrect=off autocomplete=off spellcheck=false data-md-component=search-query data-md-state=active required> <label class="md-search__icon md-icon" for=__search> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg> </label> <button type=reset class="md-search__icon md-icon" aria-label=Clear tabindex=-1> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg> </button> </form> <div class=md-search__output> <div class=md-search__scrollwrap data-md-scrollfix> <div class=md-search-result data-md-component=search-result> <div class=md-search-result__meta> Initializing search </div> <ol class=md-search-result__list></ol> </div> </div> </div> </div> </div> <div class=md-header__source> <a href=https://github.com/etclabscore/core-geth title="Go to repository" class=md-source data-md-component=source> <div class="md-source__icon md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg> </div> <div class=md-source__repository> etclabscore/core-geth </div> </a> </div> </nav> </header> <div class=md-container data-md-component=container> <nav class=md-tabs aria-label=Tabs data-md-component=tabs> <div class="md-tabs__inner md-grid"> <ul class=md-tabs__list> <li class=md-tabs__item> <a href=../.. class=md-tabs__link> CoreGeth </a> </li> <li class=md-tabs__item> <a href=../../JSON-RPC-API/ class=md-tabs__link> JSON RPC API </a> </li> <li class=md-tabs__item> <a href=../../core/ class=md-tabs__link> Core </a> </li> <li class=md-tabs__item> <a href=../../developers/add-network/ class=md-tabs__link> Developers </a> </li> <li class=md-tabs__item> <a href=../installation/ class="md-tabs__link md-tabs__link--active"> Getting started </a> </li> <li class=md-tabs__item> <a href=../../postmortems/2021-08-22-split-postmortem/ class=md-tabs__link> Postmortems </a> </li> <li class=md-tabs__item> <a href=../../tutorials/private-network/ class=md-tabs__link> Tutorials </a> </li> </ul> </div> </nav> <main class=md-main data-md-component=main> <div class="md-main__inner md-grid"> <div class="md-sidebar md-sidebar--primary" data-md-component=sidebar data-md-type=navigation> <div class=md-sidebar__scrollwrap> <div class=md-sidebar__inner> <nav class="md-nav md-nav--primary md-nav--lifted" aria-label=Navigation data-md-level=0> <label class=md-nav__title for=__drawer> <a href=../.. title="CoreGeth Documentation" class="md-nav__button md-logo" aria-label="CoreGeth Documentation" data-md-component=logo> <img src=../../img/favicon.png alt=logo> </a> CoreGeth Documentation </label> <div class=md-nav__source> <a href=https://github.com/etclabscore/core-geth title="Go to repository" class=md-source data-md-component=source> <div class="md-source__icon md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg> </div> <div class=md-source__repository> etclabscore/core-geth </div> </a> </div> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../.. class=md-nav__link> CoreGeth </a> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_2 data-md-state=indeterminate type=checkbox id=__nav_2 checked> <label class=md-nav__link for=__nav_2> JSON RPC API <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label="JSON RPC API" data-md-level=1> <label class=md-nav__title for=__nav_2> <span class="md-nav__icon md-icon"></span> JSON RPC API </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../JSON-RPC-API/ class=md-nav__link> Using JSON-RPC APIs </a> </li> <li class=md-nav__item> <a href=../../JSON-RPC-API/openrpc/ class=md-nav__link> OpenRPC Discovery </a> </li> <li class=md-nav__item> <a href=../../JSON-RPC-API/trace-module-overview/ class=md-nav__link> "trace" Module Overview </a> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_2_4 data-md-state=indeterminate type=checkbox id=__nav_2_4 checked> <label class=md-nav__link for=__nav_2_4> Modules <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label=Modules data-md-level=2> <label class=md-nav__title for=__nav_2_4> <span class="md-nav__icon md-icon"></span> Modules </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../JSON-RPC-API/modules/admin/ class=md-nav__link> Admin </a> </li> <li class=md-nav__item> <a href=../../JSON-RPC-API/modules/debug/ class=md-nav__link> Debug </a> </li> <li class=md-nav__item> <a href=../../JSON-RPC-API/modules/eth/ class=md-nav__link> Eth </a> </li> <li class=md-nav__item> <a href=../../JSON-RPC-API/modules/ethash/ class=md-nav__link> Ethash </a> </li> <li class=md-nav__item> <a href=../../JSON-RPC-API/modules/miner/ class=md-nav__link> Miner </a> </li> <li class=md-nav__item> <a href=../../JSON-RPC-API/modules/net/ class=md-nav__link> Net </a> </li> <li class=md-nav__item> <a href=../../JSON-RPC-API/modules/personal/ class=md-nav__link> Personal </a> </li> <li class=md-nav__item> <a href=../../JSON-RPC-API/modules/trace/ class=md-nav__link> Trace </a> </li> <li class=md-nav__item> <a href=../../JSON-RPC-API/modules/txpool/ class=md-nav__link> Txpool </a> </li> <li class=md-nav__item> <a href=../../JSON-RPC-API/modules/web3/ class=md-nav__link> Web3 </a> </li> </ul> </nav> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_3 data-md-state=indeterminate type=checkbox id=__nav_3 checked> <label class=md-nav__link for=__nav_3> Core <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label=Core data-md-level=1> <label class=md-nav__title for=__nav_3> <span class="md-nav__icon md-icon"></span> Core </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../core/ class=md-nav__link> About </a> </li> <li class=md-nav__item> <a href=../../core/alltools/ class=md-nav__link> Included Tools </a> </li> <li class=md-nav__item> <a href=../../core/evmc/ class=md-nav__link> Running Geth with an External VM </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_4 data-md-state=indeterminate type=checkbox id=__nav_4 checked> <label class=md-nav__link for=__nav_4> Developers <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label=Developers data-md-level=1> <label class=md-nav__title for=__nav_4> <span class="md-nav__icon md-icon"></span> Developers </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../developers/add-network/ class=md-nav__link> Adding a Network to Core-Geth </a> </li> <li class=md-nav__item> <a href=../../developers/build-from-source/ class=md-nav__link> Build from Source </a> </li> <li class=md-nav__item> <a href=../../developers/create-new-release/ class=md-nav__link> Publishing a Release </a> </li> <li class=md-nav__item> <a href=../../developers/documentation/ class=md-nav__link> Documentation </a> </li> <li class=md-nav__item> <a href=../../developers/testing/ class=md-nav__link> Testing </a> </li> <li class=md-nav__item> <a href=../../developers/versioning/ class=md-nav__link> Versioning </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--active md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_5 type=checkbox id=__nav_5 checked> <label class=md-nav__link for=__nav_5> Getting started <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label="Getting started" data-md-level=1> <label class=md-nav__title for=__nav_5> <span class="md-nav__icon md-icon"></span> Getting started </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../installation/ class=md-nav__link> Installation </a> </li> <li class="md-nav__item md-nav__item--active"> <input class="md-nav__toggle md-toggle" data-md-toggle=toc type=checkbox id=__toc> <label class="md-nav__link md-nav__link--active" for=__toc> Command Line Interface (CLI) <span class="md-nav__icon md-icon"></span> </label> <a href=./ class="md-nav__link md-nav__link--active"> Command Line Interface (CLI) </a> <nav class="md-nav md-nav--secondary" aria-label="Table of contents"> <label class=md-nav__title for=__toc> <span class="md-nav__icon md-icon"></span> Table of contents </label> <ul class=md-nav__list data-md-component=toc data-md-scrollfix> <li class=md-nav__item> <a href=#running-geth class=md-nav__link> Running geth </a> <nav class=md-nav aria-label="Running geth"> <ul class=md-nav__list> <li class=md-nav__item> <a href=#fast-node-on-an-ethereum-classic-network class=md-nav__link> Fast node on an Ethereum Classic network </a> </li> <li class=md-nav__item> <a href=#a-full-node-on-the-mordor-test-network class=md-nav__link> A Full node on the Mordor test network </a> </li> <li class=md-nav__item> <a href=#configuration class=md-nav__link> Configuration </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#command-line-options class=md-nav__link> Command-line Options </a> </li> </ul> </nav> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_6 data-md-state=indeterminate type=checkbox id=__nav_6 checked> <label class=md-nav__link for=__nav_6> Postmortems <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label=Postmortems data-md-level=1> <label class=md-nav__title for=__nav_6> <span class="md-nav__icon md-icon"></span> Postmortems </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../postmortems/2021-08-22-split-postmortem/ class=md-nav__link> Minority split 2021-08-27 post mortem </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_7 data-md-state=indeterminate type=checkbox id=__nav_7 checked> <label class=md-nav__link for=__nav_7> Tutorials <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label=Tutorials data-md-level=1> <label class=md-nav__title for=__nav_7> <span class="md-nav__icon md-icon"></span> Tutorials </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../tutorials/private-network/ class=md-nav__link> Tutorial: Operating a Private Network </a> </li> </ul> </nav> </li> </ul> </nav> </div> </div> </div> <div class="md-sidebar md-sidebar--secondary" data-md-component=sidebar data-md-type=toc> <div class=md-sidebar__scrollwrap> <div class=md-sidebar__inner> <nav class="md-nav md-nav--secondary" aria-label="Table of contents"> <label class=md-nav__title for=__toc> <span class="md-nav__icon md-icon"></span> Table of contents </label> <ul class=md-nav__list data-md-component=toc data-md-scrollfix> <li class=md-nav__item> <a href=#running-geth class=md-nav__link> Running geth </a> <nav class=md-nav aria-label="Running geth"> <ul class=md-nav__list> <li class=md-nav__item> <a href=#fast-node-on-an-ethereum-classic-network class=md-nav__link> Fast node on an Ethereum Classic network </a> </li> <li class=md-nav__item> <a href=#a-full-node-on-the-mordor-test-network class=md-nav__link> A Full node on the Mordor test network </a> </li> <li class=md-nav__item> <a href=#configuration class=md-nav__link> Configuration </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#command-line-options class=md-nav__link> Command-line Options </a> </li> </ul> </nav> </div> </div> </div> <div class=md-content data-md-component=content> <article class="md-content__inner md-typeset"> <a href=https://github.com/etclabscore/core-geth/edit/master/docs/getting-started/run-cli.md title="Edit this page" class="md-content__button md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg> </a> <h1>Command Line Interface (CLI)</h1> <h2 id=running-geth>Running <code>geth</code><a class=headerlink href=#running-geth title="Permanent link">&para;</a></h2> <div class="admonition tip"> <p class=admonition-title>Use for Ethereum mainnet</p> <p>While <code>core-geth</code> is mainly used for the Ethereum Classic network, you can use it for Ethereum mainnet and other <a href=/#networkprovider-comparison>supported networks</a> as well.</p> </div> <h3 id=fast-node-on-an-ethereum-classic-network>Fast node on an Ethereum Classic network<a class=headerlink href=#fast-node-on-an-ethereum-classic-network title="Permanent link">&para;</a></h3> <p>By far the most common scenario is people wanting to simply interact with the Ethereum network: create accounts; transfer funds; deploy and interact with contracts. For this particular use-case the user doesn&rsquo;t care about years-old historical data, so we can fast-sync quickly to the current state of the network. To do so:</p> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code>$ geth [|--classic|--testnet|--rinkeby|--mordor] console
+</code></pre></div></td></tr></table></div> <p>This command will:</p> <ul> <li>Start <code>geth</code> in fast sync mode (default, can be changed with the <code>--syncmode</code> flag), causing it to download more data in exchange for avoiding processing the entire history of the Ethereum network, which is very CPU intensive.</li> <li>Start up <code>geth</code>&rsquo;s built-in interactive <a href=https://geth.ethereum.org/docs/interface/javascript-console>JavaScript console</a>, (via the trailing <code>console</code> subcommand) through which you can invoke all official <a href=https://web3js.readthedocs.io/en/v1.2.9/ ><code>web3</code> methods</a> as well as <code>geth</code>&rsquo;s own <a href=https://geth.ethereum.org/docs/rpc/server>management APIs</a>. This tool is optional and if you leave it out you can always attach to an already running <code>geth</code> instance with <code>geth attach</code>.</li> </ul> <h3 id=a-full-node-on-the-mordor-test-network>A Full node on the Mordor test network<a class=headerlink href=#a-full-node-on-the-mordor-test-network title="Permanent link">&para;</a></h3> <p>Transitioning towards developers, if you&rsquo;d like to play around with creating Ethereum contracts, you almost certainly would like to do that without any real money involved until you get the hang of the entire system. In other words, instead of attaching to the main network, you want to join the <strong>mordor test</strong> network with your node, which is fully equivalent to the main network, but with play-Ether only.</p> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code>$<span class=w> </span>geth<span class=w> </span>--mordor<span class=w> </span>console
+</code></pre></div></td></tr></table></div> <p>The <code>console</code> subcommand has the exact same meaning as above and they are equally useful on the testnet too. Please see above for their explanations if you&rsquo;ve skipped here.</p> <p>Specifying the <code>--mordor</code> flag, however, will reconfigure your <code>geth</code> instance a bit:</p> <ul> <li>Instead of using the default data directory (<code>~/.ethereum</code> on Linux for example), <code>geth</code> will nest itself one level deeper into a <code>mordor</code> subfolder (<code>~/.ethereum/mordor</code> on Linux). Note, on OSX and Linux this also means that attaching to a running testnet node requires the use of a custom endpoint since <code>geth attach</code> will try to attach to a production node endpoint by default. E.g. <code>geth attach &lt;datadir&gt;/mordor/geth.ipc</code>. Windows users are not affected by this.</li> <li>Instead of connecting the main Ethereum network, the client will connect to the mordor&rsquo;s test network, which uses different P2P bootnodes, different network IDs and genesis states.</li> </ul> <div class="admonition note"> <p class=admonition-title>Note</p> <p>Although there are some internal protective measures to prevent transactions from crossing over between the classic network and test network, you should make sure to always use separate accounts for play-money and real-money. Unless you manually move accounts, <code>geth</code> will by default correctly separate the two networks and will not make any accounts available between them.*</p> </div> <h3 id=configuration>Configuration<a class=headerlink href=#configuration title="Permanent link">&para;</a></h3> <p>As an alternative to passing the numerous flags to the <code>geth</code> binary, you can also pass a configuration file via:</p> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code>$<span class=w> </span>geth<span class=w> </span>--config<span class=w> </span>/path/to/your_config.toml
+</code></pre></div></td></tr></table></div> <p>To get an idea how the file should look like you can use the <code>dumpconfig</code> subcommand to export your existing configuration:</p> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>1</span></pre></div></td><td class=code><div><pre><span></span><code>$<span class=w> </span>geth<span class=w> </span>--your-favourite-flags<span class=w> </span>dumpconfig
+</code></pre></div></td></tr></table></div> <div class="admonition note"> <p class=admonition-title>Note</p> <p>This works only with <code>geth</code> v1.6.0 and above.*</p> </div> <h2 id=command-line-options>Command-line Options<a class=headerlink href=#command-line-options title="Permanent link">&para;</a></h2> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>  1</span>
+<span class=normal>  2</span>
+<span class=normal>  3</span>
+<span class=normal>  4</span>
+<span class=normal>  5</span>
+<span class=normal>  6</span>
+<span class=normal>  7</span>
+<span class=normal>  8</span>
+<span class=normal>  9</span>
+<span class=normal> 10</span>
+<span class=normal> 11</span>
+<span class=normal> 12</span>
+<span class=normal> 13</span>
+<span class=normal> 14</span>
+<span class=normal> 15</span>
+<span class=normal> 16</span>
+<span class=normal> 17</span>
+<span class=normal> 18</span>
+<span class=normal> 19</span>
+<span class=normal> 20</span>
+<span class=normal> 21</span>
+<span class=normal> 22</span>
+<span class=normal> 23</span>
+<span class=normal> 24</span>
+<span class=normal> 25</span>
+<span class=normal> 26</span>
+<span class=normal> 27</span>
+<span class=normal> 28</span>
+<span class=normal> 29</span>
+<span class=normal> 30</span>
+<span class=normal> 31</span>
+<span class=normal> 32</span>
+<span class=normal> 33</span>
+<span class=normal> 34</span>
+<span class=normal> 35</span>
+<span class=normal> 36</span>
+<span class=normal> 37</span>
+<span class=normal> 38</span>
+<span class=normal> 39</span>
+<span class=normal> 40</span>
+<span class=normal> 41</span>
+<span class=normal> 42</span>
+<span class=normal> 43</span>
+<span class=normal> 44</span>
+<span class=normal> 45</span>
+<span class=normal> 46</span>
+<span class=normal> 47</span>
+<span class=normal> 48</span>
+<span class=normal> 49</span>
+<span class=normal> 50</span>
+<span class=normal> 51</span>
+<span class=normal> 52</span>
+<span class=normal> 53</span>
+<span class=normal> 54</span>
+<span class=normal> 55</span>
+<span class=normal> 56</span>
+<span class=normal> 57</span>
+<span class=normal> 58</span>
+<span class=normal> 59</span>
+<span class=normal> 60</span>
+<span class=normal> 61</span>
+<span class=normal> 62</span>
+<span class=normal> 63</span>
+<span class=normal> 64</span>
+<span class=normal> 65</span>
+<span class=normal> 66</span>
+<span class=normal> 67</span>
+<span class=normal> 68</span>
+<span class=normal> 69</span>
+<span class=normal> 70</span>
+<span class=normal> 71</span>
+<span class=normal> 72</span>
+<span class=normal> 73</span>
+<span class=normal> 74</span>
+<span class=normal> 75</span>
+<span class=normal> 76</span>
+<span class=normal> 77</span>
+<span class=normal> 78</span>
+<span class=normal> 79</span>
+<span class=normal> 80</span>
+<span class=normal> 81</span>
+<span class=normal> 82</span>
+<span class=normal> 83</span>
+<span class=normal> 84</span>
+<span class=normal> 85</span>
+<span class=normal> 86</span>
+<span class=normal> 87</span>
+<span class=normal> 88</span>
+<span class=normal> 89</span>
+<span class=normal> 90</span>
+<span class=normal> 91</span>
+<span class=normal> 92</span>
+<span class=normal> 93</span>
+<span class=normal> 94</span>
+<span class=normal> 95</span>
+<span class=normal> 96</span>
+<span class=normal> 97</span>
+<span class=normal> 98</span>
+<span class=normal> 99</span>
+<span class=normal>100</span>
+<span class=normal>101</span>
+<span class=normal>102</span>
+<span class=normal>103</span>
+<span class=normal>104</span>
+<span class=normal>105</span>
+<span class=normal>106</span>
+<span class=normal>107</span>
+<span class=normal>108</span>
+<span class=normal>109</span>
+<span class=normal>110</span>
+<span class=normal>111</span>
+<span class=normal>112</span>
+<span class=normal>113</span>
+<span class=normal>114</span>
+<span class=normal>115</span>
+<span class=normal>116</span>
+<span class=normal>117</span>
+<span class=normal>118</span>
+<span class=normal>119</span>
+<span class=normal>120</span>
+<span class=normal>121</span>
+<span class=normal>122</span>
+<span class=normal>123</span>
+<span class=normal>124</span>
+<span class=normal>125</span>
+<span class=normal>126</span>
+<span class=normal>127</span>
+<span class=normal>128</span>
+<span class=normal>129</span>
+<span class=normal>130</span>
+<span class=normal>131</span>
+<span class=normal>132</span>
+<span class=normal>133</span>
+<span class=normal>134</span>
+<span class=normal>135</span>
+<span class=normal>136</span>
+<span class=normal>137</span>
+<span class=normal>138</span>
+<span class=normal>139</span>
+<span class=normal>140</span>
+<span class=normal>141</span>
+<span class=normal>142</span>
+<span class=normal>143</span>
+<span class=normal>144</span>
+<span class=normal>145</span>
+<span class=normal>146</span>
+<span class=normal>147</span>
+<span class=normal>148</span>
+<span class=normal>149</span>
+<span class=normal>150</span>
+<span class=normal>151</span>
+<span class=normal>152</span>
+<span class=normal>153</span>
+<span class=normal>154</span>
+<span class=normal>155</span>
+<span class=normal>156</span>
+<span class=normal>157</span>
+<span class=normal>158</span>
+<span class=normal>159</span>
+<span class=normal>160</span>
+<span class=normal>161</span>
+<span class=normal>162</span>
+<span class=normal>163</span>
+<span class=normal>164</span>
+<span class=normal>165</span>
+<span class=normal>166</span>
+<span class=normal>167</span>
+<span class=normal>168</span>
+<span class=normal>169</span>
+<span class=normal>170</span>
+<span class=normal>171</span>
+<span class=normal>172</span>
+<span class=normal>173</span>
+<span class=normal>174</span>
+<span class=normal>175</span>
+<span class=normal>176</span>
+<span class=normal>177</span>
+<span class=normal>178</span>
+<span class=normal>179</span>
+<span class=normal>180</span>
+<span class=normal>181</span>
+<span class=normal>182</span>
+<span class=normal>183</span>
+<span class=normal>184</span>
+<span class=normal>185</span>
+<span class=normal>186</span>
+<span class=normal>187</span>
+<span class=normal>188</span>
+<span class=normal>189</span>
+<span class=normal>190</span>
+<span class=normal>191</span>
+<span class=normal>192</span>
+<span class=normal>193</span>
+<span class=normal>194</span>
+<span class=normal>195</span>
+<span class=normal>196</span>
+<span class=normal>197</span>
+<span class=normal>198</span>
+<span class=normal>199</span>
+<span class=normal>200</span>
+<span class=normal>201</span>
+<span class=normal>202</span>
+<span class=normal>203</span>
+<span class=normal>204</span>
+<span class=normal>205</span>
+<span class=normal>206</span>
+<span class=normal>207</span>
+<span class=normal>208</span>
+<span class=normal>209</span>
+<span class=normal>210</span>
+<span class=normal>211</span>
+<span class=normal>212</span>
+<span class=normal>213</span>
+<span class=normal>214</span>
+<span class=normal>215</span>
+<span class=normal>216</span>
+<span class=normal>217</span>
+<span class=normal>218</span>
+<span class=normal>219</span>
+<span class=normal>220</span>
+<span class=normal>221</span>
+<span class=normal>222</span>
+<span class=normal>223</span>
+<span class=normal>224</span>
+<span class=normal>225</span>
+<span class=normal>226</span>
+<span class=normal>227</span>
+<span class=normal>228</span>
+<span class=normal>229</span>
+<span class=normal>230</span>
+<span class=normal>231</span>
+<span class=normal>232</span>
+<span class=normal>233</span>
+<span class=normal>234</span>
+<span class=normal>235</span>
+<span class=normal>236</span>
+<span class=normal>237</span>
+<span class=normal>238</span>
+<span class=normal>239</span>
+<span class=normal>240</span>
+<span class=normal>241</span></pre></div></td><td class=code><div><pre><span></span><code>$ geth --help
+NAME:
+   geth - the ETC Core Go-Ethereum command line interface
+
+   Copyright 2013-2019 The go-ethereum Authors
+
+USAGE:
+   geth [options] command [command options] [arguments...]
+
+VERSION:
+   1.11.21-unstable
+
+COMMANDS:
+   account                            Manage accounts
+   attach                             Start an interactive JavaScript environment (connect to node)
+   console                            Start an interactive JavaScript environment
+   copydb                             Create a local chain from a target chaindata folder
+   dump                               Dump a specific block from storage
+   dumpconfig                         Show configuration values
+   dumpgenesis                        Dumps genesis block JSON configuration to stdout
+   export                             Export blockchain into file
+   export-preimages                   Export the preimage database into an RLP stream
+   import                             Import a blockchain file
+   import-preimages                   Import the preimage database from an RLP stream
+   init                               Bootstrap and initialize a new genesis block
+   inspect                            Inspect the storage size for each type of data in the database
+   js                                 Execute the specified JavaScript files
+   license                            Display license information
+   makecache                          Generate ethash verification cache (for testing)
+   makedag                            Generate ethash mining DAG (for testing)
+   removedb                           Remove blockchain and state databases
+   show-deprecated-flags              Show flags that have been deprecated
+   version                            Print version numbers
+   version-check                      Checks (online) whether the current version suffers from any known security vulnerabilities
+   wallet                             Manage Ethereum presale wallets
+   help, h                            Shows a list of commands or help for one command
+
+ETHEREUM OPTIONS:
+  --config value                      TOML configuration file
+  --datadir value                     Data directory for the databases and keystore (default: &quot;/Users/ziogaschr/Library/Ethereum&quot;)
+  --datadir.ancient value             Data directory for ancient chain segments (default = inside chaindata)
+  --ancient.rpc value                 Connect to a remote freezer via RPC. Value must an HTTP(S), WS(S), unix socket, or &#39;stdio&#39; URL. Incompatible with --datadir.ancient
+  --keystore value                    Directory for the keystore (default = inside the datadir)
+  --nousb                             Disables monitoring for and managing USB hardware wallets
+  --pcscdpath value                   Path to the smartcard daemon (pcscd) socket file
+  --networkid value                   Explicitly set network id (integer)(For testnets: use --ropsten, --rinkeby, --mordor, --yolov2 instead) (default: 1)
+  --classic                           Ethereum Classic network: pre-configured Ethereum Classic mainnet
+  --mordor                            Mordor network: Ethereum Classic&#39;s cross-client proof-of-work test network
+  --rinkeby                           Rinkeby network: pre-configured proof-of-authority test network
+  --rinkeby                           Rinkeby network: pre-configured proof-of-authority test network
+  --yolov2                            YOLOv2 network: pre-configured proof-of-authority shortlived test network.
+  --mintme                            MintMe.com Coin mainnet: pre-configured MintMe.com Coin mainnet
+  --ropsten                           Ropsten network: pre-configured proof-of-work test network
+  --syncmode value                    Blockchain sync mode (&quot;fast&quot;, &quot;full&quot;, or &quot;light&quot;) (default: fast)
+  --exitwhensynced                    Exits after block synchronisation completes
+  --gcmode value                      Blockchain garbage collection mode (&quot;full&quot;, &quot;archive&quot;) (default: &quot;full&quot;)
+  --txlookuplimit value               Number of recent blocks to maintain transactions index by-hash for (default = index all blocks) (default: 0)
+  --ethstats value                    Reporting URL of a ethstats service (nodename:secret@host:port)
+  --identity value                    Custom node name
+  --lightkdf                          Reduce key-derivation RAM &amp; CPU usage at some expense of KDF strength
+  --whitelist value                   Comma separated block number-to-hash mappings to enforce (&lt;number&gt;=&lt;hash&gt;)
+  --ecbp1100 value                    Configure ECBP-1100 (MESS) block activation number (default: 18446744073709551615)
+
+LIGHT CLIENT OPTIONS:
+  --light.serve value                 Maximum percentage of time allowed for serving LES requests (multi-threaded processing allows values over 100) (default: 0)
+  --light.ingress value               Incoming bandwidth limit for serving light clients (kilobytes/sec, 0 = unlimited) (default: 0)
+  --light.egress value                Outgoing bandwidth limit for serving light clients (kilobytes/sec, 0 = unlimited) (default: 0)
+  --light.maxpeers value              Maximum number of light clients to serve, or light servers to attach to (default: 100)
+  --ulc.servers value                 List of trusted ultra-light servers
+  --ulc.fraction value                Minimum % of trusted ultra-light servers required to announce a new head (default: 75)
+  --ulc.onlyannounce                  Ultra light server sends announcements only
+  --light.nopruning                   Disable ancient light chain data pruning
+
+DEVELOPER CHAIN OPTIONS:
+  --dev                               Ephemeral proof-of-authority network with a pre-funded developer account, mining enabled
+  --dev.period value                  Block period for proof-of-authority network to use in developer mode (0 = mine only if transaction pending) (default: 0)
+  --dev.pow                           Ephemeral proof-of-work network with a pre-funded developer account, mining enabled
+
+ETHASH OPTIONS:
+  --ethash.cachedir value             Directory to store the ethash verification caches (default = inside the datadir)
+  --ethash.cachesinmem value          Number of recent ethash caches to keep in memory (16MB each) (default: 2)
+  --ethash.cachesondisk value         Number of recent ethash caches to keep on disk (16MB each) (default: 3)
+  --ethash.cacheslockmmap             Lock memory maps of recent ethash caches
+  --ethash.dagdir value               Directory to store the ethash mining DAGs (default: &quot;/Users/ziogaschr/Library/Ethash&quot;)
+  --ethash.dagsinmem value            Number of recent ethash mining DAGs to keep in memory (1+GB each) (default: 1)
+  --ethash.dagsondisk value           Number of recent ethash mining DAGs to keep on disk (1+GB each) (default: 2)
+  --ethash.dagslockmmap               Lock memory maps for recent ethash mining DAGs
+
+TRANSACTION POOL OPTIONS:
+  --txpool.locals value               Comma separated accounts to treat as locals (no flush, priority inclusion)
+  --txpool.nolocals                   Disables price exemptions for locally submitted transactions
+  --txpool.journal value              Disk journal for local transaction to survive node restarts (default: &quot;transactions.rlp&quot;)
+  --txpool.rejournal value            Time interval to regenerate the local transaction journal (default: 1h0m0s)
+  --txpool.pricelimit value           Minimum gas price limit to enforce for acceptance into the pool (default: 1)
+  --txpool.pricebump value            Price bump percentage to replace an already existing transaction (default: 10)
+  --txpool.accountslots value         Minimum number of executable transaction slots guaranteed per account (default: 16)
+  --txpool.globalslots value          Maximum number of executable transaction slots for all accounts (default: 4096)
+  --txpool.accountqueue value         Maximum number of non-executable transaction slots permitted per account (default: 64)
+  --txpool.globalqueue value          Maximum number of non-executable transaction slots for all accounts (default: 1024)
+  --txpool.lifetime value             Maximum amount of time non-executable transaction are queued (default: 3h0m0s)
+
+PERFORMANCE TUNING OPTIONS:
+  --cache value                       Megabytes of memory allocated to internal caching (default = 4096 mainnet full node, 128 light mode) (default: 1024)
+  --cache.database value              Percentage of cache memory allowance to use for database io (default: 50)
+  --cache.trie value                  Percentage of cache memory allowance to use for trie caching (default = 15% full mode, 30% archive mode) (default: 15)
+  --cache.trie.journal value          Disk journal directory for trie cache to survive node restarts (default: &quot;triecache&quot;)
+  --cache.trie.rejournal value        Time interval to regenerate the trie cache journal (default: 1h0m0s)
+  --cache.gc value                    Percentage of cache memory allowance to use for trie pruning (default = 25% full mode, 0% archive mode) (default: 25)
+  --cache.snapshot value              Percentage of cache memory allowance to use for snapshot caching (default = 10% full mode, 20% archive mode) (default: 10)
+  --cache.noprefetch                  Disable heuristic state prefetch during block import (less CPU and disk IO, more time waiting for data)
+  --cache.preimages                   Enable recording the SHA3/keccak preimages of trie keys (default: true)
+
+ACCOUNT OPTIONS:
+  --unlock value                      Comma separated list of accounts to unlock
+  --password value                    Password file to use for non-interactive password input
+  --signer value                      External signer (url or path to ipc file)
+  --allow-insecure-unlock             Allow insecure account unlocking when account-related RPCs are exposed by http
+
+API AND CONSOLE OPTIONS:
+  --ipcdisable                        Disable the IPC-RPC server
+  --ipcpath value                     Filename for IPC socket/pipe within the datadir (explicit paths escape it)
+  --http                              Enable the HTTP-RPC server
+  --http.addr value                   HTTP-RPC server listening interface (default: &quot;localhost&quot;)
+  --http.port value                   HTTP-RPC server listening port (default: 8545)
+  --http.api value                    API&#39;s offered over the HTTP-RPC interface
+  --http.corsdomain value             Comma separated list of domains from which to accept cross origin requests (browser enforced)
+  --http.vhosts value                 Comma separated list of virtual hostnames from which to accept requests (server enforced). Accepts &#39;*&#39; wildcard. (default: &quot;localhost&quot;)
+  --ws                                Enable the WS-RPC server
+  --ws.addr value                     WS-RPC server listening interface (default: &quot;localhost&quot;)
+  --ws.port value                     WS-RPC server listening port (default: 8546)
+  --ws.api value                      API&#39;s offered over the WS-RPC interface
+  --ws.origins value                  Origins from which to accept websockets requests
+  --graphql                           Enable GraphQL on the HTTP-RPC server. Note that GraphQL can only be started if an HTTP server is started as well.
+  --graphql.corsdomain value          Comma separated list of domains from which to accept cross origin requests (browser enforced)
+  --graphql.vhosts value              Comma separated list of virtual hostnames from which to accept requests (server enforced). Accepts &#39;*&#39; wildcard. (default: &quot;localhost&quot;)
+  --rpc.gascap value                  Sets a cap on gas that can be used in eth_call/estimateGas (0=infinite) (default: 25000000)
+  --rpc.txfeecap value                Sets a cap on transaction fee (in ether) that can be sent via the RPC APIs (0 = no cap) (default: 1)
+  --jspath loadScript                 JavaScript root path for loadScript (default: &quot;.&quot;)
+  --exec value                        Execute JavaScript statement
+  --preload value                     Comma separated list of JavaScript files to preload into the console
+
+NETWORKING OPTIONS:
+  --bootnodes value                   Comma separated enode URLs for P2P discovery bootstrap
+  --bootnodesv4 value                 Comma separated enode URLs for P2P v4 discovery bootstrap (light server, full nodes) (deprecated, use --bootnodes)
+  --bootnodesv5 value                 Comma separated enode URLs for P2P v5 discovery bootstrap (light server, light nodes) (deprecated, use --bootnodes)
+  --discovery.dns value               Sets DNS discovery entry points (use &quot;&quot; to disable DNS)
+  --eth.protocols value               Sets the Ethereum Protocol versions (65|64|63) (default = 65,64,63 first is primary)
+  --port value                        Network listening port (default: 30303)
+  --maxpeers value                    Maximum number of network peers (network disabled if set to 0) (default: 50)
+  --maxpendpeers value                Maximum number of pending connection attempts (defaults used if set to 0) (default: 0)
+  --nat value                         NAT port mapping mechanism (any|none|upnp|pmp|extip:&lt;IP&gt;) (default: &quot;any&quot;)
+  --nodiscover                        Disables the peer discovery mechanism (manual peer addition)
+  --v5disc                            Enables the experimental RLPx V5 (Topic Discovery) mechanism
+  --netrestrict value                 Restricts network communication to the given IP networks (CIDR masks)
+  --nodekey value                     P2P node key file
+  --nodekeyhex value                  P2P node key as hex (for testing)
+
+MINER OPTIONS:
+  --mine                              Enable mining
+  --miner.threads value               Number of CPU threads to use for mining (default: 0)
+  --miner.notify value                Comma separated HTTP URL list to notify of new work packages
+  --miner.gasprice value              Minimum gas price for mining a transaction (default: 1000000000)
+  --miner.gastarget value             Target gas floor for mined blocks (default: 8000000)
+  --miner.gaslimit value              Target gas ceiling for mined blocks (default: 8000000)
+  --miner.etherbase value             Public address for block mining rewards (default = first account) (default: &quot;0&quot;)
+  --miner.extradata value             Block extra data set by the miner (default = client version)
+  --miner.recommit value              Time interval to recreate the block being mined (default: 3s)
+  --miner.noverify                    Disable remote sealing verification
+
+GAS PRICE ORACLE OPTIONS:
+  --gpo.blocks value                  Number of recent blocks to check for gas prices (default: 20)
+  --gpo.percentile value              Suggested gas price is the given percentile of a set of recent transaction gas prices (default: 60)
+  --gpo.maxprice value                Maximum gas price will be recommended by gpo (default: 500000000000)
+
+VIRTUAL MACHINE OPTIONS:
+  --vmdebug                           Record information useful for VM and contract debugging
+  --vm.evm value                      External EVM configuration (default = built-in interpreter)
+  --vm.ewasm value                    External ewasm configuration (default = built-in interpreter)
+
+LOGGING AND DEBUGGING OPTIONS:
+  --fakepow                           Disables proof-of-work verification
+  --fakepow.poisson                   Disables proof-of-work verification and adds mining delay (Poisson) based on --miner.threads
+  --nocompaction                      Disables db compaction after import
+  --verbosity value                   Logging verbosity: 0=silent, 1=error, 2=warn, 3=info, 4=debug, 5=detail (default: 3)
+  --vmodule value                     Per-module verbosity: comma-separated list of &lt;pattern&gt;=&lt;level&gt; (e.g. eth/*=5,p2p=4)
+  --backtrace value                   Request a stack trace at a specific logging statement (e.g. &quot;block.go:271&quot;)
+  --debug                             Prepends log messages with call-site location (file and line number)
+  --pprof                             Enable the pprof HTTP server
+  --pprof.addr value                  pprof HTTP server listening interface (default: &quot;127.0.0.1&quot;)
+  --pprof.port value                  pprof HTTP server listening port (default: 6060)
+  --pprof.memprofilerate value        Turn on memory profiling with the given rate (default: 524288)
+  --pprof.blockprofilerate value      Turn on block profiling with the given rate (default: 0)
+  --pprof.cpuprofile value            Write CPU profile to the given file
+  --trace value                       Write execution trace to the given file
+
+METRICS AND STATS OPTIONS:
+  --metrics                           Enable metrics collection and reporting
+  --metrics.expensive                 Enable expensive metrics collection and reporting
+  --metrics.addr value                Enable stand-alone metrics HTTP server listening interface (default: &quot;127.0.0.1&quot;)
+  --metrics.port value                Metrics HTTP server listening port (default: 6060)
+  --metrics.influxdb                  Enable metrics export/push to an external InfluxDB database
+  --metrics.influxdb.endpoint value   InfluxDB API endpoint to report metrics to (default: &quot;http://localhost:8086&quot;)
+  --metrics.influxdb.database value   InfluxDB database name to push reported metrics to (default: &quot;geth&quot;)
+  --metrics.influxdb.username value   Username to authorize access to the database (default: &quot;test&quot;)
+  --metrics.influxdb.password value   Password to authorize access to the database (default: &quot;test&quot;)
+  --metrics.influxdb.tags value       Comma-separated InfluxDB tags (key/values) attached to all measurements (default: &quot;host=localhost&quot;)
+
+WHISPER (deprecated) OPTIONS:
+  --shh                               Enable Whisper
+  --shh.maxmessagesize value          Max message size accepted (default: 1048576)
+  --shh.pow value                     Minimum POW accepted (default: 0.2)
+  --shh.restrict-light                Restrict connection between two whisper light clients
+
+ALIASED (deprecated) OPTIONS:
+  --rpc                               Enable the HTTP-RPC server (deprecated, use --http)
+  --rpcaddr value                     HTTP-RPC server listening interface (deprecated, use --http.addr) (default: &quot;localhost&quot;)
+  --rpcport value                     HTTP-RPC server listening port (deprecated, use --http.port) (default: 8545)
+  --rpccorsdomain value               Comma separated list of domains from which to accept cross origin requests (browser enforced) (deprecated, use --http.corsdomain)
+  --rpcvhosts value                   Comma separated list of virtual hostnames from which to accept requests (server enforced). Accepts &#39;*&#39; wildcard. (deprecated, use --http.vhosts) (default: &quot;localhost&quot;)
+  --rpcapi value                      API&#39;s offered over the HTTP-RPC interface (deprecated, use --http.api)
+  --wsaddr value                      WS-RPC server listening interface (deprecated, use --ws.addr) (default: &quot;localhost&quot;)
+  --wsport value                      WS-RPC server listening port (deprecated, use --ws.port) (default: 8546)
+  --wsorigins value                   Origins from which to accept websockets requests (deprecated, use --ws.origins)
+  --wsapi value                       API&#39;s offered over the WS-RPC interface (deprecated, use --ws.api)
+  --gpoblocks value                   Number of recent blocks to check for gas prices (deprecated, use --gpo.blocks) (default: 20)
+  --gpopercentile value               Suggested gas price is the given percentile of a set of recent transaction gas prices (deprecated, use --gpo.percentile) (default: 60)
+  --graphql.addr value                GraphQL server listening interface (deprecated, graphql can only be enabled on the HTTP-RPC server endpoint, use --graphql)
+  --graphql.port value                GraphQL server listening port (deprecated, graphql can only be enabled on the HTTP-RPC server endpoint, use --graphql) (default: 8545)
+  --pprofport value                   pprof HTTP server listening port (deprecated, use --pprof.port) (default: 6060)
+  --pprofaddr value                   pprof HTTP server listening interface (deprecated, use --pprof.addr) (default: &quot;127.0.0.1&quot;)
+  --memprofilerate value              Turn on memory profiling with the given rate (deprecated, use --pprof.memprofilerate) (default: 524288)
+  --blockprofilerate value            Turn on block profiling with the given rate (deprecated, use --pprof.blockprofilerate) (default: 0)
+  --cpuprofile value                  Write CPU profile to the given file (deprecated, use --pprof.cpuprofile)
+
+MISC OPTIONS:
+  --snapshot                          Enables snapshot-database mode -- experimental work in progress feature
+  --help, -h                          show help
+
+
+COPYRIGHT:
+   Copyright 2013-2020 The core-geth and go-ethereum Authors
+</code></pre></div></td></tr></table></div> <hr> <div class=md-source-date> <small> Last update: <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago"><span class=timeago datetime=2025-01-20T15:08:14+00:00 locale=en></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date">2025-01-20</span> </small> </div> </article> </div> </div> </main> <footer class=md-footer> <nav class="md-footer__inner md-grid" aria-label=Footer> <a href=../installation/ class="md-footer__link md-footer__link--prev" rel=prev> <div class="md-footer__button md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg> </div> <div class=md-footer__title> <div class=md-ellipsis> <span class=md-footer__direction> Previous </span> Installation </div> </div> </a> <a href=../../postmortems/2021-08-22-split-postmortem/ class="md-footer__link md-footer__link--next" rel=next> <div class=md-footer__title> <div class=md-ellipsis> <span class=md-footer__direction> Next </span> Minority split 2021-08-27 post mortem </div> </div> <div class="md-footer__button md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg> </div> </a> </nav> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright> <div class=md-footer-copyright__highlight> Copyright &copy; 2021 etclabscore/core-geth and ethereum/go-ethereum authors; see <a href=https://github.com/etclabscore/core-geth/tree/master/COPYING target=_>COPYING file</a> - All rights reserved </div> Made with <a href=https://squidfunk.github.io/mkdocs-material/ target=_blank rel=noopener> Material for MkDocs </a> </div> </div> </div> </footer> </div> <div class=md-dialog data-md-component=dialog> <div class="md-dialog__inner md-typeset"></div> </div> <script id=__config type=application/json>{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.expand", "navigation.sections", "navigation.tracking", "navigation.top"], "search": "../../assets/javascripts/workers/search.fb4a9340.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing"}, "version": null}</script> <script src=../../assets/javascripts/bundle.a1c7c35e.min.js></script> <script src=../../js/timeago.min.js></script> <script src=../../js/timeago_mkdocs_material.js></script> </body> </html>

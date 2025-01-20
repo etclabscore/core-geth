@@ -40,26 +40,6 @@ pipeline {
                         unsuccessful { githubNotify context: 'Mordor Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'FAILURE', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
                     }
                 }
-                stage('Goerli') {
-                    agent { label "aws-slave-m5-xlarge" }
-                    steps {
-                        sh "curl -L -O https://go.dev/dl/go1.22.4.linux-amd64.tar.gz"
-                        sh "sudo rm -rf /usr/bin/go && sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.22.4.linux-amd64.tar.gz"
-                        sh "export GOROOT=/usr/local/go"
-                        sh "/usr/local/go/bin/go version"
-                        sh "mkdir -p ./build/bin && /usr/local/go/bin/go build -o ./build/bin/geth ./cmd/geth && sudo chmod +x ./build/bin/geth"
-                        sh "sudo cp ./build/bin/geth /usr/bin/ && which geth"
-                        sh "geth version"
-                        sh "rm -rf ${GETH_DATADIR}-goerli"
-                        sh "shasum -a 256 -c ./tests/regression/shasums/goerli.0-2000000.rlp.gz.sha256"
-                        sh "geth --goerli --cache=2048 --nocompaction --nousb --txlookuplimit=1 --datadir=${GETH_DATADIR}-goerli import ${GETH_EXPORTS}/goerli.0-2000000.rlp.gz"
-                    }
-                    post {
-                        always { sh "rm -rf ${GETH_DATADIR}-goerli" }
-                        success { githubNotify context: 'Goerli Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'SUCCESS', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
-                        unsuccessful { githubNotify context: 'Goerli Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'FAILURE', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
-                    }
-                }
                 // Commented now because these take a looong time.
                 // One way of approaching a solution is to break each chain into a "stepladder" of imports, eg. 0-1150000, 1150000-1920000, 1920000-2500000, etc...
                 // This would allow further parallelization at the cost of duplicated base chaindata stores.

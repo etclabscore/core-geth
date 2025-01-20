@@ -306,9 +306,6 @@ func checkMainnet(ctx *cli.Context) bool {
 	isMainnet := false
 
 	switch {
-	case ctx.IsSet(utils.GoerliFlag.Name):
-		log.Info("Starting Geth on Görli testnet...")
-
 	case ctx.IsSet(utils.SepoliaFlag.Name):
 		log.Info("Starting Geth on Sepolia testnet...")
 

@@ -33,7 +33,6 @@ Networks supported by the respective core-geth packaged `geth` program.
 |        | :zap:             | Morden (Geth+Parity ETH PoW Testnet)  |                                                          |                      |
 |        | :zap:             | Ropsten (Geth+Parity ETH PoW Testnet) | :heavy_check_mark:                                       | :heavy_check_mark:   |
 |        | :handshake:       | Rinkeby (Geth-only ETH PoA Testnet)   | :heavy_check_mark:                                       | :heavy_check_mark:   |
-|        | :handshake:       | Goerli (Geth+Parity ETH PoA Testnet)  | :heavy_check_mark:                                       | :heavy_check_mark:   |
 |        | :handshake:       | Kovan (Parity-only ETH PoA Testnet)   |                                                          |                      |
 |        |                   | Tobalaba (EWF Testnet)                |                                                          |                      |
 |        |                   | Ephemeral development PoA network     | :heavy_check_mark:                                       | :heavy_check_mark:   |

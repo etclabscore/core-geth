@@ -73,16 +73,6 @@ func TestSetupGenesisBlock(t *testing.T) {
 	}
 }
 
-func TestInvalidCliqueConfig(t *testing.T) {
-	db := rawdb.NewMemoryDatabase()
-	gspec := params.DefaultGoerliGenesisBlock()
-	gspec.ExtraData = []byte{}
-
-	if _, err := CommitGenesis(gspec, db, triedb.NewDatabase(db, nil)); err == nil {
-		t.Fatal("Expected error on invalid clique config")
-	}
-}
-
 func TestSetupGenesis(t *testing.T) {
 	testSetupGenesis(t, rawdb.HashScheme)
 	testSetupGenesis(t, rawdb.PathScheme)
@@ -143,15 +133,15 @@ func testSetupGenesis(t *testing.T, scheme string) {
 			wantConfig: customg.Config,
 		},
 		{
-			name: "custom block in DB, genesis == goerli",
+			name: "custom block in DB, genesis == mordor",
 			fn: func(db ethdb.Database) (ctypes.ChainConfigurator, common.Hash, error) {
 				tdb := triedb.NewDatabase(db, newDbConfig(scheme))
 				MustCommitGenesis(db, tdb, &customg)
-				return SetupGenesisBlock(db, tdb, params.DefaultGoerliGenesisBlock())
+				return SetupGenesisBlock(db, tdb, params.DefaultMordorGenesisBlock())
 			},
-			wantErr:    &genesisT.GenesisMismatchError{Stored: customghash, New: params.GoerliGenesisHash},
-			wantHash:   params.GoerliGenesisHash,
-			wantConfig: params.GoerliChainConfig,
+			wantErr:    &genesisT.GenesisMismatchError{Stored: customghash, New: params.MordorGenesisHash},
+			wantHash:   params.MordorGenesisHash,
+			wantConfig: params.MordorChainConfig,
 		},
 		{
 			name: "compatible config in DB",
@@ -222,7 +212,7 @@ func TestGenesisHashes(t *testing.T) {
 		want    common.Hash
 	}{
 		{params.DefaultGenesisBlock(), params.MainnetGenesisHash},
-		{params.DefaultGoerliGenesisBlock(), params.GoerliGenesisHash},
+		{params.DefaultMordorGenesisBlock(), params.MordorGenesisHash},
 		{params.DefaultSepoliaGenesisBlock(), params.SepoliaGenesisHash},
 	} {
 		// Test via MustCommit

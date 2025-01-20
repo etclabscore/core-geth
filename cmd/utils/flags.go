@@ -147,7 +147,7 @@ var (
 	}
 	NetworkIdFlag = &cli.Uint64Flag{
 		Name:     "networkid",
-		Usage:    "Explicitly set network id (integer)(For testnets: use --goerli, --sepolia, --holesky instead)",
+		Usage:    "Explicitly set network id (integer)(For testnets: use --sepolia, --holesky instead)",
 		Value:    ethconfig.Defaults.NetworkId,
 		Category: flags.EthCategory,
 	}
@@ -180,11 +180,6 @@ var (
 	MordorFlag = &cli.BoolFlag{
 		Name:     "mordor",
 		Usage:    "Mordor network: Ethereum Classic's cross-client proof-of-work test network",
-		Category: flags.EthCategory,
-	}
-	GoerliFlag = &cli.BoolFlag{
-		Name:     "goerli",
-		Usage:    "Görli network: pre-configured proof-of-authority test network",
 		Category: flags.EthCategory,
 	}
 	SepoliaFlag = &cli.BoolFlag{
@@ -1127,7 +1122,6 @@ Please note that --` + MetricsHTTPFlag.Name + ` must be set to start the server.
 var (
 	// TestnetFlags is the flag group of all built-in supported testnets.
 	TestnetFlags = []cli.Flag{
-		GoerliFlag,
 		SepoliaFlag,
 		MordorFlag,
 		HoleskyFlag,
@@ -1200,7 +1194,7 @@ func setNodeUserIdent(ctx *cli.Context, cfg *node.Config) {
 //
 // 1. --bootnodes flag
 // 2. Config file
-// 3. Network preset flags (e.g. --goerli)
+// 3. Network preset flags (e.g. --classic)
 // 4. default to mainnet nodes
 func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 	urls := params.MainnetBootnodes
@@ -1219,8 +1213,6 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 			urls = params.MordorBootnodes
 		case ctx.Bool(SepoliaFlag.Name):
 			urls = params.SepoliaBootnodes
-		case ctx.Bool(GoerliFlag.Name):
-			urls = params.GoerliBootnodes
 		case ctx.Bool(HoleskyFlag.Name):
 			urls = params.HoleskyBootnodes
 		}
@@ -1254,8 +1246,6 @@ func setBootstrapNodesV5(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.ClassicBootnodes
 	case ctx.IsSet(MordorFlag.Name):
 		urls = params.MordorBootnodes
-	case ctx.Bool(GoerliFlag.Name):
-		urls = params.GoerliBootnodes
 	case ctx.Bool(MintMeFlag.Name):
 		urls = params.MintMeBootnodes
 	case cfg.BootstrapNodesV5 != nil:
@@ -1699,8 +1689,6 @@ func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) stri
 		return filepath.Join(baseDataDirPath, "classic")
 	case ctx.Bool(MordorFlag.Name):
 		return filepath.Join(baseDataDirPath, "mordor")
-	case ctx.Bool(GoerliFlag.Name):
-		return filepath.Join(baseDataDirPath, "goerli")
 	case ctx.Bool(SepoliaFlag.Name):
 		return filepath.Join(baseDataDirPath, "sepolia")
 	case ctx.Bool(MintMeFlag.Name):
@@ -1957,7 +1945,7 @@ func CheckExclusive(ctx *cli.Context, args ...interface{}) {
 // SetEthConfig applies eth-related command line flags to the config.
 func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	// Avoid conflicting network flags
-	CheckExclusive(ctx, MainnetFlag, DeveloperFlag, DeveloperPoWFlag, GoerliFlag, SepoliaFlag, ClassicFlag, MordorFlag, MintMeFlag, HoleskyFlag)
+	CheckExclusive(ctx, MainnetFlag, DeveloperFlag, DeveloperPoWFlag, SepoliaFlag, ClassicFlag, MordorFlag, MintMeFlag, HoleskyFlag)
 	CheckExclusive(ctx, LightServeFlag, SyncModeFlag, "light")
 	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, ExternalSignerFlag) // Can't use both ephemeral unlocked and external signer
 
@@ -2191,8 +2179,6 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	case ctx.Bool(SepoliaFlag.Name):
 		cfg.Genesis = params.DefaultSepoliaGenesisBlock()
 		SetDNSDiscoveryDefaults(cfg, params.SepoliaGenesisHash)
-	case ctx.Bool(GoerliFlag.Name):
-		SetDNSDiscoveryDefaults(cfg, params.GoerliGenesisHash)
 	case ctx.Bool(ClassicFlag.Name):
 		SetDNSDiscoveryDefaults2(cfg, params.ClassicDNSNetwork1)
 	case ctx.Bool(MordorFlag.Name):
@@ -2522,8 +2508,6 @@ func genesisForCtxChainConfig(ctx *cli.Context) *genesisT.Genesis {
 		genesis = params.DefaultMordorGenesisBlock()
 	case ctx.Bool(SepoliaFlag.Name):
 		genesis = params.DefaultSepoliaGenesisBlock()
-	case ctx.Bool(GoerliFlag.Name):
-		genesis = params.DefaultGoerliGenesisBlock()
 	case ctx.Bool(MintMeFlag.Name):
 		genesis = params.DefaultMintMeGenesisBlock()
 	case ctx.Bool(HoleskyFlag.Name):

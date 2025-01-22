@@ -26,7 +26,7 @@ jobs:
         run: |
           go test -short ./tests -count 1 -p 1 -timeout 60m -run NONE -bench=VM -v |& tee core-geth.txt
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: core-geth
           path: ./core-geth.txt
@@ -57,7 +57,7 @@ jobs:
           git checkout $GITHUB_SHA -- tests/vm_bench_test.go
           go test -short ./tests -count 1 -p 1 -timeout 60m -run NONE -bench=VM -v |& tee go-ethereum.txt
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: go-ethereum
           path: ./go-ethereum.txt
@@ -81,12 +81,12 @@ jobs:
         run: |
           go install golang.org/x/perf/cmd/benchstat@latest
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4
         name: Get go-ethereum artifact
         with:
           name: go-ethereum
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4
         name: Get core-geth artifact
         with:
           name: core-geth

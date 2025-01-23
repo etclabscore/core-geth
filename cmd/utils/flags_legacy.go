@@ -18,6 +18,7 @@ package utils
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/eth/ethconfig"
 	"github.com/ethereum/go-ethereum/internal/flags"
@@ -85,6 +86,58 @@ var (
 		Value:    ethconfig.Defaults.TransactionHistory,
 		Category: flags.DeprecatedCategory,
 	}
+	// Light server and client settings, Deprecated November 2023
+	LightServeFlag = &cli.IntFlag{
+		Name:     "light.serve",
+		Usage:    "Maximum percentage of time allowed for serving LES requests (deprecated)",
+		Value:    ethconfig.Defaults.LightServ,
+		Category: flags.DeprecatedCategory,
+	}
+	LightIngressFlag = &cli.IntFlag{
+		Name:     "light.ingress",
+		Usage:    "Incoming bandwidth limit for serving light clients (deprecated)",
+		Value:    ethconfig.Defaults.LightIngress,
+		Category: flags.DeprecatedCategory,
+	}
+	LightEgressFlag = &cli.IntFlag{
+		Name:     "light.egress",
+		Usage:    "Outgoing bandwidth limit for serving light clients (deprecated)",
+		Value:    ethconfig.Defaults.LightEgress,
+		Category: flags.DeprecatedCategory,
+	}
+	LightMaxPeersFlag = &cli.IntFlag{
+		Name:     "light.maxpeers",
+		Usage:    "Maximum number of light clients to serve, or light servers to attach to (deprecated)",
+		Value:    ethconfig.Defaults.LightPeers,
+		Category: flags.DeprecatedCategory,
+	}
+	UltraLightServersFlag = &cli.StringFlag{
+		Name:     "ulc.servers",
+		Usage:    "List of trusted ultra-light servers",
+		Value:    strings.Join(ethconfig.Defaults.UltraLightServers, ","),
+		Category: flags.DeprecatedCategory,
+	}
+	UltraLightFractionFlag = &cli.IntFlag{
+		Name:     "ulc.fraction",
+		Usage:    "Minimum % of trusted ultra-light servers required to announce a new head",
+		Value:    ethconfig.Defaults.UltraLightFraction,
+		Category: flags.DeprecatedCategory,
+	}
+	UltraLightOnlyAnnounceFlag = &cli.BoolFlag{
+		Name:     "ulc.onlyannounce",
+		Usage:    "Ultra light server sends announcements only",
+		Category: flags.DeprecatedCategory,
+	}
+	LightNoPruneFlag = &cli.BoolFlag{
+		Name:     "light.nopruning",
+		Usage:    "Disable ancient light chain data pruning (deprecated)",
+		Category: flags.DeprecatedCategory,
+	}
+	LightNoSyncServeFlag = &cli.BoolFlag{
+		Name:     "light.nosyncserve",
+		Usage:    "Enables serving light clients before syncing (deprecated)",
+		Category: flags.DeprecatedCategory,
+	}
 	// Deprecated November 2023
 	LogBacktraceAtFlag = &cli.StringFlag{
 		Name:     "log.backtrace",
@@ -95,6 +148,12 @@ var (
 	LogDebugFlag = &cli.BoolFlag{
 		Name:     "log.debug",
 		Usage:    "Prepends log messages with call-site location (deprecated)",
+		Category: flags.DeprecatedCategory,
+	}
+	// Deprecated February 2024
+	MetricsEnabledExpensiveFlag = &cli.BoolFlag{
+		Name:     "metrics.expensive",
+		Usage:    "Enable expensive metrics collection and reporting (deprecated)",
 		Category: flags.DeprecatedCategory,
 	}
 )

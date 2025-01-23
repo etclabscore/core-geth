@@ -26,6 +26,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/log"
@@ -124,6 +125,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *triedb.Database, g
 		} else {
 			log.Info("Writing custom genesis block")
 		}
+
 		applyOverrides(genesis.Config)
 		block, err := CommitGenesis(genesis, db, triedb)
 		if err != nil {
@@ -335,7 +337,7 @@ func gaFlush(ga *genesisT.GenesisAlloc, triedb *triedb.Database, db ethdb.Databa
 	}
 	for addr, account := range *ga {
 		if account.Balance != nil {
-			statedb.AddBalance(addr, uint256.MustFromBig(account.Balance))
+			statedb.AddBalance(addr, uint256.MustFromBig(account.Balance), tracing.BalanceIncreaseGenesisBalance)
 		}
 		statedb.SetCode(addr, account.Code)
 		statedb.SetNonce(addr, account.Nonce)
@@ -384,7 +386,7 @@ func gaHash(ga *genesisT.GenesisAlloc, isVerkle bool) (common.Hash, error) {
 	}
 	for addr, account := range *ga {
 		if account.Balance != nil {
-			statedb.AddBalance(addr, uint256.MustFromBig(account.Balance))
+			statedb.AddBalance(addr, uint256.MustFromBig(account.Balance), tracing.BalanceIncreaseGenesisBalance)
 		}
 		statedb.SetCode(addr, account.Code)
 		statedb.SetNonce(addr, account.Nonce)
@@ -578,4 +580,41 @@ func GenesisBlockForTesting(db ethdb.Database, addr common.Address, balance *big
 		BaseFee: big.NewInt(vars.InitialBaseFee),
 	}
 	return MustCommitGenesis(db, triedb.NewDatabase(db, nil), &g)
+}
+
+func getGenesisState(db ethdb.Database, blockhash common.Hash) (alloc genesisT.GenesisAlloc, err error) {
+	blob := rawdb.ReadGenesisStateSpec(db, blockhash)
+	if len(blob) != 0 {
+		if err := alloc.UnmarshalJSON(blob); err != nil {
+			return nil, err
+		}
+
+		return alloc, nil
+	}
+
+	// Genesis allocation is missing and there are several possibilities:
+	// the node is legacy which doesn't persist the genesis allocation or
+	// the persisted allocation is just lost.
+	// - supported networks(mainnet, testnets), recover with defined allocations
+	// - private network, can't recover
+	var genesis *genesisT.Genesis
+	switch blockhash {
+	case params.MainnetGenesisHash:
+		genesis = params.DefaultGenesisBlock()
+	case params.GoerliGenesisHash:
+		genesis = params.DefaultGoerliGenesisBlock()
+	case params.SepoliaGenesisHash:
+		genesis = params.DefaultSepoliaGenesisBlock()
+	case params.HoleskyGenesisHash:
+		genesis = params.DefaultHoleskyGenesisBlock()
+	case params.MordorGenesisHash:
+		genesis = params.DefaultMordorGenesisBlock()
+	case params.MintMeGenesisHash:
+		genesis = params.DefaultMintMeGenesisBlock()
+	}
+	if genesis != nil {
+		return genesis.Alloc, nil
+	}
+
+	return nil, nil
 }

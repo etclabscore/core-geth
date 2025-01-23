@@ -41,34 +41,36 @@ const (
 	numberCacheLimit = 2048
 )
 
-// HeaderChain implements the basic block header chain logic that is shared by
-// core.BlockChain and light.LightChain. It is not usable in itself, only as
-// a part of either structure.
+// HeaderChain implements the basic block header chain logic. It is not usable
+// in itself, but rather an internal structure of core.Blockchain.
 //
 // HeaderChain is responsible for maintaining the header chain including the
 // header query and updating.
 //
-// The components maintained by headerchain includes: (1) total difficulty
-// (2) header (3) block hash -> number mapping (4) canonical number -> hash mapping
-// and (5) head header flag.
+// The data components maintained by HeaderChain include:
 //
-// It is not thread safe either, the encapsulating chain structures should do
-// the necessary mutex locking/unlocking.
+// - total difficulty
+// - header
+// - block hash -> number mapping
+// - canonical number -> hash mapping
+// - head header flag.
+//
+// It is not thread safe, the encapsulating chain structures should do the
+// necessary mutex locking/unlocking.
 type HeaderChain struct {
 	config        ctypes.ChainConfigurator
 	chainDb       ethdb.Database
 	genesisHeader *types.Header
 
-	currentHeader     atomic.Value // Current head of the header chain (may be above the block chain!)
-	currentHeaderHash common.Hash  // Hash of the current head of the header chain (prevent recomputing all the time)
+	currentHeader     atomic.Pointer[types.Header] // Current head of the header chain (maybe above the block chain!)
+	currentHeaderHash common.Hash                  // Hash of the current head of the header chain (prevent recomputing all the time)
 
 	headerCache *lru.Cache[common.Hash, *types.Header]
 	tdCache     *lru.Cache[common.Hash, *big.Int] // most recent total difficulties
 	numberCache *lru.Cache[common.Hash, uint64]   // most recent block numbers
 
 	procInterrupt func() bool
-
-	engine consensus.Engine
+	engine        consensus.Engine
 }
 
 // NewHeaderChain creates a new HeaderChain structure. ProcInterrupt points
@@ -545,7 +547,7 @@ func (hc *HeaderChain) GetCanonicalHash(number uint64) common.Hash {
 // CurrentHeader retrieves the current head header of the canonical chain. The
 // header is retrieved from the HeaderChain's internal cache.
 func (hc *HeaderChain) CurrentHeader() *types.Header {
-	return hc.currentHeader.Load().(*types.Header)
+	return hc.currentHeader.Load()
 }
 
 // SetCurrentHeader sets the in-memory head header marker of the canonical chan

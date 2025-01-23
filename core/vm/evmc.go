@@ -30,6 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/vars"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/holiman/uint256"
@@ -229,7 +230,7 @@ func (host *hostContext) Selfdestruct(evmcAddr evmc.Address, evmcBeneficiary evm
 	if !db.HasSelfDestructed(addr) {
 		db.AddRefund(vars.SelfdestructRefundGas)
 	}
-	db.AddBalance(beneficiary, db.GetBalance(addr))
+	db.AddBalance(beneficiary, db.GetBalance(addr), tracing.BalanceIncreaseSelfdestruct)
 	db.SelfDestruct(addr)
 }
 

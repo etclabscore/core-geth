@@ -20,10 +20,10 @@ jobs:
         - os: macos-latest
           BUILD_OS_NAME: osx
 
-        - os: ubuntu-20.04
+        - os: ubuntu-latest
           BUILD_OS_NAME: linux
 
-        - os: ubuntu-20.04
+        - os: ubuntu-latest
           BUILD_OS_NAME: arm
 
         - os: windows-latest
@@ -38,7 +38,7 @@ jobs:
         id: go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: 'stable'
 
       - name: Cache lookup (Linux/ARM)
         uses: actions/cache@v3

@@ -1,0 +1,56 @@
+name: Build and publish Docker image
+on:
+  push:
+    tags:
+    - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+  workflow_dispatch:
+
+jobs:
+  geth-docker:
+    name: Build Geth Docker Image
+
+    permissions:
+      contents: read  # Allows access to repository files
+      packages: write # Required to push the Docker image to ghcr.io
+      
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Login to Docker Registry
+      - name: Login to Docker Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 3: Determine Docker image tag based on git commit or git tag
+      - name: Determine Docker Image Tag
+        id: tags
+        run: |
+          IMAGE=ghcr.io/${{ github.repository }}
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            TAG="${IMAGE}:${{ github.ref_name }},${IMAGE}:latest"
+            echo "TAG=$TAG" >> $GITHUB_ENV
+          else
+            TAG="${IMAGE}:${{ github.sha }}"
+            echo "TAG=$TAG" >> $GITHUB_ENV
+          fi
+
+      # Step 4: Setup Docker
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Step 5: Build and Push Docker Image
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .           # Specify the build context (current directory with the Dockerfile)
+          push: true           # Push to container registry
+          tags: ${{ env.TAG }} # Image and tag
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max

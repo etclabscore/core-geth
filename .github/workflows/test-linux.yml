@@ -64,3 +64,21 @@ jobs:
       - run: |
           make all
           make test
+
+  # Build on latest golang version
+  build-stable:
+    name: Build Golang Latest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.x
+        id: go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - run: |
+          make all

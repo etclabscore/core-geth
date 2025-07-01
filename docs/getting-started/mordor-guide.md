@@ -45,7 +45,7 @@ $ geth --mordor # Runs Ethereum Classic's testnet Mordor
 
 You’ll notice listing the account will print the keystore file location.For example:keystore:///home/USER/.ethereum/mordor/keystore/UTC...
 
-## Run Mordor with Mining Enable
+## Run Mordor with Mining Enabled
 
 ```shell
 $ geth --mordor --mine --minerthreads 1 --miner.etherbase 0x_INSERT_YOUR_ADDRESS_HERE_3a087

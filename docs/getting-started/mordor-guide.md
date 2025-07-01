@@ -55,7 +55,7 @@ Check Mordor Balance on Blockscout
 
 So, you’re running a Mordor node and mining testnet mETC. Woohoo! An easy way to double check you’re actually growing a Mordor testnet balance is on [Blockscout](https://etc-mordor.blockscout.com). Just search the account address you created earlier.
 
-## Add your Mordor Account to a Wallet?
+## Add your Mordor Account to a Wallet (Optional)
 
 You can use your keystore file to import your wallet into a wallet application such as MetaMask. In MetaMask
 

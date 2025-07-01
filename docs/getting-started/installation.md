@@ -11,7 +11,8 @@ If you just want to download and run `geth --classic` or any of the other tools 
 
 Binary archives are published at https://github.com/etclabscore/core-geth/releases. Find the latest one for your OS, download it, (check the SHA sum), unarchive it, and run!
 
-Tip: When running Core-geth use `--classic` flag for Ethereum Classic mainnet.
+!!! tip "Run Ethereum Classic"
+    When running Core-geth use `--classic` flag for Ethereum Classic mainnet.
 
 ```shell
 $ wget https://github.com/etclabscore/core-geth/releases/download/v1.12.17/core-geth-linux-v1.12.17.zip # Update to the most current release version

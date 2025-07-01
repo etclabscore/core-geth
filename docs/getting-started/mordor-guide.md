@@ -3,7 +3,7 @@ title: Mordor Testnet Guide
 ---
 
 !!! tip "Mordor Testnet"
-    Mordor is a PoW Ethereum Classic testnet. A testnet allows developers to perform specific tests. Developers may want to test protocol changes, test a smart contract, or interact with the network in anyway that does not require real EthClassic (ETC)—just don’t test on mainnet, mainnet is for production.
+    Mordor is a PoW Ethereum Classic testnet. A testnet allows developers to test transactions before deploying them with real value on the mainnet. Developers may want to test protocol changes, test a smart contract, or interact with the network in any way that does not require real EthClassic (ETC)—just don’t test on mainnet, mainnet is for production.
 
 ## Summary:
 

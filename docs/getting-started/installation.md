@@ -16,7 +16,7 @@ Binary archives are published at https://github.com/etclabscore/core-geth/releas
 
 ```shell
 $ wget https://github.com/etclabscore/core-geth/releases/download/v1.12.17/core-geth-linux-v1.12.17.zip # Update to the most current release version
-$ sudo unzip core-geth-linux-v1.12.17.zip -d /bin/ # Update to the most current release version
+$ sudo unzip core-geth-linux-v1.12.17.zip -d /usr/local/bin # Update to the most current release version
 $ geth --help # Lists available options
 $ geth --classic # Runs Ethereum Classic mainnet
 ```

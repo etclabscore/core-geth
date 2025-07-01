@@ -77,7 +77,7 @@ Enter the following in a new terminal window (ctrl + alt + t):
 touch start-mordor.sh && echo "geth --mordor --mine --minerthreads 1 --miner.etherbase 0x_INSERT_YOUR_ADDRESS_HERE_3a087" >start-mordor.sh && chmod +x start-mordor.sh
 ```
 
-touch start-mordor.sh to create the file && echo “the contents” into the shell script file && add chmod executable+x permissions to the file.
+Create or truncate the script file and echo the command into it, then make it executable.
 
 Enter the following in a new terminal window (ctrl + alt + t):
 

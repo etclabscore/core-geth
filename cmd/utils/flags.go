@@ -941,6 +941,11 @@ var (
 		Usage:    "Enables the experimental RLPx V5 (Topic Discovery) mechanism",
 		Category: flags.NetworkingCategory,
 	}
+	UseProxyFlag = &cli.BoolFlag{
+		Name:     "use-proxy",
+		Usage:    "Use SOCKS5 proxy from ALL_PROXY or all_proxy environment variable for peer connections",
+		Category: flags.NetworkingCategory,
+	}
 	NetrestrictFlag = &cli.StringFlag{
 		Name:     "netrestrict",
 		Usage:    "Restricts network communication to the given IP networks (CIDR masks)",
@@ -1552,6 +1557,7 @@ func SetP2PConfig(ctx *cli.Context, cfg *p2p.Config) {
 	CheckExclusive(ctx, DiscoveryV5Flag, NoDiscoverFlag)
 	cfg.DiscoveryV4 = ctx.Bool(DiscoveryV4Flag.Name)
 	cfg.DiscoveryV5 = ctx.Bool(DiscoveryV5Flag.Name)
+	cfg.UseProxy = ctx.Bool(UseProxyFlag.Name)
 
 	if netrestrict := ctx.String(NetrestrictFlag.Name); netrestrict != "" {
 		list, err := netutil.ParseNetlist(netrestrict)

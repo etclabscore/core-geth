@@ -166,6 +166,9 @@ type Config struct {
 	// Logger is a custom logger to use with the p2p.Server.
 	Logger log.Logger `toml:",omitempty"`
 
+	// If UseProxy is set to true, the server will use SOCKS5 proxy from ALL_PROXY or all_proxy environment variable for dialing peers.
+	UseProxy bool `toml:",omitempty"`
+
 	clock mclock.Clock
 }
 
@@ -617,7 +620,7 @@ func (srv *Server) setupDialScheduler() {
 		config.resolver = srv.discv4
 	}
 	if config.dialer == nil {
-		config.dialer = tcpDialer{&net.Dialer{Timeout: defaultDialTimeout}}
+		config.dialer = tcpDialer{&net.Dialer{Timeout: defaultDialTimeout}, srv.UseProxy}
 	}
 	srv.dialsched = newDialScheduler(config, srv.discmix, srv.SetupConn)
 	for _, n := range srv.StaticNodes {

@@ -50,7 +50,7 @@ func ipcListen(endpoint string) (net.Listener, error) {
 	os.Remove(endpoint)
 	l, err := net.Listen("unix", endpoint)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to listen on unix socket: %w; if the error persists, verify that the disk partition supports Unix domain sockets (ext2/ext3/ext4 work; exFAT does not)", err)
 	}
 	os.Chmod(endpoint, 0600)
 	return l, nil

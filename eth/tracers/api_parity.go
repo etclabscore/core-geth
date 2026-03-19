@@ -60,28 +60,28 @@ type TraceRewardAction struct {
 	RewardType string          `json:"rewardType,omitempty"`
 }
 
-// setTraceConfigDefaultTracer sets the default tracer to "callTracerParity" if none set
+// setTraceConfigDefaultTracer sets the default tracer to "flatCallTracer" if none set
 func setTraceConfigDefaultTracer(config *TraceConfig) *TraceConfig {
 	if config == nil {
 		config = &TraceConfig{}
 	}
 
 	if config.Tracer == nil {
-		tracer := "callTracerParity"
+		tracer := "flatCallTracer"
 		config.Tracer = &tracer
 	}
 
 	return config
 }
 
-// setTraceCallConfigDefaultTracer sets the default tracer to "callTracerParity" if none set
+// setTraceCallConfigDefaultTracer sets the default tracer to "flatCallTracer" if none set
 func setTraceCallConfigDefaultTracer(config *TraceCallConfig) *TraceCallConfig {
 	if config == nil {
 		config = &TraceCallConfig{}
 	}
 
 	if config.Tracer == nil {
-		tracer := "callTracerParity"
+		tracer := "flatCallTracer"
 		config.Tracer = &tracer
 	}
 
@@ -125,7 +125,7 @@ func decorateResponse(res interface{}, config *TraceConfig) (interface{}, error)
 */
 func decorateNestedTraceResponse(res interface{}, tracer string) interface{} {
 	out := map[string]interface{}{}
-	if tracer == "callTracerParity" {
+	if tracer == "flatCallTracer" {
 		out["trace"] = res
 	} else if tracer == "stateDiffTracer" {
 		out["stateDiff"] = res
@@ -271,8 +271,21 @@ func (api *TraceAPI) Call(ctx context.Context, args ethapi.TransactionArgs, bloc
 
 // CallMany lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
 // if the given transaction was added on top of the provided block and returns them as a JSON object.
-// You can provide -2 as a block number to trace on top of the pending block.
+// You can provide -2 as a block number to trace oln top of the pending block.
+// TODO(meowsbits/ziogaschr): api.debugAPI.TraceCallMany does not exist anymore.
+//
+//	I've resolved the compilation error by installing what appears to be a fix but which probably isn't an actual fix.
+//	PTAL.
 func (api *TraceAPI) CallMany(ctx context.Context, txs []ethapi.TransactionArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceCallConfig) (interface{}, error) {
 	config = setTraceCallConfigDefaultTracer(config)
-	return api.debugAPI.TraceCallMany(ctx, txs, blockNrOrHash, config)
+	responses := make([]interface{}, len(txs))
+	for _, tx := range txs {
+		res, err := api.debugAPI.TraceCall(ctx, tx, blockNrOrHash, config)
+		if err != nil {
+			return nil, err
+		}
+		responses = append(responses, res)
+	}
+	traceConfig := getTraceConfigFromTraceCallConfig(config)
+	return decorateResponse(responses, traceConfig)
 }

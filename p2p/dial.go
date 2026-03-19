@@ -436,7 +436,7 @@ func (d *dialScheduler) removeFromStaticPool(idx int) {
 // startDial runs the given dial task in a separate goroutine.
 func (d *dialScheduler) startDial(task *dialTask) {
 	node := task.dest()
-	d.log.Trace("Starting p2p dial", "id", node.ID(), "ip", node.IPAddr(), "flag", task.flags)
+	d.log.Trace("Starting p2p dial", "id", node.ID(), "ip", node.IP(), "flag", task.flags)
 	hkey := string(node.ID().Bytes())
 	d.history.add(hkey, d.clock.Now().Add(dialHistoryExpiration))
 	d.dialing[node.ID()] = task
@@ -489,7 +489,7 @@ func (t *dialTask) run(d *dialScheduler) {
 }
 
 func (t *dialTask) needResolve() bool {
-	return t.flags&staticDialedConn != 0 && !t.dest().IPAddr().IsValid()
+	return t.flags&staticDialedConn != 0 && t.dest().IP() == nil
 }
 
 // resolve attempts to find the current endpoint for the destination
@@ -523,8 +523,7 @@ func (t *dialTask) resolve(d *dialScheduler) bool {
 	// The node was found.
 	t.resolveDelay = initialResolveDelay
 	t.destPtr.Store(resolved)
-	resAddr, _ := resolved.TCPEndpoint()
-	d.log.Debug("Resolved node", "id", resolved.ID(), "addr", resAddr)
+	d.log.Debug("Resolved node", "id", resolved.ID(), "addr", &net.TCPAddr{IP: resolved.IP(), Port: resolved.TCP()})
 	return true
 }
 
@@ -544,7 +543,7 @@ func (t *dialTask) dial(d *dialScheduler, dest *enode.Node) error {
 func (t *dialTask) String() string {
 	node := t.dest()
 	id := node.ID()
-	return fmt.Sprintf("%v %x %v:%d", t.flags, id[:8], node.IPAddr(), node.TCP())
+	return fmt.Sprintf("%v %x %v:%d", t.flags, id[:8], node.IP(), node.TCP())
 }
 
 func cleanupDialErr(err error) error {

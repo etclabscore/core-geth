@@ -75,7 +75,7 @@ func startSimulatedBeaconEthService(t *testing.T, genesis *genesisT.Genesis) (*n
 // send enough transactions to fill multiple blocks
 func TestSimulatedBeaconSendWithdrawals(t *testing.T) {
 	var withdrawals []types.Withdrawal
-	txs := make(map[common.Hash]types.Transaction)
+	txs := make(map[common.Hash]*types.Transaction)
 
 	var (
 		// testKey is a private key to use for funding a tester account.
@@ -111,7 +111,7 @@ func TestSimulatedBeaconSendWithdrawals(t *testing.T) {
 		if err != nil {
 			t.Fatalf("error signing transaction, err=%v", err)
 		}
-		txs[tx.Hash()] = *tx
+		txs[tx.Hash()] = tx
 
 		if err := ethService.APIBackend.SendTx(context.Background(), tx); err != nil {
 			t.Fatal("SendTx failed", err)

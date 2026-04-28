@@ -30,10 +30,55 @@ Networks supported by the respective go-ethereum packaged `geth` program.
 |        | :handshake:       | Kovan (Parity-only ETH PoA Testnet)   |                                                          |                      |
 |        |                   | Tobalaba (EWF Testnet)                |                                                          |                      |
 |        |                   | Ephemeral development PoA network     | :heavy_check_mark:                                       | :heavy_check_mark:   |
+|        | :zap::keycap_ten:  | Greenpoint (ECIP-1049 keccak256 Testnet) | :heavy_check_mark:                                    |                      |
 | MINTME | :zap:             | MintMe.com Coin                       | :heavy_check_mark:                                       |                      |
 
 - :zap: = __Proof of Work__
 - :handshake: = __Proof of Authority__
+- :keycap_ten: = __ECIP-1049 keccak256 PoW__ (replaces Ethash/Etchash with raw `keccak256(SealHash || nonce)`)
+
+### Network preset flags
+
+| Flag           | Network                                                          |
+| ---            | ---                                                              |
+| `--mainnet`    | Ethereum mainnet (default)                                       |
+| `--classic`    | Ethereum Classic mainnet (Etchash)                               |
+| `--mordor`     | Mordor: ETC cross-client PoW testnet — tests the Etchash → ECIP-1049 keccak256 switchover |
+| `--sepolia`    | Sepolia ETH PoW testnet                                          |
+| `--holesky`    | Holesky ETH PoS testnet                                          |
+| `--mintme`     | MintMe.com Coin mainnet (Lyra2)                                  |
+| `--greenpoint` | Greenpoint: ECIP-1049 keccak256-only PoW testnet (from genesis)  |
+| `--dev`        | Ephemeral PoA developer chain                                    |
+| `--dev.pow`    | Ephemeral PoW developer chain                                    |
+
+### ECIP-1049 external mining
+
+When the chain is post-ECIP-1049, the consensus engine exposes a JSON-RPC
+namespace `eccmine` for external miners:
+
+| Method                                | Description                                              |
+| ---                                   | ---                                                      |
+| `eccmine_getWork()`                   | `[sealHash, target, blockNumber]` (3-tuple, no DAG seed) |
+| `eccmine_submitWork(nonce, sealHash)` | Submit a winning nonce. Returns `bool`.                  |
+| `eccmine_submitHashrate(rate, id)`    | Report a self-measured hashrate.                         |
+| `eccmine_getHashrate()`               | Aggregate reported hashrate across all remote miners.    |
+
+PoW formula: `keccak256(sealHash || be8(nonce)) ≤ target`, where
+`target = 2^256 / difficulty`. Headers must have `MixDigest = 0x0…0`.
+
+A reference external miner ships in [cmd/toyminer](cmd/toyminer/toyminer.go):
+
+```sh
+# Run a Greenpoint node and expose the eccmine namespace.
+geth --greenpoint --mine --miner.threads=0 \
+     --http --http.api=eth,net,web3,eccmine
+
+# In another terminal, point toyminer at it.
+go run ./cmd/toyminer --rpc http://127.0.0.1:8545 --threads 4
+```
+
+The same toyminer works against any chain post-ECIP-1049 transition (currently
+Greenpoint, and Mordor / mainnet ETC after their respective `ECIP1049FBlock`).
 
 <a name="ellaism-footnote">1</a>: This is originally an [Ellaism
 Project](https://github.com/ellaism). However, A [recent hard

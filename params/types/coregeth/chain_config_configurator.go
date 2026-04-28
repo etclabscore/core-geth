@@ -1300,6 +1300,21 @@ func (c *CoreGethChainConfig) SetEthashECIP1099Transition(n *uint64) error {
 	return nil
 }
 
+func (c *CoreGethChainConfig) GetEthashECIP1049Transition() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
+		return nil
+	}
+	return bigNewU64(c.ECIP1049FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEthashECIP1049Transition(n *uint64) error {
+	if c.Ethash == nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
+	c.ECIP1049FBlock = setBig(c.ECIP1049FBlock, n)
+	return nil
+}
+
 func (c *CoreGethChainConfig) GetEthashEIP5133Transition() *uint64 {
 	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil

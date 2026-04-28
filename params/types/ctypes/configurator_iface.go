@@ -344,6 +344,8 @@ type EthashConfigurator interface {
 	SetEthashECIP1041Transition(n *uint64) error
 	GetEthashECIP1099Transition() *uint64
 	SetEthashECIP1099Transition(n *uint64) error
+	GetEthashECIP1049Transition() *uint64
+	SetEthashECIP1049Transition(n *uint64) error
 	GetEthashEIP5133Transition() *uint64 // Gray Glacier difficulty bomb delay
 	SetEthashEIP5133Transition(n *uint64) error
 

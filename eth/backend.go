@@ -168,7 +168,12 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 		}
 	}
 
-	engine := ethconfig.CreateConsensusEngine(stack, &ethashConfig, cliqueConfig, lyra2Config, config.Miner.Notify, config.Miner.Noverify, chainDb)
+	var genesisChainConfig ctypes.ChainConfigurator
+	if config.Genesis != nil && config.Genesis.Config != nil {
+		genesisChainConfig = config.Genesis.Config
+	}
+
+	engine := ethconfig.CreateConsensusEngine(stack, &ethashConfig, cliqueConfig, lyra2Config, genesisChainConfig, config.Miner.Notify, config.Miner.Noverify, chainDb)
 
 	chainConfig, err := core.LoadChainConfig(chainDb, config.Genesis)
 	if err != nil {

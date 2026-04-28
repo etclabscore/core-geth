@@ -88,6 +88,12 @@ var (
 		// EIP4895FBlock: nil, // Beacon chain push withdrawals as operations
 		EIP6049FBlock: big.NewInt(9_957_000), // Deprecate SELFDESTRUCT (noop)
 
+		// ECIP-1049: keccak256 proof-of-work switchover. Mordor is the
+		// staging ground for the Etchash -> keccak256 transition; pre-fork
+		// blocks remain Etchash, post-fork blocks are sealed with
+		// keccak256(SealHash || nonce).
+		ECIP1049FBlock: big.NewInt(15_000_000),
+
 		DisposalBlock:            big.NewInt(0),
 		ECIP1017FBlock:           big.NewInt(0),
 		ECIP1017EraRounds:        big.NewInt(2000000),

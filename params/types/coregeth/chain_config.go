@@ -185,6 +185,7 @@ type CoreGethChainConfig struct {
 	ECIP1080FBlock     *big.Int `json:"ecip1080FBlock,omitempty"`
 
 	ECIP1099FBlock           *big.Int `json:"ecip1099FBlock,omitempty"`                 // ECIP1099 etchash HF block
+	ECIP1049FBlock           *big.Int `json:"ecip1049FBlock,omitempty"`                 // ECIP1049 keccak256 PoW HF block
 	ECBP1100FBlock           *big.Int `json:"ecbp1100FBlock,omitempty"`                 // ECBP1100:MESS artificial finality
 	ECBP1100DeactivateFBlock *big.Int `json:"ecbp1100DeactivateFBlockFBlock,omitempty"` // Deactivate ECBP1100:MESS artificial finality
 

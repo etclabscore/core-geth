@@ -1113,6 +1113,14 @@ func (g *Genesis) SetEthashECIP1099Transition(n *uint64) error {
 	return g.Config.SetEthashECIP1099Transition(n)
 }
 
+func (g *Genesis) GetEthashECIP1049Transition() *uint64 {
+	return g.Config.GetEthashECIP1049Transition()
+}
+
+func (g *Genesis) SetEthashECIP1049Transition(n *uint64) error {
+	return g.Config.SetEthashECIP1049Transition(n)
+}
+
 func (g *Genesis) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64Uint256MapEncodesHex {
 	return g.Config.GetEthashDifficultyBombDelaySchedule()
 }

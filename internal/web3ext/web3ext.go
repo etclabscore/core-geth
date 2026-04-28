@@ -21,6 +21,7 @@ var Modules = map[string]string{
 	"admin":    AdminJs,
 	"clique":   CliqueJs,
 	"ethash":   EthashJs,
+	"eccmine":  EccmineJs,
 	"debug":    DebugJs,
 	"eth":      EthJs,
 	"miner":    MinerJs,
@@ -113,6 +114,34 @@ web3._extend({
 		new web3._extend.Method({
 			name: 'submitHashrate',
 			call: 'ethash_submitHashrate',
+			params: 2,
+		}),
+	]
+});
+`
+
+const EccmineJs = `
+web3._extend({
+	property: 'eccmine',
+	methods: [
+		new web3._extend.Method({
+			name: 'getWork',
+			call: 'eccmine_getWork',
+			params: 0
+		}),
+		new web3._extend.Method({
+			name: 'getHashrate',
+			call: 'eccmine_getHashrate',
+			params: 0
+		}),
+		new web3._extend.Method({
+			name: 'submitWork',
+			call: 'eccmine_submitWork',
+			params: 2,
+		}),
+		new web3._extend.Method({
+			name: 'submitHashrate',
+			call: 'eccmine_submitHashrate',
 			params: 2,
 		}),
 	]

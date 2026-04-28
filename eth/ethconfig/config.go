@@ -29,6 +29,7 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/beacon"
 	"github.com/ethereum/go-ethereum/consensus/clique"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
+	"github.com/ethereum/go-ethereum/consensus/keccak256"
 	"github.com/ethereum/go-ethereum/consensus/lyra2"
 	"github.com/ethereum/go-ethereum/core/txpool/blobpool"
 	"github.com/ethereum/go-ethereum/core/txpool/legacypool"
@@ -235,7 +236,11 @@ type Config struct {
 }
 
 // CreateConsensusEngine creates a consensus engine for the given chain configuration.
-func CreateConsensusEngine(stack *node.Node, ethashConfig *ethash.Config, cliqueConfig *ctypes.CliqueConfig, lyra2Config *lyra2.Config, notify []string, noverify bool, db ethdb.Database) consensus.Engine {
+//
+// The chainConfig argument is consulted only to detect optional engine
+// transitions (currently ECIP-1049 / Keccak-256 PoW). Passing nil yields the
+// default Ethash/Clique/Lyra2 selection unchanged.
+func CreateConsensusEngine(stack *node.Node, ethashConfig *ethash.Config, cliqueConfig *ctypes.CliqueConfig, lyra2Config *lyra2.Config, chainConfig ctypes.ChainConfigurator, notify []string, noverify bool, db ethdb.Database) consensus.Engine {
 	// If proof-of-authority is requested, set it up
 	var engine consensus.Engine
 	if cliqueConfig != nil {
@@ -243,21 +248,22 @@ func CreateConsensusEngine(stack *node.Node, ethashConfig *ethash.Config, clique
 	} else if lyra2Config != nil {
 		engine = lyra2.New(lyra2Config, notify, noverify)
 	} else {
+		var ethashEngine *ethash.Ethash
 		switch ethashConfig.PowMode {
 		case ethash.ModeFake:
 			log.Warn("Ethash used in fake mode")
-			engine = ethash.NewFaker()
+			ethashEngine = ethash.NewFaker()
 		case ethash.ModeTest:
 			log.Warn("Ethash used in test mode")
-			engine = ethash.NewTester(nil, noverify)
+			ethashEngine = ethash.NewTester(nil, noverify)
 		case ethash.ModeShared:
 			log.Warn("Ethash used in shared mode")
-			engine = ethash.NewShared()
+			ethashEngine = ethash.NewShared()
 		case ethash.ModePoissonFake:
 			log.Warn("Ethash used in fake Poisson mode")
-			engine = ethash.NewPoissonFaker()
+			ethashEngine = ethash.NewPoissonFaker()
 		default:
-			engine = ethash.New(ethash.Config{
+			ethashEngine = ethash.New(ethash.Config{
 				PowMode:          ethashConfig.PowMode,
 				CacheDir:         stack.ResolvePath(ethashConfig.CacheDir),
 				CachesInMem:      ethashConfig.CachesInMem,
@@ -270,7 +276,20 @@ func CreateConsensusEngine(stack *node.Node, ethashConfig *ethash.Config, clique
 				NotifyFull:       ethashConfig.NotifyFull,
 				ECIP1099Block:    ethashConfig.ECIP1099Block,
 			}, notify, noverify)
-			engine.(*ethash.Ethash).SetThreads(-1) // Disable CPU mining
+			ethashEngine.SetThreads(-1) // Disable CPU mining
+		}
+		// If ECIP-1049 is configured, wrap the inner Ethash engine so that
+		// blocks at and after the transition are verified/sealed using
+		// Keccak-256 PoW.
+		if chainConfig != nil {
+			if t := chainConfig.GetEthashECIP1049Transition(); t != nil {
+				log.Info("ECIP-1049 (Keccak-256 PoW) enabled", "transition", *t)
+				engine = keccak256.New(ethashEngine, t)
+			} else {
+				engine = ethashEngine
+			}
+		} else {
+			engine = ethashEngine
 		}
 	}
 

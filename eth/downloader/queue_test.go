@@ -486,3 +486,53 @@ func (n *network) headers(from int) []*types.Header {
 	}
 	return hdrs
 }
+
+// A delivered batch may straddle the result cache's offset: headers below it are
+// stale because another peer already filled them. The headers above it must still
+// be reconstructed from their own position in the response, not from a counter
+// that only advances on non-stale slots.
+func TestDeliverReconstructUsesBatchIndex(t *testing.T) {
+	all := chain.headers()
+	if len(all) < 6 {
+		t.Fatalf("need at least 6 headers, got %d", len(all))
+	}
+	// Take three consecutive headers and prepare the cache so that the first of
+	// them sits below the offset — exactly the state a delivery races into when
+	// another peer has already filled that slot.
+	batch := all[2:5]
+	offset := batch[1].Number.Uint64()
+
+	q := newQueue(10, 10)
+	q.Prepare(offset, FullSync)
+	for _, h := range batch[1:] {
+		if _, _, _, err := q.resultCache.AddFetch(h, false); err != nil {
+			t.Fatalf("could not allocate a result slot for header %d: %v", h.Number.Uint64(), err)
+		}
+	}
+	q.blockPendPool["peer"] = &fetchRequest{Peer: &peerConnection{id: "peer"}, Headers: batch}
+
+	seen := map[uint64]int{}
+	q.deliver("peer", q.blockTaskPool, q.blockTaskQueue, q.blockPendPool,
+		bodyReqTimer, bodyInMeter, bodyDropMeter, len(batch),
+		func(index int, header *types.Header) error { return nil },
+		func(index int, result *fetchResult) { seen[result.Header.Number.Uint64()] = index },
+	)
+
+	for k, h := range batch {
+		n := h.Number.Uint64()
+		got, ok := seen[n]
+		if n < offset {
+			if ok {
+				t.Errorf("header %d is below the offset and should have been stale, but was reconstructed", n)
+			}
+			continue
+		}
+		if !ok {
+			t.Fatalf("header %d was never reconstructed", n)
+		}
+		if got != k {
+			t.Fatalf("header %d reconstructed from response index %d, want its batch index %d", n, got, k)
+		}
+		t.Logf("header %d -> response index %d (batch index %d) ok", n, got, k)
+	}
+}

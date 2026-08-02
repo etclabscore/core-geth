@@ -49,6 +49,9 @@ var protocolLengths = map[uint]uint64{ETH68: 17}
 // maxMessageSize is the maximum cap on the size of a protocol message.
 const maxMessageSize = 10 * 1024 * 1024
 
+// This is the maximum number of transactions in a Transactions message.
+const maxTransactionAnnouncements = 5000
+
 const (
 	StatusMsg                     = 0x00
 	NewBlockHashesMsg             = 0x01
@@ -115,7 +118,9 @@ func (p *NewBlockHashesPacket) Unpack() ([]common.Hash, []uint64) {
 }
 
 // TransactionsPacket is the network packet for broadcasting new transactions.
-type TransactionsPacket []*types.Transaction
+type TransactionsPacket struct {
+	rlp.RawList[*types.Transaction]
+}
 
 // GetBlockHeadersRequest represents a block header query.
 type GetBlockHeadersRequest struct {
@@ -321,7 +326,7 @@ type PooledTransactionsResponse []*types.Transaction
 // with request ID wrapping.
 type PooledTransactionsPacket struct {
 	RequestId uint64
-	PooledTransactionsResponse
+	List      rlp.RawList[*types.Transaction]
 }
 
 // PooledTransactionsRLPResponse is the network packet for transaction distribution, used
@@ -364,8 +369,8 @@ func (*NewPooledTransactionHashesPacket) Kind() byte   { return NewPooledTransac
 func (*GetPooledTransactionsRequest) Name() string { return "GetPooledTransactions" }
 func (*GetPooledTransactionsRequest) Kind() byte   { return GetPooledTransactionsMsg }
 
-func (*PooledTransactionsResponse) Name() string { return "PooledTransactions" }
-func (*PooledTransactionsResponse) Kind() byte   { return PooledTransactionsMsg }
+func (*PooledTransactionsPacket) Name() string { return "PooledTransactions" }
+func (*PooledTransactionsPacket) Kind() byte   { return PooledTransactionsMsg }
 
 func (*GetReceiptsRequest) Name() string { return "GetReceipts" }
 func (*GetReceiptsRequest) Kind() byte   { return GetReceiptsMsg }

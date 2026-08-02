@@ -31,6 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/internal/utesting"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
+	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/holiman/uint256"
 )
 
@@ -673,7 +674,11 @@ on another peer connection using GetPooledTransactions.`)
 	if got, want := msg.RequestId, req.RequestId; got != want {
 		t.Fatalf("unexpected request id in response: got %d, want %d", got, want)
 	}
-	for _, got := range msg.PooledTransactionsResponse {
+	responseTxs, err := msg.List.Items()
+	if err != nil {
+		t.Fatalf("invalid transactions in response: %v", err)
+	}
+	for _, got := range responseTxs {
 		if _, exists := set[got.Hash()]; !exists {
 			t.Fatalf("unexpected tx received: %v", got.Hash())
 		}
@@ -849,7 +854,8 @@ func (s *Suite) TestBlobViolations(t *utesting.T) {
 		if err := conn.ReadMsg(ethProto, eth.GetPooledTransactionsMsg, req); err != nil {
 			t.Fatalf("reading pooled tx request failed: %v", err)
 		}
-		resp := eth.PooledTransactionsPacket{RequestId: req.RequestId, PooledTransactionsResponse: test.resp}
+		encTxs, _ := rlp.EncodeToRawList([]*types.Transaction(test.resp))
+		resp := eth.PooledTransactionsPacket{RequestId: req.RequestId, List: encTxs}
 		if err := conn.Write(ethProto, eth.PooledTransactionsMsg, resp); err != nil {
 			t.Fatalf("writing pooled tx response failed: %v", err)
 		}

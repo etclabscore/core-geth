@@ -50,23 +50,6 @@ func TestCheckResponseItems_CVE_2026_26313(t *testing.T) {
 		}
 	}
 
-	// Build a bare packet (TransactionsPacket) with N minimal transactions.
-	buildTxsMsg := func(n int) p2p.Msg {
-		txs := make(TransactionsPacket, n)
-		for i := range txs {
-			txs[i] = types.NewTx(&types.LegacyTx{})
-		}
-		payload, err := rlp.EncodeToBytes(txs)
-		if err != nil {
-			t.Fatal(err)
-		}
-		return p2p.Msg{
-			Code:    TransactionsMsg,
-			Size:    uint32(len(payload)),
-			Payload: bytes.NewReader(payload),
-		}
-	}
-
 	t.Run("wrapped packet within limit passes", func(t *testing.T) {
 		msg := buildHeadersMsg(maxHeadersServe)
 		limit := responseItemLimits[BlockHeadersMsg]
@@ -80,22 +63,6 @@ func TestCheckResponseItems_CVE_2026_26313(t *testing.T) {
 		limit := responseItemLimits[BlockHeadersMsg]
 		if err := checkResponseItems(&msg, limit); err == nil {
 			t.Fatalf("expected error for %d headers (limit %d), got nil", maxHeadersServe+1, maxHeadersServe)
-		}
-	})
-
-	t.Run("bare packet within limit passes", func(t *testing.T) {
-		msg := buildTxsMsg(100)
-		limit := responseItemLimits[TransactionsMsg]
-		if err := checkResponseItems(&msg, limit); err != nil {
-			t.Fatalf("expected no error for 100 txs, got: %v", err)
-		}
-	})
-
-	t.Run("bare packet exceeding limit rejected", func(t *testing.T) {
-		msg := buildTxsMsg(maxHeadersServe*4 + 1)
-		limit := responseItemLimits[TransactionsMsg]
-		if err := checkResponseItems(&msg, limit); err == nil {
-			t.Fatalf("expected error for %d txs (limit %d), got nil", maxHeadersServe*4+1, maxHeadersServe*4)
 		}
 	})
 

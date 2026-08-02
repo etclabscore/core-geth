@@ -200,7 +200,6 @@ var responseItemLimits = map[uint64]responseLimit{
 	BlockBodiesMsg:        {maxItems: maxBodiesServe, wrapped: true},
 	ReceiptsMsg:           {maxItems: maxReceiptsServe, wrapped: true},
 	PooledTransactionsMsg: {maxItems: maxHeadersServe * 4, wrapped: true},
-	TransactionsMsg:       {maxItems: maxHeadersServe * 4, wrapped: false},
 }
 
 // checkResponseItems reads the message payload into a buffer, counts the number

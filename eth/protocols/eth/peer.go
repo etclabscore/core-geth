@@ -183,9 +183,9 @@ func (p *Peer) markBlock(hash common.Hash) {
 	p.knownBlocks.Add(hash)
 }
 
-// markTransaction marks a transaction as known for the peer, ensuring that it
+// MarkTransaction marks a transaction as known for the peer, ensuring that it
 // will never be propagated to this particular peer.
-func (p *Peer) markTransaction(hash common.Hash) {
+func (p *Peer) MarkTransaction(hash common.Hash) {
 	// If we reached the memory allowance, drop a previously known transaction hash
 	p.knownTxs.Add(hash)
 }

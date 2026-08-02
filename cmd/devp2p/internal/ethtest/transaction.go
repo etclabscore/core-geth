@@ -52,7 +52,8 @@ func (s *Suite) sendTxs(t *utesting.T, txs []*types.Transaction) error {
 		return fmt.Errorf("peering failed: %v", err)
 	}
 
-	if err = sendConn.Write(ethProto, eth.TransactionsMsg, eth.TransactionsPacket(txs)); err != nil {
+	encTxs, _ := rlp.EncodeToRawList(txs)
+	if err = sendConn.Write(ethProto, eth.TransactionsMsg, eth.TransactionsPacket{RawList: encTxs}); err != nil {
 		return fmt.Errorf("failed to write message to connection: %v", err)
 	}
 
@@ -69,7 +70,8 @@ func (s *Suite) sendTxs(t *utesting.T, txs []*types.Transaction) error {
 		}
 		switch msg := msg.(type) {
 		case *eth.TransactionsPacket:
-			for _, tx := range *msg {
+			txs, _ := msg.Items()
+			for _, tx := range txs {
 				got[tx.Hash()] = true
 			}
 		case *eth.NewPooledTransactionHashesPacket:

@@ -491,7 +491,7 @@ func handleNewPooledTransactionHashes(backend Backend, msg Decoder, peer *Peer) 
 	}
 	// Schedule all the unknown hashes for retrieval
 	for _, hash := range ann.Hashes {
-		peer.markTransaction(hash)
+		peer.MarkTransaction(hash)
 	}
 	return backend.Handle(peer, ann)
 }
@@ -544,12 +544,8 @@ func handleTransactions(backend Backend, msg Decoder, peer *Peer) error {
 	if err := msg.Decode(&txs); err != nil {
 		return fmt.Errorf("%w: message %v: %v", errDecode, msg, err)
 	}
-	for i, tx := range txs {
-		// Validate and mark the remote transaction
-		if tx == nil {
-			return fmt.Errorf("%w: transaction %d is nil", errDecode, i)
-		}
-		peer.markTransaction(tx.Hash())
+	if txs.Len() > maxTransactionAnnouncements {
+		return fmt.Errorf("too many transactions")
 	}
 	return backend.Handle(peer, &txs)
 }
@@ -559,19 +555,13 @@ func handlePooledTransactions(backend Backend, msg Decoder, peer *Peer) error {
 	if !backend.AcceptTxs() {
 		return nil
 	}
-	// Transactions can be processed, parse all of them and deliver to the pool
-	var txs PooledTransactionsPacket
-	if err := msg.Decode(&txs); err != nil {
+
+	// Check against request and decode.
+	var resp PooledTransactionsPacket
+	if err := msg.Decode(&resp); err != nil {
 		return fmt.Errorf("%w: message %v: %v", errDecode, msg, err)
 	}
-	for i, tx := range txs.PooledTransactionsResponse {
-		// Validate and mark the remote transaction
-		if tx == nil {
-			return fmt.Errorf("%w: transaction %d is nil", errDecode, i)
-		}
-		peer.markTransaction(tx.Hash())
-	}
-	requestTracker.Fulfil(peer.id, peer.version, PooledTransactionsMsg, txs.RequestId)
+	requestTracker.Fulfil(peer.id, peer.version, PooledTransactionsMsg, resp.RequestId)
 
-	return backend.Handle(peer, &txs.PooledTransactionsResponse)
+	return backend.Handle(peer, &resp)
 }

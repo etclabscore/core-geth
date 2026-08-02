@@ -323,8 +323,10 @@ func (dlp *downloadTesterPeer) RequestBodies(hashes []common.Hash, sink chan *et
 func (dlp *downloadTesterPeer) RequestReceipts(hashes []common.Hash, sink chan *eth.Response) (*eth.Request, error) {
 	blobs := eth.ServiceGetReceiptsQuery(dlp.chain, hashes)
 
+	raws := make(eth.ReceiptsRLPResponse, len(blobs))
 	receipts := make([][]*types.Receipt, len(blobs))
 	for i, blob := range blobs {
+		raws[i] = blob
 		rlp.DecodeBytes(blob, &receipts[i])
 	}
 	hasher := trie.NewStackTrie(nil)
@@ -337,7 +339,7 @@ func (dlp *downloadTesterPeer) RequestReceipts(hashes []common.Hash, sink chan *
 	}
 	res := &eth.Response{
 		Req:  req,
-		Res:  (*eth.ReceiptsResponse)(&receipts),
+		Res:  &raws,
 		Meta: hashes,
 		Time: 1,
 		Done: make(chan error, 1), // Ignore the returned status

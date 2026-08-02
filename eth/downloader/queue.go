@@ -32,6 +32,7 @@ import (
 	"github.com/ethereum/go-ethereum/eth/protocols/eth"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
+	"github.com/ethereum/go-ethereum/rlp"
 )
 
 const (
@@ -837,18 +838,26 @@ func (q *queue) DeliverBodies(id string, hashes eth.BlockBodyHashes, bodies []et
 // DeliverReceipts injects a receipt retrieval response into the results queue.
 // The method returns the number of transaction receipts accepted from the delivery
 // and also wakes any threads waiting for data delivery.
-func (q *queue) DeliverReceipts(id string, receiptList [][]*types.Receipt, receiptListHashes []common.Hash) (int, error) {
+func (q *queue) DeliverReceipts(id string, receiptList []rlp.RawValue, receiptListHashes []common.Hash) (int, error) {
 	q.lock.Lock()
 	defer q.lock.Unlock()
+
+	var receipts [][]*types.Receipt
 
 	validate := func(index int, header *types.Header) error {
 		if receiptListHashes[index] != header.ReceiptHash {
 			return errInvalidReceipt
 		}
+		// decode
+		var blockReceipts []*types.Receipt
+		if err := rlp.DecodeBytes(receiptList[index], &blockReceipts); err != nil {
+			return fmt.Errorf("%w: bad receipts: %v", errInvalidReceipt, err)
+		}
+		receipts = append(receipts, blockReceipts)
 		return nil
 	}
 	reconstruct := func(index int, result *fetchResult) {
-		result.Receipts = receiptList[index]
+		result.Receipts = receipts[index]
 		result.SetReceiptsDone()
 	}
 	return q.deliver(id, q.receiptTaskPool, q.receiptTaskQueue, q.receiptPendPool,

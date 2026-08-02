@@ -452,18 +452,27 @@ func handleReceipts(backend Backend, msg Decoder, peer *Peer) error {
 	if err := msg.Decode(res); err != nil {
 		return fmt.Errorf("%w: message %v: %v", errDecode, msg, err)
 	}
+
+	receiptLists, err := res.List.Items()
+	if err != nil {
+		return fmt.Errorf("Receipts: %w", err)
+	}
 	metadata := func() interface{} {
 		hasher := trie.NewStackTrie(nil)
-		hashes := make([]common.Hash, len(res.ReceiptsResponse))
-		for i, receipt := range res.ReceiptsResponse {
-			hashes[i] = types.DeriveSha(types.Receipts(receipt), hasher)
+		hashes := make([]common.Hash, len(receiptLists))
+		for i := range receiptLists {
+			hashes[i] = types.DeriveSha(newDerivableRawList(&receiptLists[i], writeTxForHash), hasher)
 		}
 		return hashes
+	}
+	var enc ReceiptsRLPResponse
+	for i := range receiptLists {
+		enc = append(enc, receiptLists[i].Bytes())
 	}
 	return peer.dispatchResponse(&Response{
 		id:   res.RequestId,
 		code: ReceiptsMsg,
-		Res:  &res.ReceiptsResponse,
+		Res:  &enc,
 	}, metadata)
 }
 

@@ -366,16 +366,22 @@ func XTestDelivery(t *testing.T) {
 		for {
 			f, _, _ := q.ReserveReceipts(peer, rand.Intn(50))
 			if f != nil {
-				var rcs [][]*types.Receipt
+				var (
+					rcs  [][]*types.Receipt
+					raws []rlp.RawValue
+				)
 				for _, hdr := range f.Headers {
-					rcs = append(rcs, world.getReceipts(hdr.Number.Uint64()))
+					blockReceipts := world.getReceipts(hdr.Number.Uint64())
+					rcs = append(rcs, blockReceipts)
+					raw, _ := rlp.EncodeToBytes(blockReceipts)
+					raws = append(raws, raw)
 				}
 				hasher := trie.NewStackTrie(nil)
 				hashes := make([]common.Hash, len(rcs))
 				for i, receipt := range rcs {
 					hashes[i] = types.DeriveSha(types.Receipts(receipt), hasher)
 				}
-				_, err := q.DeliverReceipts(peer.id, rcs, hashes)
+				_, err := q.DeliverReceipts(peer.id, raws, hashes)
 				if err != nil {
 					fmt.Printf("delivered %d receipts %v\n", len(rcs), err)
 				}

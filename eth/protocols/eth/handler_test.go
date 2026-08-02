@@ -547,13 +547,14 @@ func testGetBlockReceipts(t *testing.T, protocol uint) {
 	// Collect the hashes to request, and the response to expect
 	var (
 		hashes   []common.Hash
-		receipts [][]*types.Receipt
+		receipts rlp.RawList[ReceiptList]
 	)
 	for i := uint64(0); i <= backend.chain.CurrentBlock().Number.Uint64(); i++ {
 		block := backend.chain.GetBlockByNumber(i)
 
 		hashes = append(hashes, block.Hash())
-		receipts = append(receipts, backend.chain.GetReceiptsByHash(block.Hash()))
+		blockReceipts := backend.chain.GetReceiptsByHash(block.Hash())
+		receipts.Append(encodeRL([]*types.Receipt(blockReceipts)))
 	}
 	// Send the hash request and verify the response
 	p2p.Send(peer.app, GetReceiptsMsg, &GetReceiptsPacket{
@@ -561,8 +562,8 @@ func testGetBlockReceipts(t *testing.T, protocol uint) {
 		GetReceiptsRequest: hashes,
 	})
 	if err := p2p.ExpectMsg(peer.app, ReceiptsMsg, &ReceiptsPacket{
-		RequestId:        123,
-		ReceiptsResponse: receipts,
+		RequestId: 123,
+		List:      receipts,
 	}); err != nil {
 		t.Errorf("receipts mismatch: %v", err)
 	}

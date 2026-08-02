@@ -30,6 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/p2p/enr"
+	"github.com/ethereum/go-ethereum/p2p/tracker"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/trie"
 	"github.com/ethereum/go-ethereum/trie/trienode"
@@ -101,6 +102,7 @@ func MakeProtocols(backend Backend, dnsdisc enode.Iterator) []p2p.Protocol {
 			Length:  protocolLengths[version],
 			Run: func(p *p2p.Peer, rw p2p.MsgReadWriter) error {
 				return backend.RunPeer(NewPeer(version, p, rw), func(peer *Peer) error {
+					defer peer.Close()
 					return Handle(backend, peer)
 				})
 			},
@@ -230,7 +232,10 @@ func HandleMessage(backend Backend, peer *Peer) error {
 		if len := res.Proof.Len(); len > 128 {
 			return fmt.Errorf("AccountRange: invalid proof (length %d)", len)
 		}
-		requestTracker.Fulfil(peer.id, peer.version, AccountRangeMsg, res.ID)
+		tresp := tracker.Response{ID: res.ID, MsgCode: AccountRangeMsg, Size: len(res.Accounts.Content())}
+		if err := peer.tracker.Fulfil(tresp); err != nil {
+			return err
+		}
 
 		// Decode.
 		accounts, err := res.Accounts.Items()
@@ -276,7 +281,10 @@ func HandleMessage(backend Backend, peer *Peer) error {
 		if len := res.Proof.Len(); len > 128 {
 			return fmt.Errorf("StorageRangesMsg: invalid proof (length %d)", len)
 		}
-		requestTracker.Fulfil(peer.id, peer.version, StorageRangesMsg, res.ID)
+		tresp := tracker.Response{ID: res.ID, MsgCode: StorageRangesMsg, Size: len(res.Slots.Content())}
+		if err := peer.tracker.Fulfil(tresp); err != nil {
+			return fmt.Errorf("StorageRangesMsg: %w", err)
+		}
 
 		// Decode.
 		slotLists, err := res.Slots.Items()
@@ -318,7 +326,12 @@ func HandleMessage(backend Backend, peer *Peer) error {
 		if err := msg.Decode(res); err != nil {
 			return fmt.Errorf("%w: message %v: %v", errDecode, msg, err)
 		}
-		requestTracker.Fulfil(peer.id, peer.version, ByteCodesMsg, res.ID)
+
+		length := res.Codes.Len()
+		tresp := tracker.Response{ID: res.ID, MsgCode: ByteCodesMsg, Size: length}
+		if err := peer.tracker.Fulfil(tresp); err != nil {
+			return fmt.Errorf("ByteCodes: %w", err)
+		}
 
 		codes, err := res.Codes.Items()
 		if err != nil {
@@ -348,8 +361,11 @@ func HandleMessage(backend Backend, peer *Peer) error {
 		if err := msg.Decode(res); err != nil {
 			return fmt.Errorf("%w: message %v: %v", errDecode, msg, err)
 		}
-		requestTracker.Fulfil(peer.id, peer.version, TrieNodesMsg, res.ID)
 
+		tresp := tracker.Response{ID: res.ID, MsgCode: TrieNodesMsg, Size: res.Nodes.Len()}
+		if err := peer.tracker.Fulfil(tresp); err != nil {
+			return fmt.Errorf("TrieNodes: %w", err)
+		}
 		nodes, err := res.Nodes.Items()
 		if err != nil {
 			return fmt.Errorf("TrieNodes: %w", err)

@@ -27,6 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/p2p/tracker"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/trie"
 )
@@ -322,6 +323,10 @@ func handleBlockHeaders(backend Backend, msg Decoder, peer *Peer) error {
 	if err := msg.Decode(res); err != nil {
 		return fmt.Errorf("%w: message %v: %v", errDecode, msg, err)
 	}
+	tresp := tracker.Response{ID: res.RequestId, MsgCode: BlockHeadersMsg, Size: res.List.Len()}
+	if err := peer.tracker.Fulfil(tresp); err != nil {
+		return fmt.Errorf("BlockHeaders: %w", err)
+	}
 	headers, err := res.List.Items()
 	if err != nil {
 		return fmt.Errorf("BlockHeaders: %w", err)
@@ -346,6 +351,13 @@ func handleBlockBodies(backend Backend, msg Decoder, peer *Peer) error {
 	res := new(BlockBodiesPacket)
 	if err := msg.Decode(res); err != nil {
 		return fmt.Errorf("%w: message %v: %v", errDecode, msg, err)
+	}
+
+	// Check against the request.
+	length := res.List.Len()
+	tresp := tracker.Response{ID: res.RequestId, MsgCode: BlockBodiesMsg, Size: length}
+	if err := peer.tracker.Fulfil(tresp); err != nil {
+		return fmt.Errorf("BlockBodies: %w", err)
 	}
 
 	// Collect items and dispatch.
@@ -451,6 +463,12 @@ func handleReceipts(backend Backend, msg Decoder, peer *Peer) error {
 	res := new(ReceiptsPacket)
 	if err := msg.Decode(res); err != nil {
 		return fmt.Errorf("%w: message %v: %v", errDecode, msg, err)
+	}
+
+	// Check against the request.
+	tresp := tracker.Response{ID: res.RequestId, MsgCode: ReceiptsMsg, Size: res.List.Len()}
+	if err := peer.tracker.Fulfil(tresp); err != nil {
+		return fmt.Errorf("Receipts: %w", err)
 	}
 
 	receiptLists, err := res.List.Items()
@@ -561,7 +579,14 @@ func handlePooledTransactions(backend Backend, msg Decoder, peer *Peer) error {
 	if err := msg.Decode(&resp); err != nil {
 		return fmt.Errorf("%w: message %v: %v", errDecode, msg, err)
 	}
-	requestTracker.Fulfil(peer.id, peer.version, PooledTransactionsMsg, resp.RequestId)
+	tresp := tracker.Response{
+		ID:      resp.RequestId,
+		MsgCode: PooledTransactionsMsg,
+		Size:    resp.List.Len(),
+	}
+	if err := peer.tracker.Fulfil(tresp); err != nil {
+		return fmt.Errorf("PooledTransactions: %w", err)
+	}
 
 	return backend.Handle(peer, &resp)
 }

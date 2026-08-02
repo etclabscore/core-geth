@@ -20,6 +20,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p"
+	"github.com/ethereum/go-ethereum/rlp"
 )
 
 // Peer is a collection of relevant information we have about a `snap` peer.
@@ -124,10 +125,11 @@ func (p *Peer) RequestTrieNodes(id uint64, root common.Hash, paths []TrieNodePat
 	p.logger.Trace("Fetching set of trie nodes", "reqid", id, "root", root, "pathsets", len(paths), "bytes", common.StorageSize(bytes))
 
 	requestTracker.Track(p.id, p.version, GetTrieNodesMsg, TrieNodesMsg, id)
+	encPaths, _ := rlp.EncodeToRawList(paths)
 	return p2p.Send(p.rw, GetTrieNodesMsg, &GetTrieNodesPacket{
 		ID:    id,
 		Root:  root,
-		Paths: paths,
+		Paths: encPaths,
 		Bytes: bytes,
 	})
 }

@@ -422,10 +422,14 @@ func (dlp *downloadTesterPeer) RequestByteCodes(id uint64, hashes []common.Hash,
 // RequestTrieNodes fetches a batch of account or storage trie nodes rooted in
 // a specific state trie.
 func (dlp *downloadTesterPeer) RequestTrieNodes(id uint64, root common.Hash, paths []snap.TrieNodePathSet, bytes uint64) error {
+	encPaths, err := rlp.EncodeToRawList(paths)
+	if err != nil {
+		panic(err)
+	}
 	req := &snap.GetTrieNodesPacket{
 		ID:    id,
 		Root:  root,
-		Paths: paths,
+		Paths: encPaths,
 		Bytes: bytes,
 	}
 	nodes, _ := snap.ServiceGetTrieNodesQuery(dlp.chain, req, time.Now())

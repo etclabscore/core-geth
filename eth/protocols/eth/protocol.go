@@ -173,7 +173,7 @@ type BlockHeadersRequest []*types.Header
 // BlockHeadersPacket represents a block header response over with request ID wrapping.
 type BlockHeadersPacket struct {
 	RequestId uint64
-	BlockHeadersRequest
+	List      rlp.RawList[*types.Header]
 }
 
 // BlockHeadersRLPResponse represents a block header response, to use when we already
@@ -214,14 +214,11 @@ type GetBlockBodiesPacket struct {
 	GetBlockBodiesRequest
 }
 
-// BlockBodiesResponse is the network packet for block content distribution.
-type BlockBodiesResponse []*BlockBody
-
 // BlockBodiesPacket is the network packet for block content distribution with
 // request ID wrapping.
 type BlockBodiesPacket struct {
 	RequestId uint64
-	BlockBodiesResponse
+	List      rlp.RawList[BlockBody]
 }
 
 // BlockBodiesRLPResponse is used for replying to block body requests, in cases
@@ -235,16 +232,19 @@ type BlockBodiesRLPPacket struct {
 	BlockBodiesRLPResponse
 }
 
+// BlockBodiesResponse is the network packet for block content distribution.
+type BlockBodiesResponse []BlockBody
+
 // BlockBody represents the data content of a single block.
 type BlockBody struct {
-	Transactions []*types.Transaction // Transactions contained within a block
-	Uncles       []*types.Header      // Uncles contained within a block
-	Withdrawals  []*types.Withdrawal  `rlp:"optional"` // Withdrawals contained within a block
+	Transactions rlp.RawList[*types.Transaction]
+	Uncles       rlp.RawList[*types.Header]
+	Withdrawals  *rlp.RawList[*types.Withdrawal] `rlp:"optional"`
 }
 
 // Unpack retrieves the transactions and uncles from the range packet and returns
 // them in a split flat format that's more consistent with the internal data structures.
-func (p *BlockBodiesResponse) Unpack() ([][]*types.Transaction, [][]*types.Header, [][]*types.Withdrawal) {
+func (p *BlockBodiesResponse) Unpack() ([][]*types.Transaction, [][]*types.Header, [][]*types.Withdrawal, error) {
 	// TODO(matt): add support for withdrawals to fetchers
 	var (
 		txset         = make([][]*types.Transaction, len(*p))
@@ -252,9 +252,20 @@ func (p *BlockBodiesResponse) Unpack() ([][]*types.Transaction, [][]*types.Heade
 		withdrawalset = make([][]*types.Withdrawal, len(*p))
 	)
 	for i, body := range *p {
-		txset[i], uncleset[i], withdrawalset[i] = body.Transactions, body.Uncles, body.Withdrawals
+		var err error
+		if txset[i], err = body.Transactions.Items(); err != nil {
+			return nil, nil, nil, err
+		}
+		if uncleset[i], err = body.Uncles.Items(); err != nil {
+			return nil, nil, nil, err
+		}
+		if body.Withdrawals != nil {
+			if withdrawalset[i], err = body.Withdrawals.Items(); err != nil {
+				return nil, nil, nil, err
+			}
+		}
 	}
-	return txset, uncleset, withdrawalset
+	return txset, uncleset, withdrawalset, nil
 }
 
 // GetReceiptsRequest represents a block receipts query.

@@ -36,8 +36,8 @@ func TestCheckResponseItems_CVE_2026_26313(t *testing.T) {
 			headers[i] = &types.Header{}
 		}
 		pkt := &BlockHeadersPacket{
-			RequestId:           1,
-			BlockHeadersRequest: BlockHeadersRequest(headers),
+			RequestId: 1,
+			List:      encodeRL(headers),
 		}
 		payload, err := rlp.EncodeToBytes(pkt)
 		if err != nil {
@@ -110,8 +110,8 @@ func TestCheckResponseItems_CVE_2026_26313(t *testing.T) {
 		if err := msg.Decode(res); err != nil {
 			t.Fatalf("failed to decode after check: %v", err)
 		}
-		if len(res.BlockHeadersRequest) != 10 {
-			t.Fatalf("expected 10 headers, got %d", len(res.BlockHeadersRequest))
+		if res.List.Len() != 10 {
+			t.Fatalf("expected 10 headers, got %d", res.List.Len())
 		}
 	})
 }

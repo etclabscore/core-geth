@@ -18,6 +18,7 @@ package ethtest
 
 import (
 	"crypto/rand"
+	"fmt"
 	"math/big"
 	"reflect"
 
@@ -149,7 +150,11 @@ func (s *Suite) TestGetBlockHeaders(t *utesting.T) {
 	if err != nil {
 		t.Fatalf("failed to get headers for given request: %v", err)
 	}
-	if !headersMatch(expected, headers.BlockHeadersRequest) {
+	received, err := headers.List.Items()
+	if err != nil {
+		t.Fatalf("invalid headers received: %v", err)
+	}
+	if !headersMatch(expected, received) {
 		t.Fatalf("header mismatch: \nexpected %v \ngot %v", expected, headers)
 	}
 }
@@ -216,16 +221,25 @@ concurrently, with different request IDs.`)
 	}
 
 	// Check received headers for accuracy.
-	if expected, err := s.chain.GetHeaders(req1); err != nil {
-		t.Fatalf("failed to get expected headers for request 1: %v", err)
-	} else if !headersMatch(expected, headers1.BlockHeadersRequest) {
-		t.Fatalf("header mismatch: \nexpected %v \ngot %v", expected, headers1)
+	if err := s.checkHeadersAgainstChain(req1, headers1); err != nil {
+		t.Fatal(err)
 	}
-	if expected, err := s.chain.GetHeaders(req2); err != nil {
-		t.Fatalf("failed to get expected headers for request 2: %v", err)
-	} else if !headersMatch(expected, headers2.BlockHeadersRequest) {
-		t.Fatalf("header mismatch: \nexpected %v \ngot %v", expected, headers2)
+	if err := s.checkHeadersAgainstChain(req2, headers2); err != nil {
+		t.Fatal(err)
 	}
+}
+
+func (s *Suite) checkHeadersAgainstChain(req *eth.GetBlockHeadersPacket, resp *eth.BlockHeadersPacket) error {
+	received2, err := resp.List.Items()
+	if err != nil {
+		return fmt.Errorf("invalid headers in response with request ID %v (%d items): %v", resp.RequestId, resp.List.Len(), err)
+	}
+	if expected, err := s.chain.GetHeaders(req); err != nil {
+		return fmt.Errorf("test chain failed to get expected headers for request: %v", err)
+	} else if !headersMatch(expected, received2) {
+		return fmt.Errorf("header mismatch for request ID %v (%d items): \nexpected %v \ngot %v", resp.RequestId, resp.List.Len(), expected, resp)
+	}
+	return nil
 }
 
 func (s *Suite) TestSameRequestID(t *utesting.T) {
@@ -287,15 +301,11 @@ same request ID. The node should handle the request by responding to both reques
 	}
 
 	// Check if headers match.
-	if expected, err := s.chain.GetHeaders(request1); err != nil {
-		t.Fatalf("failed to get expected block headers: %v", err)
-	} else if !headersMatch(expected, headers1.BlockHeadersRequest) {
-		t.Fatalf("header mismatch: \nexpected %v \ngot %v", expected, headers1)
+	if err := s.checkHeadersAgainstChain(request1, headers1); err != nil {
+		t.Fatal(err)
 	}
-	if expected, err := s.chain.GetHeaders(request2); err != nil {
-		t.Fatalf("failed to get expected block headers: %v", err)
-	} else if !headersMatch(expected, headers2.BlockHeadersRequest) {
-		t.Fatalf("header mismatch: \nexpected %v \ngot %v", expected, headers2)
+	if err := s.checkHeadersAgainstChain(request2, headers2); err != nil {
+		t.Fatal(err)
 	}
 }
 
@@ -328,10 +338,8 @@ and expects a response.`)
 	if got, want := headers.RequestId, req.RequestId; got != want {
 		t.Fatalf("unexpected request id")
 	}
-	if expected, err := s.chain.GetHeaders(req); err != nil {
-		t.Fatalf("failed to get expected block headers: %v", err)
-	} else if !headersMatch(expected, headers.BlockHeadersRequest) {
-		t.Fatalf("header mismatch: \nexpected %v \ngot %v", expected, headers)
+	if err := s.checkHeadersAgainstChain(req, headers); err != nil {
+		t.Fatal(err)
 	}
 }
 
@@ -365,9 +373,8 @@ func (s *Suite) TestGetBlockBodies(t *utesting.T) {
 	if got, want := resp.RequestId, req.RequestId; got != want {
 		t.Fatalf("unexpected request id in respond", got, want)
 	}
-	bodies := resp.BlockBodiesResponse
-	if len(bodies) != len(req.GetBlockBodiesRequest) {
-		t.Fatalf("wrong bodies in response: expected %d bodies, got %d", len(req.GetBlockBodiesRequest), len(bodies))
+	if resp.List.Len() != len(req.GetBlockBodiesRequest) {
+		t.Fatalf("wrong bodies in response: expected %d bodies, got %d", len(req.GetBlockBodiesRequest), resp.List.Len())
 	}
 }
 

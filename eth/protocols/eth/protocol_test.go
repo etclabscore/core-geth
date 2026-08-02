@@ -19,6 +19,7 @@ package eth
 import (
 	"bytes"
 	"math/big"
+	"strings"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -78,10 +79,8 @@ func TestEmptyMessages(t *testing.T) {
 	for i, msg := range []interface{}{
 		// Headers
 		GetBlockHeadersPacket{1111, nil},
-		BlockHeadersPacket{1111, nil},
 		// Bodies
 		GetBlockBodiesPacket{1111, nil},
-		BlockBodiesPacket{1111, nil},
 		BlockBodiesRLPPacket{1111, nil},
 		// Receipts
 		GetReceiptsPacket{1111, nil},
@@ -92,10 +91,10 @@ func TestEmptyMessages(t *testing.T) {
 		PooledTransactionsRLPPacket{1111, nil},
 
 		// Headers
-		BlockHeadersPacket{1111, BlockHeadersRequest([]*types.Header{})},
+		BlockHeadersPacket{1111, encodeRL([]*types.Header{})},
 		// Bodies
 		GetBlockBodiesPacket{1111, GetBlockBodiesRequest([]common.Hash{})},
-		BlockBodiesPacket{1111, BlockBodiesResponse([]*BlockBody{})},
+		BlockBodiesPacket{1111, encodeRL([]BlockBody{})},
 		BlockBodiesRLPPacket{1111, BlockBodiesRLPResponse([]rlp.RawValue{})},
 		// Receipts
 		GetReceiptsPacket{1111, GetReceiptsRequest([]common.Hash{})},
@@ -105,10 +104,108 @@ func TestEmptyMessages(t *testing.T) {
 		PooledTransactionsPacket{1111, PooledTransactionsResponse([]*types.Transaction{})},
 		PooledTransactionsRLPPacket{1111, PooledTransactionsRLPResponse([]rlp.RawValue{})},
 	} {
-		if have, _ := rlp.EncodeToBytes(msg); !bytes.Equal(have, want) {
+		have, err := rlp.EncodeToBytes(msg)
+		if err != nil {
+			t.Errorf("test %d, type %T, error: %v", i, msg, err)
+		} else if !bytes.Equal(have, want) {
 			t.Errorf("test %d, type %T, have\n\t%x\nwant\n\t%x", i, msg, have, want)
 		}
 	}
+}
+
+// TestBlockBodiesUnpack tests that BlockBodiesResponse.Unpack materializes
+// valid bodies, and that it surfaces the first item decoding failure without
+// returning any partial results, for the transaction, uncle and withdrawal
+// lists alike.
+func TestBlockBodiesUnpack(t *testing.T) {
+	// A structurally valid RLP item that does not decode into any of the body
+	// item types: too short for a typed transaction, not a list for headers
+	// and withdrawals.
+	badItem := []byte{0x05}
+
+	var badTxs rlp.RawList[*types.Transaction]
+	if err := badTxs.AppendRaw(badItem); err != nil {
+		t.Fatal(err)
+	}
+	var badUncles rlp.RawList[*types.Header]
+	if err := badUncles.AppendRaw(badItem); err != nil {
+		t.Fatal(err)
+	}
+	var badWithdrawals rlp.RawList[*types.Withdrawal]
+	if err := badWithdrawals.AppendRaw(badItem); err != nil {
+		t.Fatal(err)
+	}
+	// Assemble a fully valid body to lead the response, ensuring errors in a
+	// later body discard the earlier results too.
+	var tx *types.Transaction
+	if err := rlp.DecodeBytes(common.FromHex("f867088504a817c8088302e2489435353535353535353535353535353535353535358202008025a064b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c12a064b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c10"), &tx); err != nil {
+		t.Fatal(err)
+	}
+	withdrawals := encodeRL([]*types.Withdrawal{{Index: 1}})
+	validBody := BlockBody{
+		Transactions: encodeRL([]*types.Transaction{tx}),
+		Uncles:       encodeRL([]*types.Header{{Number: big.NewInt(1), Difficulty: big.NewInt(2)}}),
+		Withdrawals:  &withdrawals,
+	}
+
+	t.Run("valid bodies", func(t *testing.T) {
+		res := BlockBodiesResponse{validBody}
+		txs, uncles, wds, err := res.Unpack()
+		if err != nil {
+			t.Fatalf("failed to unpack valid bodies: %v", err)
+		}
+		if len(txs) != 1 || len(txs[0]) != 1 || txs[0][0].Hash() != tx.Hash() {
+			t.Errorf("transaction mismatch after unpack: %v", txs)
+		}
+		if len(uncles) != 1 || len(uncles[0]) != 1 {
+			t.Errorf("uncle mismatch after unpack: %v", uncles)
+		}
+		if len(wds) != 1 || len(wds[0]) != 1 || wds[0][0].Index != 1 {
+			t.Errorf("withdrawal mismatch after unpack: %v", wds)
+		}
+	})
+
+	for _, tt := range []struct {
+		name string
+		body BlockBody
+	}{
+		{"invalid transaction", BlockBody{Transactions: badTxs}},
+		{"invalid uncle", BlockBody{Uncles: badUncles}},
+		{"invalid withdrawal", BlockBody{Withdrawals: &badWithdrawals}},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			res := BlockBodiesResponse{validBody, tt.body}
+			txs, uncles, wds, err := res.Unpack()
+			if err == nil {
+				t.Fatalf("expected unpack error, got none")
+			}
+			if txs != nil || uncles != nil || wds != nil {
+				t.Fatalf("partial results returned alongside error %q: txs %v, uncles %v, withdrawals %v", err, txs, uncles, wds)
+			}
+		})
+	}
+
+	// A network encoded body response whose single body carries one item that
+	// is structurally valid RLP but not a decodable transaction. Before the
+	// error was surfaced, this unpacked into an empty transaction list.
+	t.Run("network encoded response", func(t *testing.T) {
+		var pkt BlockBodiesPacket
+		if err := rlp.DecodeBytes(common.FromHex("c62ac4c3c105c0"), &pkt); err != nil {
+			t.Fatal(err)
+		}
+		bodies, err := pkt.List.Items()
+		if err != nil {
+			t.Fatal(err)
+		}
+		res := BlockBodiesResponse(bodies)
+		txs, uncles, wds, err := res.Unpack()
+		if err == nil || !strings.Contains(err.Error(), "typed transaction too short") {
+			t.Fatalf("error mismatch: have %v, want typed transaction too short", err)
+		}
+		if txs != nil || uncles != nil || wds != nil {
+			t.Fatalf("partial results returned alongside error: txs %v, uncles %v, withdrawals %v", txs, uncles, wds)
+		}
+	})
 }
 
 // TestMessages tests the encoding of all messages.
@@ -116,7 +213,7 @@ func TestMessages(t *testing.T) {
 	// Some basic structs used during testing
 	var (
 		header       *types.Header
-		blockBody    *BlockBody
+		blockBody    BlockBody
 		blockBodyRlp rlp.RawValue
 		txs          []*types.Transaction
 		txRlps       []rlp.RawValue
@@ -150,9 +247,9 @@ func TestMessages(t *testing.T) {
 		}
 	}
 	// init the block body data, both object and rlp form
-	blockBody = &BlockBody{
-		Transactions: txs,
-		Uncles:       []*types.Header{header},
+	blockBody = BlockBody{
+		Transactions: encodeRL(txs),
+		Uncles:       encodeRL([]*types.Header{header}),
 	}
 	blockBodyRlp, err = rlp.EncodeToBytes(blockBody)
 	if err != nil {
@@ -201,7 +298,7 @@ func TestMessages(t *testing.T) {
 			common.FromHex("ca820457c682270f050580"),
 		},
 		{
-			BlockHeadersPacket{1111, BlockHeadersRequest{header}},
+			BlockHeadersPacket{1111, encodeRL([]*types.Header{header})},
 			common.FromHex("f90202820457f901fcf901f9a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000940000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000b90100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008208ae820d0582115c8215b3821a0a827788a00000000000000000000000000000000000000000000000000000000000000000880000000000000000"),
 		},
 		{
@@ -209,7 +306,7 @@ func TestMessages(t *testing.T) {
 			common.FromHex("f847820457f842a000000000000000000000000000000000000000000000000000000000deadc0dea000000000000000000000000000000000000000000000000000000000feedbeef"),
 		},
 		{
-			BlockBodiesPacket{1111, BlockBodiesResponse([]*BlockBody{blockBody})},
+			BlockBodiesPacket{1111, encodeRL([]BlockBody{blockBody})},
 			common.FromHex("f902dc820457f902d6f902d3f8d2f867088504a817c8088302e2489435353535353535353535353535353535353535358202008025a064b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c12a064b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c10f867098504a817c809830334509435353535353535353535353535353535353535358202d98025a052f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afba052f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afbf901fcf901f9a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000940000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000b90100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008208ae820d0582115c8215b3821a0a827788a00000000000000000000000000000000000000000000000000000000000000000880000000000000000"),
 		},
 		{ // Identical to non-rlp-shortcut version

@@ -26,6 +26,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/eth/protocols/eth"
 	"github.com/ethereum/go-ethereum/internal/utesting"
+	"github.com/ethereum/go-ethereum/rlp"
 )
 
 // sendTxs sends the given transactions to the node and
@@ -80,9 +81,10 @@ func (s *Suite) sendTxs(t *utesting.T, txs []*types.Transaction) error {
 			if err != nil {
 				t.Logf("invalid GetBlockHeaders request: %v", err)
 			}
+			encHeaders, _ := rlp.EncodeToRawList(headers)
 			recvConn.Write(ethProto, eth.BlockHeadersMsg, &eth.BlockHeadersPacket{
-				RequestId:           msg.RequestId,
-				BlockHeadersRequest: headers,
+				RequestId: msg.RequestId,
+				List:      encHeaders,
 			})
 		default:
 			return fmt.Errorf("unexpected eth wire msg: %s", pretty.Sdump(msg))
@@ -167,9 +169,10 @@ func (s *Suite) sendInvalidTxs(t *utesting.T, txs []*types.Transaction) error {
 			if err != nil {
 				t.Logf("invalid GetBlockHeaders request: %v", err)
 			}
+			encHeaders, _ := rlp.EncodeToRawList(headers)
 			recvConn.Write(ethProto, eth.BlockHeadersMsg, &eth.BlockHeadersPacket{
-				RequestId:           msg.RequestId,
-				BlockHeadersRequest: headers,
+				RequestId: msg.RequestId,
+				List:      encHeaders,
 			})
 		default:
 			return fmt.Errorf("unexpected eth message: %v", pretty.Sdump(msg))

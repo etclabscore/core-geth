@@ -280,10 +280,12 @@ func (dlp *downloadTesterPeer) RequestHeadersByNumber(origin uint64, amount int,
 func (dlp *downloadTesterPeer) RequestBodies(hashes []common.Hash, sink chan *eth.Response) (*eth.Request, error) {
 	blobs := eth.ServiceGetBlockBodiesQuery(dlp.chain, hashes)
 
-	bodies := make([]*eth.BlockBody, len(blobs))
+	bodies := make([]*types.Body, len(blobs))
+	ethbodies := make([]eth.BlockBody, len(blobs))
 	for i, blob := range blobs {
-		bodies[i] = new(eth.BlockBody)
+		bodies[i] = new(types.Body)
 		rlp.DecodeBytes(blob, bodies[i])
+		rlp.DecodeBytes(blob, &ethbodies[i])
 	}
 	var (
 		txsHashes        = make([]common.Hash, len(bodies))
@@ -299,9 +301,13 @@ func (dlp *downloadTesterPeer) RequestBodies(hashes []common.Hash, sink chan *et
 		Peer: dlp.id,
 	}
 	res := &eth.Response{
-		Req:  req,
-		Res:  (*eth.BlockBodiesResponse)(&bodies),
-		Meta: [][]common.Hash{txsHashes, uncleHashes, withdrawalHashes},
+		Req: req,
+		Res: (*eth.BlockBodiesResponse)(&ethbodies),
+		Meta: eth.BlockBodyHashes{
+			TransactionRoots: txsHashes,
+			UncleHashes:      uncleHashes,
+			WithdrawalRoots:  withdrawalHashes,
+		},
 		Time: 1,
 		Done: make(chan error, 1), // Ignore the returned status
 	}

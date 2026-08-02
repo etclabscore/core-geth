@@ -20,8 +20,10 @@ import (
 	"math"
 	"math/big"
 	"math/rand"
+	"reflect"
 	"testing"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/consensus/beacon"
@@ -41,6 +43,8 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
+	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/ethereum/go-ethereum/trie"
 )
 
 var (
@@ -315,8 +319,8 @@ func testGetBlockHeaders(t *testing.T, protocol uint) {
 			GetBlockHeadersRequest: tt.query,
 		})
 		if err := p2p.ExpectMsg(peer.app, BlockHeadersMsg, &BlockHeadersPacket{
-			RequestId:           123,
-			BlockHeadersRequest: headers,
+			RequestId: 123,
+			List:      encodeRL(headers),
 		}); err != nil {
 			t.Errorf("test %d: headers mismatch: %v", i, err)
 		}
@@ -329,7 +333,7 @@ func testGetBlockHeaders(t *testing.T, protocol uint) {
 					RequestId:              456,
 					GetBlockHeadersRequest: tt.query,
 				})
-				expected := &BlockHeadersPacket{RequestId: 456, BlockHeadersRequest: headers}
+				expected := &BlockHeadersPacket{RequestId: 456, List: encodeRL(headers)}
 				if err := p2p.ExpectMsg(peer.app, BlockHeadersMsg, expected); err != nil {
 					t.Errorf("test %d by hash: headers mismatch: %v", i, err)
 				}
@@ -392,7 +396,7 @@ func testGetBlockBodies(t *testing.T, protocol uint) {
 		// Collect the hashes to request, and the response to expect
 		var (
 			hashes []common.Hash
-			bodies []*BlockBody
+			bodies []BlockBody
 			seen   = make(map[int64]bool)
 		)
 		for j := 0; j < tt.random; j++ {
@@ -404,7 +408,7 @@ func testGetBlockBodies(t *testing.T, protocol uint) {
 					block := backend.chain.GetBlockByNumber(uint64(num))
 					hashes = append(hashes, block.Hash())
 					if len(bodies) < tt.expected {
-						bodies = append(bodies, &BlockBody{Transactions: block.Transactions(), Uncles: block.Uncles(), Withdrawals: block.Withdrawals()})
+						bodies = append(bodies, encodeBody(block))
 					}
 					break
 				}
@@ -414,7 +418,7 @@ func testGetBlockBodies(t *testing.T, protocol uint) {
 			hashes = append(hashes, hash)
 			if tt.available[j] && len(bodies) < tt.expected {
 				block := backend.chain.GetBlockByHash(hash)
-				bodies = append(bodies, &BlockBody{Transactions: block.Transactions(), Uncles: block.Uncles(), Withdrawals: block.Withdrawals()})
+				bodies = append(bodies, encodeBody(block))
 			}
 		}
 
@@ -424,11 +428,71 @@ func testGetBlockBodies(t *testing.T, protocol uint) {
 			GetBlockBodiesRequest: hashes,
 		})
 		if err := p2p.ExpectMsg(peer.app, BlockBodiesMsg, &BlockBodiesPacket{
-			RequestId:           123,
-			BlockBodiesResponse: bodies,
+			RequestId: 123,
+			List:      encodeRL(bodies),
 		}); err != nil {
 			t.Fatalf("test %d: bodies mismatch: %v", i, err)
 		}
+	}
+}
+
+func encodeBody(b *types.Block) BlockBody {
+	body := BlockBody{
+		Transactions: encodeRL([]*types.Transaction(b.Transactions())),
+		Uncles:       encodeRL(b.Uncles()),
+	}
+	if b.Withdrawals() != nil {
+		wd := encodeRL([]*types.Withdrawal(b.Withdrawals()))
+		body.Withdrawals = &wd
+	}
+	return body
+}
+
+func encodeRL[T any](slice []T) rlp.RawList[T] {
+	rl, err := rlp.EncodeToRawList(slice)
+	if err != nil {
+		panic(err)
+	}
+	return rl
+}
+
+func TestHashBody(t *testing.T) {
+	key, _ := crypto.HexToECDSA("8a1f9a8f95be41cd7ccb6168179afb4504aefe388d1e14474d32c45c72ce7b7a")
+	signer := types.NewCancunSigner(big.NewInt(1))
+
+	// create block 1
+	header := &types.Header{Number: big.NewInt(11)}
+	txs := []*types.Transaction{
+		types.MustSignNewTx(key, signer, &types.DynamicFeeTx{
+			ChainID: big.NewInt(1),
+			Nonce:   1,
+			Data:    []byte("testing"),
+		}),
+		types.MustSignNewTx(key, signer, &types.LegacyTx{
+			Nonce: 2,
+			Data:  []byte("testing"),
+		}),
+	}
+	uncles := []*types.Header{{Number: big.NewInt(10)}}
+	block1 := types.NewBlock(header, txs, uncles, nil, trie.NewStackTrie(nil))
+
+	// create block 2 (has withdrawals)
+	header2 := &types.Header{Number: big.NewInt(12)}
+	withdrawals := []*types.Withdrawal{{Index: 10}, {Index: 11}}
+	block2 := types.NewBlockWithWithdrawals(header2, nil, nil, nil, withdrawals, trie.NewStackTrie(nil))
+
+	expectedHashes := BlockBodyHashes{
+		TransactionRoots: []common.Hash{block1.TxHash(), block2.TxHash()},
+		WithdrawalRoots:  []common.Hash{common.Hash{}, *block2.Header().WithdrawalsHash},
+		UncleHashes:      []common.Hash{block1.UncleHash(), block2.UncleHash()},
+	}
+
+	// compute hash like protocol handler does
+	protocolBodies := []BlockBody{encodeBody(block1), encodeBody(block2)}
+	hashes := hashBodyParts(protocolBodies)
+	if !reflect.DeepEqual(hashes, expectedHashes) {
+		t.Errorf("wrong hashes: %s", spew.Sdump(hashes))
+		t.Logf("expected: %s", spew.Sdump(expectedHashes))
 	}
 }
 

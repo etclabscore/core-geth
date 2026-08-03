@@ -228,10 +228,12 @@ func ServiceGetBlockBodiesQuery(chain *core.BlockChain, query GetBlockBodiesRequ
 			lookups >= 2*maxBodiesServe {
 			break
 		}
-		if data := chain.GetBodyRLP(hash); len(data) != 0 {
-			bodies = append(bodies, data)
-			bytes += len(data)
+		data := chain.GetBodyRLP(hash)
+		if len(data) == 0 {
+			break // If we don't have this block's body, stop serving.
 		}
+		bodies = append(bodies, data)
+		bytes += len(data)
 	}
 	return bodies
 }
@@ -263,7 +265,7 @@ func ServiceGetReceiptsQuery(chain *core.BlockChain, query GetReceiptsRequest) [
 		results := chain.GetReceiptsByHash(hash)
 		if results == nil {
 			if header := chain.GetHeaderByHash(hash); header == nil || header.ReceiptHash != types.EmptyRootHash {
-				continue
+				break // Don't have this block's receipts, stop serving.
 			}
 		}
 		// If known, encode and queue for response packet

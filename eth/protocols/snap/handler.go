@@ -133,7 +133,10 @@ func Handle(backend Backend, peer *Peer) error {
 // snapResponseLimits defines the maximum number of items allowed in snap
 // response messages to prevent memory amplification attacks (CVE-2026-26313).
 var snapResponseLimits = map[uint64]int{
-	AccountRangeMsg:  maxCodeLookups * 10, // generous limit for account ranges
+	// An AccountRange response must fit the request tracker's byte bound of
+	// 2*req.Bytes <= 2*maxRequestSize, and each item costs more than a bare
+	// common.HashLength on the wire, which bounds the acceptable item count.
+	AccountRangeMsg:  2*maxRequestSize/common.HashLength + 1,
 	StorageRangesMsg: maxCodeLookups * 10,
 	ByteCodesMsg:     maxCodeLookups,
 	TrieNodesMsg:     maxTrieNodeLookups,

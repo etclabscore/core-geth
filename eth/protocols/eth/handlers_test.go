@@ -26,10 +26,12 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/tracker"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/ethereum/go-ethereum/trie"
 )
 
 // recordingBackend wraps testBackend so that packets surviving the protocol
@@ -626,4 +628,291 @@ func TestHandleReceipts(t *testing.T) {
 	})
 }
 
-// Tests that broadcast transactions are delivered to the backend only when the
+// makeTestUncles creates n minimal distinct uncle headers.
+func makeTestUncles(n int) []*types.Header {
+	uncles := make([]*types.Header, n)
+	for i := range uncles {
+		uncles[i] = &types.Header{
+			Number:     big.NewInt(int64(i)),
+			Difficulty: big.NewInt(131072),
+			Extra:      []byte{byte(i)},
+		}
+	}
+	return uncles
+}
+
+// newPropagatedBlock assembles a block with the given body parts and header
+// roots matching them, the way a remote peer would propagate it.
+func newPropagatedBlock(txs []*types.Transaction, uncles []*types.Header) *types.Block {
+	header := &types.Header{
+		Number:     big.NewInt(1),
+		Difficulty: big.NewInt(131072),
+		GasLimit:   8_000_000,
+		Time:       1,
+	}
+	return types.NewBlock(header, txs, uncles, nil, trie.NewStackTrie(nil))
+}
+
+// Tests that a propagated block carrying exactly the allowed number of
+// transactions and uncles is accepted and delivered to the backend.
+func TestNewBlockAtLimits(t *testing.T) {
+	t.Parallel()
+
+	backend := &recordingBackend{testBackend: newTestBackend(1), handled: make(chan Packet, 4)}
+	defer backend.close()
+
+	peer, _ := newTestPeer("peer", ETH68, backend)
+	defer peer.close()
+
+	td := big.NewInt(131136)
+	for i, block := range []*types.Block{
+		newPropagatedBlock(makeTestTransactions(maxBlockTransactions), nil),
+		newPropagatedBlock(nil, makeTestUncles(maxBlockUncles)),
+	} {
+		if err := p2p.Send(peer.app, NewBlockMsg, &NewBlockPacket{Block: block, TD: td}); err != nil {
+			t.Fatalf("test %d: failed to send block: %v", i, err)
+		}
+		select {
+		case packet := <-backend.handled:
+			res, ok := packet.(*NewBlockPacket)
+			if !ok {
+				t.Fatalf("test %d: unexpected packet type delivered: %T", i, packet)
+			}
+			if res.Block.Hash() != block.Hash() {
+				t.Fatalf("test %d: block hash mismatch: have %x, want %x", i, res.Block.Hash(), block.Hash())
+			}
+			if res.TD.Cmp(td) != 0 {
+				t.Fatalf("test %d: block TD mismatch: have %v, want %v", i, res.TD, td)
+			}
+		case <-time.After(2 * time.Second):
+			t.Fatalf("test %d: block at limit not delivered to backend", i)
+		}
+		if !peer.KnownBlock(block.Hash()) {
+			t.Fatalf("test %d: block not marked as known to the peer", i)
+		}
+	}
+}
+
+// Tests that a propagated block exceeding the transaction or uncle bounds, or
+// carrying a body element which proof-of-work blocks cannot have, is rejected
+// with an error, dropping the sending peer.
+func TestNewBlockExceedsLimits(t *testing.T) {
+	t.Parallel()
+
+	// withdrawalsBlock mirrors the block encoding with a fourth body element
+	// appended, which rawBlock deliberately does not admit.
+	type withdrawalsBlock struct {
+		Header      *types.Header
+		Txs         []*types.Transaction
+		Uncles      []*types.Header
+		Withdrawals []*types.Withdrawal
+	}
+	td := big.NewInt(131136)
+
+	// The header of the withdrawals-carrying block commits to its (empty)
+	// transaction and uncle lists, so only the extra body element is wrong
+	// with it.
+	header := &types.Header{
+		Number:      big.NewInt(1),
+		Difficulty:  big.NewInt(131072),
+		GasLimit:    8_000_000,
+		TxHash:      types.EmptyTxsHash,
+		UncleHash:   types.EmptyUncleHash,
+		ReceiptHash: types.EmptyReceiptsHash,
+	}
+	tests := []struct {
+		name string
+		msg  interface{}
+	}{
+		{
+			name: "too many transactions",
+			msg:  &NewBlockPacket{Block: newPropagatedBlock(makeTestTransactions(maxBlockTransactions+1), nil), TD: td},
+		},
+		{
+			name: "too many uncles",
+			msg:  &NewBlockPacket{Block: newPropagatedBlock(nil, makeTestUncles(maxBlockUncles+1)), TD: td},
+		},
+		{
+			name: "withdrawals",
+			msg: &struct {
+				Block withdrawalsBlock
+				TD    *big.Int
+			}{
+				Block: withdrawalsBlock{
+					Header:      header,
+					Withdrawals: []*types.Withdrawal{{Index: 1, Validator: 2, Address: common.Address{0x03}, Amount: 4}},
+				},
+				TD: td,
+			},
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			backend := &recordingBackend{testBackend: newTestBackend(1), handled: make(chan Packet, 1)}
+			defer backend.close()
+
+			peer, errc := newTestPeer("peer", ETH68, backend)
+			defer peer.close()
+
+			if err := p2p.Send(peer.app, NewBlockMsg, tt.msg); err != nil {
+				t.Fatalf("failed to send block: %v", err)
+			}
+			select {
+			case err := <-errc:
+				if err == nil {
+					t.Fatalf("expected block to be rejected with an error")
+				}
+			case packet := <-backend.handled:
+				t.Fatalf("out of bounds block delivered to backend: %v", packet)
+			case <-time.After(2 * time.Second):
+				t.Fatalf("peer not dropped for out of bounds block")
+			}
+		})
+	}
+}
+
+// Tests that a propagated block whose encoded body matches the roots committed
+// in its header, but does not decode into transactions or uncles, is rejected
+// with an error when materialized, dropping the sending peer.
+func TestNewBlockUndecodableBody(t *testing.T) {
+	t.Parallel()
+
+	// rawBlockOut mirrors the block encoding while keeping the body lists in
+	// their encoded form, so undecodable items can be injected.
+	type rawBlockOut struct {
+		Header *types.Header
+		Txs    rlp.RawList[*types.Transaction]
+		Uncles rlp.RawList[*types.Header]
+	}
+	newHeader := func() *types.Header {
+		return &types.Header{
+			Number:      big.NewInt(1),
+			Difficulty:  big.NewInt(131072),
+			GasLimit:    8_000_000,
+			TxHash:      types.EmptyTxsHash,
+			UncleHash:   types.EmptyUncleHash,
+			ReceiptHash: types.EmptyReceiptsHash,
+		}
+	}
+	// A structurally valid RLP item that decodes into neither a transaction
+	// nor a header.
+	badItem := []byte{0x05}
+
+	var badTxs rlp.RawList[*types.Transaction]
+	if err := badTxs.AppendRaw(badItem); err != nil {
+		t.Fatal(err)
+	}
+	var badUncles rlp.RawList[*types.Header]
+	if err := badUncles.AppendRaw(badItem); err != nil {
+		t.Fatal(err)
+	}
+	// Commit the junk lists into the headers, so that only materialization is
+	// left to reject the blocks.
+	txBlock := rawBlockOut{Header: newHeader(), Txs: badTxs}
+	txBlock.Header.TxHash = types.DeriveSha(newDerivableRawList(&txBlock.Txs, writeTxForHash), trie.NewStackTrie(nil))
+
+	uncleBlock := rawBlockOut{Header: newHeader(), Uncles: badUncles}
+	uncleBlock.Header.UncleHash = crypto.Keccak256Hash(uncleBlock.Uncles.Bytes())
+
+	for _, tt := range []struct {
+		name  string
+		block rawBlockOut
+	}{
+		{"transactions", txBlock},
+		{"uncles", uncleBlock},
+	} {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			backend := &recordingBackend{testBackend: newTestBackend(1), handled: make(chan Packet, 1)}
+			defer backend.close()
+
+			peer, errc := newTestPeer("peer", ETH68, backend)
+			defer peer.close()
+
+			msg := &struct {
+				Block rawBlockOut
+				TD    *big.Int
+			}{Block: tt.block, TD: big.NewInt(131136)}
+
+			if err := p2p.Send(peer.app, NewBlockMsg, msg); err != nil {
+				t.Fatalf("failed to send block: %v", err)
+			}
+			select {
+			case err := <-errc:
+				if err == nil {
+					t.Fatalf("expected block to be rejected with an error")
+				}
+			case packet := <-backend.handled:
+				t.Fatalf("undecodable block delivered to backend: %v", packet)
+			case <-time.After(2 * time.Second):
+				t.Fatalf("peer not dropped for undecodable block")
+			}
+		})
+	}
+}
+
+// Tests that a propagated block whose body does not match the roots committed
+// in its header is discarded without dropping the peer. Keeping the peer is
+// deliberate (see handleNewBlock), so this pins the warn-and-ignore behaviour
+// rather than an error.
+func TestNewBlockInvalidBodyKeepsPeer(t *testing.T) {
+	t.Parallel()
+
+	backend := &recordingBackend{testBackend: newTestBackend(1), handled: make(chan Packet, 1)}
+	defer backend.close()
+
+	peer, errc := newTestPeer("peer", ETH68, backend)
+	defer peer.close()
+
+	base := newPropagatedBlock(makeTestTransactions(2), makeTestUncles(1))
+
+	malformedTxs := base.Header()
+	malformedTxs.TxHash[0]++
+	malformedUncles := base.Header()
+	malformedUncles.UncleHash[0]++
+
+	for i, header := range []*types.Header{malformedTxs, malformedUncles} {
+		block := types.NewBlockWithHeader(header).WithBody(base.Transactions(), base.Uncles())
+		if err := p2p.Send(peer.app, NewBlockMsg, &NewBlockPacket{Block: block, TD: big.NewInt(131136)}); err != nil {
+			t.Fatalf("test %d: failed to send block: %v", i, err)
+		}
+		// The block must be dropped without killing the connection: a request
+		// sent afterwards on the same peer must still be answered.
+		probePeer(t, peer, backend.chain, uint64(i))
+
+		select {
+		case packet := <-backend.handled:
+			t.Fatalf("test %d: mismatching block delivered to backend: %v", i, packet)
+		case err := <-errc:
+			t.Fatalf("test %d: peer dropped after mismatching block: %v", i, err)
+		default:
+		}
+	}
+}
+
+// Tests the propagated block pre-decoding sanity checks.
+func TestNewBlockSanityCheck(t *testing.T) {
+	t.Parallel()
+
+	head := func() *types.Header {
+		return &types.Header{Number: big.NewInt(1), Difficulty: big.NewInt(131072)}
+	}
+	hugeExtra := head()
+	hugeExtra.Extra = make([]byte, 100*1024+1)
+
+	tests := []struct {
+		name string
+		pkt  *rawNewBlockPacket
+		fail bool
+	}{
+		{"valid", &rawNewBlockPacket{Block: rawBlock{Header: head()}, TD: big.NewInt(131136)}, false},
+		{"oversized td", &rawNewBlockPacket{Block: rawBlock{Header: head()}, TD: new(big.Int).Lsh(big.NewInt(1), 100)}, true},
+		{"oversized extradata", &rawNewBlockPacket{Block: rawBlock{Header: hugeExtra}, TD: big.NewInt(131136)}, true},
+	}
+	for _, tt := range tests {
+		if err := tt.pkt.sanityCheck(); (err != nil) != tt.fail {
+			t.Errorf("test %s: sanity check mismatch: have error %v, want failure %v", tt.name, err, tt.fail)
+		}
+	}
+}

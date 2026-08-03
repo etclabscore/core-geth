@@ -191,15 +191,52 @@ type BlockHeadersRLPPacket struct {
 	BlockHeadersRLPResponse
 }
 
-// NewBlockPacket is the network packet for the block propagation message.
+// maxBlockTransactions bounds the number of transactions a propagated block may
+// carry before it is rejected without being decoded. A block cannot hold more
+// transactions than its gas limit admits at the 21000 gas floor of a plain
+// transfer, which puts ETC's current 8M limit at a few hundred; this is set far
+// above that so it keeps holding for any plausible future gas limit, and equals
+// the figure upstream uses for the analogous cap on transaction broadcasts
+// (maxTransactionAnnouncements). Computing it from the announced gas limit
+// instead would be self-defeating: on this message that field is attacker
+// controlled.
+const maxBlockTransactions = 5000
+
+// maxBlockUncles is the maximum number of uncles a block can contain, per the
+// ethash/etchash consensus rules. Blocks announcing more cannot be valid.
+const maxBlockUncles = 2
+
+// NewBlockPacket is the network packet for the block propagation message. It is
+// what the sending side encodes and what the backend consumes; inbound messages
+// are decoded into rawNewBlockPacket first and assembled into this afterwards.
 type NewBlockPacket struct {
 	Block *types.Block
 	TD    *big.Int
 }
 
+// rawNewBlockPacket is the receiving side's view of NewBlockMsg, holding the
+// block body encoded so that its item counts can be checked, and the body
+// verified against the header, before any of it is materialized. A broadcast
+// carries no request id, so there is nothing to match it against: the counts
+// are all that stands between the message size limit and the heap.
+type rawNewBlockPacket struct {
+	Block rawBlock
+	TD    *big.Int
+}
+
+// rawBlock mirrors the block encoding, [header, txs, uncles], keeping the two
+// lists encoded in the manner of BlockBody. Withdrawals are deliberately absent:
+// a PoW block carries none, so a message that includes them is rejected as
+// having too many elements.
+type rawBlock struct {
+	Header       *types.Header
+	Transactions rlp.RawList[*types.Transaction]
+	Uncles       rlp.RawList[*types.Header]
+}
+
 // sanityCheck verifies that the values are reasonable, as a DoS protection
-func (request *NewBlockPacket) sanityCheck() error {
-	if err := request.Block.SanityCheck(); err != nil {
+func (request *rawNewBlockPacket) sanityCheck() error {
+	if err := request.Block.Header.SanityCheck(); err != nil {
 		return err
 	}
 	// TD at mainnet block #7753254 is 76 bits. If it becomes 100 million times
@@ -208,6 +245,12 @@ func (request *NewBlockPacket) sanityCheck() error {
 		return fmt.Errorf("too large block TD: bitlen %d", tdlen)
 	}
 	return nil
+}
+
+// body returns the encoded body parts in the shape the shared hashing helpers
+// consume.
+func (b *rawBlock) body() BlockBody {
+	return BlockBody{Transactions: b.Transactions, Uncles: b.Uncles}
 }
 
 // GetBlockBodiesRequest represents a block body query.

@@ -294,29 +294,51 @@ func handleNewBlockhashes(backend Backend, msg Decoder, peer *Peer) error {
 }
 
 func handleNewBlock(backend Backend, msg Decoder, peer *Peer) error {
-	// Retrieve and decode the propagated block
-	ann := new(NewBlockPacket)
+	// Retrieve the propagated block, leaving its body encoded for now
+	ann := new(rawNewBlockPacket)
 	if err := msg.Decode(ann); err != nil {
 		return fmt.Errorf("%w: message %v: %v", errDecode, msg, err)
 	}
 	if err := ann.sanityCheck(); err != nil {
 		return err
 	}
-	if hash := types.CalcUncleHash(ann.Block.Uncles()); hash != ann.Block.UncleHash() {
-		log.Warn("Propagated block has invalid uncles", "have", hash, "exp", ann.Block.UncleHash())
+	// Bound what the body may expand into. Decoding into rlp.RawList only counts
+	// the items, so this runs before any transaction or uncle is materialized.
+	if txs := ann.Block.Transactions.Len(); txs > maxBlockTransactions {
+		return fmt.Errorf("too many transactions in propagated block: %d > %d", txs, maxBlockTransactions)
+	}
+	if uncles := ann.Block.Uncles.Len(); uncles > maxBlockUncles {
+		return fmt.Errorf("too many uncles in propagated block: %d > %d", uncles, maxBlockUncles)
+	}
+	// Check the body against the header on the encoded form, so a block that is
+	// not what it claims to be is dropped without being materialized either.
+	header := ann.Block.Header
+	roots := hashBodyParts([]BlockBody{ann.Block.body()})
+	if hash := roots.UncleHashes[0]; hash != header.UncleHash {
+		log.Warn("Propagated block has invalid uncles", "have", hash, "exp", header.UncleHash)
 		return nil // TODO(karalabe): return error eventually, but wait a few releases
 	}
-	if hash := types.DeriveSha(ann.Block.Transactions(), trie.NewStackTrie(nil)); hash != ann.Block.TxHash() {
-		log.Warn("Propagated block has invalid body", "have", hash, "exp", ann.Block.TxHash())
+	if hash := roots.TransactionRoots[0]; hash != header.TxHash {
+		log.Warn("Propagated block has invalid body", "have", hash, "exp", header.TxHash)
 		return nil // TODO(karalabe): return error eventually, but wait a few releases
 	}
-	ann.Block.ReceivedAt = msg.Time()
-	ann.Block.ReceivedFrom = peer
+	// Bounded and self-consistent, so it is safe to materialize now.
+	txs, err := ann.Block.Transactions.Items()
+	if err != nil {
+		return fmt.Errorf("NewBlock: %w", err)
+	}
+	uncles, err := ann.Block.Uncles.Items()
+	if err != nil {
+		return fmt.Errorf("NewBlock: %w", err)
+	}
+	block := types.NewBlockWithHeader(header).WithBody(txs, uncles)
+	block.ReceivedAt = msg.Time()
+	block.ReceivedFrom = peer
 
 	// Mark the peer as owning the block
-	peer.markBlock(ann.Block.Hash())
+	peer.markBlock(block.Hash())
 
-	return backend.Handle(peer, ann)
+	return backend.Handle(peer, &NewBlockPacket{Block: block, TD: ann.TD})
 }
 
 func handleBlockHeaders(backend Backend, msg Decoder, peer *Peer) error {

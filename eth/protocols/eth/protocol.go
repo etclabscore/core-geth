@@ -49,6 +49,9 @@ var protocolLengths = map[uint]uint64{ETH68: 17}
 // maxMessageSize is the maximum cap on the size of a protocol message.
 const maxMessageSize = 10 * 1024 * 1024
 
+// This is the maximum number of transactions in a Transactions message.
+const maxTransactionAnnouncements = 5000
+
 const (
 	StatusMsg                     = 0x00
 	NewBlockHashesMsg             = 0x01
@@ -115,7 +118,9 @@ func (p *NewBlockHashesPacket) Unpack() ([]common.Hash, []uint64) {
 }
 
 // TransactionsPacket is the network packet for broadcasting new transactions.
-type TransactionsPacket []*types.Transaction
+type TransactionsPacket struct {
+	rlp.RawList[*types.Transaction]
+}
 
 // GetBlockHeadersRequest represents a block header query.
 type GetBlockHeadersRequest struct {
@@ -173,7 +178,7 @@ type BlockHeadersRequest []*types.Header
 // BlockHeadersPacket represents a block header response over with request ID wrapping.
 type BlockHeadersPacket struct {
 	RequestId uint64
-	BlockHeadersRequest
+	List      rlp.RawList[*types.Header]
 }
 
 // BlockHeadersRLPResponse represents a block header response, to use when we already
@@ -186,15 +191,52 @@ type BlockHeadersRLPPacket struct {
 	BlockHeadersRLPResponse
 }
 
-// NewBlockPacket is the network packet for the block propagation message.
+// maxBlockTransactions bounds the number of transactions a propagated block may
+// carry before it is rejected without being decoded. A block cannot hold more
+// transactions than its gas limit admits at the 21000 gas floor of a plain
+// transfer, which puts ETC's current 8M limit at a few hundred; this is set far
+// above that so it keeps holding for any plausible future gas limit, and equals
+// the figure upstream uses for the analogous cap on transaction broadcasts
+// (maxTransactionAnnouncements). Computing it from the announced gas limit
+// instead would be self-defeating: on this message that field is attacker
+// controlled.
+const maxBlockTransactions = 5000
+
+// maxBlockUncles is the maximum number of uncles a block can contain, per the
+// ethash/etchash consensus rules. Blocks announcing more cannot be valid.
+const maxBlockUncles = 2
+
+// NewBlockPacket is the network packet for the block propagation message. It is
+// what the sending side encodes and what the backend consumes; inbound messages
+// are decoded into rawNewBlockPacket first and assembled into this afterwards.
 type NewBlockPacket struct {
 	Block *types.Block
 	TD    *big.Int
 }
 
+// rawNewBlockPacket is the receiving side's view of NewBlockMsg, holding the
+// block body encoded so that its item counts can be checked, and the body
+// verified against the header, before any of it is materialized. A broadcast
+// carries no request id, so there is nothing to match it against: the counts
+// are all that stands between the message size limit and the heap.
+type rawNewBlockPacket struct {
+	Block rawBlock
+	TD    *big.Int
+}
+
+// rawBlock mirrors the block encoding, [header, txs, uncles], keeping the two
+// lists encoded in the manner of BlockBody. Withdrawals are deliberately absent:
+// a PoW block carries none, so a message that includes them is rejected as
+// having too many elements.
+type rawBlock struct {
+	Header       *types.Header
+	Transactions rlp.RawList[*types.Transaction]
+	Uncles       rlp.RawList[*types.Header]
+}
+
 // sanityCheck verifies that the values are reasonable, as a DoS protection
-func (request *NewBlockPacket) sanityCheck() error {
-	if err := request.Block.SanityCheck(); err != nil {
+func (request *rawNewBlockPacket) sanityCheck() error {
+	if err := request.Block.Header.SanityCheck(); err != nil {
 		return err
 	}
 	// TD at mainnet block #7753254 is 76 bits. If it becomes 100 million times
@@ -203,6 +245,12 @@ func (request *NewBlockPacket) sanityCheck() error {
 		return fmt.Errorf("too large block TD: bitlen %d", tdlen)
 	}
 	return nil
+}
+
+// body returns the encoded body parts in the shape the shared hashing helpers
+// consume.
+func (b *rawBlock) body() BlockBody {
+	return BlockBody{Transactions: b.Transactions, Uncles: b.Uncles}
 }
 
 // GetBlockBodiesRequest represents a block body query.
@@ -214,14 +262,11 @@ type GetBlockBodiesPacket struct {
 	GetBlockBodiesRequest
 }
 
-// BlockBodiesResponse is the network packet for block content distribution.
-type BlockBodiesResponse []*BlockBody
-
 // BlockBodiesPacket is the network packet for block content distribution with
 // request ID wrapping.
 type BlockBodiesPacket struct {
 	RequestId uint64
-	BlockBodiesResponse
+	List      rlp.RawList[BlockBody]
 }
 
 // BlockBodiesRLPResponse is used for replying to block body requests, in cases
@@ -235,16 +280,19 @@ type BlockBodiesRLPPacket struct {
 	BlockBodiesRLPResponse
 }
 
+// BlockBodiesResponse is the network packet for block content distribution.
+type BlockBodiesResponse []BlockBody
+
 // BlockBody represents the data content of a single block.
 type BlockBody struct {
-	Transactions []*types.Transaction // Transactions contained within a block
-	Uncles       []*types.Header      // Uncles contained within a block
-	Withdrawals  []*types.Withdrawal  `rlp:"optional"` // Withdrawals contained within a block
+	Transactions rlp.RawList[*types.Transaction]
+	Uncles       rlp.RawList[*types.Header]
+	Withdrawals  *rlp.RawList[*types.Withdrawal] `rlp:"optional"`
 }
 
 // Unpack retrieves the transactions and uncles from the range packet and returns
 // them in a split flat format that's more consistent with the internal data structures.
-func (p *BlockBodiesResponse) Unpack() ([][]*types.Transaction, [][]*types.Header, [][]*types.Withdrawal) {
+func (p *BlockBodiesResponse) Unpack() ([][]*types.Transaction, [][]*types.Header, [][]*types.Withdrawal, error) {
 	// TODO(matt): add support for withdrawals to fetchers
 	var (
 		txset         = make([][]*types.Transaction, len(*p))
@@ -252,9 +300,20 @@ func (p *BlockBodiesResponse) Unpack() ([][]*types.Transaction, [][]*types.Heade
 		withdrawalset = make([][]*types.Withdrawal, len(*p))
 	)
 	for i, body := range *p {
-		txset[i], uncleset[i], withdrawalset[i] = body.Transactions, body.Uncles, body.Withdrawals
+		var err error
+		if txset[i], err = body.Transactions.Items(); err != nil {
+			return nil, nil, nil, err
+		}
+		if uncleset[i], err = body.Uncles.Items(); err != nil {
+			return nil, nil, nil, err
+		}
+		if body.Withdrawals != nil {
+			if withdrawalset[i], err = body.Withdrawals.Items(); err != nil {
+				return nil, nil, nil, err
+			}
+		}
 	}
-	return txset, uncleset, withdrawalset
+	return txset, uncleset, withdrawalset, nil
 }
 
 // GetReceiptsRequest represents a block receipts query.
@@ -269,11 +328,13 @@ type GetReceiptsPacket struct {
 // ReceiptsResponse is the network packet for block receipts distribution.
 type ReceiptsResponse [][]*types.Receipt
 
+type ReceiptList = rlp.RawList[*types.Receipt]
+
 // ReceiptsPacket is the network packet for block receipts distribution with
 // request ID wrapping.
 type ReceiptsPacket struct {
 	RequestId uint64
-	ReceiptsResponse
+	List      rlp.RawList[ReceiptList]
 }
 
 // ReceiptsRLPResponse is used for receipts, when we already have it encoded
@@ -308,7 +369,7 @@ type PooledTransactionsResponse []*types.Transaction
 // with request ID wrapping.
 type PooledTransactionsPacket struct {
 	RequestId uint64
-	PooledTransactionsResponse
+	List      rlp.RawList[*types.Transaction]
 }
 
 // PooledTransactionsRLPResponse is the network packet for transaction distribution, used
@@ -351,8 +412,8 @@ func (*NewPooledTransactionHashesPacket) Kind() byte   { return NewPooledTransac
 func (*GetPooledTransactionsRequest) Name() string { return "GetPooledTransactions" }
 func (*GetPooledTransactionsRequest) Kind() byte   { return GetPooledTransactionsMsg }
 
-func (*PooledTransactionsResponse) Name() string { return "PooledTransactions" }
-func (*PooledTransactionsResponse) Kind() byte   { return PooledTransactionsMsg }
+func (*PooledTransactionsPacket) Name() string { return "PooledTransactions" }
+func (*PooledTransactionsPacket) Kind() byte   { return PooledTransactionsMsg }
 
 func (*GetReceiptsRequest) Name() string { return "GetReceipts" }
 func (*GetReceiptsRequest) Kind() byte   { return GetReceiptsMsg }

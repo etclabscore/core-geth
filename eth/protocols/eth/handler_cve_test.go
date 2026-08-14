@@ -36,8 +36,8 @@ func TestCheckResponseItems_CVE_2026_26313(t *testing.T) {
 			headers[i] = &types.Header{}
 		}
 		pkt := &BlockHeadersPacket{
-			RequestId:           1,
-			BlockHeadersRequest: BlockHeadersRequest(headers),
+			RequestId: 1,
+			List:      encodeRL(headers),
 		}
 		payload, err := rlp.EncodeToBytes(pkt)
 		if err != nil {
@@ -45,23 +45,6 @@ func TestCheckResponseItems_CVE_2026_26313(t *testing.T) {
 		}
 		return p2p.Msg{
 			Code:    BlockHeadersMsg,
-			Size:    uint32(len(payload)),
-			Payload: bytes.NewReader(payload),
-		}
-	}
-
-	// Build a bare packet (TransactionsPacket) with N minimal transactions.
-	buildTxsMsg := func(n int) p2p.Msg {
-		txs := make(TransactionsPacket, n)
-		for i := range txs {
-			txs[i] = types.NewTx(&types.LegacyTx{})
-		}
-		payload, err := rlp.EncodeToBytes(txs)
-		if err != nil {
-			t.Fatal(err)
-		}
-		return p2p.Msg{
-			Code:    TransactionsMsg,
 			Size:    uint32(len(payload)),
 			Payload: bytes.NewReader(payload),
 		}
@@ -83,22 +66,6 @@ func TestCheckResponseItems_CVE_2026_26313(t *testing.T) {
 		}
 	})
 
-	t.Run("bare packet within limit passes", func(t *testing.T) {
-		msg := buildTxsMsg(100)
-		limit := responseItemLimits[TransactionsMsg]
-		if err := checkResponseItems(&msg, limit); err != nil {
-			t.Fatalf("expected no error for 100 txs, got: %v", err)
-		}
-	})
-
-	t.Run("bare packet exceeding limit rejected", func(t *testing.T) {
-		msg := buildTxsMsg(maxHeadersServe*4 + 1)
-		limit := responseItemLimits[TransactionsMsg]
-		if err := checkResponseItems(&msg, limit); err == nil {
-			t.Fatalf("expected error for %d txs (limit %d), got nil", maxHeadersServe*4+1, maxHeadersServe*4)
-		}
-	})
-
 	t.Run("payload still decodable after check", func(t *testing.T) {
 		msg := buildHeadersMsg(10)
 		limit := responseItemLimits[BlockHeadersMsg]
@@ -110,8 +77,8 @@ func TestCheckResponseItems_CVE_2026_26313(t *testing.T) {
 		if err := msg.Decode(res); err != nil {
 			t.Fatalf("failed to decode after check: %v", err)
 		}
-		if len(res.BlockHeadersRequest) != 10 {
-			t.Fatalf("expected 10 headers, got %d", len(res.BlockHeadersRequest))
+		if res.List.Len() != 10 {
+			t.Fatalf("expected 10 headers, got %d", res.List.Len())
 		}
 	})
 }

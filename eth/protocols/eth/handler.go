@@ -200,7 +200,6 @@ var responseItemLimits = map[uint64]responseLimit{
 	BlockBodiesMsg:        {maxItems: maxBodiesServe, wrapped: true},
 	ReceiptsMsg:           {maxItems: maxReceiptsServe, wrapped: true},
 	PooledTransactionsMsg: {maxItems: maxHeadersServe * 4, wrapped: true},
-	TransactionsMsg:       {maxItems: maxHeadersServe * 4, wrapped: false},
 }
 
 // checkResponseItems reads the message payload into a buffer, counts the number
@@ -249,10 +248,10 @@ func handleMessage(backend Backend, peer *Peer) error {
 	if err != nil {
 		return err
 	}
+	defer msg.Discard()
 	if msg.Size > maxMessageSize {
 		return fmt.Errorf("%w: %v > %v", errMsgTooLarge, msg.Size, maxMessageSize)
 	}
-	defer msg.Discard()
 
 	// Pre-decode item count validation to prevent memory amplification attacks.
 	if limit, ok := responseItemLimits[msg.Code]; ok {

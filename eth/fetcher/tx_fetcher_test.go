@@ -1159,6 +1159,39 @@ func TestTransactionFetcherDoSProtection(t *testing.T) {
 	})
 }
 
+// Tests that an announcement overflowing the cap is truncated to the room that
+// is actually left, not to the size of the overflow.
+func TestTransactionFetcherDoSProtectionOverflow(t *testing.T) {
+	var hashes []common.Hash
+	for i := 0; i < maxTxAnnounces+2; i++ {
+		hashes = append(hashes, common.Hash{0x01, byte(i / 256), byte(i % 256)})
+	}
+	testTransactionFetcherParallel(t, txFetcherTest{
+		init: func() *TxFetcher {
+			return NewTxFetcher(
+				func(common.Hash) bool { return false },
+				nil,
+				func(string, []common.Hash) error { return nil },
+				nil,
+			)
+		},
+		steps: []interface{}{
+			// Fill the waitlist to one below the cap.
+			doTxNotify{peer: "A", hashes: hashes[:maxTxAnnounces-1]},
+			isWaiting(map[string][]common.Hash{
+				"A": hashes[:maxTxAnnounces-1],
+			}),
+			// Announce three more against the one remaining slot. Keeping the
+			// overflow (want-maxTxAnnounces = 2) instead of the room left
+			// (maxTxAnnounces-used = 1) would leave the peer one over the cap.
+			doTxNotify{peer: "A", hashes: hashes[maxTxAnnounces-1 : maxTxAnnounces+2]},
+			isWaiting(map[string][]common.Hash{
+				"A": hashes[:maxTxAnnounces],
+			}),
+		},
+	})
+}
+
 // Tests that underpriced transactions don't get rescheduled after being rejected.
 func TestTransactionFetcherUnderpricedDedup(t *testing.T) {
 	testTransactionFetcherParallel(t, txFetcherTest{

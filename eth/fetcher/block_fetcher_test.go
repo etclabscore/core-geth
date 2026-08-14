@@ -34,6 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
+	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/trie"
 	"github.com/ethereum/go-ethereum/triedb"
 )
@@ -246,11 +247,13 @@ func (f *fetcherTester) makeBodyFetcher(peer string, blocks map[common.Hash]*typ
 			}
 		}
 		// Return on a new thread
-		bodies := make([]*eth.BlockBody, len(transactions))
+		bodies := make([]eth.BlockBody, len(transactions))
 		for i, txs := range transactions {
-			bodies[i] = &eth.BlockBody{
-				Transactions: txs,
-				Uncles:       uncles[i],
+			encTxs, _ := rlp.EncodeToRawList(txs)
+			encUncles, _ := rlp.EncodeToRawList(uncles[i])
+			bodies[i] = eth.BlockBody{
+				Transactions: encTxs,
+				Uncles:       encUncles,
 			}
 		}
 		req := &eth.Request{

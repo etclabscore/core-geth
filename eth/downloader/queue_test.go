@@ -29,9 +29,11 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/eth/protocols/eth"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/vars"
+	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/trie"
 	"golang.org/x/exp/slog"
 )
@@ -324,26 +326,31 @@ func XTestDelivery(t *testing.T) {
 					emptyList []*types.Header
 					txset     [][]*types.Transaction
 					uncleset  [][]*types.Header
+					bodies    []eth.BlockBody
 				)
 				numToSkip := rand.Intn(len(f.Headers))
 				for _, hdr := range f.Headers[0 : len(f.Headers)-numToSkip] {
-					txset = append(txset, world.getTransactions(hdr.Number.Uint64()))
+					txs := world.getTransactions(hdr.Number.Uint64())
+					txset = append(txset, txs)
 					uncleset = append(uncleset, emptyList)
+					txsList, _ := rlp.EncodeToRawList(txs)
+					bodies = append(bodies, eth.BlockBody{Transactions: txsList})
 				}
-				var (
-					txsHashes   = make([]common.Hash, len(txset))
-					uncleHashes = make([]common.Hash, len(uncleset))
-				)
+				hashes := eth.BlockBodyHashes{
+					TransactionRoots: make([]common.Hash, len(txset)),
+					UncleHashes:      make([]common.Hash, len(uncleset)),
+					WithdrawalRoots:  make([]common.Hash, len(txset)),
+				}
 				hasher := trie.NewStackTrie(nil)
 				for i, txs := range txset {
-					txsHashes[i] = types.DeriveSha(types.Transactions(txs), hasher)
+					hashes.TransactionRoots[i] = types.DeriveSha(types.Transactions(txs), hasher)
 				}
 				for i, uncles := range uncleset {
-					uncleHashes[i] = types.CalcUncleHash(uncles)
+					hashes.UncleHashes[i] = types.CalcUncleHash(uncles)
 				}
+
 				time.Sleep(100 * time.Millisecond)
-				_, err := q.DeliverBodies(peer.id, txset, txsHashes, uncleset, uncleHashes, nil, nil)
-				if err != nil {
+				if _, err := q.DeliverBodies(peer.id, hashes, bodies); err != nil {
 					fmt.Printf("delivered %d bodies %v\n", len(txset), err)
 				}
 			} else {
@@ -359,16 +366,22 @@ func XTestDelivery(t *testing.T) {
 		for {
 			f, _, _ := q.ReserveReceipts(peer, rand.Intn(50))
 			if f != nil {
-				var rcs [][]*types.Receipt
+				var (
+					rcs  [][]*types.Receipt
+					raws []rlp.RawValue
+				)
 				for _, hdr := range f.Headers {
-					rcs = append(rcs, world.getReceipts(hdr.Number.Uint64()))
+					blockReceipts := world.getReceipts(hdr.Number.Uint64())
+					rcs = append(rcs, blockReceipts)
+					raw, _ := rlp.EncodeToBytes(blockReceipts)
+					raws = append(raws, raw)
 				}
 				hasher := trie.NewStackTrie(nil)
 				hashes := make([]common.Hash, len(rcs))
 				for i, receipt := range rcs {
 					hashes[i] = types.DeriveSha(types.Receipts(receipt), hasher)
 				}
-				_, err := q.DeliverReceipts(peer.id, rcs, hashes)
+				_, err := q.DeliverReceipts(peer.id, raws, hashes)
 				if err != nil {
 					fmt.Printf("delivered %d receipts %v\n", len(rcs), err)
 				}
@@ -472,4 +485,54 @@ func (n *network) headers(from int) []*types.Header {
 		}
 	}
 	return hdrs
+}
+
+// A delivered batch may straddle the result cache's offset: headers below it are
+// stale because another peer already filled them. The headers above it must still
+// be reconstructed from their own position in the response, not from a counter
+// that only advances on non-stale slots.
+func TestDeliverReconstructUsesBatchIndex(t *testing.T) {
+	all := chain.headers()
+	if len(all) < 6 {
+		t.Fatalf("need at least 6 headers, got %d", len(all))
+	}
+	// Take three consecutive headers and prepare the cache so that the first of
+	// them sits below the offset — exactly the state a delivery races into when
+	// another peer has already filled that slot.
+	batch := all[2:5]
+	offset := batch[1].Number.Uint64()
+
+	q := newQueue(10, 10)
+	q.Prepare(offset, FullSync)
+	for _, h := range batch[1:] {
+		if _, _, _, err := q.resultCache.AddFetch(h, false); err != nil {
+			t.Fatalf("could not allocate a result slot for header %d: %v", h.Number.Uint64(), err)
+		}
+	}
+	q.blockPendPool["peer"] = &fetchRequest{Peer: &peerConnection{id: "peer"}, Headers: batch}
+
+	seen := map[uint64]int{}
+	q.deliver("peer", q.blockTaskPool, q.blockTaskQueue, q.blockPendPool,
+		bodyReqTimer, bodyInMeter, bodyDropMeter, len(batch),
+		func(index int, header *types.Header) error { return nil },
+		func(index int, result *fetchResult) { seen[result.Header.Number.Uint64()] = index },
+	)
+
+	for k, h := range batch {
+		n := h.Number.Uint64()
+		got, ok := seen[n]
+		if n < offset {
+			if ok {
+				t.Errorf("header %d is below the offset and should have been stale, but was reconstructed", n)
+			}
+			continue
+		}
+		if !ok {
+			t.Fatalf("header %d was never reconstructed", n)
+		}
+		if got != k {
+			t.Fatalf("header %d reconstructed from response index %d, want its batch index %d", n, got, k)
+		}
+		t.Logf("header %d -> response index %d (batch index %d) ok", n, got, k)
+	}
 }

@@ -36,14 +36,6 @@ jobs:
       - name: Install devtools
         id: install-devtools
         run: make devtools
-      - name: Run go:generate
-        id: go-generate
-        run: |
-          list="$(go list ./...)"
-          for pattern in ${GENERATE_EXCEPTIONS[@]}; do
-            list="$(grep -v "$pattern" <<< "$list")"
-          done
-          go generate "$list"
       - name: Revert custom generated files modifications before comparing them
         id: revert-custom-generated-modifications
         run: |
@@ -60,9 +52,18 @@ jobs:
           # This commit implements genesis JSON unmarshaling for supported data types.
           git revert --no-edit db245033d654c18d5fd82ca7050dc2d72d2d6d0a
 
+      - name: Run go:generate
+        id: go-generate
+        run: |
+          list="$(go list ./...)"
+          for pattern in ${GENERATE_EXCEPTIONS[@]}; do
+            list="$(grep -v "$pattern" <<< "$list")"
+          done
+          xargs go generate <<< "$list"
       - name: Check for modified files
         id: git-check
         run: |
+          git update-index --refresh > /dev/null || true
           if ! git diff-index --quiet HEAD --; then
             echo "🔴 ERROR: There are modified files after running 'go generate'"
             git status

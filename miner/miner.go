@@ -237,6 +237,15 @@ func (miner *Miner) SetEtherbase(addr common.Address) {
 	miner.worker.setEtherbase(addr)
 }
 
+// GetWorkFor builds a new sealing block on top of the current chain head that
+// pays the given coinbase instead of the configured etherbase, and returns it as
+// a remote work package in the eth_getWork format. A valid solution submitted
+// via eth_submitWork is imported and broadcast like any other mined block. The
+// work package returned by eth_getWork is not affected.
+func (miner *Miner) GetWorkFor(coinbase common.Address) ([4]string, error) {
+	return miner.worker.getWorkFor(coinbase)
+}
+
 // SetGasCeil sets the gaslimit to strive for when mining blocks post 1559.
 // For pre-1559 blocks, it sets the ceiling.
 func (miner *Miner) SetGasCeil(ceil uint64) {

@@ -18,7 +18,7 @@ func BenchmarkTraceResultsAppend1(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		// results := make([]interface{}, len(traceResults))
 		results := []interface{}{}
-		for _, it := range traceResults { // nolint:gosimple
+		for _, it := range traceResults { // nolint:staticcheck
 			results = append(results, it) // nolint:staticcheck
 		}
 	}

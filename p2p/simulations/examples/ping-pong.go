@@ -57,7 +57,6 @@ func main() {
 	var adapter adapters.NodeAdapter
 
 	switch *adapterType {
-
 	case "sim":
 		log.Info("using sim adapter")
 		adapter = adapters.NewSimAdapter(services)

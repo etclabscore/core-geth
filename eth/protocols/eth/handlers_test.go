@@ -747,7 +747,6 @@ func TestNewBlockExceedsLimits(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			backend := &recordingBackend{testBackend: newTestBackend(1), handled: make(chan Packet, 1)}
 			defer backend.close()
@@ -822,7 +821,6 @@ func TestNewBlockUndecodableBody(t *testing.T) {
 		{"transactions", txBlock},
 		{"uncles", uncleBlock},
 	} {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			backend := &recordingBackend{testBackend: newTestBackend(1), handled: make(chan Packet, 1)}
 			defer backend.close()

@@ -438,8 +438,6 @@ func TestGenStateCoreGethConfigs(t *testing.T) {
 		st.walkFullName(t, d, func(t *testing.T, name string, test *StateTest) {
 			subtests := test.Subtests(nil)
 			for _, subtest := range subtests {
-				subtest := subtest
-
 				genesis := test.genesis(Forks[subtest.Fork])
 
 				cgConfig := &coregeth.CoreGethChainConfig{}

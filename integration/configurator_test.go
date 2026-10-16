@@ -57,7 +57,6 @@ func TestEquivalent_Features(t *testing.T) {
 
 	for name, oconf := range tests.Forks {
 		log.Println(name)
-		oconf := oconf
 
 		if oconf.GetConsensusEngineType().IsUnknown() {
 			oconf.MustSetConsensusEngineType(ctypes.ConsensusEngineT_Ethash)

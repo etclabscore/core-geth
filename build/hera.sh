@@ -20,6 +20,9 @@ main() {
     git submodule update --init
     mkdir -p build
     cd build
+    # Hera v0.3.2 and the dependencies it fetches declare compatibility with
+    # CMake < 3.5, which CMake 4 no longer accepts. Older CMake ignores this.
+    export CMAKE_POLICY_VERSION_MINIMUM=3.5
     cmake -DBUILD_SHARED_LIBS=ON ..
     cmake --build .
     echo "Built library at: $(pwd)/src/libhera.so"

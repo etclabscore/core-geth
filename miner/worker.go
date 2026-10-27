@@ -88,6 +88,12 @@ var (
 	errBlockInterruptedByNewHead  = errors.New("new head arrived while building block")
 	errBlockInterruptedByRecommit = errors.New("recommit interrupt while building block")
 	errBlockInterruptedByTimeout  = errors.New("timeout while building block")
+
+	errZeroCoinbase           = errors.New("coinbase must not be the zero address")
+	errMinerNotRunning        = errors.New("miner not running")
+	errMinerSyncing           = errors.New("node is syncing")
+	errRemoteWorkNotSupported = errors.New("not supported")
+	errTTDReached             = errors.New("terminal total difficulty reached, proof-of-work sealing is disabled")
 )
 
 // environment is the worker's current environment and holds all
@@ -196,6 +202,26 @@ type getWorkReq struct {
 	result chan *newPayloadResult // non-blocking channel
 }
 
+// getWorkForReq represents a request for a remote sealing work package whose
+// block pays the given coinbase.
+type getWorkForReq struct {
+	coinbase common.Address
+	result   chan *getWorkForResult // non-blocking channel
+}
+
+// getWorkForResult is the result of a getWorkForReq.
+type getWorkForResult struct {
+	work [4]string
+	err  error
+}
+
+// remoteWorkSealer is implemented by consensus engines that can hand out
+// additional work packages to remote miners next to the regular sealing work,
+// such as ethash.
+type remoteWorkSealer interface {
+	AddRemoteWork(block *types.Block, results chan<- *types.Block) ([4]string, error)
+}
+
 // intervalAdjust represents a resubmitting interval adjustment.
 type intervalAdjust struct {
 	ratio float64
@@ -226,6 +252,7 @@ type worker struct {
 	// Channels
 	newWorkCh          chan *newWorkReq
 	getWorkCh          chan *getWorkReq
+	getWorkForCh       chan *getWorkForReq
 	taskCh             chan *task
 	resultCh           chan *types.Block
 	startCh            chan struct{}
@@ -307,6 +334,7 @@ func newWorker(config *Config, chainConfig ctypes.ChainConfigurator, engine cons
 		chainSideCh:        make(chan core.ChainSideEvent, chainSideChanSize),
 		newWorkCh:          make(chan *newWorkReq),
 		getWorkCh:          make(chan *getWorkReq),
+		getWorkForCh:       make(chan *getWorkForReq),
 		taskCh:             make(chan *task),
 		resultCh:           make(chan *types.Block, resultQueueSize),
 		startCh:            make(chan struct{}, 1),
@@ -599,6 +627,10 @@ func (w *worker) mainLoop() {
 
 		case req := <-w.getWorkCh:
 			req.result <- w.generateWork(req.params)
+
+		case req := <-w.getWorkForCh:
+			work, err := w.generateWorkFor(req.coinbase)
+			req.result <- &getWorkForResult{work: work, err: err}
 
 		case ev := <-w.chainSideCh:
 			// Short circuit for duplicate side blocks
@@ -1288,6 +1320,84 @@ func (w *worker) generateWork(params *generateParams) *newPayloadResult {
 	}
 }
 
+// generateWorkFor builds a sealing block on top of the current chain head that
+// pays the given coinbase, registers it as a pending task and hands it to the
+// consensus engine's remote sealer as an additional work package. Unlike the
+// regular sealing work, it neither replaces the work package returned by
+// eth_getWork nor interrupts the running sealing task. A valid solution for
+// the package is written and broadcast by resultLoop like any mined block.
+func (w *worker) generateWorkFor(coinbase common.Address) ([4]string, error) {
+	sealer := w.remoteWorkSealer()
+	if sealer == nil {
+		return [4]string{}, errRemoteWorkNotSupported
+	}
+	if !w.isRunning() {
+		return [4]string{}, errMinerNotRunning
+	}
+	if w.syncing.Load() {
+		return [4]string{}, errMinerSyncing
+	}
+	start := time.Now()
+	work, err := w.prepareWork(&generateParams{
+		timestamp: uint64(start.Unix()),
+		coinbase:  coinbase,
+	})
+	if err != nil {
+		return [4]string{}, err
+	}
+	defer work.discard()
+
+	if w.isTTDReached(work.header) {
+		return [4]string{}, errTTDReached
+	}
+	interrupt := new(atomic.Int32)
+	timer := time.AfterFunc(w.newpayloadTimeout, func() {
+		interrupt.Store(commitInterruptTimeout)
+	})
+	err = w.fillTransactions(interrupt, work)
+	timer.Stop()
+	if errors.Is(err, errBlockInterruptedByTimeout) {
+		log.Warn("Block building is interrupted", "allowance", common.PrettyDuration(w.newpayloadTimeout))
+	}
+	// Withdrawals are set to nil here, because this is only called in PoW.
+	block, err := w.engine.FinalizeAndAssemble(w.chain, work.header, work.state, work.txs, work.unclelist(), work.receipts, nil)
+	if err != nil {
+		return [4]string{}, err
+	}
+	// Register the task before handing out the work package, so that resultLoop
+	// always finds it when a solution comes back.
+	sealhash := w.engine.SealHash(block.Header())
+	task := &task{receipts: work.receipts, state: work.state, block: block, createdAt: time.Now()}
+	w.pendingMu.Lock()
+	w.pendingTasks[sealhash] = task
+	w.pendingMu.Unlock()
+
+	pkg, err := sealer.AddRemoteWork(block, w.resultCh)
+	if err != nil {
+		w.pendingMu.Lock()
+		if w.pendingTasks[sealhash] == task {
+			delete(w.pendingTasks, sealhash)
+		}
+		w.pendingMu.Unlock()
+		return [4]string{}, err
+	}
+	log.Debug("Created remote sealing work", "number", block.Number(), "sealhash", sealhash, "coinbase", coinbase,
+		"uncles", len(block.Uncles()), "txs", len(block.Transactions()), "gas", block.GasUsed(),
+		"elapsed", common.PrettyDuration(time.Since(start)))
+	return pkg, nil
+}
+
+// remoteWorkSealer returns the consensus engine as a remoteWorkSealer, looking
+// through a wrapping engine (e.g. beacon), or nil if it is not supported.
+func (w *worker) remoteWorkSealer() remoteWorkSealer {
+	engine := w.engine
+	if wrapper, ok := engine.(interface{ InnerEngine() consensus.Engine }); ok {
+		engine = wrapper.InnerEngine()
+	}
+	sealer, _ := engine.(remoteWorkSealer)
+	return sealer
+}
+
 // commitWork generates several new sealing tasks based on the parent block
 // and submit them to the sealer.
 func (w *worker) commitWork(interrupt *atomic.Int32, noempty bool, timestamp int64) {
@@ -1412,6 +1522,25 @@ func (w *worker) getSealingBlock(params *generateParams) *newPayloadResult {
 		return <-req.result
 	case <-w.exitCh:
 		return &newPayloadResult{err: errors.New("miner closed")}
+	}
+}
+
+// getWorkFor returns a remote sealing work package, in the eth_getWork format,
+// whose block pays the given coinbase. The block is generated on the main loop.
+func (w *worker) getWorkFor(coinbase common.Address) ([4]string, error) {
+	if coinbase == (common.Address{}) {
+		return [4]string{}, errZeroCoinbase
+	}
+	req := &getWorkForReq{
+		coinbase: coinbase,
+		result:   make(chan *getWorkForResult, 1),
+	}
+	select {
+	case w.getWorkForCh <- req:
+		res := <-req.result
+		return res.work, res.err
+	case <-w.exitCh:
+		return [4]string{}, errors.New("miner closed")
 	}
 }
 

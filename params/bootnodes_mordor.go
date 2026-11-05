@@ -19,7 +19,5 @@ package params
 // MordorBootnodes are the enode URLs of the P2P bootstrap nodes running on
 // the Ethereum Classic Mordor network.
 // https://github.com/etclabscore/mordor/blob/master/static-nodes.json
-var MordorBootnodes = []string{
-	"enode://4539a067ae1f6a7ffac509603ba37baf772fc832880ddc67c53f292b6199fb048267f0311c820bc90bfd39ec663bc6b5256bdf787ec38425c82bde6bc2bcfe3c@24.199.107.164:30303", // @etccoop-sfo
-}
+var MordorBootnodes = []string{}
 var MordorDNSNetwork1 = dnsPrefixETC + "all.mordor.blockd.info"

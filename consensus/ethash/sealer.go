@@ -46,6 +46,7 @@ const (
 var (
 	errNoMiningWork      = errors.New("no mining work available yet")
 	errInvalidSealResult = errors.New("invalid or stale proof-of-work solution")
+	errNotSupported      = errors.New("not supported")
 )
 
 // makePoissonFakeDelay uses the ethash.threads value as a mean time (lambda)
@@ -250,6 +251,7 @@ type remoteSealer struct {
 	notifyURLs   []string
 	results      chan<- *types.Block
 	workCh       chan *sealTask   // Notification channel to push new work and relative result channel to remote sealer
+	addWorkCh    chan *addWork    // Channel used to register additional work packages without replacing the current one
 	fetchWorkCh  chan *sealWork   // Channel used for remote sealer to fetch mining work
 	submitWorkCh chan *mineResult // Channel used for remote sealer to submit their mining result
 	fetchRateCh  chan chan uint64 // Channel used to gather submitted hash rate for local or remote sealer.
@@ -288,6 +290,16 @@ type sealWork struct {
 	res  chan [4]string
 }
 
+// addWork wraps an additional block to be registered as a work package with
+// the remote sealer, together with the channel to deliver its solution on.
+type addWork struct {
+	block   *types.Block
+	results chan<- *types.Block
+
+	errc chan error
+	res  chan [4]string
+}
+
 func startRemoteSealer(ethash *Ethash, urls []string, noverify bool) *remoteSealer {
 	ctx, cancel := context.WithCancel(context.Background())
 	s := &remoteSealer{
@@ -299,6 +311,7 @@ func startRemoteSealer(ethash *Ethash, urls []string, noverify bool) *remoteSeal
 		works:        make(map[common.Hash]*types.Block),
 		rates:        make(map[common.Hash]hashrate),
 		workCh:       make(chan *sealTask),
+		addWorkCh:    make(chan *addWork),
 		fetchWorkCh:  make(chan *sealWork),
 		submitWorkCh: make(chan *mineResult),
 		fetchRateCh:  make(chan chan uint64),
@@ -329,6 +342,21 @@ func (s *remoteSealer) loop() {
 			s.results = work.results
 			s.makeWork(work.block)
 			s.notifyWork()
+
+		case req := <-s.addWorkCh:
+			// Register an additional work package (e.g. a block built for a
+			// different coinbase). The current work is left untouched and no
+			// notification is sent.
+			if s.currentBlock == nil {
+				req.errc <- errNoMiningWork
+				continue
+			}
+			if s.results == nil {
+				s.results = req.results
+			}
+			hash, work := s.workPackage(req.block)
+			s.works[hash] = req.block
+			req.res <- work
 
 		case work := <-s.fetchWorkCh:
 			// Return current mining work to remote miner.
@@ -391,17 +419,60 @@ func (s *remoteSealer) loop() {
 //	result[2], 32 bytes hex encoded boundary condition ("target"), 2^256/difficulty
 //	result[3], hex encoded block number
 func (s *remoteSealer) makeWork(block *types.Block) {
-	hash := s.ethash.SealHash(block.Header())
-	epochLength := calcEpochLength(block.NumberU64(), s.ethash.config.ECIP1099Block)
-	epoch := calcEpoch(block.NumberU64(), epochLength)
-	s.currentWork[0] = hash.Hex()
-	s.currentWork[1] = common.BytesToHash(SeedHash(epoch, epochLength)).Hex()
-	s.currentWork[2] = common.BytesToHash(new(big.Int).Div(two256, block.Difficulty()).Bytes()).Hex()
-	s.currentWork[3] = hexutil.EncodeBig(block.Number())
+	hash, work := s.workPackage(block)
+	s.currentWork = work
 
 	// Trace the seal work fetched by remote sealer.
 	s.currentBlock = block
 	s.works[hash] = block
+}
+
+// workPackage returns the seal hash of the given block and its work package in
+// the format described at makeWork.
+func (s *remoteSealer) workPackage(block *types.Block) (common.Hash, [4]string) {
+	hash := s.ethash.SealHash(block.Header())
+	epochLength := calcEpochLength(block.NumberU64(), s.ethash.config.ECIP1099Block)
+	epoch := calcEpoch(block.NumberU64(), epochLength)
+
+	var work [4]string
+	work[0] = hash.Hex()
+	work[1] = common.BytesToHash(SeedHash(epoch, epochLength)).Hex()
+	work[2] = common.BytesToHash(new(big.Int).Div(two256, block.Difficulty()).Bytes()).Hex()
+	work[3] = hexutil.EncodeBig(block.Number())
+	return hash, work
+}
+
+// AddRemoteWork registers block as an additional work package with the remote
+// sealer and returns it in the same format as eth_getWork. Unlike Seal, it does
+// not replace the current work returned by eth_getWork, does not notify the
+// configured remote miners and does not start local mining.
+//
+// Valid solutions submitted via eth_submitWork are delivered on the result
+// channel of the regular sealing work (results is only used if none has been
+// registered yet), so callers should pass the same channel they pass to Seal.
+// The package stays submittable for the same staleness window as regular work
+// packages. An error is returned if no regular mining work exists yet.
+func (ethash *Ethash) AddRemoteWork(block *types.Block, results chan<- *types.Block) ([4]string, error) {
+	if ethash.remote == nil {
+		return [4]string{}, errNotSupported
+	}
+	req := &addWork{
+		block:   block,
+		results: results,
+		errc:    make(chan error, 1),
+		res:     make(chan [4]string, 1),
+	}
+	select {
+	case ethash.remote.addWorkCh <- req:
+	case <-ethash.remote.exitCh:
+		return [4]string{}, errEthashStopped
+	}
+	select {
+	case work := <-req.res:
+		return work, nil
+	case err := <-req.errc:
+		return [4]string{}, err
+	}
 }
 
 // notifyWork notifies all the specified mining endpoints of the availability of

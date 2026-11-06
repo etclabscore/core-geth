@@ -1284,6 +1284,7 @@ var allRPCMethods = []string{
 	"ethash_getWork",
 	"ethash_submitHashrate",
 	"ethash_submitWork",
+	"miner_getWorkFor",
 	"miner_setEtherbase",
 	"miner_setExtra",
 	"miner_setGasLimit",

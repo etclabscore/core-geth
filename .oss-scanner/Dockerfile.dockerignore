@@ -1,0 +1,3 @@
+# Replaces the root .dockerignore for .oss-scanner/Dockerfile, which needs the test files.
+build/_workspace
+build/_bin

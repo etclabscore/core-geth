@@ -84,6 +84,23 @@ func (api *MinerAPI) SetEtherbase(etherbase common.Address) bool {
 	return true
 }
 
+// GetWorkFor returns a new proof-of-work package, in the same format as
+// eth_getWork, for a block built on top of the current chain head whose block
+// reward and fees go to the given coinbase instead of the configured etherbase.
+// Solutions are submitted with eth_submitWork. The work returned by eth_getWork
+// is not affected. Every call assembles a full block, which is why this method
+// is part of the miner namespace.
+//
+// The work package consists of 4 strings:
+//
+//	result[0] - 32 bytes hex encoded block header pow-hash
+//	result[1] - 32 bytes hex encoded seed hash used for DAG
+//	result[2] - 32 bytes hex encoded boundary condition ("target"), 2^256/difficulty
+//	result[3] - hex encoded block number
+func (api *MinerAPI) GetWorkFor(coinbase common.Address) ([4]string, error) {
+	return api.e.Miner().GetWorkFor(coinbase)
+}
+
 // SetRecommitInterval updates the interval for miner sealing work recommitting.
 func (api *MinerAPI) SetRecommitInterval(interval int) {
 	api.e.Miner().SetRecommitInterval(time.Duration(interval) * time.Millisecond)

@@ -316,3 +316,108 @@ func TestStaleSubmission(t *testing.T) {
 		}
 	}
 }
+
+// Tests that additional work packages can be registered with the remote sealer
+// without replacing the current work or notifying remote miners, and that
+// solutions for both kinds of packages are accepted.
+func TestRemoteAddWork(t *testing.T) {
+	// Start a simple web server to capture notifications.
+	sink := make(chan [4]string, 4)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		blob, err := io.ReadAll(req.Body)
+		if err != nil {
+			t.Errorf("failed to read miner notification: %v", err)
+		}
+		var work [4]string
+		if err := json.Unmarshal(blob, &work); err != nil {
+			t.Errorf("failed to unmarshal miner notification: %v", err)
+		}
+		sink <- work
+	}))
+	defer server.Close()
+
+	ethash := NewTester([]string{server.URL}, true)
+	ethash.SetThreads(-1) // Remote sealing only
+	defer ethash.Close()
+	api := &API{ethash}
+
+	var (
+		results = make(chan *types.Block, 4)
+		base    = types.NewBlockWithHeader(&types.Header{Number: big.NewInt(1), Difficulty: big.NewInt(100000000)})
+		payee   = common.HexToAddress("0x00000000000000000000000000000000000a11ce")
+		header  = &types.Header{Number: big.NewInt(1), Coinbase: payee, Difficulty: big.NewInt(200000000)}
+		extra   = types.NewBlockWithHeader(header)
+
+		fakeNonce, fakeDigest = types.BlockNonce{0x01, 0x02, 0x03}, common.HexToHash("deadbeef")
+	)
+	// Additional work requires regular work to exist.
+	if _, err := ethash.AddRemoteWork(extra, results); err != errNoMiningWork {
+		t.Fatalf("add work without regular work: have %v, want %v", err, errNoMiningWork)
+	}
+	ethash.Seal(nil, base, results, nil)
+	current, err := api.GetWork()
+	if err != nil {
+		t.Fatalf("failed to get regular work: %v", err)
+	}
+
+	work, err := ethash.AddRemoteWork(extra, results)
+	if err != nil {
+		t.Fatalf("failed to add work: %v", err)
+	}
+	if want := ethash.SealHash(header).Hex(); work[0] != want {
+		t.Errorf("sealhash mismatch: have %s, want %s", work[0], want)
+	}
+	if work[1] != current[1] {
+		t.Errorf("seed hash mismatch: have %s, want %s", work[1], current[1])
+	}
+	if want := common.BytesToHash(new(big.Int).Div(two256, header.Difficulty).Bytes()).Hex(); work[2] != want {
+		t.Errorf("boundary mismatch: have %s, want %s", work[2], want)
+	}
+	if work[3] != "0x1" {
+		t.Errorf("block number mismatch: have %s, want 0x1", work[3])
+	}
+	// The regular work must not be replaced.
+	if have, err := api.GetWork(); err != nil || have != current {
+		t.Errorf("regular work changed: have %v (err %v), want %v", have, err, current)
+	}
+	// Both packages are submittable.
+	for _, c := range []struct {
+		sealhash common.Hash
+		coinbase common.Address
+	}{{ethash.SealHash(header), payee}, {ethash.SealHash(base.Header()), common.Address{}}} {
+		if !api.SubmitWork(fakeNonce, c.sealhash, fakeDigest) {
+			t.Fatalf("solution for %x rejected", c.sealhash)
+		}
+		select {
+		case res := <-results:
+			if ethash.SealHash(res.Header()) != c.sealhash {
+				t.Errorf("sealhash mismatch: have %x, want %x", ethash.SealHash(res.Header()), c.sealhash)
+			}
+			if res.Coinbase() != c.coinbase {
+				t.Errorf("coinbase mismatch: have %x, want %x", res.Coinbase(), c.coinbase)
+			}
+			if res.Nonce() != fakeNonce.Uint64() || res.MixDigest() != fakeDigest {
+				t.Errorf("seal mismatch: nonce %x digest %x", res.Nonce(), res.MixDigest())
+			}
+		case <-time.After(time.Second):
+			t.Fatalf("result for %x timed out", c.sealhash)
+		}
+	}
+	// Remote miners must only be notified of the regular work. Notifications
+	// time out after remoteSealerTimeout, so wait a bit longer than that.
+	timeout := time.After(remoteSealerTimeout + 500*time.Millisecond)
+	for done := false; !done; {
+		select {
+		case notified := <-sink:
+			if notified[0] != current[0] {
+				t.Errorf("unexpected notification for %s", notified[0])
+			}
+		case <-timeout:
+			done = true
+		}
+	}
+	// Engines without a remote sealer don't support additional work.
+	if _, err := NewFaker().AddRemoteWork(extra, results); err != errNotSupported {
+		t.Errorf("faker: have %v, want %v", err, errNotSupported)
+	}
+}
